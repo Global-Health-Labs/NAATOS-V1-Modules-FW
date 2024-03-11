@@ -1,0 +1,16 @@
+*.emSession
+*.jlink
+
+*.o
+*.d
+*.ind
+*.ld
+*.elf
+*.hex
+*.map
+
+*.mp4
+*.mp3
+
+application/solution/Output/*
+bootloader/solution/Output/*
