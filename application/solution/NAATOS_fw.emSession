@@ -38,7 +38,7 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="38" y="533" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/main.c" selected="1" top="507" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="98" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/main.c" selected="1" top="98" codecName="Default"/>
  </Files>
  <ARMCrossStudioWindow activeProject="NAATOS_fw" fileDialogDefaultFilter="*.c;*.cpp;*.cxx;*.cc;*.h;*.hpp;*.hxx" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>
