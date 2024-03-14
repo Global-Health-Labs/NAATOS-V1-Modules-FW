@@ -67,4 +67,8 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\logger.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sensors.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\heater.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\usb.h
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\usb.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_queues.h \
+ ../sdk/external/freertos/source/include/queue.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_structs.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_config.h
