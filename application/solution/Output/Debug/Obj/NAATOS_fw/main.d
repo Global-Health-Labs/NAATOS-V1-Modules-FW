@@ -64,7 +64,7 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/modules/nrfx/drivers/include/nrfx_power_clock.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\states.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\battery.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\heater.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\logger.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sensors.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\heater.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\usb.h

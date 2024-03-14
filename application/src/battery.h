@@ -1,4 +1,4 @@
 #pragma once
 
-void battery_task();
+void battery_task(void * pvParameters);
 

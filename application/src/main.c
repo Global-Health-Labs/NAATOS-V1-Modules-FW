@@ -9,6 +9,7 @@ Purpose : NAATOS Application Start
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "timers.h"
@@ -20,13 +21,18 @@ Purpose : NAATOS Application Start
 
 #include "states.h"
 #include "battery.h"
-#include "heater.h"
 #include "logger.h"
 #include "sensors.h"
+#include "heater.h"
 #include "usb.h"
 
-// Main Task Handle
+// Task Handles
 xTaskHandle mainTaskHandle;
+xTaskHandle heaterTaskHandle;
+xTaskHandle loggerTaskHandle;
+xTaskHandle sensorsTaskHandle;
+xTaskHandle batteryTaskHandle;
+xTaskHandle usbTaskHandle;
 
 // Main State
 main_state_t main_state;
@@ -58,6 +64,41 @@ void create_tasks() {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating main task. Error: %d\n", xReturned);
       vTaskDelete( mainTaskHandle );
+  }
+  // Heater Task
+  xReturned = xTaskCreate(heater_task, "HeaterTask", 100, NULL, 0, &heaterTaskHandle);
+  if( xReturned != pdPASS ) {
+      /* The task was created.  Use the task's handle to delete the task. */
+      printf("Error creating heater task. Error: %d\n", xReturned);
+      vTaskDelete( heaterTaskHandle );
+  }
+  // Logger Task
+  xReturned = xTaskCreate(logger_task, "LoggerTask", 100, NULL, 0, &loggerTaskHandle);
+  if( xReturned != pdPASS ) {
+      /* The task was created.  Use the task's handle to delete the task. */
+      printf("Error creating logger task. Error: %d\n", xReturned);
+      vTaskDelete( loggerTaskHandle );
+  }
+  // Sensors Task
+  xReturned = xTaskCreate(sensors_task, "SensorsTask", 100, NULL, 0, &sensorsTaskHandle);
+  if( xReturned != pdPASS ) {
+      /* The task was created.  Use the task's handle to delete the task. */
+      printf("Error creating sensors task. Error: %d\n", xReturned);
+      vTaskDelete( sensorsTaskHandle );
+  }
+  // Battery Management Task
+  xReturned = xTaskCreate(battery_task, "BatteryTask", 100, NULL, 0, &batteryTaskHandle);
+  if( xReturned != pdPASS ) {
+      /* The task was created.  Use the task's handle to delete the task. */
+      printf("Error creating battery management task. Error: %d\n", xReturned);
+      vTaskDelete( batteryTaskHandle );
+  }
+  // USB Management Task
+  xReturned = xTaskCreate(usb_task, "USBTask", 100, NULL, 0, &usbTaskHandle);
+  if( xReturned != pdPASS ) {
+      /* The task was created.  Use the task's handle to delete the task. */
+      printf("Error creating usb management task. Error: %d\n", xReturned);
+      vTaskDelete( usbTaskHandle );
   }
 }
 

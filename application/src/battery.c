@@ -6,7 +6,11 @@
 *   Application entry point.
 */
 
-void battery_task() {
+#include "battery.h"
+
+void battery_task(void * pvParameters) {
   for (;;) {
+    printf("In the battery management task :)\n");
+    vTaskDelay(1000);
   }
 }
