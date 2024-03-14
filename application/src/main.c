@@ -39,7 +39,7 @@ main_state_t main_state;
 */
 void main_task(void * pvParameters) {
   for (;;) {
-    printf("In the main task");
+    printf("In the main task :)\n");
     vTaskDelay(1000);
   }
 }
@@ -52,8 +52,13 @@ void main_task(void * pvParameters) {
 */
 void create_tasks() {
   BaseType_t xReturned;
-
-  xReturned = xTaskCreate(main_task, "MainTask", 2048, NULL, 2, &mainTaskHandle);
+  // Main Task
+  xReturned = xTaskCreate(main_task, "MainTask", 100, NULL, 0, &mainTaskHandle);
+  if( xReturned != pdPASS ) {
+      /* The task was created.  Use the task's handle to delete the task. */
+      printf("Error creating main task. Error: %d\n", xReturned);
+      vTaskDelete( mainTaskHandle );
+  }
 }
 
 /*********************************************************************
@@ -91,6 +96,7 @@ int main(void) {
   // Create Queues
   create_queues();
 
+  printf("Starting Tasks\n");
   // Start Tasks
   vTaskStartScheduler();
 }

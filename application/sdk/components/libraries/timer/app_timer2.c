@@ -72,7 +72,7 @@ NRF_LOG_MODULE_REGISTER();
 /* Check if timer is idle */
 #define APP_TIMER_IS_IDLE(timer) (timer->end_val == APP_TIMER_IDLE_VAL)
 
-static drv_rtc_t m_rtc_inst = DRV_RTC_INSTANCE(1);
+static drv_rtc_t m_rtc_inst = DRV_RTC_INSTANCE(0);
 
 #if APP_TIMER_WITH_PROFILER
 static uint8_t m_max_user_op_queue_utilization;     /**< Maximum observed timer user operations queue utilization. */

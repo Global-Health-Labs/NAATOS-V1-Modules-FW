@@ -348,12 +348,12 @@ void drv_rtc_rtc_0_irq_handler(void)
 }
 #endif
 
-//#if defined(APP_TIMER_V2_RTC1_ENABLED)
-//void drv_rtc_rtc_1_irq_handler(void)
-//{
-//    m_handlers[DRV_RTC_RTC1_INST_IDX](m_cb[DRV_RTC_RTC1_INST_IDX].p_instance);
-//}
-//#endif
+#if defined(APP_TIMER_V2_RTC1_ENABLED)
+void drv_rtc_rtc_1_irq_handler(void)
+{
+    m_handlers[DRV_RTC_RTC1_INST_IDX](m_cb[DRV_RTC_RTC1_INST_IDX].p_instance);
+}
+#endif
 
 #if defined(APP_TIMER_V2_RTC2_ENABLED)
 void drv_rtc_rtc_2_irq_handler(void)
