@@ -26,7 +26,6 @@ Purpose : NAATOS Application Start
 #include "heater.h"
 #include "usb.h"
 #include "naatos_queues.h"
-#include "naatos_structs.h"
 #include "naatos_config.h"
 
 // Task Handles
@@ -36,6 +35,9 @@ xTaskHandle loggerTaskHandle;
 xTaskHandle sensorsTaskHandle;
 xTaskHandle batteryTaskHandle;
 xTaskHandle usbTaskHandle;
+
+xQueueHandle main_batteryDataQueue;
+xQueueHandle main_switchQueue;
 
 /*********************************************************************
 *
@@ -60,6 +62,7 @@ void main_task(void * pvParameters) {
       // In Standby State
       case STANDBY:
         // Check for Battery Data in Battery Queue
+        printf("Current size of main_batteryDataQueue: %d\n", uxQueueMessagesWaiting(main_batteryDataQueue));
         if (uxQueueMessagesWaiting(main_batteryDataQueue) > 0) {
           xReturned = xQueueReceive(main_batteryDataQueue, &percent_recv, portMAX_DELAY);
           if (xReturned != pdPASS) {
@@ -161,17 +164,37 @@ void create_tasks() {
 void create_queues() {
   // Main Task Queues
   main_batteryDataQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));        // TODO: Update sizes, int is just the placeholder 
+  if (main_batteryDataQueue == NULL)
+    printf("Unable to create main_batteryDataQueue queue\n");
   main_switchQueue = xQueueCreate(1, sizeof(int));
+  if (main_switchQueue == NULL)
+    printf("Unable to create main_switchQueue queue\n");
+
   // Heater Task Queues
   heater_zoneRunQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
+  if (heater_zoneRunQueue == NULL)
+    printf("Unable to create heater_zoneRunQueue queue\n");
   heater_temperatureDataQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
+  if (heater_temperatureDataQueue == NULL)
+    printf("Unable to create heater_temperatureDataQueue queue\n");
+
   // Battery Management Task Queues
   battery_requestPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
+  if (battery_requestPercentQueue == NULL)
+    printf("Unable to create battery_requestPercentQueue queue\n");
+
   // USB Management Task Queues
   usb_stateChangeQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
+  if (usb_stateChangeQueue == NULL)
+    printf("Unable to create usb_stateChangeQueue queue\n");
+
   // Logger Task Queues
   logger_recvBattPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
+  if (logger_recvBattPercentQueue == NULL)
+    printf("Unable to create logger_recvBattPercentQueue queue\n");
   logger_logMessageQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
+  if (logger_logMessageQueue == NULL)
+    printf("Unable to create logger_logMessageQueue queue\n");
 }
 
 /*********************************************************************

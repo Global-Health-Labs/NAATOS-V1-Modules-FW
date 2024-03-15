@@ -125,7 +125,6 @@
       <file file_name="../src/usb.c" />
       <file file_name="../src/usb.h" />
       <file file_name="../src/naatos_queues.h" />
-      <file file_name="../src/naatos_structs.h" />
       <file file_name="../src/naatos_config.h" />
     </folder>
     <folder Name="nRF_Segger_RTT">

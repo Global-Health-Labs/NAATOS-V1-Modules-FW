@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NAATOS_QUEUES_H
+#define NAATOS_QUEUES_H
 
 #include "FreeRTOS.h"
 #include "queue.h"
@@ -6,19 +7,21 @@
 #define QUEUE_SIZE  5
 
 // Main Task Queue(s)
-xQueueHandle main_batteryDataQueue;
-xQueueHandle main_switchQueue;
+extern xQueueHandle main_batteryDataQueue;
+extern xQueueHandle main_switchQueue;
 
 // Heater Task Queue(s)
-xQueueHandle heater_zoneRunQueue;
-xQueueHandle heater_temperatureDataQueue;
+extern xQueueHandle heater_zoneRunQueue;
+extern xQueueHandle heater_temperatureDataQueue;
 
 // Battery Management Task Queue(s)
-xQueueHandle battery_requestPercentQueue;
+extern xQueueHandle battery_requestPercentQueue;
 
 // USB Management Task Queue(s)
-xQueueHandle usb_stateChangeQueue;
+extern xQueueHandle usb_stateChangeQueue;
 
 // Logger Task Queue(s)
-xQueueHandle logger_recvBattPercentQueue;
-xQueueHandle logger_logMessageQueue;
+extern xQueueHandle logger_recvBattPercentQueue;
+extern xQueueHandle logger_logMessageQueue;
+
+#endif
