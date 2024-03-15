@@ -63,16 +63,15 @@ void main_task(void * pvParameters) {
       case STANDBY:
         // Check for Battery Data in Battery Queue
         printf("Current size of main_batteryDataQueue: %d\n", uxQueueMessagesWaiting(main_batteryDataQueue));
-        if (uxQueueMessagesWaiting(main_batteryDataQueue) > 0) {
-          xReturned = xQueueReceive(main_batteryDataQueue, &percent_recv, portMAX_DELAY);
-          if (xReturned != pdPASS) {
-            printf("Error receiving battery percentage from main_batteryDataQueue\n");
-          }
-          else if (percent_recv < LOW_POWER_THRESHOLD) {
+        if (xQueueReceive(main_batteryDataQueue, &percent_recv, 0) == pdPASS) {
+          if (percent_recv < LOW_POWER_THRESHOLD) {
              main_state = LOW_POWER;
              break;
           }
-          printf("Got battery percentage in main_batteryDataQueue\n");
+          printf("Got battery percentage in main_batteryDataQueue: %d \n",percent_recv);
+        }
+        else {
+          printf("Error receiving battery percentage from main_batteryDataQueue\n");
         }
         // Wait for Sensor Switch Data 
         xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
@@ -166,7 +165,7 @@ void create_queues() {
   main_batteryDataQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));        // TODO: Update sizes, int is just the placeholder 
   if (main_batteryDataQueue == NULL)
     printf("Unable to create main_batteryDataQueue queue\n");
-  main_switchQueue = xQueueCreate(1, sizeof(int));
+  main_switchQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
   if (main_switchQueue == NULL)
     printf("Unable to create main_switchQueue queue\n");
 

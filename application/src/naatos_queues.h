@@ -4,7 +4,7 @@
 #include "FreeRTOS.h"
 #include "queue.h"
 
-#define QUEUE_SIZE  5
+#define QUEUE_SIZE  1
 
 // Main Task Queue(s)
 extern xQueueHandle main_batteryDataQueue;
