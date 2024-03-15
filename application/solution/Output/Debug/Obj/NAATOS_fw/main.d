@@ -1,12 +1,12 @@
 Output/Debug/Obj/NAATOS_fw/main.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\main.c \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdio.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdlib.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdbool.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\main.c \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdlib.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  ../sdk/external/freertos/source/include/FreeRTOS.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stddef.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stddef.h \
  ../sdk/external/freertos/config/FreeRTOSConfig.h \
  ../sdk/components/libraries/util/app_util_platform.h \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
@@ -62,13 +62,13 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/modules/nrfx/drivers/include/nrfx_clock.h \
  ../sdk/modules/nrfx/hal/nrf_clock.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_power_clock.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\states.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\battery.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\logger.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sensors.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\heater.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\usb.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_queues.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\states.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\battery.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\logger.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\sensors.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\heater.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\usb.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\naatos_queues.h \
  ../sdk/external/freertos/source/include/queue.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_structs.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_config.h
+ C\:\Nordic\NAATOS_fw_src\application\src\naatos_structs.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\naatos_config.h

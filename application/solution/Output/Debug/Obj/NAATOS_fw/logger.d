@@ -1,3 +1,3 @@
 Output/Debug/Obj/NAATOS_fw/logger.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\logger.c \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\logger.h
+ C\:\Nordic\NAATOS_fw_src\application\src\logger.c \
+ C\:\Nordic\NAATOS_fw_src\application\src\logger.h

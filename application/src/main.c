@@ -197,6 +197,11 @@ int main(void) {
 
   // Start Tasks
   vTaskStartScheduler();
+  while(1)
+  {
+      /* FreeRTOS should not be here... FreeRTOS goes back to the start of stack
+         * in vTaskStartScheduler function. */
+  }
 }
 
 /*************************** End of file ****************************/

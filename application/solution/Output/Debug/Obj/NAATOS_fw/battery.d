@@ -1,3 +1,3 @@
 Output/Debug/Obj/NAATOS_fw/battery.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\battery.c \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\battery.h
+ C\:\Nordic\NAATOS_fw_src\application\src\battery.c \
+ C\:\Nordic\NAATOS_fw_src\application\src\battery.h

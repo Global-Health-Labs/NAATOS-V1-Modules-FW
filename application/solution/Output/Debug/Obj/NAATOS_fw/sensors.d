@@ -1,3 +1,3 @@
 Output/Debug/Obj/NAATOS_fw/sensors.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sensors.c \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sensors.h
+ C\:\Nordic\NAATOS_fw_src\application\src\sensors.c \
+ C\:\Nordic\NAATOS_fw_src\application\src\sensors.h
