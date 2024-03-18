@@ -39,6 +39,24 @@ xTaskHandle usbTaskHandle;
 xQueueHandle main_batteryDataQueue;
 xQueueHandle main_switchQueue;
 
+// Zone Request Constants
+const zone_run_req_t run_amplification_zone = {
+  .on = true,
+  .zone = AMPLIFICATION
+};
+const zone_run_req_t run_valve_zone = {
+  .on = true,
+  .zone = VALVE
+};
+const zone_run_req_t stop_amplification_zone = {
+  .on = false, 
+  .zone = AMPLIFICATION
+};
+const zone_run_req_t stop_valve_zone = {
+  .on = false,
+  .zone = VALVE
+};
+
 /*********************************************************************
 *
 *       main_task()
@@ -62,23 +80,22 @@ void main_task(void * pvParameters) {
       // In Standby State
       case STANDBY:
         // Check for Battery Data in Battery Queue
-        printf("Current size of main_batteryDataQueue: %d\n", uxQueueMessagesWaiting(main_batteryDataQueue));
         if (xQueueReceive(main_batteryDataQueue, &percent_recv, 0) == pdPASS) {
           if (percent_recv < LOW_POWER_THRESHOLD) {
              main_state = LOW_POWER;
              break;
           }
-          printf("Got battery percentage in main_batteryDataQueue: %d \n",percent_recv);
+          printf("MAIN_TASK: Got battery percentage in main_batteryDataQueue: %d \n",percent_recv);
         }
         else {
-          printf("Error receiving battery percentage from main_batteryDataQueue\n");
+          printf("MAIN_TASK: Error receiving battery percentage from main_batteryDataQueue\n");
         }
         // Wait for Sensor Switch Data 
         xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
         if (xReturned != pdPASS) {
-          printf("Error receiving switch data from main_switchQueue\n");
+          printf("MAIN_TASK: Error receiving switch data from main_switchQueue\n");
         }
-        printf("Got switch data in main_switchQueue\n");
+        printf("MAIN_TASK: Got switch data in main_switchQueue\n");
         // Update switches triggered
         hal_triggered = switch_data.hal_triggered;
         optical_triggered = switch_data.optical_tiggered;
@@ -87,10 +104,76 @@ void main_task(void * pvParameters) {
           main_state = RUNNING;
         }
       break;
-      // In Running State
+      // In Running State (Will block task for the duration of the test)
       case RUNNING:
+        /* ***** Start Sample Preperation ***** */
+        // TODO: Send Start Test Preperation to log 
 
-      break;
+        /* ***** Amplification Zone Run ***** */
+        // Send start amplification message to heater queue
+        xReturned = xQueueSend(heater_zoneRunQueue, &run_amplification_zone, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send run amplification zone request.\n");
+        }
+        // TODO: Get the amplification start time
+        // Get sensor switch data ensuring sample is still in position
+        do {
+          // TODO: Get the current time
+          xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
+          hal_triggered = switch_data.hal_triggered;
+          optical_triggered = switch_data.optical_tiggered;
+          if (!hal_triggered || !optical_triggered) {
+            // TODO: Send Log Error about sample removed during run
+            main_state = STANDBY;
+            break;
+          }
+        } while (1/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
+        // Send amplification zone stop request
+        xReturned = xQueueSend(heater_zoneRunQueue, &stop_amplification_zone, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send stop amplification zone request.\n");
+        }
+        // TODO: might have to do small delay here for heater task to update
+
+        /* ***** Valve Zone Run **** */
+        // Send start valve message to heater queue
+        xReturned = xQueueSend(heater_zoneRunQueue, &run_valve_zone, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send run valve zone request.\n");
+        }
+        // TODO: Get the amplification start time
+        // Get sensor switch data ensuring sample is still in position
+        do {
+          // TODO: Get the current time
+          xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
+          hal_triggered = switch_data.hal_triggered;
+          optical_triggered = switch_data.optical_tiggered;
+          if (!hal_triggered || !optical_triggered) {
+            // TODO: Send Log Error about sample removed during run
+            main_state = STANDBY;
+            break;
+          }
+        } while (1/*TODO: Compare current time against VALVE_ON_TIME*/);
+        // Send valve zone stop request
+        xReturned = xQueueSend(heater_zoneRunQueue, &stop_valve_zone, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send stop valve zone request.\n");
+        }
+
+        // TODO: might have to do small delay here for heater task to update
+      
+        /* ***** End Sample Preperation ***** */
+        if (!hal_triggered || !optical_triggered) {
+          break;
+        }
+        // Wait for the sample to be removed prior to going back to STANDBY state
+        do {
+          xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
+          hal_triggered = switch_data.hal_triggered;
+          optical_triggered = switch_data.optical_tiggered;
+        } while(hal_triggered || optical_triggered);
+        main_state = STANDBY;
+        break;
       // In Low Power State
       case LOW_POWER:
 

@@ -35,25 +35,28 @@ void battery_task(void * pvParameters) {
     else 
       battery_percentage--;
 
-    if (battery_percentage < 1) inc = true;
+    if (battery_percentage < 22) inc = true;
     else if (battery_percentage > 99) inc = false;
 
     // Send Battery Percentage to main task
     xReturned = xQueueSend(main_batteryDataQueue, (void *)&battery_percentage, 1000); // TODO: Probably want to send full BMS information instead
     if (xReturned != pdPASS) {
-      printf("Was unable to send battery percentage to main queue. Error:%d\n", xReturned);
+      printf("BATT_TASK: Was unable to send battery percentage to main queue. Error:%d\n", xReturned);
+    }
+    else {
+      printf("BATT_TASK: Sent battery data to main task.\n");
     }
     // Check the battery request queue (logging)
     if (uxQueueMessagesWaiting(battery_requestPercentQueue) > 0) {
       // Pull off the battery request
       xReturned = xQueueReceive(battery_requestPercentQueue, &request, portMAX_DELAY);
       if (xReturned != pdPASS) {
-        printf("Was unable to pull off battery request for logger queue\n");
+        printf("BATT_TASK: Was unable to pull off battery request for logger queue\n");
       }
       // Send the Battery information
       xReturned = xQueueSend(main_batteryDataQueue, &battery_percentage, 0); // TODO: Probably want to send full BMS information instead
       if (xReturned != pdPASS) {
-        printf("Was unable to send battery information to logger queue\n");
+        printf("BATT_TASK: Was unable to send battery information to logger queue\n");
       }
     }
     vTaskDelay(500);
