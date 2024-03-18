@@ -104,6 +104,7 @@ void main_task(void * pvParameters) {
           main_state = RUNNING;
         }
       break;
+
       // In Running State (Will block task for the duration of the test)
       case RUNNING:
         /* ***** Start Sample Preperation ***** */
@@ -174,6 +175,7 @@ void main_task(void * pvParameters) {
         } while(hal_triggered || optical_triggered);
         main_state = STANDBY;
         break;
+
       // In Low Power State
       case LOW_POWER:
 
