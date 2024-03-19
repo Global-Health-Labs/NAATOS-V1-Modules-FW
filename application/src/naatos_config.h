@@ -14,6 +14,15 @@ typedef enum {
   RUNNING
 } main_state_t;
 
+typedef enum {
+  MAIN,
+  BATTERY,
+  HEATER,
+  LOGGER,
+  SENSORS, 
+  USB
+} tasks_t;
+
 // Charging Enum
 typedef enum {
   CHARGING,
@@ -29,8 +38,19 @@ typedef enum {
 // Type of update message being sent to usb queue
 typedef enum {
   USB_CONNECTION_TYPE,
-  CURRENT_STATE_TYPE
+  MAIN_STATE_TYPE
 } usb_message_type_t; 
+
+typedef enum {
+  TEMPERATURE_DATA,
+  EVENT_DATA
+} log_data_type_t;
+
+typedef enum {
+  SAMPLE_START,
+  SAMPLE_END
+  // Add more events here
+} event_t;
 
 // Holds data for Hal and Optical Switch
 typedef struct {
@@ -56,3 +76,20 @@ typedef struct {
   main_state_t current_state;
   charge_state_t charge_state;
 } usb_message_t;
+
+typedef struct {
+  event_t event;
+  char * message;
+} log_event_t;
+
+// Log Message
+typedef struct {
+  log_data_type_t data_type;
+  temperature_data_t temperature_data;
+  log_event_t event_data;
+} log_data_message_t;
+
+// Battery Request with task to send to
+typedef struct {
+  tasks_t task_req;
+} battery_percent_req_t; 

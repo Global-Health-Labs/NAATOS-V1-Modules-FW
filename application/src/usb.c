@@ -33,7 +33,7 @@ void usb_task(void * pvParameters) {
     // Update from received message
     if (recv_msg.message_type == USB_CONNECTION_TYPE) 
       connection_state = recv_msg.charge_state;
-    else if (recv_msg.message_type == CURRENT_STATE_TYPE) 
+    else if (recv_msg.message_type == MAIN_STATE_TYPE) 
       main_state = recv_msg.current_state;
 
     // Check USB Connection Status 

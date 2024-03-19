@@ -57,6 +57,21 @@ const zone_run_req_t stop_valve_zone = {
   .zone = VALVE
 };
 
+// USB Main State Update Constants
+const usb_message_t standby_update = {
+  .message_type = MAIN_STATE_TYPE,
+  .current_state = STANDBY,
+  .charge_state = NULL
+};
+const usb_message_t running_update = {
+  .message_type = MAIN_STATE_TYPE,
+  .current_state = RUNNING,
+  .charge_state = NULL
+};
+
+// Function defs
+void sendUpdatedMainTaskState(main_state_t new_state);
+
 /*********************************************************************
 *
 *       main_task()
@@ -83,6 +98,7 @@ void main_task(void * pvParameters) {
         if (xQueueReceive(main_batteryDataQueue, &percent_recv, 0) == pdPASS) {
           if (percent_recv < LOW_POWER_THRESHOLD) {
              main_state = LOW_POWER;
+             // TODO: send main state update to usb task
              break;
           }
           printf("MAIN_TASK: Got battery percentage in main_batteryDataQueue: %d \n",percent_recv);
@@ -101,7 +117,9 @@ void main_task(void * pvParameters) {
         optical_triggered = switch_data.optical_tiggered;
         // Check if we can go to RUN state
         if (hal_triggered && optical_triggered) {
+          // Set the new main state
           main_state = RUNNING;
+          // TODO: send main state update to usb task
         }
       break;
 
@@ -126,6 +144,7 @@ void main_task(void * pvParameters) {
           if (!hal_triggered || !optical_triggered) {
             // TODO: Send Log Error about sample removed during run
             main_state = STANDBY;
+            sendUpdatedMainTaskState(main_state);
             break;
           }
         } while (1/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
@@ -152,6 +171,7 @@ void main_task(void * pvParameters) {
           if (!hal_triggered || !optical_triggered) {
             // TODO: Send Log Error about sample removed during run
             main_state = STANDBY;
+            sendUpdatedMainTaskState(main_state);
             break;
           }
         } while (1/*TODO: Compare current time against VALVE_ON_TIME*/);
@@ -173,7 +193,9 @@ void main_task(void * pvParameters) {
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
         } while(hal_triggered || optical_triggered);
+        // Update current main state
         main_state = STANDBY;
+        sendUpdatedMainTaskState(main_state);
         break;
 
       // In Low Power State
@@ -185,6 +207,31 @@ void main_task(void * pvParameters) {
       break;
     }
   }
+}
+
+void sendUpdatedMainTaskState(main_state_t new_state) {
+  BaseType_t xReturned;
+  usb_message_t msg;
+  
+  // Get the update to send
+  if (new_state == RUNNING)
+    msg = running_update;
+  else if (new_state == STANDBY)
+    msg = standby_update;
+
+  // Send main state update to usb task
+  xReturned = xQueueSend(usb_stateChangeQueue, &msg, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send main state change to usb_stateChangeQueue.\n");
+  }
+  
+  // Send the state to the logger
+  xReturned = xQueueSend(logger_mainStateChangeQueue, &new_state, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send main state change to logger_mainStateChangeQueue.\n");
+  }
+
+  // TODO: might have to do small delay here for usb task to update
 }
 
 /*********************************************************************
@@ -279,6 +326,9 @@ void create_queues() {
   logger_logMessageQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
   if (logger_logMessageQueue == NULL)
     printf("Unable to create logger_logMessageQueue queue\n");
+  logger_mainStateChangeQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
+  if (logger_mainStateChangeQueue == NULL)
+    printf("Unable to create logger_mainStateChangeQueue queue\n");
 }
 
 /*********************************************************************

@@ -5,7 +5,6 @@
   <BreakpointListItem trigger="" line="512" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="../src/composite_usb.h" useHWbreakpoint="false"/>
   <BreakpointListItem trigger="" line="513" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="../src/composite_usb.h" useHWbreakpoint="false"/>
   <BreakpointListItem trigger="" line="15" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="heater.c" useHWbreakpoint="false"/>
-  <BreakpointListItem trigger="" line="23" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="../src/main.c" useHWbreakpoint="false"/>
   <Exceptions set="MemManage;UsageFault_Coprocessor;UsageFault_CheckingError;UsageFault_StateError;BusFault;ExceptionEntryReturnFault;HardFault"/>
  </Breakpoints>
  <ExecutionProfileWindow/>
@@ -61,23 +60,17 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="192" useTextEdit="1" openedFrom="D:/NAATOS/Source Code/GHL-NAATOS/application/src/battery.c" useBinaryEdit="0" left="0" path="../src/main.c" selected="1" top="164" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="15" useTextEdit="1" openedFrom="D:/NAATOS/Source Code/GHL-NAATOS/application/src/main.c" useBinaryEdit="0" left="0" path="../src/naatos_queues.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="55" y="17" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../sdk/external/freertos/config/FreeRTOSConfig.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="17" y="17" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/naatos_config.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="38" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/battery.c" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="18" y="6" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/battery.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="9" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/config/sdk_config.h" selected="0" top="39" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="31" y="4" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/heater.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="3" y="16" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/usb.c" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="35" y="4" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/usb.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="26" y="2" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/logger.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="8" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/heater.c" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="10" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/logger.c" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="46" useTextEdit="1" openedFrom="D:/NAATOS/Source Code/GHL-NAATOS/application/src/battery.c" useBinaryEdit="0" left="0" path="../sdk/external/freertos/source/include/projdefs.h" selected="0" top="6" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="3493" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../sdk/external/freertos/source/tasks.c" selected="0" top="3450" codecName=""/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="477" useTextEdit="1" openedFrom="D:/NAATOS/Source Code/GHL-NAATOS/application/src/battery.c" useBinaryEdit="0" left="0" path="../sdk/external/freertos/source/include/queue.h" selected="0" top="454" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="729" useTextEdit="1" openedFrom="D:/NAATOS/Source Code/GHL-NAATOS/application/sdk/external/freertos/source/include/queue.h" useBinaryEdit="0" left="0" path="../sdk/external/freertos/source/queue.c" selected="0" top="707" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="209" useTextEdit="1" openedFrom="D:/NAATOS/Source Code/GHL-NAATOS/application/src/battery.c" useBinaryEdit="0" left="0" path="../src/main.c" selected="0" top="143" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="37" y="8" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/sensors.c" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/sensors.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="42" y="36" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/usb.c" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="30" y="8" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/usb.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="26" y="8" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/logger.c" selected="1" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="38" y="5" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/logger.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="6" y="27" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/naatos_queues.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="28" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/naatos_config.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="10" y="45" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/battery.c" selected="0" top="21" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="4" useTextEdit="1" openedFrom="D:/NAATOS/Source Code/GHL-NAATOS/application/src/main.c" useBinaryEdit="0" left="0" path="../src/states.h" selected="0" top="0" codecName="Default"/>
  </Files>
  <ARMCrossStudioWindow activeProject="NAATOS_fw" fileDialogDefaultFilter="*.c;*.cpp;*.cxx;*.cc;*.h;*.hpp;*.hxx" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="D:/NAATOS/Source Code/GHL-NAATOS/application/src" debugSearchPath="" autoConnectCapabilities="3711"/>
 </session>
