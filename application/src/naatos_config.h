@@ -2,8 +2,10 @@
 
 #include "stdbool.h"
 
+/* Battery Parameters */
 #define LOW_POWER_THRESHOLD     20
 
+/* Heater Zones' Parameters */
 #define AMPLIFICATION_ZONE_ON_TIME  30    // Minutes
 #define VALVE_ZONE_ON_TIME          3     // Minutes
 
