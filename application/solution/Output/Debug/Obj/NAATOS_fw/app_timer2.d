@@ -1,11 +1,11 @@
 Output/Debug/Obj/NAATOS_fw/app_timer2.o: \
- C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\timer\app_timer2.c \
- C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\timer\app_timer.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\timer\app_timer2.c \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\timer\app_timer.h \
  ../src/config/sdk_config.h ../sdk/components/libraries/util/app_error.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdio.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdbool.h \
  ../sdk/modules/nrfx/mdk/nrf.h ../sdk/modules/nrfx/mdk/nrf52840.h \
  ../sdk/components/toolchain/cmsis/include/core_cm4.h \
  ../sdk/components/toolchain/cmsis/include/cmsis_version.h \
@@ -22,7 +22,7 @@ Output/Debug/Obj/NAATOS_fw/app_timer2.o: \
  ../sdk/components/libraries/util/nordic_common.h \
  ../sdk/components/libraries/util/app_error_weak.h \
  ../sdk/components/libraries/util/app_util.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stddef.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stddef.h \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
  ../sdk/components/libraries/util/nordic_common.h \
  ../sdk/components/libraries/log/nrf_log_instance.h \
@@ -50,11 +50,12 @@ Output/Debug/Obj/NAATOS_fw/app_timer2.o: \
  ../sdk/modules/nrfx/drivers/nrfx_errors.h \
  ../sdk/components/libraries/log/nrf_log.h \
  ../sdk/components/libraries/util/sdk_common.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/string.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
  ../sdk/components/libraries/util/sdk_os.h \
  ../sdk/components/libraries/util/app_util.h \
  ../sdk/components/libraries/util/sdk_macros.h \
+ ../sdk/components/libraries/strerror/nrf_strerror.h \
  ../sdk/components/libraries/log/src/nrf_log_internal.h \
  ../sdk/components/libraries/log/nrf_log_types.h \
- C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\timer\drv_rtc.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\timer\drv_rtc.h \
  ../sdk/modules/nrfx/hal/nrf_rtc.h

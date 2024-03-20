@@ -54,14 +54,18 @@
       <file file_name="../sdk/components/libraries/fifo/app_fifo.c" />
       <file file_name="../sdk/components/libraries/scheduler/app_scheduler.c" />
       <file file_name="../sdk/components/libraries/sdcard/app_sdcard.c" />
-      <file file_name="../sdk/components/libraries/timer/app_timer_freertos.c" />
+      <file file_name="../sdk/components/libraries/timer/app_timer2.c" />
       <file file_name="../sdk/components/libraries/uart/app_uart_fifo.c" />
       <file file_name="../sdk/components/libraries/usbd/app_usbd.c" />
       <file file_name="../sdk/components/libraries/usbd/app_usbd_core.c" />
       <file file_name="../sdk/components/libraries/usbd/class/msc/app_usbd_msc.c" />
       <file file_name="../sdk/components/libraries/usbd/app_usbd_string_desc.c" />
       <file file_name="../sdk/components/libraries/util/app_util_platform.c" />
-      <file file_name="../sdk/components/libraries/timer/drv_rtc.c" />
+      <file file_name="../sdk/components/libraries/timer/drv_rtc.c">
+        <configuration
+          Name="Debug"
+          c_preprocessor_definitions="APP_TIMER_V2_RTC0_ENABLED" />
+      </file>
       <file file_name="../sdk/components/libraries/hardfault/nrf52/handler/hardfault_handler_gcc.c" />
       <file file_name="../sdk/components/libraries/hardfault/hardfault_implementation.c" />
       <file file_name="../sdk/components/libraries/util/nrf_assert.c" />
@@ -104,7 +108,9 @@
       <file file_name="../sdk/components/libraries/bsp/bsp.c" />
     </folder>
     <folder Name="Application">
-      <file file_name="../src/main.c" />
+      <file file_name="../src/main.c">
+        <configuration Name="Debug" c_user_include_directories="." />
+      </file>
       <file file_name="../src/config/sdk_config.h" />
       <file file_name="../src/battery.c" />
       <file file_name="../src/battery.h" />
@@ -120,10 +126,6 @@
       <file file_name="../src/usb.h" />
       <file file_name="../src/naatos_queues.h" />
       <file file_name="../src/naatos_config.h" />
-    </folder>
-	<folder Name="hal">
-      <file file_name="../src/i2c_hal.h" />
-      <file file_name="../src/i2c_hal.c" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../sdk/external/segger_rtt/SEGGER_RTT.c" />
@@ -150,9 +152,29 @@
       <file file_name="../sdk/external/freertos/source/queue.c" />
       <file file_name="../sdk/external/freertos/source/stream_buffer.c" />
       <file file_name="../sdk/external/freertos/source/timers.c" />
+      <file file_name="../sdk/external/freertos/config/FreeRTOSConfig.h" />
+      <file file_name="../sdk/external/freertos/source/include/croutine.h" />
+      <file file_name="../sdk/external/freertos/source/include/deprecated_definitions.h" />
+      <file file_name="../sdk/external/freertos/source/include/event_groups.h" />
+      <file file_name="../sdk/external/freertos/source/include/FreeRTOS.h" />
+      <file file_name="../sdk/external/freertos/source/include/list.h" />
+      <file file_name="../sdk/external/freertos/source/include/message_buffer.h" />
+      <file file_name="../sdk/external/freertos/source/include/mpu_prototypes.h" />
+      <file file_name="../sdk/external/freertos/source/include/mpu_wrappers.h" />
+      <file file_name="../sdk/external/freertos/source/include/portable.h" />
+      <file file_name="../sdk/external/freertos/source/include/projdefs.h" />
+      <file file_name="../sdk/external/freertos/source/include/queue.h" />
+      <file file_name="../sdk/external/freertos/source/include/semphr.h" />
+      <file file_name="../sdk/external/freertos/source/include/stack_macros.h" />
+      <file file_name="../sdk/external/freertos/source/include/StackMacros.h" />
+      <file file_name="../sdk/external/freertos/source/include/stream_buffer.h" />
+      <file file_name="../sdk/external/freertos/source/include/task.h" />
+      <file file_name="../sdk/external/freertos/source/include/timers.h" />
       <file file_name="../sdk/external/freertos/portable/GCC/nrf52/port.c" />
+      <file file_name="../sdk/external/freertos/portable/GCC/nrf52/portmacro.h" />
       <file file_name="../sdk/external/freertos/portable/CMSIS/nrf52/port_cmsis.c" />
       <file file_name="../sdk/external/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c" />
+      <file file_name="../sdk/external/freertos/portable/CMSIS/nrf52/portmacro_cmsis.h" />
       <file file_name="../sdk/external/freertos/source/portable/MemMang/heap_1.c">
         <configuration Name="Debug" build_exclude_from_build="Yes" />
       </file>
@@ -169,7 +191,14 @@
         <configuration Name="Debug" build_exclude_from_build="Yes" />
       </file>
       <file file_name="../sdk/external/freertos/source/portable/Common/mpu_wrappers.c" />
+      <configuration
+        Name="Debug"
+        build_exclude_from_build="No"
+        c_preprocessor_undefinitions="APP_TIMER_V2_RTC1_ENABLED" />
     </folder>
+    <configuration
+      Name="Debug"
+      c_user_include_directories="../sdk/external/freertos/source" />
   </project>
   <configuration
     Name="Release"

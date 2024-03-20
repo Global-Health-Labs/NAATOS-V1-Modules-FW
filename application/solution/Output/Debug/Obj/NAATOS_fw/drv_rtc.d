@@ -1,11 +1,11 @@
 Output/Debug/Obj/NAATOS_fw/drv_rtc.o: \
- C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\timer\drv_rtc.c \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\timer\drv_rtc.c \
  ../sdk/modules/nrfx/nrfx.h ../sdk/integration/nrfx/nrfx_config.h \
  ../src/config/sdk_config.h ../sdk/modules/nrfx/drivers/nrfx_common.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stddef.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stddef.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdbool.h \
  ../sdk/modules/nrfx/mdk/nrf.h ../sdk/modules/nrfx/mdk/nrf52840.h \
  ../sdk/components/toolchain/cmsis/include/core_cm4.h \
  ../sdk/components/toolchain/cmsis/include/cmsis_version.h \
@@ -31,7 +31,7 @@ Output/Debug/Obj/NAATOS_fw/drv_rtc.o: \
  ../sdk/components/libraries/util/app_util_platform.h \
  ../sdk/components/libraries/util/nrf_assert.h \
  ../sdk/components/libraries/util/app_error.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdio.h \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../sdk/components/libraries/util/app_error_weak.h \
@@ -45,11 +45,12 @@ Output/Debug/Obj/NAATOS_fw/drv_rtc.o: \
  ../sdk/modules/nrfx/hal/nrf_rtc.h \
  ../sdk/components/libraries/log/nrf_log.h \
  ../sdk/components/libraries/util/sdk_common.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/string.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
  ../sdk/components/libraries/util/sdk_os.h \
  ../sdk/components/libraries/util/app_util.h \
  ../sdk/components/libraries/util/sdk_macros.h \
  ../sdk/components/libraries/experimental_section_vars/nrf_section.h \
+ ../sdk/components/libraries/strerror/nrf_strerror.h \
  ../sdk/components/libraries/log/src/nrf_log_internal.h \
  ../sdk/components/libraries/log/nrf_log_instance.h \
  ../sdk/components/libraries/log/nrf_log_types.h \
