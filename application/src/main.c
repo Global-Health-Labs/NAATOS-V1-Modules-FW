@@ -27,6 +27,7 @@ Purpose : NAATOS Application Start
 #include "usb.h"
 #include "naatos_queues.h"
 #include "naatos_config.h"
+#include "pwm.h"
 
 // Task Handles
 xTaskHandle mainTaskHandle;
@@ -35,6 +36,7 @@ xTaskHandle loggerTaskHandle;
 xTaskHandle sensorsTaskHandle;
 xTaskHandle batteryTaskHandle;
 xTaskHandle usbTaskHandle;
+xTaskHandle pwmTaskHandle;
 
 xQueueHandle main_batteryDataQueue;
 xQueueHandle main_switchQueue;
@@ -284,6 +286,13 @@ void create_tasks() {
       printf("Error creating usb management task. Error: %d\n", xReturned);
       vTaskDelete( usbTaskHandle );
   }
+  // PWM Task
+  xReturned = xTaskCreate(pwm_task, "PWMTask", 100, NULL, 0, &pwmTaskHandle);
+  if ( xReturned != pdPASS ) {
+      /* The task was created.  Use the task's handle to delete the task. */
+      printf("Error creating PWM task. Error: %d\n", xReturned);
+      vTaskDelete( pwmTaskHandle );
+  }
 }
 
 /*********************************************************************
@@ -354,6 +363,7 @@ int main(void) {
 
   // Start Tasks
   vTaskStartScheduler();
+
 }
 
 /*************************** End of file ****************************/

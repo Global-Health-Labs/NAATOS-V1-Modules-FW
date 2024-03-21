@@ -1504,6 +1504,14 @@
 // <h> nRF_Libraries 
 
 //==========================================================
+// <q> APP_PWM_ENABLED  - app_pwm - PWM functionality
+ 
+
+#ifndef APP_PWM_ENABLED
+#define APP_PWM_ENABLED 1
+#endif
+
+//==========================================================
 // <q> APP_FIFO_ENABLED  - app_fifo - Software FIFO implementation
  
 
@@ -2923,6 +2931,18 @@
 #endif
 
 // </e>
+
+// <e> NRFX_PPI_ENABLED - nrfx_ppi - PPI peripheral allocator
+//==========================================================
+#ifndef NRFX_PPI_ENABLED
+#define NRFX_PPI_ENABLED 1
+#endif
+
+// <q> PPI_ENABLED  - nrf_drv_ppi - PPI peripheral driver - legacy layer
+ 
+#ifndef PPI_ENABLED
+#define PPI_ENABLED 1
+#endif
 
 // <e> PPI_CONFIG_LOG_ENABLED - Enables logging in the module.
 //==========================================================
@@ -5393,7 +5413,7 @@
  
 
 #ifndef NRFX_TIMER0_ENABLED
-#define NRFX_TIMER0_ENABLED 0
+#define NRFX_TIMER0_ENABLED 1
 #endif
 
 // <q> NRFX_TIMER1_ENABLED  - Enable TIMER1 instance
@@ -5407,7 +5427,7 @@
  
 
 #ifndef NRFX_TIMER2_ENABLED
-#define NRFX_TIMER2_ENABLED 0
+#define NRFX_TIMER2_ENABLED 1
 #endif
 
 // <q> NRFX_TIMER3_ENABLED  - Enable TIMER3 instance

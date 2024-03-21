@@ -70,4 +70,13 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\logger.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sensors.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\heater.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\usb.h
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pid.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\usb.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pwm.h \
+ ../sdk/components/libraries/pwm/app_pwm.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_timer.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_timer.h \
+ ../sdk/modules/nrfx/hal/nrf_timer.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_ppi.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_ppi.h \
+ ../sdk/modules/nrfx/hal/nrf_ppi.h

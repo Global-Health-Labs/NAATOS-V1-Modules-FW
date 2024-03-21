@@ -37,4 +37,5 @@ Output/Debug/Obj/NAATOS_fw/heater.o: \
  ../sdk/components/libraries/util/app_util.h \
  ../sdk/external/freertos/source/include/mpu_wrappers.h \
  ../sdk/external/freertos/source/include/queue.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_config.h
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_config.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pid.h
