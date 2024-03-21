@@ -6,21 +6,21 @@
 #include "i2c_hal_freertos.h"
 #include "nrf_drv_twi.h"
 #include "nrfx_twi.h"
+#include "nrf_gpio.h"
+#include "nrf_error.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
 #include "timers.h"
+#include "semphr.h"
 
 static const nrf_drv_twi_t m_i2c[i2c_num_interfaces] = {
     NRF_DRV_TWI_INSTANCE(I2C_SYSTEM_INSTANCE_ID),
     NRF_DRV_TWI_INSTANCE(I2C_SENSOR_INSTANCE_ID),
 };
 
-static SemaphoreHandle_t m_i2c_semaphores[i2c_num_interfaces];
 
-/** Internal Variable Declaration **/
-static const nrf_drv_twi_t	twi_instance = NRF_DRV_TWI_INSTANCE( TWI_INSTANCE );				// Instance of TWI master driver that will be used for communication
-static SemaphoreHandle_t	xProtection_smphr = NULL;
+static SemaphoreHandle_t m_i2c_semaphores[i2c_num_interfaces];
 
 
 /* INIT for TWI hardware for peripheral */
@@ -39,7 +39,7 @@ void vInit_TWI_Hardware(i2c_interface_selection_t interface, uint32_t sda_pin, u
     else {
         nrf_freq = NRF_DRV_TWI_FREQ_400K;
     }
-    static const nrf_drv_twi_config_t twi_config = {
+    nrf_drv_twi_config_t twi_config = {
             .scl = scl_pin,	// SCL pin number.
             .sda = sda_pin, // SDA pin number.
             .frequency = nrf_freq, // TWI frequency.
@@ -50,14 +50,14 @@ void vInit_TWI_Hardware(i2c_interface_selection_t interface, uint32_t sda_pin, u
     err_code = nrf_drv_twi_init( &m_i2c[interface], &twi_config, NULL, NULL );
     APP_ERROR_CHECK( err_code );
     //
-    nrf_gpio_cfg( TWI_SCL_PIN, // pin_number
+    nrf_gpio_cfg( scl_pin, // pin_number
                     NRF_GPIO_PIN_DIR_INPUT, // Input.
                     NRF_GPIO_PIN_INPUT_CONNECT, // Connect input buffer.
                     NRF_GPIO_PIN_NOPULL, // Pin pull-up resistor disabled.
                     NRF_GPIO_PIN_S0S1, // Standard '0', standard '1'.
                     NRF_GPIO_PIN_NOSENSE // Pin sense level disabled.
                   );
-    nrf_gpio_cfg( TWI_SDA_PIN,	// pin_number
+    nrf_gpio_cfg( sda_pin,	// pin_number
                     NRF_GPIO_PIN_DIR_INPUT, // Input.
                     NRF_GPIO_PIN_INPUT_CONNECT, // Connect input buffer.
                     NRF_GPIO_PIN_NOPULL, // Pin pull-up resistor disabled.
@@ -92,13 +92,13 @@ ret_code_t xUtil_TWI_Read( i2c_interface_selection_t interface, uint8_t slave_ad
         nrf_drv_twi_disable( &m_i2c[interface] );
         xSemaphoreGive( m_i2c_semaphores[interface] ); // 'Give' the semaphore to unblock the blocked task.
 
-    } else { err_code = NRF_ERROR_RESOURCES; }
+    } else { err_code = NRF_ERROR_BUSY; }
 
     return err_code;
 }
 
 /*  */
-ret_code_t xUtil_TWI_Write( uint8_t slave_addr, uint8_t start_addr, uint8_t const *p_buff, uint16_t length ) {
+ret_code_t xUtil_TWI_Write( i2c_interface_selection_t interface, uint8_t slave_addr, uint8_t start_addr, uint8_t const *p_buff, uint16_t length ) {
     #ifdef VERB_HW_TWI
     NRF_LOG_INFO( "xUtil_TWI_Write:\tslave = 0x%02X\taddr = 0x%02X\tlenght = %u", slave_addr, start_addr, length );
     #endif
@@ -118,7 +118,7 @@ ret_code_t xUtil_TWI_Write( uint8_t slave_addr, uint8_t start_addr, uint8_t cons
         nrf_drv_twi_disable( &m_i2c[interface] );
         xSemaphoreGive( m_i2c_semaphores[interface] );	// 'Give' the semaphore to unblock the blocked task.
 
-    } else { err_code = NRF_ERROR_RESOURCES; }
+    } else { err_code = NRF_ERROR_BUSY; }
 
     return err_code;
 }

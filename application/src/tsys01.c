@@ -4,9 +4,7 @@
 #include <string.h>
 #include "tsys01.h"
 #include "i2c_hal.h"
-#include "delay_hal.h"
 #include "app_scheduler.h"
-#include "main.h"
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
@@ -102,13 +100,13 @@ static tsys01_errors_t tsys01_writeRegister(uint8_t reg,
     i2c_write_transaction_t i2c_trans_info;
     i2c_trans_info.p_write_data = &writeBuffer;
     i2c_trans_info.write_len = 1;
-    i2c_trans_info.addr = tsys01_ADDR;
+    i2c_trans_info.addr = TSYS01_ADDR;
     i2c_trans_info.cb = tsys01i2cDoneCallback;
     i2c_trans_info.stop = true; //single write then stop
 
     current_op_type = ts_operation;
     savedUserCallback = cb;
-    i2c_status_t i2c_trans_status = i2c_write_data(i2c_interface_master, &i2c_trans_info);//acquire data
+    i2c_status_t i2c_trans_status = i2c_write_data(i2c_interface_system, &i2c_trans_info);//acquire data
     
     if (i2c_trans_status != i2c_success) {
         sensorIsBusy = false;
@@ -134,7 +132,7 @@ static tsys01_errors_t tsys01_readRegister(uint8_t reg, tsys01_internal_op_type_
 
     //setup I2C read
     readBuffer.regSelection = reg;
-    i2c_trans_info.addr = tsys01_ADDR;
+    i2c_trans_info.addr = TSYS01_ADDR;
     i2c_trans_info.p_register_selection = &readBuffer.regSelection;
     i2c_trans_info.register_len = 1;
     i2c_trans_info.p_read_data = &readBuffer.readData[0];
@@ -149,7 +147,7 @@ static tsys01_errors_t tsys01_readRegister(uint8_t reg, tsys01_internal_op_type_
 
     current_op_type = ts_operation;
     savedUserCallback = cb;
-    i2c_status_t i2c_trans_status = i2c_write_read_with_repeated_start(i2c_interface_master, &i2c_trans_info);//acquire data
+    i2c_status_t i2c_trans_status = i2c_write_read_with_repeated_start(i2c_interface_system, &i2c_trans_info);//acquire data
     
     if (i2c_trans_status != i2c_success) {
         sensorIsBusy = false;
@@ -164,10 +162,10 @@ static tsys01_errors_t tsys01_readRegister(uint8_t reg, tsys01_internal_op_type_
 
 tsys01_errors_t tsys01_startConversion(tsys01_opDoneCallback_t cb)
 {
-    return tsys01_writeRegister(tsys01_START_CONVERSION_COMMAND, tsys01_start_conversion_op, cb);
+    return tsys01_writeRegister(TSYS01_START_CONVERSION_COMMAND, tsys01_start_conversion_op, cb);
 }
 
 tsys01_errors_t tsys01_getTemp(tsys01_opDoneCallback_t cb)
 {
-    return tsys01_readRegister(tsys01_READ_ADC_COMMAND, tsys01_read_adc_op, cb);
+    return tsys01_readRegister(TSYS01_READ_ADC_COMMAND, tsys01_read_adc_op, cb);
 }

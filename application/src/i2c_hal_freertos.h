@@ -11,6 +11,14 @@ extern "C" {
 #define I2C_SYSTEM_INSTANCE_ID 0
 #define I2C_SENSOR_INSTANCE_ID 1
 
+#define I2C_SYSTEM_SDA 16
+#define I2C_SYSTEM_SCL 17
+
+#define I2C_SENSOR_SDA 23
+#define I2C_SENSOR_SCL 24
+
+#define I2C_
+
 typedef enum {
     i2c_interface_system,
     i2c_interface_sensors,
