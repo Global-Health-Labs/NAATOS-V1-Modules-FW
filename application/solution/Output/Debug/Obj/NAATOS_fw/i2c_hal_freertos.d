@@ -6,6 +6,8 @@ Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o: \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/string.h \
  C\:\Nordic\NAATOS_fw_src\application\src\i2c_hal_freertos.h \
+ ../sdk/components/libraries/util/sdk_errors.h \
+ ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_twi.h ../sdk/modules/nrfx/nrfx.h \
  ../sdk/integration/nrfx/nrfx_config.h ../src/config/sdk_config.h \
  ../sdk/modules/nrfx/drivers/nrfx_common.h ../sdk/modules/nrfx/mdk/nrf.h \
@@ -36,11 +38,9 @@ Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o: \
  ../sdk/components/libraries/util/app_error.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
  ../sdk/components/libraries/util/sdk_errors.h \
- ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../sdk/components/libraries/util/app_error_weak.h \
  ../sdk/modules/nrfx/soc/nrfx_coredep.h \
  ../sdk/modules/nrfx/soc/nrfx_atomic.h \
- ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/libraries/util/sdk_resources.h \
  ../sdk/modules/nrfx/drivers/nrfx_errors.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_twim.h \

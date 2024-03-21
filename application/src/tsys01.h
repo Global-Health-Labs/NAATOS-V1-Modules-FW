@@ -6,7 +6,6 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "i2c_hal.h"
 
 #define TSYS01_ADDR 0b1110110
 #define TSYS01_ADDR_ALT 0b1110111
@@ -21,6 +20,14 @@ typedef enum {
     tsys01_busy,
     tsys01_timeout
 } tsys01_errors_t;
+
+typedef enum {
+    valve_zone,
+    amp_zone_1,
+    amp_zone_2,
+    amp_zone_3,
+    num_sensors
+} sensor_selection_t;
 
 typedef enum {
     tsys01_start_conversion,
@@ -40,8 +47,8 @@ typedef struct {
 
 typedef void (*tsys01_opDoneCallback_t)(tsys01_errors_t outcome, tsys01_callback_data_t *p_data);
 
-tsys01_errors_t tsys01_startConversion(tsys01_opDoneCallback_t cb);
-tsys01_errors_t tsys01_getTemp(tsys01_opDoneCallback_t cb);
+tsys01_errors_t tsys01_startConversion(sensor_selection_t sensor, tsys01_opDoneCallback_t cb);
+tsys01_errors_t tsys01_getTemp(sensor_selection_t sensor, tsys01_opDoneCallback_t cb);
 
 #ifdef __cplusplus
 }

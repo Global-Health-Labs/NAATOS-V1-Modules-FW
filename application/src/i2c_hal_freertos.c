@@ -8,6 +8,7 @@
 #include "nrfx_twi.h"
 #include "nrf_gpio.h"
 #include "nrf_error.h"
+#include "sdk_errors.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
