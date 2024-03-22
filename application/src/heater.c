@@ -11,6 +11,12 @@ temperature_data_t temperature_data;
 
 void heater_task(void * pvParameters) {
   BaseType_t xReturned;
+  
+  // TODO: REMOVE
+  update_valve_duty(90);
+  update_amp0_duty(20);
+  update_amp1_duty(70);
+  update_amp2_duty(50);
 
   // TODO: Get configuration parameters (temperature setpoints)
   

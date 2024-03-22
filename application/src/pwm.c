@@ -6,10 +6,10 @@ APP_PWM_INSTANCE(PWM2, 2); // Create instance "PWM2" using TIMER2
 static volatile bool pwm0_ready_flag = false;
 static volatile bool pwm2_ready_flag = false;
 
-static volatile unsigned int valve_duty;
-static volatile unsigned int amp0_duty;
-static volatile unsigned int amp1_duty;
-static volatile unsigned int amp2_duty;
+int valve_duty = 0;
+int amp0_duty = 0;
+int amp1_duty = 0;
+int amp2_duty = 0;
 
 static bool valve_zone_active = false;
 static bool amp0_zone_active = false;
@@ -47,12 +47,6 @@ void init_pwms() {
   /* Enable PWMs */
   app_pwm_enable(&PWM0);
   app_pwm_enable(&PWM2);
-  
-  /* Set duty cycles to 0 */
-  valve_duty = 0;
-  amp0_duty = 0;
-  amp1_duty = 0;
-  amp2_duty = 0;
 }
 
 // Updates the Valve PWM Duty Cycle
@@ -100,12 +94,6 @@ void pwm_task(void * pvParameters) {
   app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  amp0_duty);
   app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  amp1_duty);
   app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL,  amp2_duty);
-
-  // remove
-  update_valve_duty(70);
-  update_amp0_duty(50);
-  update_amp1_duty(30);
-  update_amp2_duty(10);
   
   // Main Task Loop
   for (;;) {
