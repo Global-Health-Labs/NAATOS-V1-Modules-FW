@@ -29,6 +29,7 @@ Purpose : NAATOS Application Start
 #include "naatos_config.h"
 #include "pid.h"
 #include "pwm.h"
+#include "adc.h"
 
 // Task Handles
 xTaskHandle mainTaskHandle;
@@ -355,6 +356,7 @@ int main(void) {
   APP_ERROR_CHECK(err_code);
 
   // TODO: Full Peripheral Initalizations
+  init_adc();
 
   // Create Tasks
   create_tasks();

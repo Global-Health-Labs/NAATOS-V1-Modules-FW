@@ -69,6 +69,10 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/external/freertos/source/include/queue.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\logger.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sensors.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\adc.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_saadc.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_saadc.h \
+ ../sdk/modules/nrfx/hal/nrf_saadc.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\heater.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pid.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pwm.h \

@@ -56,4 +56,8 @@ Output/Debug/Obj/NAATOS_fw/sensors.o: \
  ../sdk/components/libraries/bsp/bsp.h ../sdk/components/boards/boards.h \
  ../sdk/components/boards/pca10056.h \
  ../sdk/components/libraries/button/app_button.h \
- ../sdk/components/libraries/util/app_error.h
+ ../sdk/components/libraries/util/app_error.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\adc.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_saadc.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_saadc.h \
+ ../sdk/modules/nrfx/hal/nrf_saadc.h

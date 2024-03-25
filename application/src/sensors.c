@@ -12,7 +12,7 @@ void sensors_task(void * pvParameters) {
   // TODO: Get Configuration Settings
   for (;;) {
     // TODO: ADC Read for Optical Sensors
-    switches.optical_tiggered = false;  // Temp
+    switches.optical_tiggered = get_optical_triggered(); 
     // GPIO Read for Hall Sensor
     if (nrf_gpio_pin_read(HAL_INPUT_PIN))
      switches.hal_triggered = false;   // Temp
