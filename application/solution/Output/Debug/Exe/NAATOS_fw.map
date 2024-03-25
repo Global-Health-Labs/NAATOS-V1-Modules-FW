@@ -1,5 +1,7 @@
 Archive member included to satisfy reference by file (symbol)
 
+C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                              Output/Debug/Obj/NAATOS_fw/tsys01.o (__aeabi_dsub)
 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc_asm.o)
                               Output/Debug/Obj/NAATOS_fw/bsp.o (__aeabi_uldivmod)
 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
@@ -18,8 +20,6 @@ C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libdebugio_v7em
                               C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libdebugio_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libdebugio.o) (__do_nvdebug_operation)
 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libdebugio_v7em_fpv4_sp_d16_hard_t_le_eabi.a(mempoll_debug_operations.o)
                               (__do_debug_operation_mempoll)
-C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                              C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o) (__aeabi_dadd)
 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
                               C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libvfprintf.o) (frexp)
 
@@ -12187,6 +12187,292 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x22 Output/Debug/Obj/NAATOS_fw/adc.o
  .debug_macro   0x0000000000000000       0x94 Output/Debug/Obj/NAATOS_fw/adc.o
  .debug_macro   0x0000000000000000       0x10 Output/Debug/Obj/NAATOS_fw/adc.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .text          0x0000000000000000        0x0 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .data          0x0000000000000000        0x0 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .bss           0x0000000000000000        0x0 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .text.nrf_drv_twi_enable
+                0x0000000000000000       0x18 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .text.nrf_drv_twi_disable
+                0x0000000000000000       0x18 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .text.nrf_drv_twi_tx
+                0x0000000000000000       0x40 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .text.nrf_drv_twi_rx
+                0x0000000000000000       0x38 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .rodata        0x0000000000000000       0x95 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .text.nrf_gpio_pin_port_decode
+                0x0000000000000000       0x4c Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .text.nrf_gpio_cfg
+                0x0000000000000000       0x62 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .text.nrf_gpio_pin_present_check
+                0x0000000000000000       0x50 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .rodata.m_i2c  0x0000000000000000       0x20 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .bss.m_i2c_semaphores
+                0x0000000000000000        0x8 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .text.vInit_TWI_Hardware
+                0x0000000000000000      0x10c Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .text.xUtil_TWI_Read
+                0x0000000000000000       0xfc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .text.xUtil_TWI_Write
+                0x0000000000000000      0x100 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .bss.reg_addr.1
+                0x0000000000000000        0x1 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .bss.reg_addr.0
+                0x0000000000000000        0x1 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_frame   0x0000000000000000      0x19c Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_info    0x0000000000000000     0x115d Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_abbrev  0x0000000000000000      0x2a4 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_pubnames
+                0x0000000000000000      0x526 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_pubtypes
+                0x0000000000000000      0x2f0 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_aranges
+                0x0000000000000000       0x68 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_ranges  0x0000000000000000       0x58 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000      0x302 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000      0xacc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000      0x1a3 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x22 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x89 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x1c Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x8e Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0xad Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x2e Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000      0xfc9 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x22 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x3b Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x1c Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x22 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0xfb Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000     0x1011 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000      0x11f Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000      0x410 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000    0x10d6b Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000      0xa65 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x96 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x40 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000      0x462 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x59 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000      0x781 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000      0x14e Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x16 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000      0x16d Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000      0x7ca Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x3f Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x72 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x49 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x8c Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x19 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x1d Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0xac Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x64 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x20 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x56 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x3e Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x7f Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x22 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000      0x1a4 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000      0x15a Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0xc7 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x10 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x1f Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000      0x42c Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0xb5 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x8c Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x91 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x86 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_macro   0x0000000000000000       0x7e Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_line    0x0000000000000000      0x8c2 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_str     0x0000000000000000    0x8e026 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .comment       0x0000000000000000       0x26 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .ARM.attributes
+                0x0000000000000000       0x39 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .text          0x0000000000000000        0x0 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .data          0x0000000000000000        0x0 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .bss           0x0000000000000000        0x0 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .bss.sensorIsBusy
+                0x0000000000000000        0x1 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .bss.current_op_type
+                0x0000000000000000        0x1 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .bss.savedUserCallback
+                0x0000000000000000        0x4 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .bss.writeBuffer
+                0x0000000000000000        0x1 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .bss.readBuffer
+                0x0000000000000000        0x6 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .bss.initOpOutcome
+                0x0000000000000000        0x1 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .bss.conversionStarted
+                0x0000000000000000        0x1 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .text.tsys01_task
+                0x0000000000000000        0xa Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .text.tsys01i2cDoneCallback
+                0x0000000000000000      0x154 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .text.tsys01_writeRegister
+                0x0000000000000000       0xe4 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .text.tsys01_readRegister
+                0x0000000000000000       0xe0 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .text.tsys01_startConversion
+                0x0000000000000000       0x24 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .text.tsys01_getTemp
+                0x0000000000000000       0x24 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_frame   0x0000000000000000       0xf8 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_info    0x0000000000000000      0x566 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_abbrev  0x0000000000000000      0x186 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_pubnames
+                0x0000000000000000      0x35a Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_pubtypes
+                0x0000000000000000      0x201 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_aranges
+                0x0000000000000000       0x48 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_ranges  0x0000000000000000       0x38 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000      0x26b Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000      0xacc Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000      0x1a3 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x22 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000      0x113 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x89 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x10 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x28 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x8e Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0xad Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x2e Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000      0xfc9 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x72 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x22 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x3b Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x1c Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x22 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0xfb Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000     0x1011 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000      0x11f Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000      0x410 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000    0x10d6b Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000      0xa65 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x96 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x40 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000      0x16d Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x49 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x16 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000      0x7ca Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x16 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x22 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x16 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x55 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x31 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x16 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x55 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000      0x185 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x9a Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x2e Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x22 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x8c Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x98 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x10 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x1d Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x1c Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_macro   0x0000000000000000       0x10 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_line    0x0000000000000000      0x70e Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_str     0x0000000000000000    0x87247 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .comment       0x0000000000000000       0x26 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .ARM.attributes
+                0x0000000000000000       0x39 Output/Debug/Obj/NAATOS_fw/tsys01.o
  .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
  .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
  .group         0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
@@ -14828,6 +15114,139 @@ Discarded input sections
  .comment       0x0000000000000000       0x26 Output/Debug/Obj/NAATOS_fw/mpu_wrappers.o
  .ARM.attributes
                 0x0000000000000000       0x39 Output/Debug/Obj/NAATOS_fw/mpu_wrappers.o
+ .text.libc     0x0000000000000000        0x0 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .data.libc     0x0000000000000000        0x0 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .bss.libc      0x0000000000000000        0x0 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .rodata.__aeabi_fdiv_reciprocal_table
+                0x0000000000000000      0x100 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .rodata.__aeabi_ddiv_reciprocal_table
+                0x0000000000000000      0x180 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_fadd
+                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_dadd
+                0x0000000000000000      0x244 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_fsub
+                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_dsub
+                0x0000000000000000        0x8 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_frsub
+                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_drsub
+                0x0000000000000000        0x8 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_fmul
+                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_dmul
+                0x0000000000000000      0x138 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_fdiv
+                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_ddiv
+                0x0000000000000000      0x1cc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_fcmple
+                0x0000000000000000       0x18 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_dcmple
+                0x0000000000000000       0x3c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_fcmpeq
+                0x0000000000000000       0x18 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_dcmpeq
+                0x0000000000000000       0x34 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_fcmpge
+                0x0000000000000000       0x18 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_dcmpge
+                0x0000000000000000       0x3c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_fcmpgt
+                0x0000000000000000       0x18 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_dcmpgt
+                0x0000000000000000       0x38 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_fcmplt
+                0x0000000000000000       0x18 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_dcmplt
+                0x0000000000000000       0x38 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_fcmpun
+                0x0000000000000000       0x18 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_dcmpun
+                0x0000000000000000       0x20 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_cfcmpeq
+                0x0000000000000000       0x2c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_cdcmpeq
+                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_cfcmple
+                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_cdcmple
+                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_cfrcmple
+                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_cdrcmple
+                0x0000000000000000       0x20 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__cmpdf2
+                0x0000000000000000       0x64 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_f2iz
+                0x0000000000000000       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_d2iz
+                0x0000000000000000       0x4c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_f2lz
+                0x0000000000000000       0x74 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_d2lz
+                0x0000000000000000       0x84 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_f2uiz
+                0x0000000000000000       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_d2uiz
+                0x0000000000000000       0x28 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_f2ulz
+                0x0000000000000000       0x44 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_d2ulz
+                0x0000000000000000       0x40 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_i2f
+                0x0000000000000000       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_i2d
+                0x0000000000000000       0x28 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_l2f
+                0x0000000000000000       0x68 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_l2d
+                0x0000000000000000       0x68 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_ui2f
+                0x0000000000000000       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_ui2d
+                0x0000000000000000       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_ul2f
+                0x0000000000000000       0x58 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_ul2d
+                0x0000000000000000       0x5c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_f2d
+                0x0000000000000000       0x34 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__aeabi_d2f
+                0x0000000000000000       0x54 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__float32_isfinite
+                0x0000000000000000       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__float64_isfinite
+                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__float32_isinf
+                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__float64_isinf
+                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__float32_isnan
+                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__float64_isnan
+                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__float32_isnormal
+                0x0000000000000000       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__float64_isnormal
+                0x0000000000000000       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__float32_signbit
+                0x0000000000000000        0xc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__float64_signbit
+                0x0000000000000000        0xc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__float32_classify
+                0x0000000000000000       0x28 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.__float64_classify
+                0x0000000000000000       0x2c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.fabs     0x0000000000000000       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.fabsf    0x0000000000000000        0x8 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.ceilf    0x0000000000000000       0x70 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.floorf   0x0000000000000000       0x70 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.frexpf   0x0000000000000000       0x3c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .text.ldexpf   0x0000000000000000       0x48 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+ .ARM.attributes
+                0x0000000000000000       0x20 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
  .text.libc     0x0000000000000000        0x0 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc_asm.o)
  .data.libc     0x0000000000000000        0x0 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc_asm.o)
  .bss.libc      0x0000000000000000        0x0 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc_asm.o)
@@ -16726,139 +17145,6 @@ Discarded input sections
  .comment       0x0000000000000000       0x26 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libdebugio_v7em_fpv4_sp_d16_hard_t_le_eabi.a(mempoll_debug_operations.o)
  .ARM.attributes
                 0x0000000000000000       0x34 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libdebugio_v7em_fpv4_sp_d16_hard_t_le_eabi.a(mempoll_debug_operations.o)
- .text.libc     0x0000000000000000        0x0 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .data.libc     0x0000000000000000        0x0 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .bss.libc      0x0000000000000000        0x0 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .rodata.__aeabi_fdiv_reciprocal_table
-                0x0000000000000000      0x100 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .rodata.__aeabi_ddiv_reciprocal_table
-                0x0000000000000000      0x180 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_fadd
-                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_dadd
-                0x0000000000000000      0x244 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_fsub
-                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_dsub
-                0x0000000000000000        0x8 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_frsub
-                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_drsub
-                0x0000000000000000        0x8 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_fmul
-                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_dmul
-                0x0000000000000000      0x138 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_fdiv
-                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_ddiv
-                0x0000000000000000      0x1cc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_fcmple
-                0x0000000000000000       0x18 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_dcmple
-                0x0000000000000000       0x3c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_fcmpeq
-                0x0000000000000000       0x18 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_dcmpeq
-                0x0000000000000000       0x34 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_fcmpge
-                0x0000000000000000       0x18 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_dcmpge
-                0x0000000000000000       0x3c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_fcmpgt
-                0x0000000000000000       0x18 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_dcmpgt
-                0x0000000000000000       0x38 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_fcmplt
-                0x0000000000000000       0x18 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_dcmplt
-                0x0000000000000000       0x38 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_fcmpun
-                0x0000000000000000       0x18 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_dcmpun
-                0x0000000000000000       0x20 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_cfcmpeq
-                0x0000000000000000       0x2c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_cdcmpeq
-                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_cfcmple
-                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_cdcmple
-                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_cfrcmple
-                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_cdrcmple
-                0x0000000000000000       0x20 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__cmpdf2
-                0x0000000000000000       0x64 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_f2iz
-                0x0000000000000000       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_d2iz
-                0x0000000000000000       0x4c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_f2lz
-                0x0000000000000000       0x74 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_d2lz
-                0x0000000000000000       0x84 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_f2uiz
-                0x0000000000000000       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_d2uiz
-                0x0000000000000000       0x28 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_f2ulz
-                0x0000000000000000       0x44 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_d2ulz
-                0x0000000000000000       0x40 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_i2f
-                0x0000000000000000       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_i2d
-                0x0000000000000000       0x28 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_l2f
-                0x0000000000000000       0x68 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_l2d
-                0x0000000000000000       0x68 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_ui2f
-                0x0000000000000000       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_ui2d
-                0x0000000000000000       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_ul2f
-                0x0000000000000000       0x58 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_ul2d
-                0x0000000000000000       0x5c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_f2d
-                0x0000000000000000       0x34 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__aeabi_d2f
-                0x0000000000000000       0x54 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__float32_isfinite
-                0x0000000000000000       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__float64_isfinite
-                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__float32_isinf
-                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__float64_isinf
-                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__float32_isnan
-                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__float64_isnan
-                0x0000000000000000       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__float32_isnormal
-                0x0000000000000000       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__float64_isnormal
-                0x0000000000000000       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__float32_signbit
-                0x0000000000000000        0xc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__float64_signbit
-                0x0000000000000000        0xc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__float32_classify
-                0x0000000000000000       0x28 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.__float64_classify
-                0x0000000000000000       0x2c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.fabs     0x0000000000000000       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.fabsf    0x0000000000000000        0x8 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.ceilf    0x0000000000000000       0x70 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.floorf   0x0000000000000000       0x70 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.frexpf   0x0000000000000000       0x3c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .text.ldexpf   0x0000000000000000       0x48 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
- .ARM.attributes
-                0x0000000000000000       0x20 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
  .text          0x0000000000000000        0x0 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
  .data          0x0000000000000000        0x0 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
  .bss           0x0000000000000000        0x0 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
@@ -19546,6 +19832,8 @@ LOAD Output/Debug/Obj/NAATOS_fw/usb.o
 LOAD Output/Debug/Obj/NAATOS_fw/pid.o
 LOAD Output/Debug/Obj/NAATOS_fw/pwm.o
 LOAD Output/Debug/Obj/NAATOS_fw/adc.o
+LOAD Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+LOAD Output/Debug/Obj/NAATOS_fw/tsys01.o
 LOAD Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
 LOAD Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_Syscalls_SES.o
 LOAD Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_printf.o

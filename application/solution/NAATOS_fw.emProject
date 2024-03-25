@@ -139,6 +139,10 @@
       <file file_name="../src/pwm.h" />
       <file file_name="../src/adc.c" />
       <file file_name="../src/adc.h" />
+      <file file_name="../src/i2c_hal_freertos.c" />
+      <file file_name="../src/i2c_hal_freertos.h" />
+      <file file_name="../src/tsys01.c" />
+      <file file_name="../src/tsys01.h" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../sdk/external/segger_rtt/SEGGER_RTT.c" />

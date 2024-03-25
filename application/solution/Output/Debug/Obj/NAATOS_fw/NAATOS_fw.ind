@@ -72,6 +72,8 @@
 "Output/Debug/Obj/NAATOS_fw/pid.o"
 "Output/Debug/Obj/NAATOS_fw/pwm.o"
 "Output/Debug/Obj/NAATOS_fw/adc.o"
+"Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o"
+"Output/Debug/Obj/NAATOS_fw/tsys01.o"
 "Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o"
 "Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_Syscalls_SES.o"
 "Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_printf.o"
