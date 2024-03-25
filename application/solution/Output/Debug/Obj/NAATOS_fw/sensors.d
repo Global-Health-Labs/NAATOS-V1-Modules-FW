@@ -37,4 +37,23 @@ Output/Debug/Obj/NAATOS_fw/sensors.o: \
  ../sdk/external/freertos/portable/CMSIS/nrf52/portmacro_cmsis.h \
  ../sdk/components/libraries/util/app_util.h \
  ../sdk/external/freertos/source/include/mpu_wrappers.h \
- ../sdk/external/freertos/source/include/queue.h
+ ../sdk/external/freertos/source/include/queue.h \
+ ../sdk/modules/nrfx/hal/nrf_gpio.h ../sdk/modules/nrfx/nrfx.h \
+ ../sdk/integration/nrfx/nrfx_config.h ../src/config/sdk_config.h \
+ ../sdk/modules/nrfx/drivers/nrfx_common.h \
+ ../sdk/modules/nrfx/mdk/nrf_peripherals.h \
+ ../sdk/modules/nrfx/mdk/nrf52840_peripherals.h \
+ ../sdk/integration/nrfx/nrfx_glue.h \
+ ../sdk/integration/nrfx/legacy/apply_old_config.h \
+ ../sdk/modules/nrfx/soc/nrfx_irqs.h \
+ ../sdk/modules/nrfx/soc/nrfx_irqs_nrf52840.h \
+ ../sdk/components/libraries/util/nordic_common.h \
+ ../sdk/modules/nrfx/soc/nrfx_coredep.h \
+ ../sdk/modules/nrfx/soc/nrfx_atomic.h \
+ ../sdk/components/libraries/util/sdk_errors.h \
+ ../sdk/components/libraries/util/sdk_resources.h \
+ ../sdk/modules/nrfx/drivers/nrfx_errors.h \
+ ../sdk/components/libraries/bsp/bsp.h ../sdk/components/boards/boards.h \
+ ../sdk/components/boards/pca10056.h \
+ ../sdk/components/libraries/button/app_button.h \
+ ../sdk/components/libraries/util/app_error.h

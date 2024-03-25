@@ -108,6 +108,7 @@
       <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_pwm.c" />
       <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_timer.c" />
       <file file_name="../sdk/integration/nrfx/legacy/nrf_drv_ppi.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_adc.c" />
     </folder>
     <folder Name="Board Support">
       <file file_name="../sdk/components/libraries/bsp/bsp.c" />

@@ -6,12 +6,18 @@ temperature_data_t temperatures;
 void sensors_task(void * pvParameters) {
   BaseType_t xReturned;
 
+  // Initalize GPIOs
+  init_gpios();
+
   // TODO: Get Configuration Settings
   for (;;) {
     // TODO: ADC Read for Optical Sensors
     switches.optical_tiggered = false;  // Temp
-    // TODO: GPIO Read for Hall Sensor
-    switches.hal_triggered = false;   // Temp
+    // GPIO Read for Hall Sensor
+    if (nrf_gpio_pin_read(HAL_INPUT_PIN))
+     switches.hal_triggered = false;   // Temp
+    else
+     switches.hal_triggered = true;
     // TODO: I2C Read for Temp Sensor 1
     temperatures.amplification_zone_temp = 26.7;  // Temp
     // TODO: I2C Read for Temp Sensor 2
@@ -31,4 +37,9 @@ void sensors_task(void * pvParameters) {
 
     vTaskDelay(500);
   }
+}
+
+void init_gpios(void) {
+  /* Setup Hal Sensor */
+  nrf_gpio_cfg_input(HAL_INPUT_PIN, NRF_GPIO_PIN_PULLDOWN);
 }
