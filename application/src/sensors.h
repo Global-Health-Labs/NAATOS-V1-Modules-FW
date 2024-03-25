@@ -10,4 +10,4 @@
 #define OPTICAL_INPUT_PIN   3
 
 void sensors_task(void * pvParameters);
-void init_gpios(void);
+void init_sensors_gpios(void);

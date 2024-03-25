@@ -36,9 +36,7 @@ void battery_task(void * pvParameters) {
     if (xReturned != pdPASS) {
       printf("BATT_TASK: Was unable to send battery percentage to main queue. Error:%d\n", xReturned);
     }
-    else {
-      printf("BATT_TASK: Sent battery data to main task.\n");
-    }
+
     // Check the battery request queue (logging)
     if (uxQueueMessagesWaiting(battery_requestPercentQueue) == 0) {
       vTaskDelay(500);

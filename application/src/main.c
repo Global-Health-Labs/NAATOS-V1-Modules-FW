@@ -105,7 +105,6 @@ void main_task(void * pvParameters) {
              // TODO: send main state update to usb task
              break;
           }
-          printf("MAIN_TASK: Got battery percentage in main_batteryDataQueue: %d \n",percent_recv);
         }
         else {
           printf("MAIN_TASK: Error receiving battery percentage from main_batteryDataQueue\n");
@@ -115,7 +114,6 @@ void main_task(void * pvParameters) {
         if (xReturned != pdPASS) {
           printf("MAIN_TASK: Error receiving switch data from main_switchQueue\n");
         }
-        printf("MAIN_TASK: Got switch data in main_switchQueue\n");
         // Update switches triggered
         hal_triggered = switch_data.hal_triggered;
         optical_triggered = switch_data.optical_tiggered;
@@ -355,8 +353,9 @@ int main(void) {
   err_code = nrf_drv_clock_init();
   APP_ERROR_CHECK(err_code);
 
-  // TODO: Full Peripheral Initalizations
-  init_adc();
+  // Full Peripheral Initalizations
+  init_adc();             // ADC
+  init_sensors_gpios();   // Sensor GPIOs
 
   // Create Tasks
   create_tasks();
