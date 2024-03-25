@@ -11,7 +11,8 @@ extern "C" {
 #define I2C_INSTANCE_ID 1
 
 typedef enum {
-    i2c_interface_master,
+    i2c_interface_system,
+    i2c_interface_sensors,
     i2c_num_interfaces
 } i2c_interface_selection_t;
 

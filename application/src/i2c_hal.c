@@ -78,22 +78,22 @@ void i2c_scheduled_event_handler(void * p_event_data, uint16_t event_size)
     }
 }
 
-static void i2c_interrupt_handler(nrf_drv_twi_evt_t const * p_event, void * p_context)
+static void i2c_interrupt_handler_system_bus(nrf_drv_twi_evt_t const * p_event, void * p_context)
 {
     // Just pass to the scheduler to quickly get this out of interrupt context
     scheduled_data_t scheduled_data;
     memcpy(&scheduled_data.evt_data, p_event, sizeof(nrf_drv_twi_evt_t));
-    scheduled_data.interface = i2c_interface_master;
+    scheduled_data.interface = i2c_interface_system;
     scheduler_add_event(&scheduled_data, sizeof(scheduled_data_t), i2c_scheduled_event_handler);
 }
 
 // unused since we are using a single i2c bus
-static void i2c_interrupt_handler_audio_bus(nrf_drv_twi_evt_t const * p_event, void * p_context)
+static void i2c_interrupt_handler_sensor_bus(nrf_drv_twi_evt_t const * p_event, void * p_context)
 {
     // Just pass to the scheduler to quickly get this out of interrupt context
     scheduled_data_t scheduled_data;
     memcpy(&scheduled_data.evt_data, p_event, sizeof(nrf_drv_twi_evt_t));
-    scheduled_data.interface = i2c_interface_master;
+    scheduled_data.interface = i2c_interface_sensors;
     scheduler_add_event(&scheduled_data, sizeof(scheduled_data_t), i2c_scheduled_event_handler);
 }
 
@@ -123,19 +123,19 @@ void app_i2c_setup(i2c_interface_selection_t interface, uint32_t sda_pin, uint32
        .hold_bus_uninit    = true
     };
     interrupt_handler = i2c_interrupt_handler;
-    /*
+    
     switch (interface) {
         default:
         // Unreached
         break;
         case i2c_interface_fuel:
-            interrupt_handler = i2c_interrupt_handler_power_bus;
+            interrupt_handler = i2c_interrupt_handler_system_bus;
             break;
         case i2c_interface_audio:
-            interrupt_handler = i2c_interrupt_handler_audio_bus;
+            interrupt_handler = i2c_interrupt_handler_sensor_bus;
             break;
     }
-    */
+    
 
     err_code = nrf_drv_twi_init(&m_i2c[interface], &i2c_bus_config, interrupt_handler, NULL);
     APP_ERROR_CHECK(err_code);
