@@ -19,7 +19,8 @@ void sensors_task(void * pvParameters) {
      switches.hal_triggered = true;
 
     // TODO: I2C Read for Temp Sensor 1
-    temperatures.amplification_zone_temp = 26.7;  // Temp
+    
+    //temperatures.amplification_zone_temp = 26.7;  // Temp
 
     // TODO: I2C Read for Temp Sensor 2
     temperatures.valve_zone_temp = 26.5;    // Temp

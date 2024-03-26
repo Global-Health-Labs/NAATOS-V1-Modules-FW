@@ -5,6 +5,7 @@
 #include "nrf_gpio.h"
 #include "bsp.h"
 #include "adc.h"
+#include "tsys01.h"
 
 #define HAL_INPUT_PIN       2
 #define OPTICAL_INPUT_PIN   3

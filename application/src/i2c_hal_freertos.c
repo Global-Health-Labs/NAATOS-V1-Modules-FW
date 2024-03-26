@@ -26,7 +26,7 @@ static SemaphoreHandle_t m_i2c_semaphores[i2c_num_interfaces];
 
 /* INIT for TWI hardware for peripheral */
 void vInit_TWI_Hardware(i2c_interface_selection_t interface, uint32_t sda_pin, uint32_t scl_pin, i2c_speed_selection_t frequency) {
-    NRF_LOG_INFO( "vInit_TWI_Hardware" );
+    //NRF_LOG_INFO( "vInit_TWI_Hardware" );
     ret_code_t err_code;
     nrf_drv_twi_frequency_t nrf_freq;
     
@@ -69,7 +69,7 @@ void vInit_TWI_Hardware(i2c_interface_selection_t interface, uint32_t sda_pin, u
     m_i2c_semaphores[interface] = xSemaphoreCreateBinary();// Ensure the semaphore is created before it gets used.
     ASSERT( m_i2c_semaphores[interface] );          // LOCK HERE: the semaphore could not be created
     xSemaphoreGive( m_i2c_semaphores[interface] );  // 'Give' the peripheral protection semaphore
-    NRF_LOG_INFO( "vInit_TWI_Hardware: DONE" );
+    //NRF_LOG_INFO( "vInit_TWI_Hardware: DONE" );
     return;
 }
 

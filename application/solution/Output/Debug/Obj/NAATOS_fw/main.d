@@ -73,6 +73,7 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/integration/nrfx/legacy/nrf_drv_saadc.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_saadc.h \
  ../sdk/modules/nrfx/hal/nrf_saadc.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\tsys01.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\heater.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pid.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pwm.h \
@@ -83,4 +84,5 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/integration/nrfx/legacy/nrf_drv_ppi.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_ppi.h \
  ../sdk/modules/nrfx/hal/nrf_ppi.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\usb.h
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\usb.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\i2c_hal_freertos.h

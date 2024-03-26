@@ -30,6 +30,7 @@ Purpose : NAATOS Application Start
 #include "pid.h"
 #include "pwm.h"
 #include "adc.h"
+#include "i2c_hal_freertos.h"
 
 // Task Handles
 xTaskHandle mainTaskHandle;
@@ -356,6 +357,7 @@ int main(void) {
   // Full Peripheral Initalizations
   init_adc();             // ADC
   init_sensors_gpios();   // Sensor GPIOs
+  vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
 
   // Create Tasks
   create_tasks();
