@@ -1,11 +1,11 @@
 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\i2c_hal_freertos.c \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdbool.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stddef.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\i2c_hal_freertos.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\i2c_hal_freertos.c \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stddef.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/string.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\i2c_hal_freertos.h \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_twi.h ../sdk/modules/nrfx/nrfx.h \
@@ -36,7 +36,7 @@ Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o: \
  ../sdk/components/libraries/util/app_util_platform.h \
  ../sdk/components/libraries/util/nrf_assert.h \
  ../sdk/components/libraries/util/app_error.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdio.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/libraries/util/app_error_weak.h \
  ../sdk/modules/nrfx/soc/nrfx_coredep.h \

@@ -1,13 +1,13 @@
 Output/Debug/Obj/NAATOS_fw/battery.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\battery.c \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\battery.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_config.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdbool.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_queues.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\battery.c \
+ C\:\Nordic\NAATOS_fw_src\application\src\battery.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\naatos_config.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\naatos_queues.h \
  ../sdk/external/freertos/source/include/FreeRTOS.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stddef.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stddef.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  ../sdk/external/freertos/config/FreeRTOSConfig.h \
  ../sdk/components/libraries/util/app_util_platform.h \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
@@ -24,7 +24,7 @@ Output/Debug/Obj/NAATOS_fw/battery.o: \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
  ../sdk/components/libraries/util/nrf_assert.h \
  ../sdk/components/libraries/util/app_error.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdio.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../sdk/components/libraries/util/nordic_common.h \
@@ -37,4 +37,7 @@ Output/Debug/Obj/NAATOS_fw/battery.o: \
  ../sdk/external/freertos/portable/CMSIS/nrf52/portmacro_cmsis.h \
  ../sdk/components/libraries/util/app_util.h \
  ../sdk/external/freertos/source/include/mpu_wrappers.h \
- ../sdk/external/freertos/source/include/queue.h
+ ../sdk/external/freertos/source/include/queue.h \
+ ../sdk/external/freertos/source/include/timers.h \
+ ../sdk/external/freertos/source/include/task.h \
+ ../sdk/external/freertos/source/include/list.h

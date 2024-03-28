@@ -116,9 +116,7 @@
       <file file_name="../sdk/components/libraries/bsp/bsp.c" />
     </folder>
     <folder Name="Application">
-      <file file_name="../src/main.c">
-        <configuration Name="Debug" c_user_include_directories="." />
-      </file>
+      <file file_name="../src/main.c" />
       <file file_name="../src/config/sdk_config.h" />
       <file file_name="../src/battery.c" />
       <file file_name="../src/battery.h" />

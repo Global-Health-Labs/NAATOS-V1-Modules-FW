@@ -11,11 +11,7 @@
 
 #define WRITE_BUFFER_SIZE 1
 #define READ_BUFFER_SIZE 4
-typedef struct {
-    uint8_t regSelection;
-    uint8_t readLength;
-    uint8_t readData[READ_BUFFER_SIZE];
-} tsys01_init_op_read_buffer_t;
+
 
 typedef enum {
     tsys01_init_read_op,
@@ -29,65 +25,15 @@ typedef enum {
 static bool sensorIsBusy = false;
 static tsys01_internal_op_type_t current_op_type = tsys01_init_read_op;
 
-static tsys01_opDoneCallback_t savedUserCallback = NULL;
+static tsys01_calibration_values_t calibration[4] = {0};
 
 static uint8_t writeBuffer = 0;
-static tsys01_init_op_read_buffer_t readBuffer = {0};
-static i2c_status_t initOpOutcome = i2c_success;
-static bool conversionStarted = false;
 
-static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t reg, tsys01_internal_op_type_t ts_operation, tsys01_opDoneCallback_t cb);
+static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t reg, tsys01_internal_op_type_t ts_operation, uint8_t *read_buf, uint8_t read_len);
 
-
-void tsys01i2cDoneCallback(i2c_status_t outcome, uint8_t data_len, uint8_t * p_data_read)
-{
-    tsys01_callback_data_t userData;
-    sensorIsBusy = false;
-    
-    switch (current_op_type) {
-        default:
-            // Never reached
-            break;
-        case tsys01_init_read_op:
-            initOpOutcome = outcome;
-            // Data was written directly to buffer, just record number of bytes actually transferred
-            readBuffer.readLength = data_len;
-            break;
-        case tsys01_init_write_op:
-            initOpOutcome = outcome;
-            break;
-        case tsys01_reset_op:
-            initOpOutcome = outcome;
-            break;
-        case tsys01_start_conversion_op:
-            initOpOutcome = outcome;
-            conversionStarted = true;
-            //savedUserCallback(tsys01_success, &userData);
-            break;
-        case tsys01_read_adc_op:
-        {
-            if (savedUserCallback != NULL) {
-                userData.data_type = tsys01_read_adc;
-                if (outcome != i2c_success) {
-                    savedUserCallback(tsys01_i2c_error, &userData);
-                } else if (data_len != 3) {
-                    savedUserCallback(tsys01_i2c_error, &userData);
-                } else {
-                    uint16_t adcRaw = ((uint16_t) readBuffer.readData[0] << 8) + ((uint16_t) readBuffer.readData[1]);
-                    double temperature = -40 + adcRaw  * 165 / 65535.0;
-                    userData.data.temperature = temperature;
-                    userData.data.crc = readBuffer.readData[2];
-                    savedUserCallback(tsys01_success, &userData);
-                }
-            }
-            break;
-        }
-    }
-}
 
 static tsys01_errors_t tsys01_writeRegister(sensor_selection_t sensor, uint8_t reg, 
-                                                   tsys01_internal_op_type_t ts_operation, 
-                                                   tsys01_opDoneCallback_t cb)
+                                                   tsys01_internal_op_type_t ts_operation)
 {
     if (sensorIsBusy) {
         return tsys01_busy;
@@ -101,7 +47,6 @@ static tsys01_errors_t tsys01_writeRegister(sensor_selection_t sensor, uint8_t r
     uint8_t slave_addr;
 
     current_op_type = ts_operation;
-    savedUserCallback = cb;
 
     switch (sensor)
     {
@@ -131,11 +76,11 @@ static tsys01_errors_t tsys01_writeRegister(sensor_selection_t sensor, uint8_t r
         }
         return tsys01_i2c_error;
     }
-    
+    sensorIsBusy = false;
     return tsys01_success;
 }
 
-static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t reg, tsys01_internal_op_type_t ts_operation, tsys01_opDoneCallback_t cb)
+static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t reg, tsys01_internal_op_type_t ts_operation, uint8_t *read_buf, uint8_t read_len)
 {
     if (sensorIsBusy) {
         return tsys01_busy;
@@ -148,7 +93,6 @@ static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t re
     uint8_t slave_addr;
 
     current_op_type = ts_operation;
-    savedUserCallback = cb;
 
     switch (sensor)
     {
@@ -170,7 +114,7 @@ static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t re
             break;
     }
 
-    err_code = xUtil_TWI_Read( interface, slave_addr, readBuffer.regSelection, &readBuffer.readData[0], 3);
+    err_code = xUtil_TWI_Read( interface, slave_addr, reg, read_buf, read_len);
     
     if (err_code != NRF_SUCCESS) {
         sensorIsBusy = false;
@@ -179,16 +123,44 @@ static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t re
         }
         return tsys01_i2c_error;
     }
-  
+    sensorIsBusy = false;
     return tsys01_success;
 }
 
-tsys01_errors_t tsys01_startConversion(sensor_selection_t sensor, tsys01_opDoneCallback_t cb)
+tsys01_errors_t tsys01_startConversion(sensor_selection_t sensor)
 {
-    return tsys01_writeRegister(sensor, TSYS01_START_CONVERSION_COMMAND, tsys01_start_conversion_op, cb);
+    return tsys01_writeRegister(sensor, TSYS01_START_CONVERSION_COMMAND, tsys01_start_conversion_op);
 }
 
-tsys01_errors_t tsys01_getTemp(sensor_selection_t sensor, tsys01_opDoneCallback_t cb)
+tsys01_errors_t tsys01_getTemp(sensor_selection_t sensor, long double *temp_val)
 {
-    return tsys01_readRegister(sensor, TSYS01_READ_ADC_COMMAND, tsys01_read_adc_op, cb);
+    uint8_t buf[3];
+    tsys01_errors_t err_code = tsys01_readRegister(sensor, TSYS01_READ_ADC_COMMAND, tsys01_read_adc_op, buf, TSYS01_TEMP_DATA_LEN);
+    uint32_t adc24 = (buf[0] << 16) + (buf[1] << 8) + buf[2];
+    uint32_t adc16 = adc24/256.0;
+    long double temp_c = (-2) * calibration[sensor].k4 * pow(10, -21) * pow(adc16, 4) \
+                       + (4) * calibration[sensor].k3 * pow(10, -16) * pow(adc16, 3) \
+                       + (-2) * calibration[sensor].k2 * pow(10, -11) * pow(adc16, 2) \
+                       + (1) * calibration[sensor].k1 * pow(10, -6) * adc16 \
+                       + (-1.5) * calibration[sensor].k0 * pow(10, -2);
+    *temp_val = temp_c;
+    return err_code;
+    
+}
+
+tsys01_errors_t tsys01_getCalibrationValues(sensor_selection_t sensor)
+{
+    uint8_t temp[2];
+    tsys01_errors_t err_code = tsys01_readRegister(sensor, TSYS01_CAL_K0_REG, tsys01_cal, temp, TSYS01_CAL_DATA_LEN);
+    calibration[sensor].k0 = (temp[0] << 8) + temp[1];
+    err_code = tsys01_readRegister(sensor, TSYS01_CAL_K1_REG, tsys01_cal, temp, TSYS01_CAL_DATA_LEN);
+    calibration[sensor].k1 = (temp[0] << 8) + temp[1];
+    err_code = tsys01_readRegister(sensor, TSYS01_CAL_K2_REG, tsys01_cal, temp, TSYS01_CAL_DATA_LEN);
+    calibration[sensor].k2 = (temp[0] << 8) + temp[1];
+    err_code = tsys01_readRegister(sensor, TSYS01_CAL_K3_REG, tsys01_cal, temp, TSYS01_CAL_DATA_LEN);
+    calibration[sensor].k3 = (temp[0] << 8) + temp[1];
+    err_code = tsys01_readRegister(sensor, TSYS01_CAL_K4_REG, tsys01_cal, temp, TSYS01_CAL_DATA_LEN);
+    calibration[sensor].k4 = (temp[0] << 8) + temp[1];
+    return err_code;
+
 }

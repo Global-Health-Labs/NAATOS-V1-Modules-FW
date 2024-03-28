@@ -1,4 +1,5 @@
 #include "pwm.h"
+#include "timers.h"
 
 APP_PWM_INSTANCE(PWM0, 0); // Create instance "PWM0" using TIMER0
 APP_PWM_INSTANCE(PWM2, 2); // Create instance "PWM2" using TIMER2

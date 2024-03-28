@@ -7,6 +7,7 @@
 */
 
 #include "battery.h"
+#include "timers.h"
 
 xQueueHandle battery_requestPercentQueue;
 charge_state_t charge_state;

@@ -1,4 +1,5 @@
 #include "heater.h"
+#include "timers.h"
 
 xQueueHandle heater_zoneRunQueue;
 xQueueHandle heater_temperatureDataQueue;
