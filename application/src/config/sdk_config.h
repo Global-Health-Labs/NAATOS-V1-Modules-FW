@@ -2122,7 +2122,7 @@
  
 
 #ifndef TWI0_USE_EASY_DMA
-#define TWI0_USE_EASY_DMA 1
+#define TWI0_USE_EASY_DMA 0
 #endif
 
 // </e>
@@ -2136,7 +2136,7 @@
  
 
 #ifndef TWI1_USE_EASY_DMA
-#define TWI1_USE_EASY_DMA 1
+#define TWI1_USE_EASY_DMA 0
 #endif
 
 // </e>

@@ -7,8 +7,8 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
-#define TSYS01_ADDR 0b1110110
-#define TSYS01_ADDR_ALT 0b1110111
+#define TSYS01_ADDR (0x77U)
+#define TSYS01_ADDR_ALT (0x76U)
 
 #define TSYS01_RESET_COMMAND 0x1E
 #define TSYS01_START_CONVERSION_COMMAND 0x48

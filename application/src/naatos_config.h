@@ -10,8 +10,8 @@
 #define VALVE_ZONE_ON_TIME          3     // Minutes
 
 /* I2C Pins */
-#define I2C0_SDA_PIN    22
-#define I2C0_SCL_PIN    23
+#define I2C0_SDA_PIN    25
+#define I2C0_SCL_PIN    24
 
 /* Main States */
 typedef enum {

@@ -661,7 +661,7 @@ nrfx_err_t nrfx_twi_xfer(nrfx_twi_t           const * p_instance,
     NRFX_LOG_WARNING("Function: %s, error code: %s.",
                      __func__,
                      NRFX_LOG_ERROR_STRING_GET(err_code));
-    return err_code;
+     return err_code;
 }
 
 nrfx_err_t nrfx_twi_tx(nrfx_twi_t const * p_instance,

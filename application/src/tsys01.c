@@ -38,11 +38,6 @@ static bool conversionStarted = false;
 
 static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t reg, tsys01_internal_op_type_t ts_operation, tsys01_opDoneCallback_t cb);
 
-void tsys01_task(void * pvParameters)
-{
-    
-}
-
 
 void tsys01i2cDoneCallback(i2c_status_t outcome, uint8_t data_len, uint8_t * p_data_read)
 {

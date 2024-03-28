@@ -54,14 +54,14 @@ void vInit_TWI_Hardware(i2c_interface_selection_t interface, uint32_t sda_pin, u
     nrf_gpio_cfg( scl_pin, // pin_number
                     NRF_GPIO_PIN_DIR_INPUT, // Input.
                     NRF_GPIO_PIN_INPUT_CONNECT, // Connect input buffer.
-                    NRF_GPIO_PIN_NOPULL, // Pin pull-up resistor disabled.
+                    NRF_GPIO_PIN_PULLUP, // Pin pull-up resistor disabled.
                     NRF_GPIO_PIN_S0S1, // Standard '0', standard '1'.
                     NRF_GPIO_PIN_NOSENSE // Pin sense level disabled.
                   );
     nrf_gpio_cfg( sda_pin,	// pin_number
                     NRF_GPIO_PIN_DIR_INPUT, // Input.
                     NRF_GPIO_PIN_INPUT_CONNECT, // Connect input buffer.
-                    NRF_GPIO_PIN_NOPULL, // Pin pull-up resistor disabled.
+                    NRF_GPIO_PIN_PULLUP, // Pin pull-up resistor disabled.
                     NRF_GPIO_PIN_S0S1,	// Standard '0', standard '1'.
                     NRF_GPIO_PIN_NOSENSE // Pin sense level disabled.
                   );
