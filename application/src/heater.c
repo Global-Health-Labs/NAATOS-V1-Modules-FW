@@ -18,13 +18,13 @@ pid_controller_t amp2_pid;
 void heater_task(void * pvParameters) {
   BaseType_t xReturned;
 
-  // Create PID Controllers
-  pid_controller_init(&valve_pid, VALVE_SETPOINT, V_KP, V_KI, V_KD);
+  // TODO: Get configuration parameters (temperature setpoints)
+
+  // Create PID Controllers 
+  pid_controller_init(&valve_pid, VALVE_SETPOINT, V_KP, V_KI, V_KD);  // TODO: make setpoints not defines but vars based on config
   pid_controller_init(&amp0_pid, AMP0_SETPOINT, A0_KP, A0_KI, A0_KD);
   pid_controller_init(&amp1_pid, AMP1_SETPOINT, A1_KP, A1_KI, A1_KD);
   pid_controller_init(&amp2_pid, AMP1_SETPOINT, A2_KP, A2_KI, A2_KD);
-
-  // TODO: Get configuration parameters (temperature setpoints)
   
   for (;;) {
     // Check for run heater zone message
