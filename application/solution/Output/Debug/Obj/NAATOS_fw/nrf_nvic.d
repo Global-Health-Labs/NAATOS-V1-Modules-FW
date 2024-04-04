@@ -1,9 +1,9 @@
 Output/Debug/Obj/NAATOS_fw/nrf_nvic.o: \
- C\:\Nordic\NAATOS_fw_src\application\sdk\components\drivers_nrf\nrf_soc_nosd\nrf_nvic.c \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdlib.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
- C\:\Nordic\NAATOS_fw_src\application\sdk\components\drivers_nrf\nrf_soc_nosd\nrf_soc.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\drivers_nrf\nrf_soc_nosd\nrf_nvic.c \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdlib.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\drivers_nrf\nrf_soc_nosd\nrf_soc.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
  ../sdk/modules/nrfx/mdk/nrf.h ../sdk/modules/nrfx/mdk/nrf52840.h \
  ../sdk/components/toolchain/cmsis/include/core_cm4.h \
  ../sdk/components/toolchain/cmsis/include/cmsis_version.h \
@@ -15,4 +15,4 @@ Output/Debug/Obj/NAATOS_fw/nrf_nvic.o: \
  ../sdk/modules/nrfx/mdk/nrf51_to_nrf52840.h \
  ../sdk/modules/nrfx/mdk/nrf52_to_nrf52840.h \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
- C\:\Nordic\NAATOS_fw_src\application\sdk\components\drivers_nrf\nrf_soc_nosd\nrf_error.h
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\drivers_nrf\nrf_soc_nosd\nrf_error.h

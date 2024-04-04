@@ -10,14 +10,16 @@ bool valve_zone_running = false;
 zone_run_req_t zone_req;
 temperature_data_t temperature_data;
 
+pid_controller_t valve_pid;
+pid_controller_t amp0_pid;
+pid_controller_t amp1_pid;
+pid_controller_t amp2_pid;
+
 void heater_task(void * pvParameters) {
   BaseType_t xReturned;
-  
-  // TODO: REMOVE
-  update_valve_duty(90);
-  update_amp0_duty(20);
-  update_amp1_duty(70);
-  update_amp2_duty(50);
+
+  // Create PID Controllers
+  pid_controller_init(&amp0_pid, AMP0_SETPOINT, A0_KP, A0_KI, A0_KD);
 
   // TODO: Get configuration parameters (temperature setpoints)
   
@@ -52,8 +54,12 @@ void heater_task(void * pvParameters) {
     
     // Update PID and PWM
     if (amplification_zone_running) {
-      // TODO: Update PID loop with new temperatures
-      // TODO: Update PWM with PID output
+      printf("Recvd Amp0 Temp: %0.3f\n", temperature_data.amplification_zone_temp);
+      // Update PID loop with new temperatures
+      pid_controller_compute(&amp0_pid, temperature_data.amplification_zone_temp);
+      printf("Amp0 Duty: %0.2f\n", amp0_pid.out);
+      // Update PWM with PID output
+      update_amp0_duty(amp0_pid.out);
     }
     if (valve_zone_running) {
       // TODO: Update PID loop with new temperatures

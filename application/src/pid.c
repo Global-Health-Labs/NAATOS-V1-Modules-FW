@@ -38,5 +38,5 @@ void pid_controller_compute(pid_controller_t * pid, float measurement) {
   // Set output
   pid->out = out;
   // Keep Track of for Next Execution
-  pid->prevMesurement;
+  pid->prevMesurement = measurement;
 } 

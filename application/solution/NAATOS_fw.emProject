@@ -214,7 +214,8 @@
     </folder>
     <configuration
       Name="Debug"
-      c_user_include_directories="../sdk/external/freertos/source" />
+      c_user_include_directories="../sdk/external/freertos/source"
+      linker_printf_fp_enabled="Double" />
   </project>
   <configuration
     Name="Release"

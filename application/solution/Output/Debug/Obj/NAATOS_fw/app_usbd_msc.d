@@ -1,10 +1,10 @@
 Output/Debug/Obj/NAATOS_fw/app_usbd_msc.o: \
- C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc.c \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc.c \
  ../sdk/components/libraries/util/sdk_common.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/string.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdbool.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
  ../src/config/sdk_config.h \
  ../sdk/components/libraries/util/nordic_common.h \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
@@ -12,7 +12,7 @@ Output/Debug/Obj/NAATOS_fw/app_usbd_msc.o: \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../sdk/components/libraries/util/app_util.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stddef.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stddef.h \
  ../sdk/modules/nrfx/mdk/nrf.h ../sdk/modules/nrfx/mdk/nrf52840.h \
  ../sdk/components/toolchain/cmsis/include/core_cm4.h \
  ../sdk/components/toolchain/cmsis/include/cmsis_version.h \
@@ -26,8 +26,8 @@ Output/Debug/Obj/NAATOS_fw/app_usbd_msc.o: \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
  ../sdk/components/libraries/util/sdk_macros.h \
  ../sdk/components/libraries/util/nrf_assert.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/ctype.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/ctype.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
  ../sdk/components/libraries/usbd/app_usbd.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_usbd.h ../sdk/modules/nrfx/nrfx.h \
  ../sdk/integration/nrfx/nrfx_config.h \
@@ -43,7 +43,7 @@ Output/Debug/Obj/NAATOS_fw/app_usbd_msc.o: \
  ../sdk/components/libraries/util/nordic_common.h \
  ../sdk/components/libraries/util/app_util_platform.h \
  ../sdk/components/libraries/util/app_error.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdio.h \
  ../sdk/components/libraries/util/app_error_weak.h \
  ../sdk/modules/nrfx/soc/nrfx_coredep.h \
  ../sdk/modules/nrfx/soc/nrfx_atomic.h \
@@ -64,15 +64,15 @@ Output/Debug/Obj/NAATOS_fw/app_usbd_msc.o: \
  ../sdk/components/libraries/usbd/app_usbd_descriptor.h \
  ../sdk/components/libraries/usbd/app_usbd_langid.h \
  ../sdk/components/libraries/usbd/app_usbd_class_base.h \
- C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc.h \
  ../sdk/components/libraries/block_dev/nrf_block_dev.h \
  ../sdk/components/libraries/usbd/app_usbd_class_base.h \
  ../sdk/components/libraries/usbd/app_usbd_core.h \
  ../sdk/components/libraries/usbd/app_usbd_descriptor.h \
- C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc_types.h \
- C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc_desc.h \
- C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc_scsi.h \
- C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc_internal.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc_types.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc_desc.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc_scsi.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc_internal.h \
  ../sdk/components/libraries/usbd/app_usbd_string_desc.h \
  ../sdk/components/libraries/usbd/app_usbd.h \
  ../sdk/components/libraries/delay/nrf_delay.h \

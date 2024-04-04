@@ -1,13 +1,13 @@
 Output/Debug/Obj/NAATOS_fw/sensors.o: \
- C\:\Nordic\NAATOS_fw_src\application\src\sensors.c \
- C\:\Nordic\NAATOS_fw_src\application\src\sensors.h \
- C\:\Nordic\NAATOS_fw_src\application\src\naatos_config.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
- C\:\Nordic\NAATOS_fw_src\application\src\naatos_queues.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sensors.c \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sensors.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_config.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdbool.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_queues.h \
  ../sdk/external/freertos/source/include/FreeRTOS.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stddef.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stddef.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
  ../sdk/external/freertos/config/FreeRTOSConfig.h \
  ../sdk/components/libraries/util/app_util_platform.h \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
@@ -24,7 +24,7 @@ Output/Debug/Obj/NAATOS_fw/sensors.o: \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
  ../sdk/components/libraries/util/nrf_assert.h \
  ../sdk/components/libraries/util/app_error.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdio.h \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../sdk/components/libraries/util/nordic_common.h \
@@ -57,11 +57,11 @@ Output/Debug/Obj/NAATOS_fw/sensors.o: \
  ../sdk/components/boards/pca10056.h \
  ../sdk/components/libraries/button/app_button.h \
  ../sdk/components/libraries/util/app_error.h \
- C\:\Nordic\NAATOS_fw_src\application\src\adc.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\adc.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_saadc.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_saadc.h \
  ../sdk/modules/nrfx/hal/nrf_saadc.h \
- C\:\Nordic\NAATOS_fw_src\application\src\tsys01.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\tsys01.h \
  ../sdk/external/freertos/source/include/timers.h \
  ../sdk/external/freertos/source/include/task.h \
  ../sdk/external/freertos/source/include/list.h
