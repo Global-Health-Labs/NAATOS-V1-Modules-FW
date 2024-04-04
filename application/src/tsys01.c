@@ -54,15 +54,15 @@ static tsys01_errors_t tsys01_writeRegister(sensor_selection_t sensor, uint8_t r
             interface = i2c_interface_system;
             slave_addr = TSYS01_ADDR;
             break;
-        case amp_zone_1:
+        case amp_zone_0:
             interface = i2c_interface_system;
             slave_addr = TSYS01_ADDR_ALT;
             break;
-        case amp_zone_2:
+        case amp_zone_1:
             interface = i2c_interface_sensors;
             slave_addr = TSYS01_ADDR;
             break;
-        case amp_zone_3:
+        case amp_zone_2:
             interface = i2c_interface_sensors;
             slave_addr = TSYS01_ADDR_ALT;
             break;
@@ -100,15 +100,15 @@ static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t re
             interface = i2c_interface_system;
             slave_addr = TSYS01_ADDR;
             break;
-        case amp_zone_1:
+        case amp_zone_0:
             interface = i2c_interface_system;
             slave_addr = TSYS01_ADDR_ALT;
             break;
-        case amp_zone_2:
+        case amp_zone_1:
             interface = i2c_interface_sensors;
             slave_addr = TSYS01_ADDR;
             break;
-        case amp_zone_3:
+        case amp_zone_2:
             interface = i2c_interface_sensors;
             slave_addr = TSYS01_ADDR_ALT;
             break;

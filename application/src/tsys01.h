@@ -33,9 +33,9 @@ typedef enum {
 
 typedef enum {
     valve_zone,
+    amp_zone_0,
     amp_zone_1,
     amp_zone_2,
-    amp_zone_3,
     num_sensors
 } sensor_selection_t;
 

@@ -72,7 +72,9 @@ typedef struct {
 
 // Temperature Data Struct
 typedef struct {
-  float amplification_zone_temp;
+  float amp0_zone_temp;
+  float amp1_zone_temp;
+  float amp2_zone_temp;
   float valve_zone_temp;
 } temperature_data_t;
 

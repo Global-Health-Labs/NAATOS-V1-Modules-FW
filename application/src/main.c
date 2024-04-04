@@ -246,14 +246,14 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
 void create_tasks() {
   BaseType_t xReturned;
   // Main Task
-  xReturned = xTaskCreate(main_task, "MainTask", 100, NULL, 0, &mainTaskHandle);
+  xReturned = xTaskCreate(main_task, "MainTask", 300, NULL, 0, &mainTaskHandle);
   if( xReturned != pdPASS ) {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating main task. Error: %d\n", xReturned);
       vTaskDelete( mainTaskHandle );
   }
   // Heater Task
-  xReturned = xTaskCreate(heater_task, "HeaterTask", 384, NULL, 0, &heaterTaskHandle);
+  xReturned = xTaskCreate(heater_task, "HeaterTask", 300, NULL, 0, &heaterTaskHandle);
   if( xReturned != pdPASS ) {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating heater task. Error: %d\n", xReturned);
@@ -267,7 +267,7 @@ void create_tasks() {
       vTaskDelete( loggerTaskHandle );
   }
   // Sensors Task
-  xReturned = xTaskCreate(sensors_task, "SensorsTask", 100, NULL, 0, &sensorsTaskHandle);
+  xReturned = xTaskCreate(sensors_task, "SensorsTask", 300, NULL, 0, &sensorsTaskHandle);
   if( xReturned != pdPASS ) {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating sensors task. Error: %d\n", xReturned);
