@@ -307,25 +307,25 @@ void create_queues() {
   main_batteryDataQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));        // TODO: Update sizes, int is just the placeholder 
   if (main_batteryDataQueue == NULL)
     printf("Unable to create main_batteryDataQueue queue\n");
-  main_switchQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
+  main_switchQueue = xQueueCreate(QUEUE_SIZE, sizeof(sensor_switches_t));
   if (main_switchQueue == NULL)
     printf("Unable to create main_switchQueue queue\n");
 
   // Heater Task Queues
-  heater_zoneRunQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
+  heater_zoneRunQueue = xQueueCreate(QUEUE_SIZE, sizeof(zone_run_req_t));
   if (heater_zoneRunQueue == NULL)
     printf("Unable to create heater_zoneRunQueue queue\n");
-  heater_temperatureDataQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
+  heater_temperatureDataQueue = xQueueCreate(QUEUE_SIZE, sizeof(temperature_data_t));
   if (heater_temperatureDataQueue == NULL)
     printf("Unable to create heater_temperatureDataQueue queue\n");
 
   // Battery Management Task Queues
-  battery_requestPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
+  battery_requestPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(battery_percent_req_t));
   if (battery_requestPercentQueue == NULL)
     printf("Unable to create battery_requestPercentQueue queue\n");
 
   // USB Management Task Queues
-  usb_stateChangeQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
+  usb_stateChangeQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_message_t));
   if (usb_stateChangeQueue == NULL)
     printf("Unable to create usb_stateChangeQueue queue\n");
 
@@ -333,10 +333,10 @@ void create_queues() {
   logger_recvBattPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
   if (logger_recvBattPercentQueue == NULL)
     printf("Unable to create logger_recvBattPercentQueue queue\n");
-  logger_logMessageQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
+  logger_logMessageQueue = xQueueCreate(QUEUE_SIZE, sizeof(log_data_message_t));
   if (logger_logMessageQueue == NULL)
     printf("Unable to create logger_logMessageQueue queue\n");
-  logger_mainStateChangeQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
+  logger_mainStateChangeQueue = xQueueCreate(QUEUE_SIZE, sizeof(main_state_t));
   if (logger_mainStateChangeQueue == NULL)
     printf("Unable to create logger_mainStateChangeQueue queue\n");
 }

@@ -16,7 +16,14 @@ void sensors_task(void * pvParameters) {
   BaseType_t xReturned;
 
   // TODO: Get Configuration Settings
+
+  /* Get TSYS01 Calibration Values */
+#if I2C_CONNECTED
   tsys01_err = tsys01_getCalibrationValues(valve_zone);
+  tsys01_err = tsys01_getCalibrationValues(amp_zone_0);
+  tsys01_err = tsys01_getCalibrationValues(amp_zone_1);
+  tsys01_err = tsys01_getCalibrationValues(amp_zone_2);
+#endif
 
   for (;;) {
     // ADC Read for Optical Sensors
@@ -28,7 +35,8 @@ void sensors_task(void * pvParameters) {
     else                                      
       switches.hal_triggered = true;
 
-    // TODO: I2C Read for Temp Sensor 2
+ #if I2C_CONNECTED
+    // I2C Read for Valve Zone
     readTemp(valve_zone, &valve_temperature);
     temperatures.valve_zone_temp = valve_temperature;    
 
@@ -43,7 +51,13 @@ void sensors_task(void * pvParameters) {
     // I2C Read for Amplification Zone 2 
     readTemp(amp_zone_2, &amp2_temperature);
     temperatures.amp2_zone_temp = amp2_temperature;
-    
+#else
+    // Set temps to their setpoints if i2c is not connected
+    temperatures.valve_zone_temp = 85;
+    temperatures.amp0_zone_temp = 65;
+    temperatures.amp1_zone_temp = 65;
+    temperatures.amp2_zone_temp = 65;
+#endif
 
     // Put Switch Data into queue
     xReturned = xQueueSend(main_switchQueue, (void *)&switches, 0);
