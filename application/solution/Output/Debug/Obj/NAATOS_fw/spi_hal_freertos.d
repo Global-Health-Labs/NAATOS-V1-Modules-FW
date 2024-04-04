@@ -1,7 +1,9 @@
-Output/Debug/Obj/NAATOS_fw/nrfx_systick.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\modules\nrfx\drivers\src\nrfx_systick.c \
- ../sdk/modules/nrfx/nrfx.h ../sdk/integration/nrfx/nrfx_config.h \
- ../src/config/sdk_config.h ../sdk/modules/nrfx/drivers/nrfx_common.h \
+Output/Debug/Obj/NAATOS_fw/spi_hal_freertos.o: \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\spi_hal_freertos.c \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\spi_hal_freertos.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_spi.h ../sdk/modules/nrfx/nrfx.h \
+ ../sdk/integration/nrfx/nrfx_config.h ../src/config/sdk_config.h \
+ ../sdk/modules/nrfx/drivers/nrfx_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stddef.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
@@ -40,5 +42,22 @@ Output/Debug/Obj/NAATOS_fw/nrfx_systick.o: \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/libraries/util/sdk_resources.h \
  ../sdk/modules/nrfx/drivers/nrfx_errors.h \
- ../sdk/modules/nrfx/drivers/include/nrfx_systick.h \
- ../sdk/modules/nrfx/hal/nrf_systick.h
+ ../sdk/modules/nrfx/drivers/include/nrfx_spim.h \
+ ../sdk/modules/nrfx/hal/nrf_spim.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_spi.h \
+ ../sdk/modules/nrfx/hal/nrf_spi.h ../sdk/modules/nrfx/hal/nrf_gpio.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
+ ../sdk/external/freertos/source/include/FreeRTOS.h \
+ ../sdk/external/freertos/config/FreeRTOSConfig.h \
+ ../sdk/external/freertos/source/include/projdefs.h \
+ ../sdk/external/freertos/source/include/portable.h \
+ ../sdk/external/freertos/source/include/deprecated_definitions.h \
+ ../sdk/external/freertos/portable/GCC/nrf52/portmacro.h \
+ ../sdk/external/freertos/portable/CMSIS/nrf52/portmacro_cmsis.h \
+ ../sdk/external/freertos/source/include/mpu_wrappers.h \
+ ../sdk/external/freertos/source/include/task.h \
+ ../sdk/external/freertos/source/include/list.h \
+ ../sdk/external/freertos/source/include/timers.h \
+ ../sdk/external/freertos/source/include/task.h \
+ ../sdk/external/freertos/source/include/semphr.h \
+ ../sdk/external/freertos/source/include/queue.h

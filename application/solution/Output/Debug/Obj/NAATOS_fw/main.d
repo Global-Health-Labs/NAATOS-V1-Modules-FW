@@ -85,4 +85,13 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/modules/nrfx/drivers/include/nrfx_ppi.h \
  ../sdk/modules/nrfx/hal/nrf_ppi.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\usb.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\i2c_hal_freertos.h
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\i2c_hal_freertos.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\spi_hal_freertos.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_spi.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_spim.h \
+ ../sdk/modules/nrfx/hal/nrf_spim.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_spi.h \
+ ../sdk/modules/nrfx/hal/nrf_spi.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
+ ../sdk/external/freertos/source/include/semphr.h \
+ ../sdk/external/freertos/source/include/queue.h

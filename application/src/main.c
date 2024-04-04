@@ -31,6 +31,7 @@ Purpose : NAATOS Application Start
 #include "pwm.h"
 #include "adc.h"
 #include "i2c_hal_freertos.h"
+#include "spi_hal_freertos.h"
 
 // Task Handles
 xTaskHandle mainTaskHandle;
@@ -359,6 +360,7 @@ int main(void) {
   init_sensors_gpios();   // Sensor GPIOs
   vInit_TWI_Hardware(i2c_interface_system, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
   //vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
+  vInit_SPI_Hardware(SPI_MISO_PIN, SPI_MOSI_PIN, SPI_SCK_PIN, SPI_SD_SS_PIN);  // SPI
 
   // Create Tasks
   create_tasks();

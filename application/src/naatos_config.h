@@ -13,6 +13,12 @@
 #define I2C0_SDA_PIN    25
 #define I2C0_SCL_PIN    24
 
+/* SPI Pins */
+#define SPI_SCK_PIN     15    /* P0.15 */
+#define SPI_MOSI_PIN    13    /* P0.13 */
+#define SPI_MISO_PIN    14    /* P0.14 */
+#define SPI_SD_SS_PIN   12    /* P0.12 */
+
 /* Main States */
 typedef enum {
   LOW_POWER,
