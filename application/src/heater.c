@@ -54,10 +54,9 @@ void heater_task(void * pvParameters) {
     
     // Update PID and PWM
     if (amplification_zone_running) {
-      printf("Recvd Amp0 Temp: %0.3f\n", temperature_data.amplification_zone_temp);
       // Update PID loop with new temperatures
       pid_controller_compute(&amp0_pid, temperature_data.amplification_zone_temp);
-      printf("Amp0 Duty: %0.2f\n", amp0_pid.out);
+      
       // Update PWM with PID output
       update_amp0_duty(amp0_pid.out);
     }
@@ -65,6 +64,12 @@ void heater_task(void * pvParameters) {
       // TODO: Update PID loop with new temperatures
       // TODO: Update PWM with PID output
     }
+
+#if VERBOSE_PID 
+    if (amplification_zone_running) {
+      printf("Amp0:\tTemp: %0.2f\tDuty: %0.2f\n",temperature_data.amplification_zone_temp, amp0_pid.out);
+    }
+#endif
 
   }
 }

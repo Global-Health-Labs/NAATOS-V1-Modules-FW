@@ -253,7 +253,7 @@ void create_tasks() {
       vTaskDelete( mainTaskHandle );
   }
   // Heater Task
-  xReturned = xTaskCreate(heater_task, "HeaterTask", 256, NULL, 0, &heaterTaskHandle);
+  xReturned = xTaskCreate(heater_task, "HeaterTask", 384, NULL, 0, &heaterTaskHandle);
   if( xReturned != pdPASS ) {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating heater task. Error: %d\n", xReturned);
