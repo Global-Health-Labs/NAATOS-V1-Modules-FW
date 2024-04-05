@@ -53,21 +53,24 @@ void init_sd_card(void) {
   else {
     printf("Mount successful.\n");
   }
+
+  // Create directories if needed
+  create_naatos_directories();
 }
 
-// Checks to make sure directories are inside of the SD card
-directories_needed_t check_naatos_directories(void) {
-  // Create return struct
-  directories_needed_t needed = {
-    .config_dir_needed = false,
-    .log_dir_needed = false
-  };
-
-}
-
-// Creates the needed naatos directories
-void create_naatos_directories(directories_needed_t needed) {
-
+// Creates the needed naatos directories if they dont already exist
+void create_naatos_directories() {
+  FRESULT res;
+  // Create logs directory
+  res = f_mkdir(logs_directory);
+  if (res == FR_OK) {
+    printf("Logs directory created\n");
+  }
+  // Create config directory
+  res = f_mkdir(config_directory);
+  if (res == FR_OK) {
+    printf("Config directory created\n");
+  }
 }
 
 // Prints directories seen on the sd card

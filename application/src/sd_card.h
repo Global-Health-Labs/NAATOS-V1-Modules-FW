@@ -11,6 +11,9 @@
 #include "nrf_log_default_backends.h"
 #include "naatos_config.h"
 
+#define logs_directory    "logs"
+#define config_directory  "config"
+
 typedef struct {
   bool log_dir_needed;
   bool config_dir_needed;
@@ -18,7 +21,6 @@ typedef struct {
 
 void init_sd_card(void);
 void sd_card_list_directories(void); 
-directories_needed_t check_naatos_directories(void);
-void create_naatos_directories(directories_needed_t needed);
+void create_naatos_directories();
 
 #endif
