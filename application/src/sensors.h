@@ -10,7 +10,5 @@
 #define HAL_INPUT_PIN       2
 #define OPTICAL_INPUT_PIN   3
 
-#define I2C_CONNECTED       0
-
 void sensors_task(void * pvParameters);
 void init_sensors_gpios(void);

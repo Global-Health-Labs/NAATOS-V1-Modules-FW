@@ -11,7 +11,7 @@ NRF_BLOCK_DEV_SDC_DEFINE(
 );
 
 /* SD Card Variables */
-static FATFS fs;
+static FATFS *fs;
 static DIR dir;
 static FILINFO fno;
 static FIL file;
@@ -44,19 +44,24 @@ void init_sd_card(void) {
   capacity = m_block_dev_sdc.block_dev.p_ops->geometry(&m_block_dev_sdc.block_dev)->blk_count / blocks_per_mb;
   printf("SD Card initalized. Capactity: %d MB\n", capacity);
   
-  // Mount the SD card volume
-  printf("Mounting volume...\n");
-  ff_result = f_mount(&fs, "", 1);
-  if (ff_result) {
-    printf("Mount failed.\n");
-    return;
+  // Mount SD Card
+  ff_result = sd_card_mount();
+  if (ff_result != FR_OK) {
+    printf("Unable to mount SD Card!\n");
   }
-  else {
-    printf("Mount successful.\n");
-  }
-
   // Create directories if needed
   create_naatos_directories();
+}
+
+FRESULT sd_card_mount(void) {
+  // Mount the SD card volume
+  fs = malloc(sizeof(FATFS));
+  return f_mount(fs, "", 1);
+}
+
+FRESULT sd_card_unmount(void) {
+  f_mount(0, "", 0);
+  free(fs);
 }
 
 // Creates the needed naatos directories if they dont already exist
@@ -78,8 +83,21 @@ void create_naatos_directories() {
 FRESULT sd_card_create_log_file(const char * file_name) {
   FRESULT res;
 
+  // Re-Mount SD Card
+  res = sd_card_mount();
+  if (res != FR_OK) {
+    printf("Unable to mount SD Card!\n");
+  }
+  // Open root directory
+  res = f_opendir(&dir, "/");
+  if (res != FR_OK) {
+      return res;
+  }
   // Change directory into logs
-  f_chdir(LOGS_DIR);
+  res = f_chdir(LOGS_DIR);
+  if (res != FR_OK) {
+    return res;
+  }
   // Make the log file
   res = f_open(&file, file_name, FA_CREATE_NEW | FA_WRITE);
   if (res != FR_OK) {

@@ -19,6 +19,10 @@
 #define SPI_MISO_PIN    14    /* P0.14 */
 #define SPI_SD_SS_PIN   12    /* P0.12 */
 
+/* Device Debug Parameters */
+#define I2C_CONNECTED           0
+#define GO_STRAIGHT_TO_RUNNING  1
+
 /* Main States */
 typedef enum {
   LOW_POWER,

@@ -8,6 +8,13 @@ const battery_percent_req_t batt_req = {
   .task_req = LOGGER
 };
 
+// Puts log file name in char pointer
+void getLogFileName(const char * _logFileName) {
+  uint8_t minute=52, hour=13, day=5, month=4, year=24;
+  // TODO: Get current Date and Time and update vars
+  sprintf(_logFileName, "sample.csv");
+}
+
 void logger_task(void * pvParameters) {
   BaseType_t xReturned;
   main_state_t main_state = STANDBY;
@@ -15,6 +22,8 @@ void logger_task(void * pvParameters) {
   int battery_percent;
   bool new_temp = false;
   bool uart_only = false;
+  char logFileName[50];
+  FRESULT res;
 
   // TODO: Get the configuration settings 
   // TODO: Check the log rate (if its less than 1 set to UART Logging only)
@@ -24,8 +33,13 @@ void logger_task(void * pvParameters) {
     if (xReturned != pdPASS) {
       printf("LOG_TASK: Unable to receive state change from logger_mainStateChangeQueue.\n");
     }
-    // TODO: Create Log File based on the UTC Time of the Sample preperation
-    
+    // Create Log File based on the UTC Time of the Sample preperation
+    getLogFileName(logFileName);
+    res = sd_card_create_log_file(logFileName);
+    if (res != FR_OK) {
+      printf("LOG_TASK: Unable to create log file for current sample preperation.\n");
+    }
+
     // Log sample data while we are running
     while (main_state == RUNNING) {
       // Check if state has changed

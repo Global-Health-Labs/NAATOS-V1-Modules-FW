@@ -26,14 +26,20 @@ void sensors_task(void * pvParameters) {
 #endif
 
   for (;;) {
+   
+ #if (GO_STRAIGHT_TO_RUNNING)
+    switches.optical_tiggered = true;
+    switches.hal_triggered = true;
+ #else 
     // ADC Read for Optical Sensors
     switches.optical_tiggered = get_optical_triggered();
-     
     // GPIO Read for Hall Sensor
     if (nrf_gpio_pin_read(HAL_INPUT_PIN))    
      switches.hal_triggered = false;   
     else                                      
       switches.hal_triggered = true;
+ #endif
+    
 
  #if I2C_CONNECTED
     // I2C Read for Valve Zone

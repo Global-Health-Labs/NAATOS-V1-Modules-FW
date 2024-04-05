@@ -68,6 +68,32 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_queues.h \
  ../sdk/external/freertos/source/include/queue.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\logger.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sd_card.h \
+ ../sdk/external/fatfs/src/ff.h ../sdk/external/fatfs/src/integer.h \
+ ../sdk/external/fatfs/src/ffconf.h \
+ ../sdk/external/fatfs/port/diskio_blkdev.h \
+ ../sdk/external/fatfs/src/diskio.h \
+ ../sdk/components/libraries/block_dev/nrf_block_dev.h \
+ ../sdk/components/libraries/util/sdk_common.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
+ ../sdk/components/libraries/util/sdk_os.h \
+ ../sdk/components/libraries/util/app_util.h \
+ ../sdk/components/libraries/util/sdk_macros.h \
+ ../sdk/components/libraries/block_dev/sdc/nrf_block_dev_sdc.h \
+ ../sdk/components/libraries/sdcard/app_sdcard.h \
+ ../sdk/components/libraries/log/nrf_log.h \
+ ../sdk/components/libraries/experimental_section_vars/nrf_section.h \
+ ../sdk/components/libraries/strerror/nrf_strerror.h \
+ ../sdk/components/libraries/log/src/nrf_log_internal.h \
+ ../sdk/components/libraries/log/nrf_log_instance.h \
+ ../sdk/components/libraries/log/nrf_log_types.h \
+ ../sdk/components/libraries/log/nrf_log_types.h \
+ ../sdk/components/libraries/log/nrf_log_ctrl.h \
+ ../sdk/components/libraries/log/src/nrf_log_ctrl_internal.h \
+ ../sdk/components/libraries/log/nrf_log_backend_interface.h \
+ ../sdk/components/libraries/memobj/nrf_memobj.h \
+ ../sdk/components/libraries/balloc/nrf_balloc.h \
+ ../sdk/components/libraries/log/nrf_log_default_backends.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sensors.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\adc.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_saadc.h \
@@ -92,31 +118,5 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/modules/nrfx/hal/nrf_spim.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_spi.h \
  ../sdk/modules/nrfx/hal/nrf_spi.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
  ../sdk/external/freertos/source/include/semphr.h \
- ../sdk/external/freertos/source/include/queue.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sd_card.h \
- ../sdk/external/fatfs/src/ff.h ../sdk/external/fatfs/src/integer.h \
- ../sdk/external/fatfs/src/ffconf.h \
- ../sdk/external/fatfs/port/diskio_blkdev.h \
- ../sdk/external/fatfs/src/diskio.h \
- ../sdk/components/libraries/block_dev/nrf_block_dev.h \
- ../sdk/components/libraries/util/sdk_common.h \
- ../sdk/components/libraries/util/sdk_os.h \
- ../sdk/components/libraries/util/app_util.h \
- ../sdk/components/libraries/util/sdk_macros.h \
- ../sdk/components/libraries/block_dev/sdc/nrf_block_dev_sdc.h \
- ../sdk/components/libraries/sdcard/app_sdcard.h \
- ../sdk/components/libraries/log/nrf_log.h \
- ../sdk/components/libraries/experimental_section_vars/nrf_section.h \
- ../sdk/components/libraries/strerror/nrf_strerror.h \
- ../sdk/components/libraries/log/src/nrf_log_internal.h \
- ../sdk/components/libraries/log/nrf_log_instance.h \
- ../sdk/components/libraries/log/nrf_log_types.h \
- ../sdk/components/libraries/log/nrf_log_types.h \
- ../sdk/components/libraries/log/nrf_log_ctrl.h \
- ../sdk/components/libraries/log/src/nrf_log_ctrl_internal.h \
- ../sdk/components/libraries/log/nrf_log_backend_interface.h \
- ../sdk/components/libraries/memobj/nrf_memobj.h \
- ../sdk/components/libraries/balloc/nrf_balloc.h \
- ../sdk/components/libraries/log/nrf_log_default_backends.h
+ ../sdk/external/freertos/source/include/queue.h

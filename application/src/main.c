@@ -124,7 +124,7 @@ void main_task(void * pvParameters) {
         if (hal_triggered && optical_triggered) {
           // Set the new main state
           main_state = RUNNING;
-          // TODO: send main state update to usb task
+          sendUpdatedMainTaskState(main_state);
         }
       break;
 
@@ -132,7 +132,10 @@ void main_task(void * pvParameters) {
       case RUNNING:
         /* ***** Start Sample Preperation ***** */
         // TODO: Send Start Test Preperation to log 
-
+#if GO_STRAIGHT_TO_RUNNING
+        // Allow for other tasks to get ready to receive main state change
+        vTaskDelay(2000);
+#endif
         /* ***** Amplification Zone Run ***** */
         // Send start amplification message to heater queue
         xReturned = xQueueSend(heater_zoneRunQueue, &run_amplification_zone, 0);
@@ -262,7 +265,7 @@ void create_tasks() {
       vTaskDelete( heaterTaskHandle );
   }
   // Logger Task
-  xReturned = xTaskCreate(logger_task, "LoggerTask", 100, NULL, 0, &loggerTaskHandle);
+  xReturned = xTaskCreate(logger_task, "LoggerTask", 300, NULL, 0, &loggerTaskHandle);
   if( xReturned != pdPASS ) {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating logger task. Error: %d\n", xReturned);
@@ -363,8 +366,7 @@ int main(void) {
   //vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
   //init_SPI_Hardware(SPI_MISO_PIN, SPI_MOSI_PIN, SPI_SCK_PIN, SPI_SD_SS_PIN);  // SPI not sure if this is needed for SD card
   init_sd_card();
-  FRESULT res = sd_card_create_log_file("log1.csv");
-  sd_card_list_contents();
+  //sd_card_list_contents();
 
   // Create Tasks
   create_tasks();
@@ -373,7 +375,7 @@ int main(void) {
   create_queues();
 
   // Start Tasks
-  //vTaskStartScheduler();
+  vTaskStartScheduler();
 
 }
 

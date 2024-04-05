@@ -37,4 +37,50 @@ Output/Debug/Obj/NAATOS_fw/logger.o: \
  ../sdk/components/libraries/util/app_util.h \
  ../sdk/external/freertos/source/include/mpu_wrappers.h \
  ../sdk/external/freertos/source/include/queue.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_config.h
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_config.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sd_card.h \
+ ../sdk/components/libraries/bsp/bsp.h ../sdk/components/boards/boards.h \
+ ../sdk/modules/nrfx/hal/nrf_gpio.h ../sdk/modules/nrfx/nrfx.h \
+ ../sdk/integration/nrfx/nrfx_config.h ../src/config/sdk_config.h \
+ ../sdk/modules/nrfx/drivers/nrfx_common.h \
+ ../sdk/modules/nrfx/mdk/nrf_peripherals.h \
+ ../sdk/modules/nrfx/mdk/nrf52840_peripherals.h \
+ ../sdk/integration/nrfx/nrfx_glue.h \
+ ../sdk/integration/nrfx/legacy/apply_old_config.h \
+ ../sdk/modules/nrfx/soc/nrfx_irqs.h \
+ ../sdk/modules/nrfx/soc/nrfx_irqs_nrf52840.h \
+ ../sdk/components/libraries/util/nordic_common.h \
+ ../sdk/modules/nrfx/soc/nrfx_coredep.h \
+ ../sdk/modules/nrfx/soc/nrfx_atomic.h \
+ ../sdk/components/libraries/util/sdk_errors.h \
+ ../sdk/components/libraries/util/sdk_resources.h \
+ ../sdk/modules/nrfx/drivers/nrfx_errors.h \
+ ../sdk/components/boards/pca10056.h \
+ ../sdk/components/libraries/button/app_button.h \
+ ../sdk/components/libraries/util/app_error.h \
+ ../sdk/external/fatfs/src/ff.h ../sdk/external/fatfs/src/integer.h \
+ ../sdk/external/fatfs/src/ffconf.h \
+ ../sdk/external/fatfs/port/diskio_blkdev.h \
+ ../sdk/external/fatfs/src/diskio.h \
+ ../sdk/components/libraries/block_dev/nrf_block_dev.h \
+ ../sdk/components/libraries/util/sdk_common.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
+ ../sdk/components/libraries/util/sdk_os.h \
+ ../sdk/components/libraries/util/app_util.h \
+ ../sdk/components/libraries/util/sdk_macros.h \
+ ../sdk/components/libraries/block_dev/sdc/nrf_block_dev_sdc.h \
+ ../sdk/components/libraries/sdcard/app_sdcard.h \
+ ../sdk/components/libraries/log/nrf_log.h \
+ ../sdk/components/libraries/experimental_section_vars/nrf_section.h \
+ ../sdk/components/libraries/strerror/nrf_strerror.h \
+ ../sdk/components/libraries/log/src/nrf_log_internal.h \
+ ../sdk/components/libraries/log/nrf_log_instance.h \
+ ../sdk/components/libraries/log/nrf_log_types.h \
+ ../sdk/components/libraries/log/nrf_log_types.h \
+ ../sdk/components/libraries/log/nrf_log_ctrl.h \
+ ../sdk/components/libraries/log/src/nrf_log_ctrl_internal.h \
+ ../sdk/components/libraries/log/nrf_log_backend_interface.h \
+ ../sdk/components/libraries/memobj/nrf_memobj.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdlib.h \
+ ../sdk/components/libraries/balloc/nrf_balloc.h \
+ ../sdk/components/libraries/log/nrf_log_default_backends.h
