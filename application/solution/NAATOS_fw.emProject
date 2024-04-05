@@ -145,8 +145,10 @@
       <file file_name="../src/i2c_hal_freertos.h" />
       <file file_name="../src/tsys01.c" />
       <file file_name="../src/tsys01.h" />
-      <file file_name="../src/spi_hal_freertos.c" />
-      <file file_name="../src/spi_hal_freertos.h" />
+      <file file_name="../src/spi.c" />
+      <file file_name="../src/spi.h" />
+      <file file_name="../src/sd_card.c" />
+      <file file_name="../src/sd_card.h" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../sdk/external/segger_rtt/SEGGER_RTT.c" />
