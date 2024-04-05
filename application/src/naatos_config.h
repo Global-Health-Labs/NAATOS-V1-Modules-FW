@@ -19,9 +19,18 @@
 #define SPI_MISO_PIN    14    /* P0.14 */
 #define SPI_SD_SS_PIN   12    /* P0.12 */
 
+/* Default Rates
+ * These rates are only used when there is no configuration file seen in the 
+   naatos_config.txt file on the sd card. When a new config files is created
+   these rates will be used in the system.
+ * Rates are in seconds
+*/
+#define DEFAULT_SAMPLE_RATE   0.100
+#define DEFAULT_LOGGING_RATE  15.000
+
 /* Device Debug Parameters */
 #define I2C_CONNECTED           0
-#define GO_STRAIGHT_TO_RUNNING  1
+#define GO_STRAIGHT_TO_RUNNING  0
 
 /* Main States */
 typedef enum {

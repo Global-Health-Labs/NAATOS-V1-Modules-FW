@@ -25,7 +25,9 @@ uint32_t b_written;
 // Initialize FATFS disk I/O interface by providing the block device.
 static diskio_blkdev_t drives[] = { DISKIO_BLOCKDEV_CONFIG(NRF_BLOCKDEV_BASE_ADDR(m_block_dev_sdc, block_dev), NULL) };
 
-FRESULT remount_goto_logs_dir();
+// "private" functions
+FRESULT remount_goto_logs_dir(void);
+FRESULT check_for_config_file(void);
 
 // Initalize Function
 void init_sd_card(void) {
@@ -33,7 +35,6 @@ void init_sd_card(void) {
   diskio_blockdev_register(drives, ARRAY_SIZE(drives));
 
   // Initalize the disk on the SD
-  printf("Initializing disk 0 (SDC)...\n");
   for (uint32_t retries = 3; retries && disk_state; --retries) {
     disk_state = disk_initialize(0);
   }
@@ -53,7 +54,6 @@ void init_sd_card(void) {
   }
   // Create directories if needed
   create_naatos_directories();
-
 }
 
 // Mount the SD card volume
@@ -79,6 +79,14 @@ void create_naatos_directories() {
   if (res == FR_OK) {
     printf("Config directory created\n");
   }
+  res = check_for_config_file();
+  if (res == FR_OK) {
+    printf("New config.txt config file in config subdirectory created with default parameters.\n");
+  }
+  else if (res != FR_EXIST) {
+    printf("Unable to retreive config.txt from sd card.\n");
+  }
+  
 }
 
 // Create a new file under the log subdirectory ** NO NAMES WITH : ALLOWED **
@@ -156,7 +164,7 @@ FRESULT sd_card_write_log_line(const char * logName, const char * writeBuff, uin
   return res;
 }
 
-// Prints directories seen on the sd card
+// Prints directories seen on the sd card -- Was used during debug of sd card, only prints directories and files at root
 void sd_card_list_contents(void) {
   printf("\r\n Listing directory: /\n");
   // Open Root Directory
@@ -206,4 +214,52 @@ FRESULT remount_goto_logs_dir(void) {
   if (res != FR_OK) {
     return res;
   }
+}
+
+
+FRESULT check_for_config_file(void) {
+  FRESULT res;
+  char configBuffer[50];
+  uint32_t configBufferSize;
+  uint32_t b_written;
+
+  // Change directory into configs
+  res = f_chdir(CONFIG_DIR);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Try to create new naatos_config.txt
+  res = f_open(&file, NAATOS_CONFIG_FILE, FA_CREATE_NEW | FA_WRITE);
+  if (res == FR_EXIST) {              
+    // Return that it already exists  
+    return res; 
+  }
+
+  // Populate new config file
+  // Write sample rate
+  configBufferSize = sprintf(configBuffer, "sample_rate:%0.2f\n", DEFAULT_SAMPLE_RATE);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write logging rate
+  configBufferSize = sprintf(configBuffer, "logging_rate:%0.2f\n", DEFAULT_SAMPLE_RATE);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Close the file
+  res = f_close(&file);
+  if (res != FR_OK) {
+      return res;
+  }
+
+  // Change back directories
+  res = f_chdir("..");
+  if (res != FR_OK) {
+      return res;
+  }
+
+  return res;
 }

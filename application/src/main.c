@@ -309,7 +309,7 @@ void create_tasks() {
 */
 void create_queues() {
   // Main Task Queues
-  main_batteryDataQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));        // TODO: Update sizes, int is just the placeholder 
+  main_batteryDataQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));       
   if (main_batteryDataQueue == NULL)
     printf("Unable to create main_batteryDataQueue queue\n");
   main_switchQueue = xQueueCreate(QUEUE_SIZE, sizeof(sensor_switches_t));
@@ -366,7 +366,6 @@ int main(void) {
   //vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
   //init_SPI_Hardware(SPI_MISO_PIN, SPI_MOSI_PIN, SPI_SCK_PIN, SPI_SD_SS_PIN);  // SPI not sure if this is needed for SD card
   init_sd_card();
-  //sd_card_list_contents();
 
   // Create Tasks
   create_tasks();
