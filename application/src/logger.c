@@ -12,7 +12,7 @@ const battery_percent_req_t batt_req = {
 void getLogFileName(const char * _logFileName) {
   uint8_t minute=52, hour=13, day=5, month=4, year=24;
   // TODO: Get current Date and Time and update vars
-  sprintf(_logFileName, "sample.csv");
+  sprintf(_logFileName, "sample1.csv");
 }
 
 void logger_task(void * pvParameters) {

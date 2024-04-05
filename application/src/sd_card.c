@@ -11,7 +11,7 @@ NRF_BLOCK_DEV_SDC_DEFINE(
 );
 
 /* SD Card Variables */
-static FATFS *fs;
+static FATFS fs;
 static DIR dir;
 static FILINFO fno;
 static FIL file;
@@ -51,17 +51,17 @@ void init_sd_card(void) {
   }
   // Create directories if needed
   create_naatos_directories();
+
 }
 
+// Mount the SD card volume
 FRESULT sd_card_mount(void) {
-  // Mount the SD card volume
-  fs = malloc(sizeof(FATFS));
-  return f_mount(fs, "", 1);
+  return f_mount(&fs, "", 1);
 }
 
+// Mount the SD card volume ** Dont believe this is working right now
 FRESULT sd_card_unmount(void) {
   f_mount(0, "", 0);
-  free(fs);
 }
 
 // Creates the needed naatos directories if they dont already exist
@@ -79,7 +79,7 @@ void create_naatos_directories() {
   }
 }
 
-// Create a new file under the log subdirectory
+// Create a new file under the log subdirectory ** NO NAMES WITH : ALLOWED **
 FRESULT sd_card_create_log_file(const char * file_name) {
   FRESULT res;
 
