@@ -23,7 +23,10 @@ void logger_task(void * pvParameters) {
   bool new_temp = false;
   bool uart_only = false;
   char logFileName[50];
+  char logFileLine[256];
+  uint32_t logFileLineSize;
   FRESULT res;
+  uint8_t hour = 12, minute = 59;
 
   // TODO: Get the configuration settings 
   // TODO: Check the log rate (if its less than 1 set to UART Logging only)
@@ -36,7 +39,10 @@ void logger_task(void * pvParameters) {
     // Create Log File based on the UTC Time of the Sample preperation
     getLogFileName(logFileName);
     res = sd_card_create_log_file(logFileName);
-    if (res != FR_OK) {
+    if (res == FR_EXIST) {
+      printf("LOG_TASK: Warning! Log file with name already exist, will be overwritting that file.\n");
+    }
+    else if (res != FR_OK) {
       printf("LOG_TASK: Unable to create log file for current sample preperation.\n");
     }
 
@@ -68,21 +74,36 @@ void logger_task(void * pvParameters) {
         if (xReturned != pdPASS) {
           printf("LOG_TASK: Unable to get log message from logger_logMessageQueue.\n");
         }
+         
+        // TODO: Get current time
 
+        // Setup Log Message for UART and File based on log message type
         if (log_message.data_type == TEMPERATURE_DATA) {
+          // Set new temp to true
           new_temp = true;
-          // TODO: Setup Log Message for UART and File
+          // Format: Time,ValveTemp,Amp0Temp,Amp1Temp,Amp2Temp,BattPercent,Event
+          logFileLineSize = sprintf(logFileLine, "%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,NONE\n", hour, minute, log_message.temperature_data.valve_zone_temp,
+                                    log_message.temperature_data.amp0_zone_temp, log_message.temperature_data.amp1_zone_temp,
+                                    log_message.temperature_data.amp2_zone_temp, battery_percent);
         }
         else if (log_message.data_type == EVENT_DATA) {
-          // TODO: Setup Log Message for UART and File
+          
+          // Format: Time,ValveTemp,Amp0Temp,Amp1Temp,Amp2Temp,BattPercent,Event
+          logFileLineSize = sprintf(logFileLine, "%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n", hour, minute, log_message.temperature_data.valve_zone_temp,
+                                    log_message.temperature_data.amp0_zone_temp, log_message.temperature_data.amp1_zone_temp,
+                                    log_message.temperature_data.amp2_zone_temp, battery_percent, log_message.event_data.message);
         }
-        
-        // TODO: Get current time
-        // TODO: Format Log String to have HH-MM-SS Message
         
         // Check UART Only 
         if (!uart_only) {
-          // TODO: Write to sample log file
+          // Write to sample log file
+          FRESULT res = sd_card_write_log_line(logFileName, logFileLine, logFileLineSize);
+          if (res != FR_OK) {
+            printf("LOG_TASK: Unable to write last log line!\n");
+          }
+          else {
+            printf("LOG_TASK: Wrote line to log\n");
+          }
         }
       } 
     }
