@@ -25,11 +25,13 @@ uint32_t b_written;
 // Initialize FATFS disk I/O interface by providing the block device.
 static diskio_blkdev_t drives[] = { DISKIO_BLOCKDEV_CONFIG(NRF_BLOCKDEV_BASE_ADDR(m_block_dev_sdc, block_dev), NULL) };
 
+FRESULT remount_goto_logs_dir();
+
 // Initalize Function
 void init_sd_card(void) {
   // Register the drives we have -- Should only be the one
   diskio_blockdev_register(drives, ARRAY_SIZE(drives));
-  
+
   // Initalize the disk on the SD
   printf("Initializing disk 0 (SDC)...\n");
   for (uint32_t retries = 3; retries && disk_state; --retries) {
@@ -82,36 +84,74 @@ void create_naatos_directories() {
 // Create a new file under the log subdirectory ** NO NAMES WITH : ALLOWED **
 FRESULT sd_card_create_log_file(const char * file_name) {
   FRESULT res;
-
-  // Re-Mount SD Card
-  res = sd_card_mount();
-  if (res != FR_OK) {
-    printf("Unable to mount SD Card!\n");
-  }
-  // Open root directory
-  res = f_opendir(&dir, "/");
-  if (res != FR_OK) {
-      return res;
-  }
-  // Change directory into logs
-  res = f_chdir(LOGS_DIR);
+  
+  // Go to the logs directory
+  res = remount_goto_logs_dir();
   if (res != FR_OK) {
     return res;
   }
+
   // Make the log file
   res = f_open(&file, file_name, FA_CREATE_NEW | FA_WRITE);
   if (res != FR_OK) {
     return res;
   }
+
   // Write the csv header to the file
   res = f_write(&file, CSV_HEADER, CSV_HEADER_SIZE, &b_written);
   if (res != FR_OK) {
     return res;
   }
+
   // Close the file
-  f_close(&file);
+  res = f_close(&file);
+  if (res != FR_OK) {
+      return res;
+  }
+
   // Change back directories
-  f_chdir("..");
+  res = f_chdir("..");
+  if (res != FR_OK) {
+      return res;
+  }
+
+  return res;
+}
+
+// Write a line to the log file on the SD card 
+FRESULT sd_card_write_log_line(const char * logName, const char * writeBuff, uint32_t writeBuffSize) {
+  FRESULT res;
+  uint32_t b_written;
+
+  // Go to the logs directory
+  res = remount_goto_logs_dir();
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Open the log file
+  res = f_open(&file, logName, FA_WRITE | FA_OPEN_APPEND);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Write the given line
+  res = f_write(&file, writeBuff, writeBuffSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Close the file
+  res = f_close(&file);
+  if (res != FR_OK) {
+      return res;
+  }
+
+  // Change back directories
+  res = f_chdir("..");
+  if (res != FR_OK) {
+      return res;
+  }
 
   return res;
 }
@@ -125,6 +165,7 @@ void sd_card_list_contents(void) {
       printf("Directory listing failed!\n");
       return;
   }
+
   // Get the other directories
   do {
       ff_result = f_readdir(&dir, &fno);
@@ -143,4 +184,26 @@ void sd_card_list_contents(void) {
       }
   }
   while (fno.fname[0]);
+}
+
+FRESULT remount_goto_logs_dir(void) {
+  FRESULT res;
+
+  // Re-Mount SD Card
+  res = sd_card_mount();
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Open root directory
+  res = f_opendir(&dir, "/");
+  if (res != FR_OK) {
+      return res;
+  }
+
+  // Change directory into logs
+  res = f_chdir(LOGS_DIR);
+  if (res != FR_OK) {
+    return res;
+  }
 }

@@ -375,7 +375,7 @@ int main(void) {
   create_queues();
 
   // Start Tasks
-  vTaskStartScheduler();
+  //vTaskStartScheduler();
 
 }
 

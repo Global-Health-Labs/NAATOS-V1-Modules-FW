@@ -28,5 +28,6 @@ void create_naatos_directories(void);
 FRESULT sd_card_create_log_file(const char * file_name);
 FRESULT sd_card_mount(void);
 FRESULT sd_card_unmount(void);
+FRESULT sd_card_write_log_line(const char * logName, const char * writeBuff, uint32_t writeBuffSize);
 
 #endif
