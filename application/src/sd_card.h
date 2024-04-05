@@ -11,8 +11,11 @@
 #include "nrf_log_default_backends.h"
 #include "naatos_config.h"
 
-#define logs_directory    "logs"
-#define config_directory  "config"
+#define LOGS_DIR      "logs"
+#define CONFIG_DIR    "config"
+
+#define CSV_HEADER        "Time,ValveTemp,Amp0Temp,Amp1Temp,Amp2Temp,Batt,Event"
+#define CSV_HEADER_SIZE   52
 
 typedef struct {
   bool log_dir_needed;
@@ -20,7 +23,8 @@ typedef struct {
 } directories_needed_t;
 
 void init_sd_card(void);
-void sd_card_list_directories(void); 
-void create_naatos_directories();
+void sd_card_list_contents(void); 
+void create_naatos_directories(void);
+FRESULT sd_card_create_log_file(const char * file_name);
 
 #endif

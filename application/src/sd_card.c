@@ -20,6 +20,7 @@ FRESULT ff_result;
 DSTATUS disk_state = STA_NOINIT;
 uint32_t blocks_per_mb;
 uint32_t capacity;
+uint32_t b_written;
 
 // Initialize FATFS disk I/O interface by providing the block device.
 static diskio_blkdev_t drives[] = { DISKIO_BLOCKDEV_CONFIG(NRF_BLOCKDEV_BASE_ADDR(m_block_dev_sdc, block_dev), NULL) };
@@ -62,19 +63,43 @@ void init_sd_card(void) {
 void create_naatos_directories() {
   FRESULT res;
   // Create logs directory
-  res = f_mkdir(logs_directory);
+  res = f_mkdir(LOGS_DIR);
   if (res == FR_OK) {
     printf("Logs directory created\n");
   }
   // Create config directory
-  res = f_mkdir(config_directory);
+  res = f_mkdir(CONFIG_DIR);
   if (res == FR_OK) {
     printf("Config directory created\n");
   }
 }
 
+// Create a new file under the log subdirectory
+FRESULT sd_card_create_log_file(const char * file_name) {
+  FRESULT res;
+
+  // Change directory into logs
+  f_chdir(LOGS_DIR);
+  // Make the log file
+  res = f_open(&file, file_name, FA_CREATE_NEW | FA_WRITE);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write the csv header to the file
+  res = f_write(&file, CSV_HEADER, CSV_HEADER_SIZE, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Close the file
+  f_close(&file);
+  // Change back directories
+  f_chdir("..");
+
+  return res;
+}
+
 // Prints directories seen on the sd card
-void sd_card_list_directories(void) {
+void sd_card_list_contents(void) {
   printf("\r\n Listing directory: /\n");
   // Open Root Directory
   ff_result = f_opendir(&dir, "/");

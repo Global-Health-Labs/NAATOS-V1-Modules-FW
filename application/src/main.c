@@ -363,7 +363,8 @@ int main(void) {
   //vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
   //init_SPI_Hardware(SPI_MISO_PIN, SPI_MOSI_PIN, SPI_SCK_PIN, SPI_SD_SS_PIN);  // SPI not sure if this is needed for SD card
   init_sd_card();
-  sd_card_list_directories();
+  FRESULT res = sd_card_create_log_file("log1.csv");
+  sd_card_list_contents();
 
   // Create Tasks
   create_tasks();
