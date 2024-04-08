@@ -124,6 +124,8 @@ void main_task(void * pvParameters) {
   // Set Start up state to standby
   main_state_t main_state = STANDBY;
   // TODO: Get Configuration Settings
+
+  int i = 0;
   
   // Main State Loop
   for (;;) {
@@ -182,7 +184,7 @@ void main_task(void * pvParameters) {
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
           if (!hal_triggered || !optical_triggered) {
-            // Send Start Event to logging task
+            // Send Interrupt Event to logging task
             xReturned = xQueueSend(logger_logMessageQueue, &interrupt_log_msg, 0);
             if (xReturned != pdPASS) {
               printf("MAIN_TASK: Unable to send sample interruption event to logging task.");
@@ -192,7 +194,8 @@ void main_task(void * pvParameters) {
             error_during_run = true;
             break;
           }
-        } while (1/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
+          i++;
+        } while ( i < 100/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
         // Send amplification zone stop request
         xReturned = xQueueSend(heater_zoneRunQueue, &stop_amplification_zone, 0);
         if (xReturned != pdPASS) {
@@ -218,7 +221,7 @@ void main_task(void * pvParameters) {
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
           if (!hal_triggered || !optical_triggered) {
-            // Send Start Event to logging task
+            // Send interrupt Event to logging task
             xReturned = xQueueSend(logger_logMessageQueue, &interrupt_log_msg, 0);
             if (xReturned != pdPASS) {
               printf("MAIN_TASK: Unable to send sample interruption event to logging task.");
@@ -294,6 +297,12 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   xReturned = xQueueSend(battery_mainStateQueue, &new_state, 0);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send main state change to battery_mainStateQueue.\n");
+  }
+
+  // Send the state to the heater task
+  xReturned = xQueueSend(sensor_mainStateQueue, &new_state, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send main state change to heater_mainStateQueue.\n");
   }
 
   // TODO: might have to do small delay here for usb task to update
@@ -380,6 +389,11 @@ void create_queues() {
   heater_temperatureDataQueue = xQueueCreate(QUEUE_SIZE, sizeof(temperature_data_t));
   if (heater_temperatureDataQueue == NULL)
     printf("Unable to create heater_temperatureDataQueue queue\n");
+
+  // Sensor Task Queues
+  sensor_mainStateQueue = xQueueCreate(QUEUE_SIZE, sizeof(main_state_t));
+  if (sensor_mainStateQueue == NULL)
+    printf("Unable to create sensor_mainStateQueue queue\n");
 
   // Battery Management Task Queues
   battery_requestPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(battery_percent_req_t));

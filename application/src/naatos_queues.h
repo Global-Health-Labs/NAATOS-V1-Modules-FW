@@ -14,6 +14,9 @@ extern xQueueHandle main_switchQueue;
 extern xQueueHandle heater_zoneRunQueue;
 extern xQueueHandle heater_temperatureDataQueue;
 
+// Sensor Task Queue(s)
+extern xQueueHandle sensor_mainStateQueue;
+
 // Battery Management Task Queue(s)
 extern xQueueHandle battery_requestPercentQueue;
 extern xQueueHandle battery_mainStateQueue;

@@ -11,6 +11,9 @@ static double amp0_temperature;
 static double amp1_temperature;
 static double amp2_temperature;
 
+xQueueHandle sensor_mainStateQueue;
+main_state_t s_main_state = STANDBY;
+
 static log_data_message_t log_msg = {
   .data_type = TEMPERATURE_DATA,
   .event_data = NULL,
@@ -36,6 +39,15 @@ void sensors_task(void * pvParameters) {
     // Get Start Time in ms, testing for timings
     //uint32_t time = pdTICKS_TO_MS(xTaskGetTickCount());
     //printf("Start Time: %dms \n", time);
+
+    // Check to see if the main task state has changed
+    if (uxQueueMessagesWaiting(sensor_mainStateQueue) > 0) {
+      xReturned = xQueueReceive(sensor_mainStateQueue, &s_main_state, 0);
+      if (xReturned != pdPASS) {
+        printf("BATT_TASK: Unable to receive state change from sensor_mainStateQueue.\n");
+      }
+      continue;
+    }
    
  #if (GO_STRAIGHT_TO_RUNNING)
     switches.optical_tiggered = true;
@@ -100,7 +112,7 @@ void sensors_task(void * pvParameters) {
     }
     
     // Only send temperature data when we are running 
-    if (switches.hal_triggered && switches.optical_tiggered) {
+    if (s_main_state == RUNNING) {
       // Put Temperature Data into queue
       xReturned = xQueueSend(heater_temperatureDataQueue, (void *)&temperatures, 0);
       if (xReturned != pdPASS) {

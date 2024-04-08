@@ -276,7 +276,7 @@ usb_task:
 	.uleb128 0x6
 	.4byte	.LASF12409
 	.byte	0x6
-	.byte	0x16
+	.byte	0x19
 	.byte	0x15
 	.4byte	0x9c
 	.uleb128 0x7

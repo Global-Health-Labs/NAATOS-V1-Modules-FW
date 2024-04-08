@@ -54,6 +54,7 @@ void heater_task(void * pvParameters) {
       printf("HEATER_TASK: unable to receive temperature data from heater_temperatureDataQueue\n");
     }
     
+    
     // Update PID and PWM
     if (amplification_zone_running) {
       // Update Amplification 0 PID loop with new temperatures
