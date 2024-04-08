@@ -10,8 +10,10 @@
 #include "timers.h"
 
 xQueueHandle battery_requestPercentQueue;
+xQueueHandle battery_mainStateQueue;
 charge_state_t charge_state;
 int battery_percentage = 100;
+main_state_t batt_main_state = STANDBY;
 
 void battery_task(void * pvParameters) {
   BaseType_t xReturned;
@@ -31,11 +33,21 @@ void battery_task(void * pvParameters) {
       // TODO: if changed, put state change message in usb_stateChangeQueue
     // TODO: I2C Fuel Gauge read (on second i2c bus to ensure no task collisions)
 
+    // Check to see if the main task state has changed
+    if (uxQueueMessagesWaiting(battery_mainStateQueue) > 0) {
+      xReturned = xQueueReceive(battery_mainStateQueue, &batt_main_state, 0);
+      if (xReturned != pdPASS) {
+        printf("BATT_TASK: Unable to receive state change from battery_mainStateQueue.\n");
+      }
+      continue;
+    }
 
-    // Send Battery Percentage to main task
-    xReturned = xQueueSend(main_batteryDataQueue, (void *)&battery_percentage, 1000); // TODO: Probably want to send full BMS information instead
-    if (xReturned != pdPASS) {
-      printf("BATT_TASK: Was unable to send battery percentage to main queue. Error:%d\n", xReturned);
+    // Send Battery Percentage to main task if we are in standby
+    if (batt_main_state == STANDBY) {
+      xReturned = xQueueSend(main_batteryDataQueue, (void *)&battery_percentage, 1000); // TODO: Probably want to send full BMS information instead
+      if (xReturned != pdPASS) {
+        printf("BATT_TASK: Was unable to send battery percentage to main queue. Error:%d\n", xReturned);
+      }
     }
 
     // Check the battery request queue (logging)

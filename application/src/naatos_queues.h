@@ -16,6 +16,7 @@ extern xQueueHandle heater_temperatureDataQueue;
 
 // Battery Management Task Queue(s)
 extern xQueueHandle battery_requestPercentQueue;
+extern xQueueHandle battery_mainStateQueue;
 
 // USB Management Task Queue(s)
 extern xQueueHandle usb_stateChangeQueue;

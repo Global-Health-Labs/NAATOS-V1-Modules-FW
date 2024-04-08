@@ -11,7 +11,6 @@ static double amp0_temperature;
 static double amp1_temperature;
 static double amp2_temperature;
 
-
 void sensors_task(void * pvParameters) {
   BaseType_t xReturned;
 
@@ -32,14 +31,31 @@ void sensors_task(void * pvParameters) {
     switches.hal_triggered = true;
  #else 
     // ADC Read for Optical Sensors
+    bool prev = switches.optical_tiggered;
     switches.optical_tiggered = get_optical_triggered();
+    if (prev != switches.optical_tiggered) {
+      if (switches.optical_tiggered) {
+        printf("Optical sensor triggered!\n");
+      }
+      else {
+        printf("Optical sensor no longer triggered!\n");
+      }
+    }
     // GPIO Read for Hall Sensor
+    prev = switches.hal_triggered;
     if (nrf_gpio_pin_read(HAL_INPUT_PIN))    
      switches.hal_triggered = false;   
     else                                      
       switches.hal_triggered = true;
+    if (prev != switches.hal_triggered) {
+      if (switches.hal_triggered) {
+        printf("Hal sensor triggered!\n");
+      }
+      else {
+        printf("Hal sensor no longer triggered!\n");
+      }
+    }
  #endif
-    
 
  #if I2C_CONNECTED
     // I2C Read for Valve Zone
@@ -70,11 +86,14 @@ void sensors_task(void * pvParameters) {
     if (xReturned != pdPASS) {
       printf("SENSORS_TASK: Unable to send switch data in main_switchQueue.\n");
     }
-
-    // Put Temperature Data into queue
-    xReturned = xQueueSend(heater_temperatureDataQueue, (void *)&temperatures, 0);
-    if (xReturned != pdPASS) {
-      printf("SENSORS_TASK: Unable to send temperature data in heater_temperatureDataQueue. Error: %d\n", xReturned);
+    
+    // Only send temperature data when we are running 
+    if (switches.hal_triggered && switches.optical_tiggered) {
+      // Put Temperature Data into queue
+      xReturned = xQueueSend(heater_temperatureDataQueue, (void *)&temperatures, 0);
+      if (xReturned != pdPASS) {
+        printf("SENSORS_TASK: Unable to send temperature data in heater_temperatureDataQueue. Error: %d\n", xReturned);
+      }
     }
 
     // TODO: Add in sending of temperature data to Log Data queue if: index = (log rate * sample rate) - 1

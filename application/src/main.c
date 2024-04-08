@@ -105,12 +105,9 @@ void main_task(void * pvParameters) {
         if (xQueueReceive(main_batteryDataQueue, &percent_recv, 0) == pdPASS) {
           if (percent_recv < LOW_POWER_THRESHOLD) {
              main_state = LOW_POWER;
-             // TODO: send main state update to usb task
+             sendUpdatedMainTaskState(main_state);
              break;
           }
-        }
-        else {
-          printf("MAIN_TASK: Error receiving battery percentage from main_batteryDataQueue\n");
         }
         // Wait for Sensor Switch Data 
         xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
@@ -239,6 +236,12 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
     printf("MAIN_TASK: Unable to send main state change to logger_mainStateChangeQueue.\n");
   }
 
+  // Send the state to the battery task
+  xReturned = xQueueSend(battery_mainStateQueue, &new_state, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send main state change to battery_mainStateQueue.\n");
+  }
+
   // TODO: might have to do small delay here for usb task to update
 }
 
@@ -328,6 +331,9 @@ void create_queues() {
   battery_requestPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(battery_percent_req_t));
   if (battery_requestPercentQueue == NULL)
     printf("Unable to create battery_requestPercentQueue queue\n");
+  battery_mainStateQueue = xQueueCreate(QUEUE_SIZE, sizeof(main_state_t));
+  if (battery_mainStateQueue == NULL)
+    printf("Unable to create battery_mainStateQueue queue\n");
 
   // USB Management Task Queues
   usb_stateChangeQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_message_t));
@@ -364,7 +370,6 @@ int main(void) {
   init_sensors_gpios();   // Sensor GPIOs
   vInit_TWI_Hardware(i2c_interface_system, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
   //vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
-  //init_SPI_Hardware(SPI_MISO_PIN, SPI_MOSI_PIN, SPI_SCK_PIN, SPI_SD_SS_PIN);  // SPI not sure if this is needed for SD card
   init_sd_card();
 
   // Create Tasks
