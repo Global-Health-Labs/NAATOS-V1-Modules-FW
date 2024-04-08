@@ -48,6 +48,7 @@ void logger_task(void * pvParameters) {
 
     // Log sample data while we are running
     while (main_state == RUNNING) {
+      new_temp = false;
       // Check if state has changed
       if (uxQueueMessagesWaiting(logger_mainStateChangeQueue) > 0) {
         xReturned = xQueueReceive(logger_mainStateChangeQueue, &main_state, 0);

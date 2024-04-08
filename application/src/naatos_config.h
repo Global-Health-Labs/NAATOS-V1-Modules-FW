@@ -28,7 +28,7 @@
  * Rates are in seconds
 */
 #define DEFAULT_SAMPLE_RATE   0.200
-#define DEFAULT_LOGGING_RATE  15.000
+#define DEFAULT_LOGGING_RATE  5.000
 
 /* Device Debug Parameters */
 #define I2C_CONNECTED           0
