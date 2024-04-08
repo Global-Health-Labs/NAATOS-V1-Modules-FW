@@ -19,6 +19,7 @@ void logger_task(void * pvParameters) {
   BaseType_t xReturned;
   main_state_t main_state = STANDBY;
   log_data_message_t log_message;
+  log_data_message_t last_temp_message;
   int battery_percent;
   bool new_temp = false;
   bool uart_only = false;
@@ -86,13 +87,14 @@ void logger_task(void * pvParameters) {
           logFileLineSize = sprintf(logFileLine, "%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,NONE\n", hour, minute, log_message.temperature_data.valve_zone_temp,
                                     log_message.temperature_data.amp0_zone_temp, log_message.temperature_data.amp1_zone_temp,
                                     log_message.temperature_data.amp2_zone_temp, battery_percent);
+          last_temp_message = log_message;
         }
         else if (log_message.data_type == EVENT_DATA) {
           
           // Format: Time,ValveTemp,Amp0Temp,Amp1Temp,Amp2Temp,BattPercent,Event
-          logFileLineSize = sprintf(logFileLine, "%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n", hour, minute, log_message.temperature_data.valve_zone_temp,
-                                    log_message.temperature_data.amp0_zone_temp, log_message.temperature_data.amp1_zone_temp,
-                                    log_message.temperature_data.amp2_zone_temp, battery_percent, log_message.event_data.message);
+          logFileLineSize = sprintf(logFileLine, "%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n", hour, minute, last_temp_message.temperature_data.valve_zone_temp,
+                                    last_temp_message.temperature_data.amp0_zone_temp, last_temp_message.temperature_data.amp1_zone_temp,
+                                    last_temp_message.temperature_data.amp2_zone_temp, battery_percent, log_message.event_data.message);
         }
         
         // Check UART Only 

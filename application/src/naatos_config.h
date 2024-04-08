@@ -34,6 +34,11 @@
 #define I2C_CONNECTED           0
 #define GO_STRAIGHT_TO_RUNNING  0
 
+/* Log Event Messages */
+#define START_EVENT_MSG       "Sample Preperation Started."
+#define STOP_EVENT_MSG        "Sample Preperation Completed."
+#define INTERRUPT_EVENT_MSG   "Sample Preperation Interrupted."
+
 /* Main States */
 typedef enum {
   LOW_POWER,
@@ -75,7 +80,8 @@ typedef enum {
 
 typedef enum {
   SAMPLE_START,
-  SAMPLE_END
+  SAMPLE_END,
+  SAMPLE_INTERRUPTED
   // Add more events here
 } event_t;
 

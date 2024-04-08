@@ -18,7 +18,6 @@ Purpose : NAATOS Application Start
 #include "nrf_drv_clock.h"
 #include "sdk_errors.h"
 #include "app_error.h"
-
 #include "states.h"
 #include "battery.h"
 #include "logger.h"
@@ -64,6 +63,35 @@ const zone_run_req_t stop_valve_zone = {
   .zone = VALVE
 };
 
+// Log Event Constants
+const log_event_t start_event = {
+  .event = SAMPLE_START,
+  .message = START_EVENT_MSG
+}; 
+const log_data_message_t start_log_msg = {
+  .data_type = EVENT_DATA,
+  .temperature_data = NULL,
+  .event_data = start_event
+};
+const log_event_t stop_event = {
+  .event = SAMPLE_END,
+  .message = STOP_EVENT_MSG
+}; 
+const log_data_message_t stop_log_msg = {
+  .data_type = EVENT_DATA,
+  .temperature_data = NULL,
+  .event_data = stop_event
+};
+const log_event_t interrupt_event = {
+  .event = SAMPLE_INTERRUPTED,
+  .message = INTERRUPT_EVENT_MSG
+}; 
+const log_data_message_t interrupt_log_msg = {
+  .data_type = EVENT_DATA,
+  .temperature_data = NULL,
+  .event_data = interrupt_event
+};
+
 // USB Main State Update Constants
 const usb_message_t standby_update = {
   .message_type = MAIN_STATE_TYPE,
@@ -91,6 +119,7 @@ void main_task(void * pvParameters) {
   sensor_switches_t switch_data;
   int percent_recv;   
   bool hal_triggered = false, optical_triggered = false; 
+  bool error_during_run = false;
 
   // Set Start up state to standby
   main_state_t main_state = STANDBY;
@@ -101,6 +130,7 @@ void main_task(void * pvParameters) {
     switch(main_state) {
       // In Standby State
       case STANDBY:
+        if (error_during_run) error_during_run = false;
         // Check for Battery Data in Battery Queue
         if (xQueueReceive(main_batteryDataQueue, &percent_recv, 0) == pdPASS) {
           if (percent_recv < LOW_POWER_THRESHOLD) {
@@ -139,6 +169,11 @@ void main_task(void * pvParameters) {
         if (xReturned != pdPASS) {
           printf("MAIN_TASK: Unable to send run amplification zone request.\n");
         }
+        // Send Start Event to logging task
+        xReturned = xQueueSend(logger_logMessageQueue, &start_log_msg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send start event to logging task.");
+        }
         // TODO: Get the amplification start time
         // Get sensor switch data ensuring sample is still in position
         do {
@@ -147,9 +182,14 @@ void main_task(void * pvParameters) {
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
           if (!hal_triggered || !optical_triggered) {
-            // TODO: Send Log Error about sample removed during run
+            // Send Start Event to logging task
+            xReturned = xQueueSend(logger_logMessageQueue, &interrupt_log_msg, 0);
+            if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to send sample interruption event to logging task.");
+            }
             main_state = STANDBY;
             sendUpdatedMainTaskState(main_state);
+            error_during_run = true;
             break;
           }
         } while (1/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
@@ -158,6 +198,10 @@ void main_task(void * pvParameters) {
         if (xReturned != pdPASS) {
           printf("MAIN_TASK: Unable to send stop amplification zone request.\n");
         }
+        if (error_during_run) {
+            break;
+        }
+
         // TODO: might have to do small delay here for heater task to update
 
         /* ***** Valve Zone Run **** */
@@ -174,9 +218,14 @@ void main_task(void * pvParameters) {
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
           if (!hal_triggered || !optical_triggered) {
-            // TODO: Send Log Error about sample removed during run
+            // Send Start Event to logging task
+            xReturned = xQueueSend(logger_logMessageQueue, &interrupt_log_msg, 0);
+            if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to send sample interruption event to logging task.");
+            }
             main_state = STANDBY;
             sendUpdatedMainTaskState(main_state);
+            error_during_run = true;
             break;
           }
         } while (1/*TODO: Compare current time against VALVE_ON_TIME*/);
@@ -185,19 +234,24 @@ void main_task(void * pvParameters) {
         if (xReturned != pdPASS) {
           printf("MAIN_TASK: Unable to send stop valve zone request.\n");
         }
+        if (error_during_run) {
+            break;
+        }
 
         // TODO: might have to do small delay here for heater task to update
       
         /* ***** End Sample Preperation ***** */
-        if (!hal_triggered || !optical_triggered) {
-          break;
-        }
         // Wait for the sample to be removed prior to going back to STANDBY state
         do {
           xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
         } while(hal_triggered || optical_triggered);
+        // Send Stop Event to logging task
+        xReturned = xQueueSend(logger_logMessageQueue, &stop_log_msg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send sample interruption event to logging task.");
+        }
         // Update current main state
         main_state = STANDBY;
         sendUpdatedMainTaskState(main_state);

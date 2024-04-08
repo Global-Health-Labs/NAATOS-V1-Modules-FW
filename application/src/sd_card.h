@@ -16,8 +16,8 @@
 
 #define NAATOS_CONFIG_FILE  "config.txt"
 
-#define CSV_HEADER        "Time,ValveTemp,Amp0Temp,Amp1Temp,Amp2Temp,Batt,Event"
-#define CSV_HEADER_SIZE   52
+#define CSV_HEADER        "Time,ValveTemp,Amp0Temp,Amp1Temp,Amp2Temp,Batt,Event\n"
+#define CSV_HEADER_SIZE   53
 
 typedef struct {
   bool log_dir_needed;
