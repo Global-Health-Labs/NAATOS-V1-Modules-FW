@@ -11,8 +11,16 @@ static double amp0_temperature;
 static double amp1_temperature;
 static double amp2_temperature;
 
+static log_data_message_t log_msg = {
+  .data_type = TEMPERATURE_DATA,
+  .event_data = NULL,
+  .temperature_data = NULL
+};
+
 void sensors_task(void * pvParameters) {
   BaseType_t xReturned;
+  uint32_t sample_log_index = 0;
+  uint32_t sample_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE); // TODO: Update to be based on config.txt
 
   // TODO: Get Configuration Settings
 
@@ -26,8 +34,8 @@ void sensors_task(void * pvParameters) {
 
   for (;;) {
     // Get Start Time in ms, testing for timings
-    uint32_t time = pdTICKS_TO_MS(xTaskGetTickCount());
-    printf("Start Time: %dms \n", time);
+    //uint32_t time = pdTICKS_TO_MS(xTaskGetTickCount());
+    //printf("Start Time: %dms \n", time);
    
  #if (GO_STRAIGHT_TO_RUNNING)
     switches.optical_tiggered = true;
@@ -100,17 +108,25 @@ void sensors_task(void * pvParameters) {
       }
     }
 
-    // TODO: Add in sending of temperature data to Log Data queue if: index = (log rate * sample rate) - 1
+    // Send temperature data to Log Data queue
+    if (switches.hal_triggered && switches.optical_tiggered) 
+      sample_log_index++;
+    if (sample_log_index >= sample_log_max) {
+      log_msg.temperature_data = temperatures;
+      xReturned = xQueueSend(logger_logMessageQueue, (void *)&log_msg, 0);
+      if (xReturned != pdPASS) {
+        printf("SENSORS_TASK: Unable to send log message to logger_logMessageQueue.\n");
+      }
+      sample_log_index = 0;
+    }
     
     // Delay based on the given sample rate
     // Remove 48 ms delay when running for temperature read delays
     vTaskDelay(pdMS_TO_TICKS((DEFAULT_SAMPLE_RATE*1000) - (12 * 4) + 1)); // TODO: Update sample rate to be based on config file
     
-    //portTICK_PERIOD_MS
-    
     // Get Stop Time in ms, testing for timings
-    time = pdTICKS_TO_MS(xTaskGetTickCount());
-    printf("End Time: %dms\n", time);
+    //time = pdTICKS_TO_MS(xTaskGetTickCount());
+    //printf("End Time: %dms\n", time);
   }
 }
 
@@ -123,7 +139,7 @@ void readTemp(sensor_selection_t sensor, double * temperature) {
   tsys01_errors_t tsys_err;
 
   tsys01_startConversion(sensor);
-  vTaskDelay(12);  // 12ms conversion time
+  vTaskDelay(pdMS_TO_TICKS(12));  // 12ms conversion time
   tsys_err = tsys01_getTemp(sensor, &temperature);
   if (tsys_err != tsys01_success) {
     printf("HEATER_TASK: Unable to read temperature!\n");
