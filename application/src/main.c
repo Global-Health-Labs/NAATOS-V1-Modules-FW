@@ -187,7 +187,7 @@ void main_task(void * pvParameters) {
             // Send Interrupt Event to logging task
             xReturned = xQueueSend(logger_logMessageQueue, &interrupt_log_msg, 0);
             if (xReturned != pdPASS) {
-              printf("MAIN_TASK: Unable to send sample interruption event to logging task.");
+              printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
             }
             main_state = STANDBY;
             sendUpdatedMainTaskState(main_state);
@@ -195,7 +195,16 @@ void main_task(void * pvParameters) {
             break;
           }
           i++;
-        } while ( i < 100/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
+        } while ( i < 50/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
+        i = 0;
+        
+        /* ***** Valve Zone Run **** */
+        // Send start valve message to heater queue
+        xReturned = xQueueSend(heater_zoneRunQueue, &run_valve_zone, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send run valve zone request.\n");
+        }
+        vTaskDelay(10);
         // Send amplification zone stop request
         xReturned = xQueueSend(heater_zoneRunQueue, &stop_amplification_zone, 0);
         if (xReturned != pdPASS) {
@@ -204,15 +213,8 @@ void main_task(void * pvParameters) {
         if (error_during_run) {
             break;
         }
-
         // TODO: might have to do small delay here for heater task to update
-
-        /* ***** Valve Zone Run **** */
-        // Send start valve message to heater queue
-        xReturned = xQueueSend(heater_zoneRunQueue, &run_valve_zone, 0);
-        if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send run valve zone request.\n");
-        }
+        
         // TODO: Get the amplification start time
         // Get sensor switch data ensuring sample is still in position
         do {
@@ -224,7 +226,7 @@ void main_task(void * pvParameters) {
             // Send interrupt Event to logging task
             xReturned = xQueueSend(logger_logMessageQueue, &interrupt_log_msg, 0);
             if (xReturned != pdPASS) {
-              printf("MAIN_TASK: Unable to send sample interruption event to logging task.");
+              printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
             }
             main_state = STANDBY;
             sendUpdatedMainTaskState(main_state);
@@ -253,7 +255,7 @@ void main_task(void * pvParameters) {
         // Send Stop Event to logging task
         xReturned = xQueueSend(logger_logMessageQueue, &stop_log_msg, 0);
         if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send sample interruption event to logging task.");
+          printf("MAIN_TASK: Unable to send sample preperation finished event to logging task.\n");
         }
         // Update current main state
         main_state = STANDBY;
@@ -281,6 +283,12 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   else if (new_state == STANDBY)
     msg = standby_update;
 
+  // Send the state to the battery task
+  xReturned = xQueueSend(battery_mainStateQueue, &new_state, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send main state change to battery_mainStateQueue.\n");
+  }
+
   // Send main state update to usb task
   xReturned = xQueueSend(usb_stateChangeQueue, &msg, 0);
   if (xReturned != pdPASS) {
@@ -291,12 +299,6 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   xReturned = xQueueSend(logger_mainStateChangeQueue, &new_state, 0);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send main state change to logger_mainStateChangeQueue.\n");
-  }
-
-  // Send the state to the battery task
-  xReturned = xQueueSend(battery_mainStateQueue, &new_state, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send main state change to battery_mainStateQueue.\n");
   }
 
   // Send the state to the heater task

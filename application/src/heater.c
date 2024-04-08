@@ -47,13 +47,15 @@ void heater_task(void * pvParameters) {
         valve_zone_running = zone_req.on;
       }
     }
+
+    if (!amplification_zone_running & !valve_zone_running)
+        continue; // Go back to top of loop if no zones running
     
     // Receive temperature data (blocking till data comes in)
     xReturned = xQueueReceive(heater_temperatureDataQueue, &temperature_data, portMAX_DELAY);
     if (xReturned != pdPASS) {
       printf("HEATER_TASK: unable to receive temperature data from heater_temperatureDataQueue\n");
     }
-    
     
     // Update PID and PWM
     if (amplification_zone_running) {

@@ -52,7 +52,7 @@ void battery_task(void * pvParameters) {
 
     // Check the battery request queue (logging)
     if (uxQueueMessagesWaiting(battery_requestPercentQueue) == 0) {
-      vTaskDelay(500);
+      vTaskDelay(100);
       continue;
     }
 
@@ -70,6 +70,6 @@ void battery_task(void * pvParameters) {
       }
     }
 
-    vTaskDelay(500);
+    vTaskDelay(100);
   }
 }
