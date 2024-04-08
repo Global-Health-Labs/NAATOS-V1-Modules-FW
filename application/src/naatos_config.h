@@ -2,6 +2,8 @@
 
 #include "stdbool.h"
 
+#define pdTICKS_TO_MS( xTimeInTicks )    ( ( TickType_t ) ( ( ( uint64_t ) ( xTimeInTicks ) * ( uint64_t ) 1000U ) / ( uint64_t ) configTICK_RATE_HZ ) )
+
 /* Battery Parameters */
 #define LOW_POWER_THRESHOLD     20
 
@@ -25,7 +27,7 @@
    these rates will be used in the system.
  * Rates are in seconds
 */
-#define DEFAULT_SAMPLE_RATE   0.100
+#define DEFAULT_SAMPLE_RATE   0.200
 #define DEFAULT_LOGGING_RATE  15.000
 
 /* Device Debug Parameters */

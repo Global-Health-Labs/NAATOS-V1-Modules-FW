@@ -25,6 +25,9 @@ void sensors_task(void * pvParameters) {
 #endif
 
   for (;;) {
+    // Get Start Time in ms, testing for timings
+    uint32_t time = pdTICKS_TO_MS(xTaskGetTickCount());
+    printf("Start Time: %dms \n", time);
    
  #if (GO_STRAIGHT_TO_RUNNING)
     switches.optical_tiggered = true;
@@ -79,6 +82,7 @@ void sensors_task(void * pvParameters) {
     temperatures.amp0_zone_temp = 65;
     temperatures.amp1_zone_temp = 65;
     temperatures.amp2_zone_temp = 65;
+    vTaskDelay(pdMS_TO_TICKS(12 * 4)); // Simulate 12ms delay for each reading
 #endif
 
     // Put Switch Data into queue
@@ -97,8 +101,16 @@ void sensors_task(void * pvParameters) {
     }
 
     // TODO: Add in sending of temperature data to Log Data queue if: index = (log rate * sample rate) - 1
-
-    vTaskDelay(100);
+    
+    // Delay based on the given sample rate
+    // Remove 48 ms delay when running for temperature read delays
+    vTaskDelay(pdMS_TO_TICKS((DEFAULT_SAMPLE_RATE*1000) - (12 * 4) + 1)); // TODO: Update sample rate to be based on config file
+    
+    //portTICK_PERIOD_MS
+    
+    // Get Stop Time in ms, testing for timings
+    time = pdTICKS_TO_MS(xTaskGetTickCount());
+    printf("End Time: %dms\n", time);
   }
 }
 
