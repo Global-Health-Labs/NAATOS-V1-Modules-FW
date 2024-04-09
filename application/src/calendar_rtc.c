@@ -34,13 +34,13 @@ bool calendar_get_time(calendar_time_t * now) {
   
   return ~(buf[0] & 0x80);
 #else 
-  now->second   = 0;
-  now->minute   = 9;
+  now->second   = 59;
+  now->minute   = 59;
   now->hour     = 12;
-  now->day      = 9;
-  now->week_day = 2;
-  now->month    = 8;
-  now->year     = 2024;
+  now->day      = 30;
+  now->week_day = 6;
+  now->month    = 12;
+  now->year     = 24;
   
   return true;
 #endif

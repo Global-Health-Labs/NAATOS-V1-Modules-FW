@@ -160,6 +160,7 @@
     <folder Name="FATFS">
       <file file_name="../sdk/external/fatfs/port/diskio_blkdev.c" />
       <file file_name="../sdk/external/fatfs/src/ff.c" />
+      <file file_name="../sdk/external/fatfs/src/ffconf.h" />
     </folder>
     <folder Name="None">
       <file file_name="../sdk/modules/nrfx/mdk/ses_startup_nrf52840.s" />

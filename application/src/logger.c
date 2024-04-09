@@ -4,15 +4,28 @@ xQueueHandle logger_recvBattPercentQueue;
 xQueueHandle logger_logMessageQueue;
 xQueueHandle logger_mainStateChangeQueue;
 
+calendar_time_t time = {
+    .second = 0,
+    .minute = 0,
+    .hour = 0,
+    .day = 0,
+    .week_day = 0,
+    .month = 0,
+    .year = 0
+  };
+
 const battery_percent_req_t batt_req = {
   .task_req = LOGGER
 };
 
 // Puts log file name in char pointer
 void getLogFileName(const char * _logFileName) {
-  uint8_t minute=52, hour=13, day=5, month=4, year=24;
-  // TODO: Get current Date and Time and update vars
-  sprintf(_logFileName, "sample1.csv");
+  if (!(calendar_get_time(&time))) {
+    printf("LOG_TASK: Unable to get time for log file name!\n");
+    sprintf(_logFileName, "unknown.csv");
+  }
+  // Get current Date and Time and update vars
+  sprintf(_logFileName, "%d%d%d%d.csv", time.month, time.day, time.hour, time.minute);
 }
 
 void logger_task(void * pvParameters) {
@@ -28,15 +41,6 @@ void logger_task(void * pvParameters) {
   uint32_t logFileLineSize;
   FRESULT res;
   bool run_stopped = false;
-  calendar_time_t time = {
-    .second = 0,
-    .minute = 0,
-    .hour = 0,
-    .day = 0,
-    .week_day = 0,
-    .month = 0,
-    .year = 0
-  };
 
   // TODO: Get the configuration settings 
   // TODO: Check the log rate (if its less than 1 set to UART Logging only)
