@@ -91,6 +91,43 @@ const log_data_message_t interrupt_log_msg = {
   .temperature_data = NULL,
   .event_data = interrupt_event
 };
+const log_event_t valve_start_event = {
+  .event = SAMPLE_VALV_STARTED,
+  .message = VALV_START_MSG
+}; 
+const log_data_message_t valve_start_log_msg = {
+  .data_type = EVENT_DATA,
+  .temperature_data = NULL,
+  .event_data = valve_start_event
+};
+const log_event_t valve_stop_event = {
+  .event = SAMPLE_VALV_ENDED,
+  .message = VALV_STOP_MSG
+}; 
+const log_data_message_t valve_stop_log_msg = {
+  .data_type = EVENT_DATA,
+  .temperature_data = NULL,
+  .event_data = valve_stop_event
+};
+const log_event_t amplification_start_event = {
+  .event = SAMPLE_AMP_STARTED,
+  .message = AMP_START_MSG
+}; 
+const log_data_message_t amplification_start_log_msg = {
+  .data_type = EVENT_DATA,
+  .temperature_data = NULL,
+  .event_data = amplification_start_event
+};
+const log_event_t amplification_stop_event = {
+  .event = SAMPLE_AMP_ENDED,
+  .message = AMP_END_MSG
+}; 
+const log_data_message_t amplification_stop_log_msg = {
+  .data_type = EVENT_DATA,
+  .temperature_data = NULL,
+  .event_data = amplification_stop_event
+};
+
 
 // USB Main State Update Constants
 const usb_message_t standby_update = {
@@ -106,6 +143,10 @@ const usb_message_t running_update = {
 
 // Function defs
 void sendUpdatedMainTaskState(main_state_t new_state);
+void begin_amplification_zone(void);
+void end_amplification_zone(void);
+void begin_valve_zone(void);
+void end_valve_zone(void);
 
 /*********************************************************************
 *
@@ -154,11 +195,14 @@ void main_task(void * pvParameters) {
           // Set the new main state
           main_state = RUNNING;
           sendUpdatedMainTaskState(main_state);
+          // Delay
+          vTaskDelay(100);
         }
       break;
 
       // In Running State (Will block task for the duration of the test)
       case RUNNING:
+        vTaskDelay(pdMS_TO_TICKS(100));
         /* ***** Start Sample Preperation ***** */
         // TODO: Send Start Test Preperation to log 
 #if GO_STRAIGHT_TO_RUNNING
@@ -167,16 +211,7 @@ void main_task(void * pvParameters) {
 #endif
         /* ***** Amplification Zone Run ***** */
         // Send start amplification message to heater queue
-        xReturned = xQueueSend(heater_zoneRunQueue, &run_amplification_zone, 0);
-        if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send run amplification zone request.\n");
-        }
-        // Send Start Event to logging task
-        xReturned = xQueueSend(logger_logMessageQueue, &start_log_msg, 0);
-        if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send start event to logging task.");
-        }
-        // TODO: Get the amplification start time
+        begin_amplification_zone();
         // Get sensor switch data ensuring sample is still in position
         do {
           // TODO: Get the current time
@@ -199,23 +234,18 @@ void main_task(void * pvParameters) {
         i = 0;
         
         /* ***** Valve Zone Run **** */
-        // Send start valve message to heater queue
-        xReturned = xQueueSend(heater_zoneRunQueue, &run_valve_zone, 0);
-        if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send run valve zone request.\n");
-        }
+        // Send valve zone start request
+        begin_valve_zone();
+        // Small delay
         vTaskDelay(10);
         // Send amplification zone stop request
-        xReturned = xQueueSend(heater_zoneRunQueue, &stop_amplification_zone, 0);
-        if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send stop amplification zone request.\n");
-        }
+        end_amplification_zone();
+        // Check for errors
         if (error_during_run) {
+            vTaskDelay(10);
+            end_valve_zone();
             break;
         }
-        // TODO: might have to do small delay here for heater task to update
-        
-        // TODO: Get the amplification start time
         // Get sensor switch data ensuring sample is still in position
         do {
           // TODO: Get the current time
@@ -236,11 +266,9 @@ void main_task(void * pvParameters) {
           i++;
         } while (i < 50/*TODO: Compare current time against VALVE_ON_TIME*/);
         i=0;
-        // Send valve zone stop request
-        xReturned = xQueueSend(heater_zoneRunQueue, &stop_valve_zone, 0);
-        if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send stop valve zone request.\n");
-        }
+        // Stop the valve zone
+        end_valve_zone();
+        // Check for errors
         if (error_during_run) {
             break;
         }
@@ -259,11 +287,6 @@ void main_task(void * pvParameters) {
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
         } while(hal_triggered && optical_triggered);
-        // Send Stop Event to logging task
-        xReturned = xQueueSend(logger_logMessageQueue, &stop_log_msg, 0);
-        if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send sample preperation finished event to logging task.\n");
-        }
         // Update current main state
         sendUpdatedMainTaskState(main_state);
         break;
@@ -314,6 +337,62 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   }
 
   // TODO: might have to do small delay here for usb task to update
+}
+
+void begin_amplification_zone(void) {
+  BaseType_t xReturned;
+  // Send start zone request
+  xReturned = xQueueSend(heater_zoneRunQueue, &run_amplification_zone, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send run amplification zone request.\n");
+  }
+  // Send Start Amplification Event to logging task
+  xReturned = xQueueSend(logger_logMessageQueue, &amplification_start_log_msg, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
+  }
+}
+
+void begin_valve_zone(void) {
+  BaseType_t xReturned;
+  // Send start valve message to heater queue
+  xReturned = xQueueSend(heater_zoneRunQueue, &run_valve_zone, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send run valve zone request.\n");
+  }
+  // Send Start Valve Event to logging task
+  xReturned = xQueueSend(logger_logMessageQueue, &valve_start_log_msg, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send start valve zone event to logging task.\n");
+  }
+}
+
+void end_amplification_zone(void) {
+  BaseType_t xReturned;
+  // Send stop amplification message to heater queue
+  xReturned = xQueueSend(heater_zoneRunQueue, &stop_amplification_zone, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send stop amplification zone request.\n");
+  }
+  // Send stop amplification Event to logging task
+  xReturned = xQueueSend(logger_logMessageQueue, &amplification_stop_log_msg, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send stop amplification zone event to logging task.\n");
+  }
+}
+
+void end_valve_zone(void) {
+  BaseType_t xReturned;
+  // Send valve zone stop request
+  xReturned = xQueueSend(heater_zoneRunQueue, &stop_valve_zone, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send stop valve zone request.\n");
+  }
+  // Send stop valve Event to logging task
+  xReturned = xQueueSend(logger_logMessageQueue, &valve_stop_log_msg, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send stop valve zone event to logging task.\n");
+  }
 }
 
 /*********************************************************************
@@ -420,7 +499,7 @@ void create_queues() {
   logger_recvBattPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
   if (logger_recvBattPercentQueue == NULL)
     printf("Unable to create logger_recvBattPercentQueue queue\n");
-  logger_logMessageQueue = xQueueCreate(QUEUE_SIZE, sizeof(log_data_message_t));
+  logger_logMessageQueue = xQueueCreate(2, sizeof(log_data_message_t));
   if (logger_logMessageQueue == NULL)
     printf("Unable to create logger_logMessageQueue queue\n");
   logger_mainStateChangeQueue = xQueueCreate(QUEUE_SIZE, sizeof(main_state_t));

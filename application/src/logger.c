@@ -103,7 +103,7 @@ void logger_task(void * pvParameters) {
           // Set new temp to true
           new_temp = true;
           // Format: Time,ValveTemp,Amp0Temp,Amp1Temp,Amp2Temp,BattPercent,Event
-          logFileLineSize = sprintf(logFileLine, "%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,NONE\n", time.hour, time.minute, log_message.temperature_data.valve_zone_temp,
+          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,NONE\n", time.hour, time.minute, time.second, log_message.temperature_data.valve_zone_temp,
                                     log_message.temperature_data.amp0_zone_temp, log_message.temperature_data.amp1_zone_temp,
                                     log_message.temperature_data.amp2_zone_temp, battery_percent);
           last_temp_message = log_message;
@@ -111,7 +111,7 @@ void logger_task(void * pvParameters) {
         else if (log_message.data_type == EVENT_DATA) {
           
           // Format: Time,ValveTemp,Amp0Temp,Amp1Temp,Amp2Temp,BattPercent,Event
-          logFileLineSize = sprintf(logFileLine, "%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n", time.hour, time.minute, last_temp_message.temperature_data.valve_zone_temp,
+          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n", time.hour, time.minute, time.second, last_temp_message.temperature_data.valve_zone_temp,
                                     last_temp_message.temperature_data.amp0_zone_temp, last_temp_message.temperature_data.amp1_zone_temp,
                                     last_temp_message.temperature_data.amp2_zone_temp, battery_percent, log_message.event_data.message);
           if (log_message.event_data.event == SAMPLE_END || log_message.event_data.event == SAMPLE_INTERRUPTED) {

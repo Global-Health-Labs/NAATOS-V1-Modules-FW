@@ -39,6 +39,10 @@
 #define START_EVENT_MSG       "Sample Preperation Started."
 #define STOP_EVENT_MSG        "Sample Preperation Completed."
 #define INTERRUPT_EVENT_MSG   "Sample Preperation Interrupted."
+#define AMP_START_MSG         "Amplification Zone Heating Started."
+#define AMP_END_MSG           "Amplification Zone Heating Stopped."
+#define VALV_START_MSG        "Valve Zone Heating Started."
+#define VALV_STOP_MSG         "Valve Zone Heating Stopped."
 
 /* Main States */
 typedef enum {
@@ -82,7 +86,11 @@ typedef enum {
 typedef enum {
   SAMPLE_START,
   SAMPLE_END,
-  SAMPLE_INTERRUPTED
+  SAMPLE_INTERRUPTED,
+  SAMPLE_AMP_STARTED,
+  SAMPLE_AMP_ENDED,
+  SAMPLE_VALV_STARTED,
+  SAMPLE_VALV_ENDED
   // Add more events here
 } event_t;
 
