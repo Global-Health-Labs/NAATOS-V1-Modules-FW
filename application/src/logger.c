@@ -25,7 +25,7 @@ void getLogFileName(const char * _logFileName) {
     sprintf(_logFileName, "unknown.csv");
   }
   // Get current Date and Time and update vars
-  sprintf(_logFileName, "%d%d%d%d.csv", time.month, time.day, time.hour, time.minute);
+  sprintf(_logFileName, "sample_%d-%d-%d_%d%d.csv", time.month, time.day, time.year, time.hour, time.minute);
 }
 
 void logger_task(void * pvParameters) {

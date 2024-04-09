@@ -85,6 +85,8 @@
 "Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_printf.o"
 "Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o"
 "Output/Debug/Obj/NAATOS_fw/ff.o"
+"Output/Debug/Obj/NAATOS_fw/cc932.o"
+"Output/Debug/Obj/NAATOS_fw/syscall.o"
 "Output/Debug/Obj/NAATOS_fw/ses_startup_nrf52840.o"
 "Output/Debug/Obj/NAATOS_fw/ses_startup_nrf_common.o"
 "Output/Debug/Obj/NAATOS_fw/system_nrf52840.o"
