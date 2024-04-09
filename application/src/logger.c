@@ -27,8 +27,16 @@ void logger_task(void * pvParameters) {
   char logFileLine[256];
   uint32_t logFileLineSize;
   FRESULT res;
-  uint8_t hour = 12, minute = 59;
   bool run_stopped = false;
+  calendar_time_t time = {
+    .second = 0,
+    .minute = 0,
+    .hour = 0,
+    .day = 0,
+    .week_day = 0,
+    .month = 0,
+    .year = 0
+  };
 
   // TODO: Get the configuration settings 
   // TODO: Check the log rate (if its less than 1 set to UART Logging only)
@@ -81,14 +89,17 @@ void logger_task(void * pvParameters) {
           printf("LOG_TASK: Unable to get log message from logger_logMessageQueue.\n");
         }
          
-        // TODO: Get current time
+        // Get current time
+        if (!(calendar_get_time(&time))) {
+          printf("LOG_TASK: Unable to retreive time!");
+        }
 
         // Setup Log Message for UART and File based on log message type
          if (log_message.data_type == TEMPERATURE_DATA) {
           // Set new temp to true
           new_temp = true;
           // Format: Time,ValveTemp,Amp0Temp,Amp1Temp,Amp2Temp,BattPercent,Event
-          logFileLineSize = sprintf(logFileLine, "%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,NONE\n", hour, minute, log_message.temperature_data.valve_zone_temp,
+          logFileLineSize = sprintf(logFileLine, "%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,NONE\n", time.hour, time.minute, log_message.temperature_data.valve_zone_temp,
                                     log_message.temperature_data.amp0_zone_temp, log_message.temperature_data.amp1_zone_temp,
                                     log_message.temperature_data.amp2_zone_temp, battery_percent);
           last_temp_message = log_message;
@@ -96,7 +107,7 @@ void logger_task(void * pvParameters) {
         else if (log_message.data_type == EVENT_DATA) {
           
           // Format: Time,ValveTemp,Amp0Temp,Amp1Temp,Amp2Temp,BattPercent,Event
-          logFileLineSize = sprintf(logFileLine, "%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n", hour, minute, last_temp_message.temperature_data.valve_zone_temp,
+          logFileLineSize = sprintf(logFileLine, "%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n", time.hour, time.minute, last_temp_message.temperature_data.valve_zone_temp,
                                     last_temp_message.temperature_data.amp0_zone_temp, last_temp_message.temperature_data.amp1_zone_temp,
                                     last_temp_message.temperature_data.amp2_zone_temp, battery_percent, log_message.event_data.message);
           if (log_message.event_data.event == SAMPLE_END || log_message.event_data.event == SAMPLE_INTERRUPTED) {

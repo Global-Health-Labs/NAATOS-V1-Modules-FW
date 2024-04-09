@@ -20,9 +20,7 @@ static const nrf_drv_twi_t m_i2c[i2c_num_interfaces] = {
     NRF_DRV_TWI_INSTANCE(I2C_SENSOR_INSTANCE_ID),
 };
 
-
 static SemaphoreHandle_t m_i2c_semaphores[i2c_num_interfaces];
-
 
 /* INIT for TWI hardware for peripheral */
 void vInit_TWI_Hardware(i2c_interface_selection_t interface, uint32_t sda_pin, uint32_t scl_pin, i2c_speed_selection_t frequency) {

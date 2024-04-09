@@ -3,11 +3,11 @@ Output/Debug/Obj/NAATOS_fw/battery.o: \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\battery.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_config.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdbool.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_queues.h \
  ../sdk/external/freertos/source/include/FreeRTOS.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stddef.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
  ../sdk/external/freertos/config/FreeRTOSConfig.h \
  ../sdk/components/libraries/util/app_util_platform.h \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \

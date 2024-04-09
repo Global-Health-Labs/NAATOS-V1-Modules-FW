@@ -79,6 +79,7 @@
 "Output/Debug/Obj/NAATOS_fw/tsys01.o"
 "Output/Debug/Obj/NAATOS_fw/spi.o"
 "Output/Debug/Obj/NAATOS_fw/sd_card.o"
+"Output/Debug/Obj/NAATOS_fw/calendar_rtc.o"
 "Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o"
 "Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_Syscalls_SES.o"
 "Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_printf.o"

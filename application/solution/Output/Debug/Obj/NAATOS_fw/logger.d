@@ -83,4 +83,6 @@ Output/Debug/Obj/NAATOS_fw/logger.o: \
  ../sdk/components/libraries/memobj/nrf_memobj.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdlib.h \
  ../sdk/components/libraries/balloc/nrf_balloc.h \
- ../sdk/components/libraries/log/nrf_log_default_backends.h
+ ../sdk/components/libraries/log/nrf_log_default_backends.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\calendar_rtc.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\i2c_hal_freertos.h
