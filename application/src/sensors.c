@@ -121,7 +121,7 @@ void sensors_task(void * pvParameters) {
     }
 
     // Send temperature data to Log Data queue
-    if (switches.hal_triggered && switches.optical_tiggered) 
+    if (s_main_state == RUNNING) 
       sample_log_index++;
     if (sample_log_index >= sample_log_max) {
       log_msg.temperature_data = temperatures;

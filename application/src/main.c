@@ -233,7 +233,9 @@ void main_task(void * pvParameters) {
             error_during_run = true;
             break;
           }
-        } while (1/*TODO: Compare current time against VALVE_ON_TIME*/);
+          i++;
+        } while (i < 50/*TODO: Compare current time against VALVE_ON_TIME*/);
+        i=0;
         // Send valve zone stop request
         xReturned = xQueueSend(heater_zoneRunQueue, &stop_valve_zone, 0);
         if (xReturned != pdPASS) {
@@ -244,21 +246,25 @@ void main_task(void * pvParameters) {
         }
 
         // TODO: might have to do small delay here for heater task to update
-      
         /* ***** End Sample Preperation ***** */
+        // Update sensor state prematuraly to stop sending of temp data
+        main_state = STANDBY;
+        xReturned = xQueueSend(sensor_mainStateQueue, &main_state, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send main state change to heater_mainStateQueue.\n");
+        }
         // Wait for the sample to be removed prior to going back to STANDBY state
         do {
           xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
-        } while(hal_triggered || optical_triggered);
+        } while(hal_triggered && optical_triggered);
         // Send Stop Event to logging task
         xReturned = xQueueSend(logger_logMessageQueue, &stop_log_msg, 0);
         if (xReturned != pdPASS) {
           printf("MAIN_TASK: Unable to send sample preperation finished event to logging task.\n");
         }
         // Update current main state
-        main_state = STANDBY;
         sendUpdatedMainTaskState(main_state);
         break;
 
@@ -301,7 +307,7 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
     printf("MAIN_TASK: Unable to send main state change to logger_mainStateChangeQueue.\n");
   }
 
-  // Send the state to the heater task
+  // Send the state to the sensor task
   xReturned = xQueueSend(sensor_mainStateQueue, &new_state, 0);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send main state change to heater_mainStateQueue.\n");
