@@ -8,6 +8,7 @@ Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o: \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\i2c_hal_freertos.h \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_config.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_twi.h ../sdk/modules/nrfx/nrfx.h \
  ../sdk/integration/nrfx/nrfx_config.h ../src/config/sdk_config.h \
  ../sdk/modules/nrfx/drivers/nrfx_common.h ../sdk/modules/nrfx/mdk/nrf.h \

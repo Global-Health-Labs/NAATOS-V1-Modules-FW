@@ -13,8 +13,10 @@
 #define VALVE_ZONE_ON_TIME          3     // Minutes
 
 /* I2C Pins */
-#define I2C0_SDA_PIN    25
-#define I2C0_SCL_PIN    24
+#define I2C0_SDA_PIN    17
+#define I2C0_SCL_PIN    16
+#define I2C1_SDA_PIN    24
+#define I2C1_SCL_PIN    23
 
 /* SPI Pins */
 #define SPI_SCK_PIN     15    /* P0.15 */
@@ -32,7 +34,7 @@
 #define DEFAULT_LOGGING_RATE  5.000
 
 /* Device Debug Parameters */
-#define I2C_CONNECTED           0
+#define I2C_CONNECTED           1
 #define GO_STRAIGHT_TO_RUNNING  0
 
 /* Log Event Messages */

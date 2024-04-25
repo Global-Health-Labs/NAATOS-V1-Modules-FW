@@ -32,10 +32,10 @@ bool calendar_get_time(calendar_time_t * now) {
   now->month    = calendar_decode(buff[5] & ~0xE0);
   now->year     = calendar_decode(buff[6]);
   
-  return ~(buf[0] & 0x80);
+  return ~(buff[0] & 0x80);
 #else 
   now->second   = 59;
-  now->minute   = 59;
+  now->minute   = 59; 
   now->hour     = 12;
   now->day      = 30;
   now->week_day = 6;
