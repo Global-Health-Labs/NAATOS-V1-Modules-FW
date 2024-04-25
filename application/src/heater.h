@@ -20,12 +20,12 @@
 #define A0_KI   0.3
 #define A0_KD   1.0
 
-#define A1_KP   5.0
-#define A1_KI   1.0
+#define A1_KP   42.0
+#define A1_KI   0.3
 #define A1_KD   1.0
 
-#define A2_KP   5.0
-#define A2_KI   1.0
+#define A2_KP   42.0
+#define A2_KI   0.3
 #define A2_KD   1.0
 
 void heater_task(void * pvParameters);

@@ -230,7 +230,7 @@ void main_task(void * pvParameters) {
             break;
           }
           i++;
-        } while ( i < 50/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
+        } while ( i < 500/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
         i = 0;
         
         /* ***** Valve Zone Run **** */
@@ -425,7 +425,7 @@ void create_tasks() {
       vTaskDelete( loggerTaskHandle );
   }
   // Sensors Task
-  xReturned = xTaskCreate(sensors_task, "SensorsTask", 300, NULL, 0, &sensorsTaskHandle);
+  xReturned = xTaskCreate(sensors_task, "SensorsTask", 1024, NULL, 0, &sensorsTaskHandle);
   if( xReturned != pdPASS ) {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating sensors task. Error: %d\n", xReturned);

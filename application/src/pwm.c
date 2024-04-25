@@ -104,7 +104,8 @@ void pwm_task(void * pvParameters) {
   
     // PWM0 Control
     if (pwm0_ready_flag) {
-      pwm0_ready_flag = false;
+      if (valve_zone_active || amp0_zone_active)
+        pwm0_ready_flag = false;
       if (valve_zone_active)
         app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty); 
       if (amp0_zone_active) 
@@ -116,7 +117,8 @@ void pwm_task(void * pvParameters) {
     
     // PWM2 Control
     if (pwm2_ready_flag) {
-      pwm2_ready_flag = false;
+      if (amp1_zone_active | amp2_zone_active)
+        pwm2_ready_flag = false;
       if (amp1_zone_active) 
         app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  amp1_duty);
       if (amp2_zone_active)

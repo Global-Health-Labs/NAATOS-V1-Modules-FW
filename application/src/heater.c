@@ -67,12 +67,12 @@ void heater_task(void * pvParameters) {
       // Update Amplification 1 PID loop with new temperatures
       pid_controller_compute(&amp1_pid, temperature_data.amp1_zone_temp);
       // Update Amplification 1 PWM with PID output
-      update_amp0_duty(amp1_pid.out);
+      update_amp1_duty(amp1_pid.out);
 
       // Update Amplification 2 PID loop with new temperatures
       pid_controller_compute(&amp2_pid, temperature_data.amp2_zone_temp);
       // Update Amplification 2 PWM with PID output
-      update_amp0_duty(amp2_pid.out);
+      update_amp2_duty(amp2_pid.out);
     }
     if (valve_zone_running) {
       // Update Valve PID loop with new temperatures
@@ -86,6 +86,7 @@ void heater_task(void * pvParameters) {
       printf("Amp0: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp0_zone_temp, amp0_pid.out);
       printf("Amp1: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp1_zone_temp, amp1_pid.out);
       printf("Amp2: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp2_zone_temp, amp2_pid.out);
+      printf("Valv: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.valve_zone_temp, valve_pid.out);
     }
     if (valve_zone_running) {
       printf("Valv: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.valve_zone_temp, valve_pid.out);

@@ -8,10 +8,15 @@
 #include "nrf_gpio.h"
 #include "FreeRTOS.h"
 
-#define VALVE_ZONE_PIN  ARDUINO_0_PIN  // P1.01
-#define AMP0_ZONE_PIN   ARDUINO_1_PIN  // P1.02
-#define AMP1_ZONE_PIN   ARDUINO_2_PIN  // P1.03
-#define AMP2_ZONE_PIN   ARDUINO_3_PIN  // P1.04
+//#define VALVE_ZONE_PIN  20  // P0.20
+//#define AMP0_ZONE_PIN   19  // P0.19
+//#define AMP1_ZONE_PIN   34  // P1.03
+//#define AMP2_ZONE_PIN   33  // P1.04
+
+#define VALVE_ZONE_PIN  19
+#define AMP0_ZONE_PIN   20
+#define AMP1_ZONE_PIN   33
+#define AMP2_ZONE_PIN   34
 
 #define VALVE_CHANNEL   0
 #define AMP0_CHANNEL    1
