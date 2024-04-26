@@ -17,7 +17,7 @@ bool calendar_get_time(calendar_time_t * now) {
 
 #if USE_CALENDAR_CHIP
   // Get the Time and Date from the calendar chip
-  ret = xUtil_TWI_Read(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
+  ret = xUtil_TWI_Read(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
   if (ret) {
     printf("Unable to i2c communicate with calendar chip!\n");
     return false;

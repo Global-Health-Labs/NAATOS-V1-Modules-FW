@@ -36,7 +36,7 @@
 /* Device Debug Parameters */
 #define I2C_CONNECTED           1
 #define GO_STRAIGHT_TO_RUNNING  0
-#define USE_CALENDAR_CHIP       0
+#define USE_CALENDAR_CHIP       1 
 
 /* Log Event Messages */
 #define START_EVENT_MSG       "Sample Preperation Started."
