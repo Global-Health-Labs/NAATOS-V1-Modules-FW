@@ -230,7 +230,7 @@ void main_task(void * pvParameters) {
             break;
           }
           i++;
-        } while ( i < 5/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
+        } while ( i < 500/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
         i = 0;
         
         /* ***** Valve Zone Run **** */
