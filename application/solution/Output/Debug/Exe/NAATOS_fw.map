@@ -12289,8 +12289,6 @@ Discarded input sections
  .text          0x0000000000000000        0x0 Output/Debug/Obj/NAATOS_fw/pwm.o
  .data          0x0000000000000000        0x0 Output/Debug/Obj/NAATOS_fw/pwm.o
  .bss           0x0000000000000000        0x0 Output/Debug/Obj/NAATOS_fw/pwm.o
- .text.update_valve_duty
-                0x0000000000000000       0x30 Output/Debug/Obj/NAATOS_fw/pwm.o
  .debug_macro   0x0000000000000000      0xacc Output/Debug/Obj/NAATOS_fw/pwm.o
  .debug_macro   0x0000000000000000       0x22 Output/Debug/Obj/NAATOS_fw/pwm.o
  .debug_macro   0x0000000000000000       0x22 Output/Debug/Obj/NAATOS_fw/pwm.o
@@ -17587,7 +17585,7 @@ FLASH1           0x0000000000000000 0x0000000000100000 xw
 Linker script and memory map
 
                 0x0000000000000000                __do_debug_operation = __do_debug_operation_mempoll
-                0x00000000000177b0                __vfprintf = __vfprintf_float_long
+                0x0000000000017860                __vfprintf = __vfprintf_float_long
                 0x0000000000000000                __vfscanf = __vfscanf_long
                 0x0000000020000000                __RAM1_segment_start__ = 0x20000000
                 0x0000000020040000                __RAM1_segment_end__ = 0x20040000
@@ -17695,7 +17693,7 @@ Linker script and memory map
                 0x0000000000000001                . = ASSERT (((__init_rodata_start__ == __init_rodata_end__) || ((__init_rodata_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .init_rodata is too large to fit in FLASH1 memory segment)
                 0x00000000000003d0                __text_load_start__ = ALIGN (__init_rodata_end__, 0x4)
 
-.text           0x00000000000003d0    0x184c8
+.text           0x00000000000003d0    0x18578
                 0x00000000000003d0                __text_start__ = .
  *(.text .text.* .glue_7t .glue_7 .gnu.linkonce.t.* .gcc_except_table .ARM.extab* .gnu.linkonce.armextab.*)
  .glue_7        0x00000000000003d0        0x0 linker stubs
@@ -19072,733 +19070,736 @@ Linker script and memory map
                 0x000000000000d93c       0xfc Output/Debug/Obj/NAATOS_fw/battery.o
                 0x000000000000d93c                battery_task
  .text.heater_task
-                0x000000000000da38      0x2dc Output/Debug/Obj/NAATOS_fw/heater.o
+                0x000000000000da38      0x35c Output/Debug/Obj/NAATOS_fw/heater.o
                 0x000000000000da38                heater_task
  .text.getLogFileName
-                0x000000000000dd14       0x6c Output/Debug/Obj/NAATOS_fw/logger.o
-                0x000000000000dd14                getLogFileName
+                0x000000000000dd94       0x6c Output/Debug/Obj/NAATOS_fw/logger.o
+                0x000000000000dd94                getLogFileName
  .text.logger_task
-                0x000000000000dd80      0x304 Output/Debug/Obj/NAATOS_fw/logger.o
-                0x000000000000dd80                logger_task
+                0x000000000000de00      0x304 Output/Debug/Obj/NAATOS_fw/logger.o
+                0x000000000000de00                logger_task
  .text.nrf_gpio_pin_port_decode
-                0x000000000000e084       0x4c Output/Debug/Obj/NAATOS_fw/sensors.o
+                0x000000000000e104       0x4c Output/Debug/Obj/NAATOS_fw/sensors.o
  .text.nrf_gpio_cfg
-                0x000000000000e0d0       0x62 Output/Debug/Obj/NAATOS_fw/sensors.o
+                0x000000000000e150       0x62 Output/Debug/Obj/NAATOS_fw/sensors.o
  .text.nrf_gpio_cfg_output
-                0x000000000000e132       0x22 Output/Debug/Obj/NAATOS_fw/sensors.o
+                0x000000000000e1b2       0x22 Output/Debug/Obj/NAATOS_fw/sensors.o
  .text.nrf_gpio_cfg_input
-                0x000000000000e154       0x2a Output/Debug/Obj/NAATOS_fw/sensors.o
+                0x000000000000e1d4       0x2a Output/Debug/Obj/NAATOS_fw/sensors.o
  .text.nrf_gpio_pin_set
-                0x000000000000e17e       0x28 Output/Debug/Obj/NAATOS_fw/sensors.o
+                0x000000000000e1fe       0x28 Output/Debug/Obj/NAATOS_fw/sensors.o
  .text.nrf_gpio_pin_read
-                0x000000000000e1a6       0x2a Output/Debug/Obj/NAATOS_fw/sensors.o
+                0x000000000000e226       0x2a Output/Debug/Obj/NAATOS_fw/sensors.o
  .text.nrf_gpio_port_in_read
-                0x000000000000e1d0       0x10 Output/Debug/Obj/NAATOS_fw/sensors.o
+                0x000000000000e250       0x10 Output/Debug/Obj/NAATOS_fw/sensors.o
  .text.nrf_gpio_port_out_set
-                0x000000000000e1e0       0x14 Output/Debug/Obj/NAATOS_fw/sensors.o
+                0x000000000000e260       0x14 Output/Debug/Obj/NAATOS_fw/sensors.o
  .text.nrf_gpio_pin_present_check
-                0x000000000000e1f4       0x50 Output/Debug/Obj/NAATOS_fw/sensors.o
+                0x000000000000e274       0x50 Output/Debug/Obj/NAATOS_fw/sensors.o
  .text.sensors_task
-                0x000000000000e244      0x228 Output/Debug/Obj/NAATOS_fw/sensors.o
-                0x000000000000e244                sensors_task
+                0x000000000000e2c4      0x228 Output/Debug/Obj/NAATOS_fw/sensors.o
+                0x000000000000e2c4                sensors_task
  .text.init_sensors_gpios
-                0x000000000000e46c       0x1a Output/Debug/Obj/NAATOS_fw/sensors.o
-                0x000000000000e46c                init_sensors_gpios
- *fill*         0x000000000000e486        0x2 
+                0x000000000000e4ec       0x1a Output/Debug/Obj/NAATOS_fw/sensors.o
+                0x000000000000e4ec                init_sensors_gpios
+ *fill*         0x000000000000e506        0x2 
  .text.readTemp
-                0x000000000000e488       0x58 Output/Debug/Obj/NAATOS_fw/sensors.o
-                0x000000000000e488                readTemp
+                0x000000000000e508       0x58 Output/Debug/Obj/NAATOS_fw/sensors.o
+                0x000000000000e508                readTemp
  .text.usb_task
-                0x000000000000e4e0       0x88 Output/Debug/Obj/NAATOS_fw/usb.o
-                0x000000000000e4e0                usb_task
+                0x000000000000e560       0x88 Output/Debug/Obj/NAATOS_fw/usb.o
+                0x000000000000e560                usb_task
  .text.pid_controller_init
-                0x000000000000e568       0x64 Output/Debug/Obj/NAATOS_fw/pid.o
-                0x000000000000e568                pid_controller_init
+                0x000000000000e5e8       0x64 Output/Debug/Obj/NAATOS_fw/pid.o
+                0x000000000000e5e8                pid_controller_init
  .text.pid_controller_compute
-                0x000000000000e5cc      0x110 Output/Debug/Obj/NAATOS_fw/pid.o
-                0x000000000000e5cc                pid_controller_compute
+                0x000000000000e64c      0x110 Output/Debug/Obj/NAATOS_fw/pid.o
+                0x000000000000e64c                pid_controller_compute
  .text.pwm0_ready_callback
-                0x000000000000e6dc       0x14 Output/Debug/Obj/NAATOS_fw/pwm.o
-                0x000000000000e6dc                pwm0_ready_callback
+                0x000000000000e75c       0x14 Output/Debug/Obj/NAATOS_fw/pwm.o
+                0x000000000000e75c                pwm0_ready_callback
  .text.pwm2_ready_callback
-                0x000000000000e6f0       0x14 Output/Debug/Obj/NAATOS_fw/pwm.o
-                0x000000000000e6f0                pwm2_ready_callback
+                0x000000000000e770       0x14 Output/Debug/Obj/NAATOS_fw/pwm.o
+                0x000000000000e770                pwm2_ready_callback
  .text.init_pwms
-                0x000000000000e704       0xac Output/Debug/Obj/NAATOS_fw/pwm.o
-                0x000000000000e704                init_pwms
+                0x000000000000e784       0xac Output/Debug/Obj/NAATOS_fw/pwm.o
+                0x000000000000e784                init_pwms
+ .text.update_valve_duty
+                0x000000000000e830       0x30 Output/Debug/Obj/NAATOS_fw/pwm.o
+                0x000000000000e830                update_valve_duty
  .text.update_amp0_duty
-                0x000000000000e7b0       0x30 Output/Debug/Obj/NAATOS_fw/pwm.o
-                0x000000000000e7b0                update_amp0_duty
+                0x000000000000e860       0x30 Output/Debug/Obj/NAATOS_fw/pwm.o
+                0x000000000000e860                update_amp0_duty
  .text.update_amp1_duty
-                0x000000000000e7e0       0x30 Output/Debug/Obj/NAATOS_fw/pwm.o
-                0x000000000000e7e0                update_amp1_duty
+                0x000000000000e890       0x30 Output/Debug/Obj/NAATOS_fw/pwm.o
+                0x000000000000e890                update_amp1_duty
  .text.update_amp2_duty
-                0x000000000000e810       0x30 Output/Debug/Obj/NAATOS_fw/pwm.o
-                0x000000000000e810                update_amp2_duty
+                0x000000000000e8c0       0x30 Output/Debug/Obj/NAATOS_fw/pwm.o
+                0x000000000000e8c0                update_amp2_duty
  .text.pwm_task
-                0x000000000000e840      0x1b0 Output/Debug/Obj/NAATOS_fw/pwm.o
-                0x000000000000e840                pwm_task
+                0x000000000000e8f0      0x1b0 Output/Debug/Obj/NAATOS_fw/pwm.o
+                0x000000000000e8f0                pwm_task
  .text.nrf_drv_saadc_init
-                0x000000000000e9f0       0x28 Output/Debug/Obj/NAATOS_fw/adc.o
+                0x000000000000eaa0       0x28 Output/Debug/Obj/NAATOS_fw/adc.o
  .text.saadc_callback_handler
-                0x000000000000ea18        0xa Output/Debug/Obj/NAATOS_fw/adc.o
-                0x000000000000ea18                saadc_callback_handler
+                0x000000000000eac8        0xa Output/Debug/Obj/NAATOS_fw/adc.o
+                0x000000000000eac8                saadc_callback_handler
  .text.get_optical_triggered
-                0x000000000000ea22       0x28 Output/Debug/Obj/NAATOS_fw/adc.o
-                0x000000000000ea22                get_optical_triggered
- *fill*         0x000000000000ea4a        0x2 
+                0x000000000000ead2       0x28 Output/Debug/Obj/NAATOS_fw/adc.o
+                0x000000000000ead2                get_optical_triggered
+ *fill*         0x000000000000eafa        0x2 
  .text.init_adc
-                0x000000000000ea4c       0x60 Output/Debug/Obj/NAATOS_fw/adc.o
-                0x000000000000ea4c                init_adc
+                0x000000000000eafc       0x60 Output/Debug/Obj/NAATOS_fw/adc.o
+                0x000000000000eafc                init_adc
  .text.nrf_drv_twi_enable
-                0x000000000000eaac       0x18 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+                0x000000000000eb5c       0x18 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
  .text.nrf_drv_twi_disable
-                0x000000000000eac4       0x18 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+                0x000000000000eb74       0x18 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
  .text.nrf_drv_twi_tx
-                0x000000000000eadc       0x40 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+                0x000000000000eb8c       0x40 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
  .text.nrf_drv_twi_rx
-                0x000000000000eb1c       0x38 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+                0x000000000000ebcc       0x38 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
  .text.nrf_gpio_pin_port_decode
-                0x000000000000eb54       0x4c Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+                0x000000000000ec04       0x4c Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
  .text.nrf_gpio_cfg
-                0x000000000000eba0       0x62 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+                0x000000000000ec50       0x62 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
  .text.nrf_gpio_pin_present_check
-                0x000000000000ec02       0x50 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
- *fill*         0x000000000000ec52        0x2 
+                0x000000000000ecb2       0x50 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ *fill*         0x000000000000ed02        0x2 
  .text.vInit_TWI_Hardware
-                0x000000000000ec54       0xf8 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
-                0x000000000000ec54                vInit_TWI_Hardware
+                0x000000000000ed04       0xf8 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+                0x000000000000ed04                vInit_TWI_Hardware
  .text.xUtil_TWI_Read
-                0x000000000000ed4c       0xfc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
-                0x000000000000ed4c                xUtil_TWI_Read
+                0x000000000000edfc       0xfc Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+                0x000000000000edfc                xUtil_TWI_Read
  .text.xUtil_TWI_Write
-                0x000000000000ee48      0x100 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
-                0x000000000000ee48                xUtil_TWI_Write
+                0x000000000000eef8      0x100 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+                0x000000000000eef8                xUtil_TWI_Write
  .text.tsys01_writeRegister
-                0x000000000000ef48       0xe0 Output/Debug/Obj/NAATOS_fw/tsys01.o
+                0x000000000000eff8       0xe0 Output/Debug/Obj/NAATOS_fw/tsys01.o
  .text.tsys01_readRegister
-                0x000000000000f028       0xd8 Output/Debug/Obj/NAATOS_fw/tsys01.o
+                0x000000000000f0d8       0xd8 Output/Debug/Obj/NAATOS_fw/tsys01.o
  .text.tsys01_startConversion
-                0x000000000000f100       0x22 Output/Debug/Obj/NAATOS_fw/tsys01.o
-                0x000000000000f100                tsys01_startConversion
- *fill*         0x000000000000f122        0x6 
+                0x000000000000f1b0       0x22 Output/Debug/Obj/NAATOS_fw/tsys01.o
+                0x000000000000f1b0                tsys01_startConversion
+ *fill*         0x000000000000f1d2        0x6 
  .text.tsys01_getTemp
-                0x000000000000f128      0x2e4 Output/Debug/Obj/NAATOS_fw/tsys01.o
-                0x000000000000f128                tsys01_getTemp
+                0x000000000000f1d8      0x2e4 Output/Debug/Obj/NAATOS_fw/tsys01.o
+                0x000000000000f1d8                tsys01_getTemp
  .text.tsys01_getCalibrationValues
-                0x000000000000f40c      0x164 Output/Debug/Obj/NAATOS_fw/tsys01.o
-                0x000000000000f40c                tsys01_getCalibrationValues
+                0x000000000000f4bc      0x164 Output/Debug/Obj/NAATOS_fw/tsys01.o
+                0x000000000000f4bc                tsys01_getCalibrationValues
  .text.init_sd_card
-                0x000000000000f570       0xcc Output/Debug/Obj/NAATOS_fw/sd_card.o
-                0x000000000000f570                init_sd_card
+                0x000000000000f620       0xcc Output/Debug/Obj/NAATOS_fw/sd_card.o
+                0x000000000000f620                init_sd_card
  .text.sd_card_mount
-                0x000000000000f63c       0x1c Output/Debug/Obj/NAATOS_fw/sd_card.o
-                0x000000000000f63c                sd_card_mount
+                0x000000000000f6ec       0x1c Output/Debug/Obj/NAATOS_fw/sd_card.o
+                0x000000000000f6ec                sd_card_mount
  .text.create_naatos_directories
-                0x000000000000f658       0x80 Output/Debug/Obj/NAATOS_fw/sd_card.o
-                0x000000000000f658                create_naatos_directories
+                0x000000000000f708       0x80 Output/Debug/Obj/NAATOS_fw/sd_card.o
+                0x000000000000f708                create_naatos_directories
  .text.sd_card_create_log_file
-                0x000000000000f6d8       0xac Output/Debug/Obj/NAATOS_fw/sd_card.o
-                0x000000000000f6d8                sd_card_create_log_file
+                0x000000000000f788       0xac Output/Debug/Obj/NAATOS_fw/sd_card.o
+                0x000000000000f788                sd_card_create_log_file
  .text.sd_card_write_log_line
-                0x000000000000f784       0xa8 Output/Debug/Obj/NAATOS_fw/sd_card.o
-                0x000000000000f784                sd_card_write_log_line
+                0x000000000000f834       0xa8 Output/Debug/Obj/NAATOS_fw/sd_card.o
+                0x000000000000f834                sd_card_write_log_line
  .text.remount_goto_logs_dir
-                0x000000000000f82c       0x68 Output/Debug/Obj/NAATOS_fw/sd_card.o
-                0x000000000000f82c                remount_goto_logs_dir
- *fill*         0x000000000000f894        0x4 
+                0x000000000000f8dc       0x68 Output/Debug/Obj/NAATOS_fw/sd_card.o
+                0x000000000000f8dc                remount_goto_logs_dir
+ *fill*         0x000000000000f944        0x4 
  .text.check_for_config_file
-                0x000000000000f898      0x100 Output/Debug/Obj/NAATOS_fw/sd_card.o
-                0x000000000000f898                check_for_config_file
+                0x000000000000f948      0x100 Output/Debug/Obj/NAATOS_fw/sd_card.o
+                0x000000000000f948                check_for_config_file
  .text.calendar_get_time
-                0x000000000000f998       0x36 Output/Debug/Obj/NAATOS_fw/calendar_rtc.o
-                0x000000000000f998                calendar_get_time
- *fill*         0x000000000000f9ce        0x2 
- .text._DoInit  0x000000000000f9d0       0x9c Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
+                0x000000000000fa48       0x36 Output/Debug/Obj/NAATOS_fw/calendar_rtc.o
+                0x000000000000fa48                calendar_get_time
+ *fill*         0x000000000000fa7e        0x2 
+ .text._DoInit  0x000000000000fa80       0x9c Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
  .text._WriteBlocking
-                0x000000000000fa6c       0xb2 Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
+                0x000000000000fb1c       0xb2 Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
  .text._WriteNoCheck
-                0x000000000000fb1e       0x7e Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
+                0x000000000000fbce       0x7e Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
  .text._GetAvailWriteSpace
-                0x000000000000fb9c       0x3c Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
+                0x000000000000fc4c       0x3c Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
  .text.SEGGER_RTT_WriteNoLock
-                0x000000000000fbd8       0xa0 Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
-                0x000000000000fbd8                SEGGER_RTT_WriteNoLock
+                0x000000000000fc88       0xa0 Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
+                0x000000000000fc88                SEGGER_RTT_WriteNoLock
  .text.SEGGER_RTT_Write
-                0x000000000000fc78       0x3c Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
-                0x000000000000fc78                SEGGER_RTT_Write
- .text.printf   0x000000000000fcb4       0x4c Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_Syscalls_SES.o
-                0x000000000000fcb4                printf
+                0x000000000000fd28       0x3c Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
+                0x000000000000fd28                SEGGER_RTT_Write
+ .text.printf   0x000000000000fd64       0x4c Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_Syscalls_SES.o
+                0x000000000000fd64                printf
  .text.nrf_blk_dev_init
-                0x000000000000fd00       0x38 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
+                0x000000000000fdb0       0x38 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
  .text.nrf_blk_dev_read_req
-                0x000000000000fd38       0x64 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
+                0x000000000000fde8       0x64 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
  .text.nrf_blk_dev_write_req
-                0x000000000000fd9c       0x64 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
+                0x000000000000fe4c       0x64 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
  .text.nrf_blk_dev_ioctl
-                0x000000000000fe00       0x40 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
+                0x000000000000feb0       0x40 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
  .text.nrf_blk_dev_geometry
-                0x000000000000fe40       0x34 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
+                0x000000000000fef0       0x34 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
  .text.block_dev_handler
-                0x000000000000fe74       0x74 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
+                0x000000000000ff24       0x74 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
  .text.default_wait_func
-                0x000000000000fee8        0x6 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
- *fill*         0x000000000000feee        0x2 
+                0x000000000000ff98        0x6 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
+ *fill*         0x000000000000ff9e        0x2 
  .text.disk_initialize
-                0x000000000000fef0      0x194 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
-                0x000000000000fef0                disk_initialize
+                0x000000000000ffa0      0x194 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
+                0x000000000000ffa0                disk_initialize
  .text.disk_status
-                0x0000000000010084       0x54 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
-                0x0000000000010084                disk_status
+                0x0000000000010134       0x54 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
+                0x0000000000010134                disk_status
  .text.disk_read
-                0x00000000000100d8      0x11c Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
-                0x00000000000100d8                disk_read
+                0x0000000000010188      0x11c Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
+                0x0000000000010188                disk_read
  .text.disk_write
-                0x00000000000101f4      0x140 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
-                0x00000000000101f4                disk_write
+                0x00000000000102a4      0x140 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
+                0x00000000000102a4                disk_write
  .text.disk_ioctl
-                0x0000000000010334      0x134 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
-                0x0000000000010334                disk_ioctl
+                0x00000000000103e4      0x134 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
+                0x00000000000103e4                disk_ioctl
  .text.diskio_blockdev_register
-                0x0000000000010468       0x3c Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
-                0x0000000000010468                diskio_blockdev_register
- .text.ld_word  0x00000000000104a4       0x2e Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000010518       0x3c Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
+                0x0000000000010518                diskio_blockdev_register
+ .text.ld_word  0x0000000000010554       0x2e Output/Debug/Obj/NAATOS_fw/ff.o
  .text.ld_dword
-                0x00000000000104d2       0x3c Output/Debug/Obj/NAATOS_fw/ff.o
- .text.st_word  0x000000000001050e       0x36 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000010582       0x3c Output/Debug/Obj/NAATOS_fw/ff.o
+ .text.st_word  0x00000000000105be       0x36 Output/Debug/Obj/NAATOS_fw/ff.o
  .text.st_dword
-                0x0000000000010544       0x4e Output/Debug/Obj/NAATOS_fw/ff.o
- .text.mem_cpy  0x0000000000010592       0x38 Output/Debug/Obj/NAATOS_fw/ff.o
- .text.mem_set  0x00000000000105ca       0x2c Output/Debug/Obj/NAATOS_fw/ff.o
- .text.mem_cmp  0x00000000000105f6       0x44 Output/Debug/Obj/NAATOS_fw/ff.o
- .text.chk_chr  0x000000000001063a       0x2c Output/Debug/Obj/NAATOS_fw/ff.o
+                0x00000000000105f4       0x4e Output/Debug/Obj/NAATOS_fw/ff.o
+ .text.mem_cpy  0x0000000000010642       0x38 Output/Debug/Obj/NAATOS_fw/ff.o
+ .text.mem_set  0x000000000001067a       0x2c Output/Debug/Obj/NAATOS_fw/ff.o
+ .text.mem_cmp  0x00000000000106a6       0x44 Output/Debug/Obj/NAATOS_fw/ff.o
+ .text.chk_chr  0x00000000000106ea       0x2c Output/Debug/Obj/NAATOS_fw/ff.o
  .text.sync_window
-                0x0000000000010666       0x8c Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000010716       0x8c Output/Debug/Obj/NAATOS_fw/ff.o
  .text.move_window
-                0x00000000000106f2       0x62 Output/Debug/Obj/NAATOS_fw/ff.o
- .text.sync_fs  0x0000000000010754       0xe4 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x00000000000107a2       0x62 Output/Debug/Obj/NAATOS_fw/ff.o
+ .text.sync_fs  0x0000000000010804       0xe4 Output/Debug/Obj/NAATOS_fw/ff.o
  .text.clust2sect
-                0x0000000000010838       0x34 Output/Debug/Obj/NAATOS_fw/ff.o
- .text.get_fat  0x000000000001086c      0x14e Output/Debug/Obj/NAATOS_fw/ff.o
- .text.put_fat  0x00000000000109ba      0x1e8 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x00000000000108e8       0x34 Output/Debug/Obj/NAATOS_fw/ff.o
+ .text.get_fat  0x000000000001091c      0x14e Output/Debug/Obj/NAATOS_fw/ff.o
+ .text.put_fat  0x0000000000010a6a      0x1e8 Output/Debug/Obj/NAATOS_fw/ff.o
  .text.remove_chain
-                0x0000000000010ba2       0xd6 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000010c52       0xd6 Output/Debug/Obj/NAATOS_fw/ff.o
  .text.create_chain
-                0x0000000000010c78      0x138 Output/Debug/Obj/NAATOS_fw/ff.o
- .text.dir_sdi  0x0000000000010db0       0xf4 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000010d28      0x138 Output/Debug/Obj/NAATOS_fw/ff.o
+ .text.dir_sdi  0x0000000000010e60       0xf4 Output/Debug/Obj/NAATOS_fw/ff.o
  .text.dir_next
-                0x0000000000010ea4      0x188 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000010f54      0x188 Output/Debug/Obj/NAATOS_fw/ff.o
  .text.dir_alloc
-                0x000000000001102c       0x9e Output/Debug/Obj/NAATOS_fw/ff.o
+                0x00000000000110dc       0x9e Output/Debug/Obj/NAATOS_fw/ff.o
  .text.ld_clust
-                0x00000000000110ca       0x3c Output/Debug/Obj/NAATOS_fw/ff.o
+                0x000000000001117a       0x3c Output/Debug/Obj/NAATOS_fw/ff.o
  .text.st_clust
-                0x0000000000011106       0x3e Output/Debug/Obj/NAATOS_fw/ff.o
- .text.cmp_lfn  0x0000000000011144       0xec Output/Debug/Obj/NAATOS_fw/ff.o
- .text.put_lfn  0x0000000000011230       0xe8 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x00000000000111b6       0x3e Output/Debug/Obj/NAATOS_fw/ff.o
+ .text.cmp_lfn  0x00000000000111f4       0xec Output/Debug/Obj/NAATOS_fw/ff.o
+ .text.put_lfn  0x00000000000112e0       0xe8 Output/Debug/Obj/NAATOS_fw/ff.o
  .text.gen_numname
-                0x0000000000011318      0x164 Output/Debug/Obj/NAATOS_fw/ff.o
- .text.sum_sfn  0x000000000001147c       0x40 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x00000000000113c8      0x164 Output/Debug/Obj/NAATOS_fw/ff.o
+ .text.sum_sfn  0x000000000001152c       0x40 Output/Debug/Obj/NAATOS_fw/ff.o
  .text.dir_find
-                0x00000000000114bc      0x1c4 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x000000000001156c      0x1c4 Output/Debug/Obj/NAATOS_fw/ff.o
  .text.dir_register
-                0x0000000000011680      0x1f4 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000011730      0x1f4 Output/Debug/Obj/NAATOS_fw/ff.o
  .text.create_name
-                0x0000000000011874      0x4f4 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000011924      0x4f4 Output/Debug/Obj/NAATOS_fw/ff.o
  .text.follow_path
-                0x0000000000011d68      0x13c Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000011e18      0x13c Output/Debug/Obj/NAATOS_fw/ff.o
  .text.get_ldnumber
-                0x0000000000011ea4       0x7e Output/Debug/Obj/NAATOS_fw/ff.o
- *fill*         0x0000000000011f22        0x2 
+                0x0000000000011f54       0x7e Output/Debug/Obj/NAATOS_fw/ff.o
+ *fill*         0x0000000000011fd2        0x2 
  .text.check_fs
-                0x0000000000011f24       0xac Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000011fd4       0xac Output/Debug/Obj/NAATOS_fw/ff.o
  .text.find_volume
-                0x0000000000011fd0      0x4b0 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000012080      0x4b0 Output/Debug/Obj/NAATOS_fw/ff.o
  .text.validate
-                0x0000000000012480       0x6c Output/Debug/Obj/NAATOS_fw/ff.o
- .text.f_mount  0x00000000000124ec       0x88 Output/Debug/Obj/NAATOS_fw/ff.o
-                0x00000000000124ec                f_mount
- .text.f_open   0x0000000000012574      0x32c Output/Debug/Obj/NAATOS_fw/ff.o
-                0x0000000000012574                f_open
- .text.f_write  0x00000000000128a0      0x2ce Output/Debug/Obj/NAATOS_fw/ff.o
-                0x00000000000128a0                f_write
- *fill*         0x0000000000012b6e        0x2 
- .text.f_sync   0x0000000000012b70      0x108 Output/Debug/Obj/NAATOS_fw/ff.o
-                0x0000000000012b70                f_sync
- .text.f_close  0x0000000000012c78       0x46 Output/Debug/Obj/NAATOS_fw/ff.o
-                0x0000000000012c78                f_close
- .text.f_chdir  0x0000000000012cbe       0x8e Output/Debug/Obj/NAATOS_fw/ff.o
-                0x0000000000012cbe                f_chdir
+                0x0000000000012530       0x6c Output/Debug/Obj/NAATOS_fw/ff.o
+ .text.f_mount  0x000000000001259c       0x88 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x000000000001259c                f_mount
+ .text.f_open   0x0000000000012624      0x32c Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000012624                f_open
+ .text.f_write  0x0000000000012950      0x2ce Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000012950                f_write
+ *fill*         0x0000000000012c1e        0x2 
+ .text.f_sync   0x0000000000012c20      0x108 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000012c20                f_sync
+ .text.f_close  0x0000000000012d28       0x46 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000012d28                f_close
+ .text.f_chdir  0x0000000000012d6e       0x8e Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000012d6e                f_chdir
  .text.f_opendir
-                0x0000000000012d4c       0xc8 Output/Debug/Obj/NAATOS_fw/ff.o
-                0x0000000000012d4c                f_opendir
- .text.f_mkdir  0x0000000000012e14      0x220 Output/Debug/Obj/NAATOS_fw/ff.o
-                0x0000000000012e14                f_mkdir
+                0x0000000000012dfc       0xc8 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000012dfc                f_opendir
+ .text.f_mkdir  0x0000000000012ec4      0x220 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x0000000000012ec4                f_mkdir
  .text.ff_convert
-                0x0000000000013034       0xc0 Output/Debug/Obj/NAATOS_fw/cc932.o
-                0x0000000000013034                ff_convert
+                0x00000000000130e4       0xc0 Output/Debug/Obj/NAATOS_fw/cc932.o
+                0x00000000000130e4                ff_convert
  .text.ff_wtoupper
-                0x00000000000130f4      0x160 Output/Debug/Obj/NAATOS_fw/cc932.o
-                0x00000000000130f4                ff_wtoupper
+                0x00000000000131a4      0x160 Output/Debug/Obj/NAATOS_fw/cc932.o
+                0x00000000000131a4                ff_wtoupper
  .text.__NVIC_SystemReset
-                0x0000000000013254       0x28 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
+                0x0000000000013304       0x28 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
  .text.nrf52_errata_36
-                0x000000000001327c       0x64 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
+                0x000000000001332c       0x64 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
  .text.nrf52_errata_66
-                0x00000000000132e0       0x64 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
+                0x0000000000013390       0x64 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
  .text.nrf52_errata_98
-                0x0000000000013344       0x64 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
+                0x00000000000133f4       0x64 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
  .text.nrf52_errata_103
-                0x00000000000133a8       0x64 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
+                0x0000000000013458       0x64 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
  .text.nrf52_errata_115
-                0x000000000001340c       0x64 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
+                0x00000000000134bc       0x64 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
  .text.nrf52_errata_120
-                0x0000000000013470       0x64 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
+                0x0000000000013520       0x64 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
  .text.nrf52_errata_136
-                0x00000000000134d4       0x64 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
+                0x0000000000013584       0x64 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
  .text.nrf52_errata_249
-                0x0000000000013538       0x64 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
+                0x00000000000135e8       0x64 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
  .text.nrf52_handle_approtect
-                0x000000000001359c       0x20 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
+                0x000000000001364c       0x20 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
  .text.nvmc_wait
-                0x00000000000135bc       0x18 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
-                0x00000000000135bc                nvmc_wait
+                0x000000000001366c       0x18 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
+                0x000000000001366c                nvmc_wait
  .text.nvmc_config
-                0x00000000000135d4       0x20 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
-                0x00000000000135d4                nvmc_config
+                0x0000000000013684       0x20 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
+                0x0000000000013684                nvmc_config
  .text.SystemCoreClockUpdate
-                0x00000000000135f4       0x14 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
-                0x00000000000135f4                SystemCoreClockUpdate
+                0x00000000000136a4       0x14 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
+                0x00000000000136a4                SystemCoreClockUpdate
  .text.SystemInit
-                0x0000000000013608      0x228 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
-                0x0000000000013608                SystemInit
+                0x00000000000136b8      0x228 Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
+                0x00000000000136b8                SystemInit
  .text.xTaskCreate
-                0x0000000000013830       0x86 Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x0000000000013830                xTaskCreate
- *fill*         0x00000000000138b6        0x2 
+                0x00000000000138e0       0x86 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x00000000000138e0                xTaskCreate
+ *fill*         0x0000000000013966        0x2 
  .text.prvInitialiseNewTask
-                0x00000000000138b8      0x104 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x0000000000013968      0x104 Output/Debug/Obj/NAATOS_fw/tasks.o
  .text.prvAddNewTaskToReadyList
-                0x00000000000139bc       0xdc Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x0000000000013a6c       0xdc Output/Debug/Obj/NAATOS_fw/tasks.o
  .text.vTaskDelete
-                0x0000000000013a98       0xe0 Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x0000000000013a98                vTaskDelete
+                0x0000000000013b48       0xe0 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x0000000000013b48                vTaskDelete
  .text.vTaskDelay
-                0x0000000000013b78       0x64 Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x0000000000013b78                vTaskDelay
+                0x0000000000013c28       0x64 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x0000000000013c28                vTaskDelay
  .text.vTaskStartScheduler
-                0x0000000000013bdc       0x88 Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x0000000000013bdc                vTaskStartScheduler
+                0x0000000000013c8c       0x88 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x0000000000013c8c                vTaskStartScheduler
  .text.vTaskSuspendAll
-                0x0000000000013c64       0x14 Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x0000000000013c64                vTaskSuspendAll
+                0x0000000000013d14       0x14 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x0000000000013d14                vTaskSuspendAll
  .text.xTaskResumeAll
-                0x0000000000013c78      0x138 Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x0000000000013c78                xTaskResumeAll
+                0x0000000000013d28      0x138 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x0000000000013d28                xTaskResumeAll
  .text.xTaskGetTickCount
-                0x0000000000013db0       0x14 Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x0000000000013db0                xTaskGetTickCount
+                0x0000000000013e60       0x14 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x0000000000013e60                xTaskGetTickCount
  .text.xTaskIncrementTick
-                0x0000000000013dc4      0x154 Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x0000000000013dc4                xTaskIncrementTick
+                0x0000000000013e74      0x154 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x0000000000013e74                xTaskIncrementTick
  .text.vTaskSwitchContext
-                0x0000000000013f18       0xac Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x0000000000013f18                vTaskSwitchContext
+                0x0000000000013fc8       0xac Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x0000000000013fc8                vTaskSwitchContext
  .text.vTaskPlaceOnEventList
-                0x0000000000013fc4       0x40 Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x0000000000013fc4                vTaskPlaceOnEventList
+                0x0000000000014074       0x40 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x0000000000014074                vTaskPlaceOnEventList
  .text.vTaskPlaceOnEventListRestricted
-                0x0000000000014004       0x4c Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x0000000000014004                vTaskPlaceOnEventListRestricted
+                0x00000000000140b4       0x4c Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x00000000000140b4                vTaskPlaceOnEventListRestricted
  .text.xTaskRemoveFromEventList
-                0x0000000000014050       0xbc Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x0000000000014050                xTaskRemoveFromEventList
+                0x0000000000014100       0xbc Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x0000000000014100                xTaskRemoveFromEventList
  .text.vTaskInternalSetTimeOutState
-                0x000000000001410c       0x24 Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x000000000001410c                vTaskInternalSetTimeOutState
+                0x00000000000141bc       0x24 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x00000000000141bc                vTaskInternalSetTimeOutState
  .text.xTaskCheckForTimeOut
-                0x0000000000014130       0xb0 Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x0000000000014130                xTaskCheckForTimeOut
+                0x00000000000141e0       0xb0 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x00000000000141e0                xTaskCheckForTimeOut
  .text.vTaskMissedYield
-                0x00000000000141e0       0x10 Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x00000000000141e0                vTaskMissedYield
+                0x0000000000014290       0x10 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x0000000000014290                vTaskMissedYield
  .text.prvIdleTask
-                0x00000000000141f0       0x34 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x00000000000142a0       0x34 Output/Debug/Obj/NAATOS_fw/tasks.o
  .text.prvInitialiseTaskLists
-                0x0000000000014224       0x7c Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x00000000000142d4       0x7c Output/Debug/Obj/NAATOS_fw/tasks.o
  .text.prvCheckTasksWaitingTermination
-                0x00000000000142a0       0x58 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x0000000000014350       0x58 Output/Debug/Obj/NAATOS_fw/tasks.o
  .text.prvDeleteTCB
-                0x00000000000142f8       0x1e Output/Debug/Obj/NAATOS_fw/tasks.o
- *fill*         0x0000000000014316        0x2 
+                0x00000000000143a8       0x1e Output/Debug/Obj/NAATOS_fw/tasks.o
+ *fill*         0x00000000000143c6        0x2 
  .text.prvResetNextTaskUnblockTime
-                0x0000000000014318       0x40 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x00000000000143c8       0x40 Output/Debug/Obj/NAATOS_fw/tasks.o
  .text.xTaskGetSchedulerState
-                0x0000000000014358       0x34 Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x0000000000014358                xTaskGetSchedulerState
+                0x0000000000014408       0x34 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x0000000000014408                xTaskGetSchedulerState
  .text.xTaskPriorityInherit
-                0x000000000001438c       0xd8 Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x000000000001438c                xTaskPriorityInherit
+                0x000000000001443c       0xd8 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x000000000001443c                xTaskPriorityInherit
  .text.xTaskPriorityDisinherit
-                0x0000000000014464       0xc4 Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x0000000000014464                xTaskPriorityDisinherit
+                0x0000000000014514       0xc4 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x0000000000014514                xTaskPriorityDisinherit
  .text.vTaskPriorityDisinheritAfterTimeout
-                0x0000000000014528       0xf8 Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x0000000000014528                vTaskPriorityDisinheritAfterTimeout
+                0x00000000000145d8       0xf8 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x00000000000145d8                vTaskPriorityDisinheritAfterTimeout
  .text.pvTaskIncrementMutexHeldCount
-                0x0000000000014620       0x20 Output/Debug/Obj/NAATOS_fw/tasks.o
-                0x0000000000014620                pvTaskIncrementMutexHeldCount
+                0x00000000000146d0       0x20 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x00000000000146d0                pvTaskIncrementMutexHeldCount
  .text.prvAddCurrentTaskToDelayedList
-                0x0000000000014640       0xa8 Output/Debug/Obj/NAATOS_fw/tasks.o
+                0x00000000000146f0       0xa8 Output/Debug/Obj/NAATOS_fw/tasks.o
  .text.vListInitialise
-                0x00000000000146e8       0x36 Output/Debug/Obj/NAATOS_fw/list.o
-                0x00000000000146e8                vListInitialise
+                0x0000000000014798       0x36 Output/Debug/Obj/NAATOS_fw/list.o
+                0x0000000000014798                vListInitialise
  .text.vListInitialiseItem
-                0x000000000001471e       0x10 Output/Debug/Obj/NAATOS_fw/list.o
-                0x000000000001471e                vListInitialiseItem
+                0x00000000000147ce       0x10 Output/Debug/Obj/NAATOS_fw/list.o
+                0x00000000000147ce                vListInitialiseItem
  .text.vListInsertEnd
-                0x000000000001472e       0x3e Output/Debug/Obj/NAATOS_fw/list.o
-                0x000000000001472e                vListInsertEnd
+                0x00000000000147de       0x3e Output/Debug/Obj/NAATOS_fw/list.o
+                0x00000000000147de                vListInsertEnd
  .text.vListInsert
-                0x000000000001476c       0x68 Output/Debug/Obj/NAATOS_fw/list.o
-                0x000000000001476c                vListInsert
+                0x000000000001481c       0x68 Output/Debug/Obj/NAATOS_fw/list.o
+                0x000000000001481c                vListInsert
  .text.uxListRemove
-                0x00000000000147d4       0x4a Output/Debug/Obj/NAATOS_fw/list.o
-                0x00000000000147d4                uxListRemove
+                0x0000000000014884       0x4a Output/Debug/Obj/NAATOS_fw/list.o
+                0x0000000000014884                uxListRemove
  .text.ulPortRaiseBASEPRI
-                0x000000000001481e       0x20 Output/Debug/Obj/NAATOS_fw/queue.o
- *fill*         0x000000000001483e        0x2 
+                0x00000000000148ce       0x20 Output/Debug/Obj/NAATOS_fw/queue.o
+ *fill*         0x00000000000148ee        0x2 
  .text.xQueueGenericReset
-                0x0000000000014840       0xc8 Output/Debug/Obj/NAATOS_fw/queue.o
-                0x0000000000014840                xQueueGenericReset
+                0x00000000000148f0       0xc8 Output/Debug/Obj/NAATOS_fw/queue.o
+                0x00000000000148f0                xQueueGenericReset
  .text.xQueueGenericCreate
-                0x0000000000014908       0x70 Output/Debug/Obj/NAATOS_fw/queue.o
-                0x0000000000014908                xQueueGenericCreate
+                0x00000000000149b8       0x70 Output/Debug/Obj/NAATOS_fw/queue.o
+                0x00000000000149b8                xQueueGenericCreate
  .text.prvInitialiseNewQueue
-                0x0000000000014978       0x3e Output/Debug/Obj/NAATOS_fw/queue.o
- *fill*         0x00000000000149b6        0x2 
+                0x0000000000014a28       0x3e Output/Debug/Obj/NAATOS_fw/queue.o
+ *fill*         0x0000000000014a66        0x2 
  .text.xQueueGenericSend
-                0x00000000000149b8      0x1c0 Output/Debug/Obj/NAATOS_fw/queue.o
-                0x00000000000149b8                xQueueGenericSend
+                0x0000000000014a68      0x1c0 Output/Debug/Obj/NAATOS_fw/queue.o
+                0x0000000000014a68                xQueueGenericSend
  .text.xQueueGenericSendFromISR
-                0x0000000000014b78       0xe4 Output/Debug/Obj/NAATOS_fw/queue.o
-                0x0000000000014b78                xQueueGenericSendFromISR
+                0x0000000000014c28       0xe4 Output/Debug/Obj/NAATOS_fw/queue.o
+                0x0000000000014c28                xQueueGenericSendFromISR
  .text.xQueueReceive
-                0x0000000000014c5c      0x194 Output/Debug/Obj/NAATOS_fw/queue.o
-                0x0000000000014c5c                xQueueReceive
+                0x0000000000014d0c      0x194 Output/Debug/Obj/NAATOS_fw/queue.o
+                0x0000000000014d0c                xQueueReceive
  .text.xQueueSemaphoreTake
-                0x0000000000014df0      0x1e8 Output/Debug/Obj/NAATOS_fw/queue.o
-                0x0000000000014df0                xQueueSemaphoreTake
+                0x0000000000014ea0      0x1e8 Output/Debug/Obj/NAATOS_fw/queue.o
+                0x0000000000014ea0                xQueueSemaphoreTake
  .text.uxQueueMessagesWaiting
-                0x0000000000014fd8       0x34 Output/Debug/Obj/NAATOS_fw/queue.o
-                0x0000000000014fd8                uxQueueMessagesWaiting
+                0x0000000000015088       0x34 Output/Debug/Obj/NAATOS_fw/queue.o
+                0x0000000000015088                uxQueueMessagesWaiting
  .text.prvGetDisinheritPriorityAfterTimeout
-                0x000000000001500c       0x26 Output/Debug/Obj/NAATOS_fw/queue.o
+                0x00000000000150bc       0x26 Output/Debug/Obj/NAATOS_fw/queue.o
  .text.prvCopyDataToQueue
-                0x0000000000015032       0xd2 Output/Debug/Obj/NAATOS_fw/queue.o
+                0x00000000000150e2       0xd2 Output/Debug/Obj/NAATOS_fw/queue.o
  .text.prvCopyDataFromQueue
-                0x0000000000015104       0x4a Output/Debug/Obj/NAATOS_fw/queue.o
+                0x00000000000151b4       0x4a Output/Debug/Obj/NAATOS_fw/queue.o
  .text.prvUnlockQueue
-                0x000000000001514e       0xae Output/Debug/Obj/NAATOS_fw/queue.o
+                0x00000000000151fe       0xae Output/Debug/Obj/NAATOS_fw/queue.o
  .text.prvIsQueueEmpty
-                0x00000000000151fc       0x2a Output/Debug/Obj/NAATOS_fw/queue.o
+                0x00000000000152ac       0x2a Output/Debug/Obj/NAATOS_fw/queue.o
  .text.prvIsQueueFull
-                0x0000000000015226       0x2e Output/Debug/Obj/NAATOS_fw/queue.o
+                0x00000000000152d6       0x2e Output/Debug/Obj/NAATOS_fw/queue.o
  .text.vQueueAddToRegistry
-                0x0000000000015254       0x48 Output/Debug/Obj/NAATOS_fw/queue.o
-                0x0000000000015254                vQueueAddToRegistry
+                0x0000000000015304       0x48 Output/Debug/Obj/NAATOS_fw/queue.o
+                0x0000000000015304                vQueueAddToRegistry
  .text.vQueueWaitForMessageRestricted
-                0x000000000001529c       0x66 Output/Debug/Obj/NAATOS_fw/queue.o
-                0x000000000001529c                vQueueWaitForMessageRestricted
- *fill*         0x0000000000015302        0x2 
+                0x000000000001534c       0x66 Output/Debug/Obj/NAATOS_fw/queue.o
+                0x000000000001534c                vQueueWaitForMessageRestricted
+ *fill*         0x00000000000153b2        0x2 
  .text.xTimerCreateTimerTask
-                0x0000000000015304       0x58 Output/Debug/Obj/NAATOS_fw/timers.o
-                0x0000000000015304                xTimerCreateTimerTask
+                0x00000000000153b4       0x58 Output/Debug/Obj/NAATOS_fw/timers.o
+                0x00000000000153b4                xTimerCreateTimerTask
  .text.xTimerGenericCommand
-                0x000000000001535c       0x8c Output/Debug/Obj/NAATOS_fw/timers.o
-                0x000000000001535c                xTimerGenericCommand
+                0x000000000001540c       0x8c Output/Debug/Obj/NAATOS_fw/timers.o
+                0x000000000001540c                xTimerGenericCommand
  .text.prvProcessExpiredTimer
-                0x00000000000153e8       0x78 Output/Debug/Obj/NAATOS_fw/timers.o
+                0x0000000000015498       0x78 Output/Debug/Obj/NAATOS_fw/timers.o
  .text.prvTimerTask
-                0x0000000000015460       0x20 Output/Debug/Obj/NAATOS_fw/timers.o
+                0x0000000000015510       0x20 Output/Debug/Obj/NAATOS_fw/timers.o
  .text.prvProcessTimerOrBlockTask
-                0x0000000000015480       0x9c Output/Debug/Obj/NAATOS_fw/timers.o
+                0x0000000000015530       0x9c Output/Debug/Obj/NAATOS_fw/timers.o
  .text.prvGetNextExpireTime
-                0x000000000001551c       0x40 Output/Debug/Obj/NAATOS_fw/timers.o
+                0x00000000000155cc       0x40 Output/Debug/Obj/NAATOS_fw/timers.o
  .text.prvSampleTimeNow
-                0x000000000001555c       0x3c Output/Debug/Obj/NAATOS_fw/timers.o
+                0x000000000001560c       0x3c Output/Debug/Obj/NAATOS_fw/timers.o
  .text.prvInsertTimerInActiveList
-                0x0000000000015598       0x84 Output/Debug/Obj/NAATOS_fw/timers.o
+                0x0000000000015648       0x84 Output/Debug/Obj/NAATOS_fw/timers.o
  .text.prvProcessReceivedCommands
-                0x000000000001561c      0x13c Output/Debug/Obj/NAATOS_fw/timers.o
+                0x00000000000156cc      0x13c Output/Debug/Obj/NAATOS_fw/timers.o
  .text.prvSwitchTimerLists
-                0x0000000000015758       0xb8 Output/Debug/Obj/NAATOS_fw/timers.o
+                0x0000000000015808       0xb8 Output/Debug/Obj/NAATOS_fw/timers.o
  .text.prvCheckForValidListAndQueue
-                0x0000000000015810       0x6c Output/Debug/Obj/NAATOS_fw/timers.o
+                0x00000000000158c0       0x6c Output/Debug/Obj/NAATOS_fw/timers.o
  .text.vPortStartFirstTask
-                0x000000000001587c       0x20 Output/Debug/Obj/NAATOS_fw/port.o
-                0x000000000001587c                vPortStartFirstTask
+                0x000000000001592c       0x20 Output/Debug/Obj/NAATOS_fw/port.o
+                0x000000000001592c                vPortStartFirstTask
  .text.SVC_Handler
-                0x000000000001589c       0x24 Output/Debug/Obj/NAATOS_fw/port.o
-                0x000000000001589c                SVC_Handler
+                0x000000000001594c       0x24 Output/Debug/Obj/NAATOS_fw/port.o
+                0x000000000001594c                SVC_Handler
  .text.PendSV_Handler
-                0x00000000000158c0       0x64 Output/Debug/Obj/NAATOS_fw/port.o
-                0x00000000000158c0                PendSV_Handler
+                0x0000000000015970       0x64 Output/Debug/Obj/NAATOS_fw/port.o
+                0x0000000000015970                PendSV_Handler
  .text.__NVIC_GetPriorityGrouping
-                0x0000000000015924       0x14 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
+                0x00000000000159d4       0x14 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
  .text.__NVIC_SetPriority
-                0x0000000000015938       0x50 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
+                0x00000000000159e8       0x50 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
  .text.pxPortInitialiseStack
-                0x0000000000015988       0x60 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
-                0x0000000000015988                pxPortInitialiseStack
+                0x0000000000015a38       0x60 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
+                0x0000000000015a38                pxPortInitialiseStack
  .text.prvTaskExitError
-                0x00000000000159e8       0x2c Output/Debug/Obj/NAATOS_fw/port_cmsis.o
+                0x0000000000015a98       0x2c Output/Debug/Obj/NAATOS_fw/port_cmsis.o
  .text.xPortStartScheduler
-                0x0000000000015a14       0xe8 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
-                0x0000000000015a14                xPortStartScheduler
+                0x0000000000015ac4       0xe8 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
+                0x0000000000015ac4                xPortStartScheduler
  .text.vPortEnterCritical
-                0x0000000000015afc       0x4c Output/Debug/Obj/NAATOS_fw/port_cmsis.o
-                0x0000000000015afc                vPortEnterCritical
+                0x0000000000015bac       0x4c Output/Debug/Obj/NAATOS_fw/port_cmsis.o
+                0x0000000000015bac                vPortEnterCritical
  .text.vPortExitCritical
-                0x0000000000015b48       0x44 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
-                0x0000000000015b48                vPortExitCritical
+                0x0000000000015bf8       0x44 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
+                0x0000000000015bf8                vPortExitCritical
  .text.vPortEnableVFP
-                0x0000000000015b8c       0x18 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
+                0x0000000000015c3c       0x18 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
  .text.vPortValidateInterruptPriority
-                0x0000000000015ba4       0x78 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
-                0x0000000000015ba4                vPortValidateInterruptPriority
+                0x0000000000015c54       0x78 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
+                0x0000000000015c54                vPortValidateInterruptPriority
  .text.__NVIC_EnableIRQ
-                0x0000000000015c1c       0x34 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
+                0x0000000000015ccc       0x34 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
  .text.__NVIC_SetPriority
-                0x0000000000015c50       0x50 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
+                0x0000000000015d00       0x50 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
  .text.ulPortRaiseBASEPRI
-                0x0000000000015ca0       0x20 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
+                0x0000000000015d50       0x20 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
  .text.nrf_rtc_int_enable
-                0x0000000000015cc0       0x14 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
+                0x0000000000015d70       0x14 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
  .text.nrf_rtc_event_clear
-                0x0000000000015cd4       0x2a Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
+                0x0000000000015d84       0x2a Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
  .text.nrf_rtc_counter_get
-                0x0000000000015cfe       0x10 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
- *fill*         0x0000000000015d0e        0x2 
+                0x0000000000015dae       0x10 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
+ *fill*         0x0000000000015dbe        0x2 
  .text.nrf_rtc_prescaler_set
-                0x0000000000015d10       0x30 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
+                0x0000000000015dc0       0x30 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
  .text.nrf_rtc_task_trigger
-                0x0000000000015d40       0x1e Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
+                0x0000000000015df0       0x1e Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
  .text.nrf_rtc_event_enable
-                0x0000000000015d5e       0x14 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
- *fill*         0x0000000000015d72        0x2 
+                0x0000000000015e0e       0x14 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
+ *fill*         0x0000000000015e22        0x2 
  .text.RTC1_IRQHandler
-                0x0000000000015d74       0x88 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
-                0x0000000000015d74                RTC1_IRQHandler
+                0x0000000000015e24       0x88 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
+                0x0000000000015e24                RTC1_IRQHandler
  .text.vPortSetupTimerInterrupt
-                0x0000000000015dfc       0x48 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
-                0x0000000000015dfc                vPortSetupTimerInterrupt
+                0x0000000000015eac       0x48 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
+                0x0000000000015eac                vPortSetupTimerInterrupt
  .text.pvPortMalloc
-                0x0000000000015e44      0x160 Output/Debug/Obj/NAATOS_fw/heap_4.o
-                0x0000000000015e44                pvPortMalloc
+                0x0000000000015ef4      0x160 Output/Debug/Obj/NAATOS_fw/heap_4.o
+                0x0000000000015ef4                pvPortMalloc
  .text.vPortFree
-                0x0000000000015fa4       0xa0 Output/Debug/Obj/NAATOS_fw/heap_4.o
-                0x0000000000015fa4                vPortFree
+                0x0000000000016054       0xa0 Output/Debug/Obj/NAATOS_fw/heap_4.o
+                0x0000000000016054                vPortFree
  .text.prvHeapInit
-                0x0000000000016044       0xbc Output/Debug/Obj/NAATOS_fw/heap_4.o
+                0x00000000000160f4       0xbc Output/Debug/Obj/NAATOS_fw/heap_4.o
  .text.prvInsertBlockIntoFreeList
-                0x0000000000016100       0xa8 Output/Debug/Obj/NAATOS_fw/heap_4.o
+                0x00000000000161b0       0xa8 Output/Debug/Obj/NAATOS_fw/heap_4.o
  .text.__aeabi_dadd
-                0x00000000000161a8      0x244 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x00000000000161a8                __aeabi_dadd
+                0x0000000000016258      0x244 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x0000000000016258                __aeabi_dadd
  .text.__aeabi_dsub
-                0x00000000000163ec        0x8 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x00000000000163ec                __aeabi_dsub
+                0x000000000001649c        0x8 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x000000000001649c                __aeabi_dsub
  .text.__aeabi_dmul
-                0x00000000000163f4      0x138 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x00000000000163f4                __aeabi_dmul
+                0x00000000000164a4      0x138 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x00000000000164a4                __aeabi_dmul
  .text.__aeabi_ddiv
-                0x000000000001652c      0x1cc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x000000000001652c                __aeabi_ddiv
+                0x00000000000165dc      0x1cc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x00000000000165dc                __aeabi_ddiv
  .text.__aeabi_dcmple
-                0x00000000000166f8       0x3c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x00000000000166f8                __aeabi_dcmple
+                0x00000000000167a8       0x3c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x00000000000167a8                __aeabi_dcmple
  .text.__aeabi_dcmpeq
-                0x0000000000016734       0x34 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x0000000000016734                __aeabi_dcmpeq
+                0x00000000000167e4       0x34 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x00000000000167e4                __aeabi_dcmpeq
  .text.__aeabi_dcmpge
-                0x0000000000016768       0x3c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x0000000000016768                __aeabi_dcmpge
+                0x0000000000016818       0x3c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x0000000000016818                __aeabi_dcmpge
  .text.__aeabi_dcmpgt
-                0x00000000000167a4       0x38 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x00000000000167a4                __aeabi_dcmpgt
+                0x0000000000016854       0x38 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x0000000000016854                __aeabi_dcmpgt
  .text.__aeabi_dcmplt
-                0x00000000000167dc       0x38 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x00000000000167dc                __aeabi_dcmplt
+                0x000000000001688c       0x38 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x000000000001688c                __aeabi_dcmplt
  .text.__aeabi_d2iz
-                0x0000000000016814       0x4c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x0000000000016814                __aeabi_d2iz
+                0x00000000000168c4       0x4c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x00000000000168c4                __aeabi_d2iz
  .text.__aeabi_d2uiz
-                0x0000000000016860       0x28 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x0000000000016860                __aeabi_d2uiz
+                0x0000000000016910       0x28 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x0000000000016910                __aeabi_d2uiz
  .text.__aeabi_d2ulz
-                0x0000000000016888       0x40 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x0000000000016888                __aeabi_d2ulz
+                0x0000000000016938       0x40 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x0000000000016938                __aeabi_d2ulz
  .text.__aeabi_i2d
-                0x00000000000168c8       0x28 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x00000000000168c8                __aeabi_i2d
+                0x0000000000016978       0x28 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x0000000000016978                __aeabi_i2d
  .text.__aeabi_ui2d
-                0x00000000000168f0       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x00000000000168f0                __aeabi_ui2d
+                0x00000000000169a0       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x00000000000169a0                __aeabi_ui2d
  .text.__aeabi_ul2d
-                0x000000000001690c       0x5c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x000000000001690c                __aeabi_ul2d
+                0x00000000000169bc       0x5c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x00000000000169bc                __aeabi_ul2d
  .text.__aeabi_f2d
-                0x0000000000016968       0x34 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x0000000000016968                __aeabi_f2d
+                0x0000000000016a18       0x34 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x0000000000016a18                __aeabi_f2d
  .text.__aeabi_d2f
-                0x000000000001699c       0x54 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x000000000001699c                __aeabi_d2f
+                0x0000000000016a4c       0x54 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x0000000000016a4c                __aeabi_d2f
  .text.__float64_isinf
-                0x00000000000169f0       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x00000000000169f0                __float64_isinf
+                0x0000000000016aa0       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x0000000000016aa0                __float64_isinf
  .text.__float64_isnan
-                0x0000000000016a04       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x0000000000016a04                __float64_isnan
+                0x0000000000016ab4       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x0000000000016ab4                __float64_isnan
  .text.__float64_signbit
-                0x0000000000016a18        0xc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x0000000000016a18                __float64_signbit
- .text.fabs     0x0000000000016a24       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
-                0x0000000000016a24                fabs(double)
-                0x0000000000016a24                fabs
+                0x0000000000016ac8        0xc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x0000000000016ac8                __float64_signbit
+ .text.fabs     0x0000000000016ad4       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm_asm.o)
+                0x0000000000016ad4                fabs(double)
+                0x0000000000016ad4                fabs
  .text.libc.frexp
-                0x0000000000016a34       0x50 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
-                0x0000000000016a34                frexpl(long double, int*)
-                0x0000000000016a34                frexpl
-                0x0000000000016a34                frexp
-                0x0000000000016a34                frexp(double, int*)
- *fill*         0x0000000000016a84        0x4 
+                0x0000000000016ae4       0x50 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
+                0x0000000000016ae4                frexpl(long double, int*)
+                0x0000000000016ae4                frexpl
+                0x0000000000016ae4                frexp
+                0x0000000000016ae4                frexp(double, int*)
+ *fill*         0x0000000000016b34        0x4 
  .text.libc.ldexp
-                0x0000000000016a88       0x7c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
-                0x0000000000016a88                ldexpl(long double, int)
-                0x0000000000016a88                ldexp
-                0x0000000000016a88                ldexpl
-                0x0000000000016a88                ldexp(double, int)
- *fill*         0x0000000000016b04        0x4 
+                0x0000000000016b38       0x7c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
+                0x0000000000016b38                ldexpl(long double, int)
+                0x0000000000016b38                ldexp
+                0x0000000000016b38                ldexpl
+                0x0000000000016b38                ldexp(double, int)
+ *fill*         0x0000000000016bb4        0x4 
  .text.libc.exp
-                0x0000000000016b08      0x200 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
-                0x0000000000016b08                expl(long double)
-                0x0000000000016b08                exp
-                0x0000000000016b08                expl
-                0x0000000000016b08                exp(double)
+                0x0000000000016bb8      0x200 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
+                0x0000000000016bb8                expl(long double)
+                0x0000000000016bb8                exp
+                0x0000000000016bb8                expl
+                0x0000000000016bb8                exp(double)
  .text.libc.log
-                0x0000000000016d08      0x230 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
-                0x0000000000016d08                log(double)
-                0x0000000000016d08                logl
-                0x0000000000016d08                logl(long double)
-                0x0000000000016d08                log
+                0x0000000000016db8      0x230 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
+                0x0000000000016db8                log(double)
+                0x0000000000016db8                logl
+                0x0000000000016db8                logl(long double)
+                0x0000000000016db8                log
  .text.libc.modf
-                0x0000000000016f38       0x94 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
-                0x0000000000016f38                modf
-                0x0000000000016f38                modf(double, double*)
-                0x0000000000016f38                modfl(long double, long double*)
-                0x0000000000016f38                modfl
- *fill*         0x0000000000016fcc        0x4 
+                0x0000000000016fe8       0x94 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
+                0x0000000000016fe8                modf
+                0x0000000000016fe8                modf(double, double*)
+                0x0000000000016fe8                modfl(long double, long double*)
+                0x0000000000016fe8                modfl
+ *fill*         0x000000000001707c        0x4 
  .text.libc.pow
-                0x0000000000016fd0      0x168 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
-                0x0000000000016fd0                pow
-                0x0000000000016fd0                powl(long double, long double)
-                0x0000000000016fd0                powl
-                0x0000000000016fd0                pow(double, double)
+                0x0000000000017080      0x168 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
+                0x0000000000017080                pow
+                0x0000000000017080                powl(long double, long double)
+                0x0000000000017080                powl
+                0x0000000000017080                pow(double, double)
  .text.libc.floor
-                0x0000000000017138       0xa8 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
-                0x0000000000017138                floorl
-                0x0000000000017138                floorl(long double)
-                0x0000000000017138                floor(double)
-                0x0000000000017138                floor
+                0x00000000000171e8       0xa8 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
+                0x00000000000171e8                floorl
+                0x00000000000171e8                floorl(long double)
+                0x00000000000171e8                floor(double)
+                0x00000000000171e8                floor
  .text.libc.fmod
-                0x00000000000171e0      0x1a4 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
-                0x00000000000171e0                fmod
-                0x00000000000171e0                fmodl
-                0x00000000000171e0                fmodl(long double, long double)
-                0x00000000000171e0                fmod(double, double)
+                0x0000000000017290      0x1a4 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libm_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libm2.o)
+                0x0000000000017290                fmod
+                0x0000000000017290                fmodl
+                0x0000000000017290                fmodl(long double, long double)
+                0x0000000000017290                fmod(double, double)
  .text.libc.__int64_udivmod
-                0x0000000000017384       0xce C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc_asm.o)
-                0x0000000000017384                __aeabi_uldivmod
-                0x0000000000017384                __int64_udiv
-                0x0000000000017384                __udivdi3
-                0x0000000000017384                __int64_udivmod
- *fill*         0x0000000000017452        0x2 
+                0x0000000000017434       0xce C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc_asm.o)
+                0x0000000000017434                __aeabi_uldivmod
+                0x0000000000017434                __int64_udiv
+                0x0000000000017434                __udivdi3
+                0x0000000000017434                __int64_udivmod
+ *fill*         0x0000000000017502        0x2 
  .text.libc.__RAL_ascii_isctype
-                0x0000000000017454       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x0000000000017504       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
  .text.libc.__RAL_ascii_toupper
-                0x0000000000017470        0xc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x0000000000017520        0xc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
  .text.libc.__RAL_ascii_tolower
-                0x000000000001747c        0xc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000001752c        0xc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
  .text.libc.__RAL_ascii_iswctype
-                0x0000000000017488       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x0000000000017538       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
  .text.libc.__RAL_ascii_towupper
-                0x00000000000174a4        0xc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x0000000000017554        0xc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
  .text.libc.__RAL_ascii_towlower
-                0x00000000000174b0        0xc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x0000000000017560        0xc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
  .text.libc.__RAL_ascii_wctomb
-                0x00000000000174bc        0xe C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x00000000000174bc                __RAL_ascii_wctomb
+                0x000000000001756c        0xe C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000001756c                __RAL_ascii_wctomb
  .text.libc.__RAL_ascii_mbtowc
-                0x00000000000174ca       0x24 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x00000000000174ca                __RAL_ascii_mbtowc
- *fill*         0x00000000000174ee        0x2 
+                0x000000000001757a       0x24 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000001757a                __RAL_ascii_mbtowc
+ *fill*         0x000000000001759e        0x2 
  .text.libc.__RAL_pow10
-                0x00000000000174f0       0x54 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x00000000000174f0                __RAL_pow10
+                0x00000000000175a0       0x54 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x00000000000175a0                __RAL_pow10
  .text.libc.__putc
-                0x0000000000017544       0x36 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x0000000000017544                __putc
+                0x00000000000175f4       0x36 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x00000000000175f4                __putc
  .text.libc.__RAL_print_padding
-                0x000000000001757a       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000001757a                __RAL_print_padding
+                0x000000000001762a       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000001762a                __RAL_print_padding
  .text.libc.__RAL_pre_padding
-                0x0000000000017596       0x1a C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x0000000000017596                __RAL_pre_padding
+                0x0000000000017646       0x1a C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x0000000000017646                __RAL_pre_padding
  .text.libc.abs
-                0x00000000000175b0        0x8 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x00000000000175b0                abs
+                0x0000000000017660        0x8 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x0000000000017660                abs
  .text.libc.__RAL_isctype
-                0x00000000000175b8       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x00000000000175b8                __RAL_isctype
+                0x0000000000017668       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x0000000000017668                __RAL_isctype
  .text.libc.isprint
-                0x00000000000175cc        0xa C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x00000000000175cc                isprint
- *fill*         0x00000000000175d6        0x2 
+                0x000000000001767c        0xa C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000001767c                isprint
+ *fill*         0x0000000000017686        0x2 
  .text.libc.__aeabi_errno_addr
-                0x00000000000175d8       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x00000000000175d8                __aeabi_errno_addr
+                0x0000000000017688       0x14 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x0000000000017688                __aeabi_errno_addr
  .text.libc.sprintf
-                0x00000000000175ec       0x2a C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x00000000000175ec                sprintf
+                0x000000000001769c       0x2a C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000001769c                sprintf
  .text.libc.strnlen
-                0x0000000000017616       0x22 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x0000000000017616                strnlen
+                0x00000000000176c6       0x22 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x00000000000176c6                strnlen
  .text.libc.vsnprintf
-                0x0000000000017638       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x0000000000017638                vsnprintf
+                0x00000000000176e8       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x00000000000176e8                vsnprintf
  .text.libc.memcpy
-                0x0000000000017654       0x52 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2_asm.o)
-                0x0000000000017654                __aeabi_memcpy
-                0x0000000000017654                memcpy
-                0x0000000000017660                __aeabi_memcpy8
-                0x0000000000017660                __aeabi_memcpy4
+                0x0000000000017704       0x52 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2_asm.o)
+                0x0000000000017704                __aeabi_memcpy
+                0x0000000000017704                memcpy
+                0x0000000000017710                __aeabi_memcpy8
+                0x0000000000017710                __aeabi_memcpy4
  .text.libc.memset
-                0x00000000000176a6       0x66 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2_asm.o)
-                0x00000000000176a6                memset
+                0x0000000000017756       0x66 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2_asm.o)
+                0x0000000000017756                memset
  .text.libc.strcpy
-                0x000000000001770c       0x44 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2_asm.o)
-                0x000000000001770c                strcpy
+                0x00000000000177bc       0x44 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2_asm.o)
+                0x00000000000177bc                strcpy
  .text.libc.strlen
-                0x0000000000017750       0x60 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2_asm.o)
-                0x0000000000017750                strlen
+                0x0000000000017800       0x60 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2_asm.o)
+                0x0000000000017800                strlen
  .text.libc.__vfprintf_float_long
-                0x00000000000177b0     0x10e8 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libvfprintf.o)
-                0x00000000000177b0                __vfprintf_float_long
-                0x0000000000018898                . = ALIGN (MAX ((__text_start__ + 0x4), .), 0x4)
-                0x0000000000018898                __text_end__ = (__text_start__ + SIZEOF (.text))
-                0x00000000000184c8                __text_size__ = SIZEOF (.text)
-                0x0000000000018898                __text_load_end__ = __text_end__
+                0x0000000000017860     0x10e8 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libvfprintf.o)
+                0x0000000000017860                __vfprintf_float_long
+                0x0000000000018948                . = ALIGN (MAX ((__text_start__ + 0x4), .), 0x4)
+                0x0000000000018948                __text_end__ = (__text_start__ + SIZEOF (.text))
+                0x0000000000018578                __text_size__ = SIZEOF (.text)
+                0x0000000000018948                __text_load_end__ = __text_end__
 
 .vfp11_veneer   0x0000000100000000        0x0
  .vfp11_veneer  0x0000000100000000        0x0 linker stubs
@@ -19809,122 +19810,122 @@ Linker script and memory map
 .iplt           0x0000000100000000        0x0
  .iplt          0x0000000100000000        0x0 Output/Debug/Obj/NAATOS_fw/thumb_crt0.o
                 0x0000000000000001                . = ASSERT (((__text_start__ == __text_end__) || ((__text_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .text is too large to fit in FLASH1 memory segment)
-                0x0000000000018898                __log_const_data_load_start__ = ALIGN (__text_end__, 0x4)
+                0x0000000000018948                __log_const_data_load_start__ = ALIGN (__text_end__, 0x4)
 
 .log_const_data
-                0x0000000000018898       0xa0
-                0x0000000000018898                __log_const_data_start__ = .
-                0x0000000000018898                __start_log_const_data = __log_const_data_start__
+                0x0000000000018948       0xa0
+                0x0000000000018948                __log_const_data_start__ = .
+                0x0000000000018948                __start_log_const_data = __log_const_data_start__
  *(SORT_BY_NAME(.log_const_data*))
  .log_const_data_CLOCK
-                0x0000000000018898        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_clock.o
-                0x0000000000018898                m_nrf_log_CLOCK_logs_data_const
+                0x0000000000018948        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_clock.o
+                0x0000000000018948                m_nrf_log_CLOCK_logs_data_const
  .log_const_data_GPIOTE
-                0x00000000000188a0        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_gpiote.o
-                0x00000000000188a0                m_nrf_log_GPIOTE_logs_data_const
+                0x0000000000018950        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_gpiote.o
+                0x0000000000018950                m_nrf_log_GPIOTE_logs_data_const
  .log_const_data_PPI
-                0x00000000000188a8        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_ppi.o
-                0x00000000000188a8                m_nrf_log_PPI_logs_data_const
+                0x0000000000018958        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_ppi.o
+                0x0000000000018958                m_nrf_log_PPI_logs_data_const
  .log_const_data_PRS
-                0x00000000000188b0        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_prs.o
-                0x00000000000188b0                m_nrf_log_PRS_logs_data_const
+                0x0000000000018960        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_prs.o
+                0x0000000000018960                m_nrf_log_PRS_logs_data_const
  .log_const_data_SAADC
-                0x00000000000188b8        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_saadc.o
-                0x00000000000188b8                m_nrf_log_SAADC_logs_data_const
+                0x0000000000018968        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_saadc.o
+                0x0000000000018968                m_nrf_log_SAADC_logs_data_const
  .log_const_data_SPIM
-                0x00000000000188c0        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_spim.o
-                0x00000000000188c0                m_nrf_log_SPIM_logs_data_const
+                0x0000000000018970        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_spim.o
+                0x0000000000018970                m_nrf_log_SPIM_logs_data_const
  .log_const_data_TIMER
-                0x00000000000188c8        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_timer.o
-                0x00000000000188c8                m_nrf_log_TIMER_logs_data_const
+                0x0000000000018978        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_timer.o
+                0x0000000000018978                m_nrf_log_TIMER_logs_data_const
  .log_const_data_TWI
-                0x00000000000188d0        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_twi.o
-                0x00000000000188d0                m_nrf_log_TWI_logs_data_const
+                0x0000000000018980        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_twi.o
+                0x0000000000018980                m_nrf_log_TWI_logs_data_const
  .log_const_data_UART
-                0x00000000000188d8        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_uart.o
-                0x00000000000188d8                m_nrf_log_UART_logs_data_const
+                0x0000000000018988        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_uart.o
+                0x0000000000018988                m_nrf_log_UART_logs_data_const
  .log_const_data_UARTE
-                0x00000000000188e0        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_uarte.o
-                0x00000000000188e0                m_nrf_log_UARTE_logs_data_const
+                0x0000000000018990        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_uarte.o
+                0x0000000000018990                m_nrf_log_UARTE_logs_data_const
  .log_const_data_USBD
-                0x00000000000188e8        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_usbd.o
-                0x00000000000188e8                m_nrf_log_USBD_logs_data_const
+                0x0000000000018998        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_usbd.o
+                0x0000000000018998                m_nrf_log_USBD_logs_data_const
  .log_const_data_app
-                0x00000000000188f0        0x8 Output/Debug/Obj/NAATOS_fw/nrf_log_frontend.o
-                0x00000000000188f0                m_nrf_log_app_logs_data_const
+                0x00000000000189a0        0x8 Output/Debug/Obj/NAATOS_fw/nrf_log_frontend.o
+                0x00000000000189a0                m_nrf_log_app_logs_data_const
  .log_const_data_app_button
-                0x00000000000188f8        0x8 Output/Debug/Obj/NAATOS_fw/app_button.o
-                0x00000000000188f8                m_nrf_log_app_button_logs_data_const
+                0x00000000000189a8        0x8 Output/Debug/Obj/NAATOS_fw/app_button.o
+                0x00000000000189a8                m_nrf_log_app_button_logs_data_const
  .log_const_data_app_timer
-                0x0000000000018900        0x8 Output/Debug/Obj/NAATOS_fw/app_timer2.o
-                0x0000000000018900                m_nrf_log_app_timer_logs_data_const
+                0x00000000000189b0        0x8 Output/Debug/Obj/NAATOS_fw/app_timer2.o
+                0x00000000000189b0                m_nrf_log_app_timer_logs_data_const
  .log_const_data_app_usbd
-                0x0000000000018908        0x8 Output/Debug/Obj/NAATOS_fw/app_usbd.o
-                0x0000000000018908                m_nrf_log_app_usbd_logs_data_const
+                0x00000000000189b8        0x8 Output/Debug/Obj/NAATOS_fw/app_usbd.o
+                0x00000000000189b8                m_nrf_log_app_usbd_logs_data_const
  .log_const_data_app_usbd_core
-                0x0000000000018910        0x8 Output/Debug/Obj/NAATOS_fw/app_usbd_core.o
-                0x0000000000018910                m_nrf_log_app_usbd_core_logs_data_const
+                0x00000000000189c0        0x8 Output/Debug/Obj/NAATOS_fw/app_usbd_core.o
+                0x00000000000189c0                m_nrf_log_app_usbd_core_logs_data_const
  .log_const_data_clock
-                0x0000000000018918        0x8 Output/Debug/Obj/NAATOS_fw/nrf_drv_clock.o
-                0x0000000000018918                m_nrf_log_clock_logs_data_const
+                0x00000000000189c8        0x8 Output/Debug/Obj/NAATOS_fw/nrf_drv_clock.o
+                0x00000000000189c8                m_nrf_log_clock_logs_data_const
  .log_const_data_hardfault
-                0x0000000000018920        0x8 Output/Debug/Obj/NAATOS_fw/hardfault_implementation.o
-                0x0000000000018920                m_nrf_log_hardfault_logs_data_const
+                0x00000000000189d0        0x8 Output/Debug/Obj/NAATOS_fw/hardfault_implementation.o
+                0x00000000000189d0                m_nrf_log_hardfault_logs_data_const
  .log_const_data_sortlist
-                0x0000000000018928        0x8 Output/Debug/Obj/NAATOS_fw/nrf_sortlist.o
-                0x0000000000018928                m_nrf_log_sortlist_logs_data_const
+                0x00000000000189d8        0x8 Output/Debug/Obj/NAATOS_fw/nrf_sortlist.o
+                0x00000000000189d8                m_nrf_log_sortlist_logs_data_const
  .log_const_data_usbd_msc
-                0x0000000000018930        0x8 Output/Debug/Obj/NAATOS_fw/app_usbd_msc.o
-                0x0000000000018930                m_nrf_log_usbd_msc_logs_data_const
-                0x0000000000018938                __log_const_data_end__ = (__log_const_data_start__ + SIZEOF (.log_const_data))
+                0x00000000000189e0        0x8 Output/Debug/Obj/NAATOS_fw/app_usbd_msc.o
+                0x00000000000189e0                m_nrf_log_usbd_msc_logs_data_const
+                0x00000000000189e8                __log_const_data_end__ = (__log_const_data_start__ + SIZEOF (.log_const_data))
                 0x00000000000000a0                __log_const_data_size__ = SIZEOF (.log_const_data)
-                0x0000000000018938                __stop_log_const_data = __log_const_data_end__
-                0x0000000000018938                __log_const_data_load_end__ = __log_const_data_end__
+                0x00000000000189e8                __stop_log_const_data = __log_const_data_end__
+                0x00000000000189e8                __log_const_data_load_end__ = __log_const_data_end__
                 0x0000000000000001                . = ASSERT (((__log_const_data_start__ == __log_const_data_end__) || ((__log_const_data_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .log_const_data is too large to fit in FLASH1 memory segment)
-                0x0000000000018938                __log_backends_load_start__ = ALIGN (__log_const_data_end__, 0x4)
+                0x00000000000189e8                __log_backends_load_start__ = ALIGN (__log_const_data_end__, 0x4)
 
-.log_backends   0x0000000000018938       0x10
-                0x0000000000018938                __log_backends_start__ = .
-                0x0000000000018938                __start_log_backends = __log_backends_start__
+.log_backends   0x00000000000189e8       0x10
+                0x00000000000189e8                __log_backends_start__ = .
+                0x00000000000189e8                __start_log_backends = __log_backends_start__
  *(SORT_BY_NAME(.log_backends*))
- .log_backends  0x0000000000018938       0x10 Output/Debug/Obj/NAATOS_fw/nrf_log_default_backends.o
-                0x0000000000018948                __log_backends_end__ = (__log_backends_start__ + SIZEOF (.log_backends))
+ .log_backends  0x00000000000189e8       0x10 Output/Debug/Obj/NAATOS_fw/nrf_log_default_backends.o
+                0x00000000000189f8                __log_backends_end__ = (__log_backends_start__ + SIZEOF (.log_backends))
                 0x0000000000000010                __log_backends_size__ = SIZEOF (.log_backends)
-                0x0000000000018948                __stop_log_backends = __log_backends_end__
-                0x0000000000018948                __log_backends_load_end__ = __log_backends_end__
+                0x00000000000189f8                __stop_log_backends = __log_backends_end__
+                0x00000000000189f8                __log_backends_load_end__ = __log_backends_end__
                 0x0000000000000001                . = ASSERT (((__log_backends_start__ == __log_backends_end__) || ((__log_backends_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .log_backends is too large to fit in FLASH1 memory segment)
-                0x0000000000018948                __nrf_balloc_load_start__ = ALIGN (__log_backends_end__, 0x4)
+                0x00000000000189f8                __nrf_balloc_load_start__ = ALIGN (__log_backends_end__, 0x4)
 
-.nrf_balloc     0x0000000000018948       0x14
-                0x0000000000018948                __nrf_balloc_start__ = .
-                0x0000000000018948                __start_nrf_balloc = __nrf_balloc_start__
+.nrf_balloc     0x00000000000189f8       0x14
+                0x00000000000189f8                __nrf_balloc_start__ = .
+                0x00000000000189f8                __start_nrf_balloc = __nrf_balloc_start__
  *(.nrf_balloc*)
- .nrf_balloc    0x0000000000018948       0x14 Output/Debug/Obj/NAATOS_fw/nrf_log_frontend.o
-                0x0000000000018948                log_mempool
-                0x000000000001895c                __nrf_balloc_end__ = (__nrf_balloc_start__ + SIZEOF (.nrf_balloc))
+ .nrf_balloc    0x00000000000189f8       0x14 Output/Debug/Obj/NAATOS_fw/nrf_log_frontend.o
+                0x00000000000189f8                log_mempool
+                0x0000000000018a0c                __nrf_balloc_end__ = (__nrf_balloc_start__ + SIZEOF (.nrf_balloc))
                 0x0000000000000014                __nrf_balloc_size__ = SIZEOF (.nrf_balloc)
-                0x000000000001895c                __stop_nrf_balloc = __nrf_balloc_end__
-                0x000000000001895c                __nrf_balloc_load_end__ = __nrf_balloc_end__
+                0x0000000000018a0c                __stop_nrf_balloc = __nrf_balloc_end__
+                0x0000000000018a0c                __nrf_balloc_load_end__ = __nrf_balloc_end__
                 0x0000000000000001                . = ASSERT (((__nrf_balloc_start__ == __nrf_balloc_end__) || ((__nrf_balloc_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .nrf_balloc is too large to fit in FLASH1 memory segment)
-                0x000000000001895c                __nrf_sections_load_start__ = ALIGN (__nrf_balloc_end__, 0x4)
+                0x0000000000018a0c                __nrf_sections_load_start__ = ALIGN (__nrf_balloc_end__, 0x4)
 
-.nrf_sections   0x000000000001895c        0x0
-                0x000000000001895c                __nrf_sections_start__ = .
-                0x000000000001895c                __start_nrf_sections = __nrf_sections_start__
+.nrf_sections   0x0000000000018a0c        0x0
+                0x0000000000018a0c                __nrf_sections_start__ = .
+                0x0000000000018a0c                __start_nrf_sections = __nrf_sections_start__
  *(.nrf_sections .nrf_sections.*)
-                0x000000000001895c                __nrf_sections_end__ = (__nrf_sections_start__ + SIZEOF (.nrf_sections))
+                0x0000000000018a0c                __nrf_sections_end__ = (__nrf_sections_start__ + SIZEOF (.nrf_sections))
                 0x0000000000000000                __nrf_sections_size__ = SIZEOF (.nrf_sections)
-                0x000000000001895c                __nrf_sections_load_end__ = __nrf_sections_end__
+                0x0000000000018a0c                __nrf_sections_load_end__ = __nrf_sections_end__
                 0x0000000000000001                . = ASSERT (((__nrf_sections_start__ == __nrf_sections_end__) || ((__nrf_sections_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .nrf_sections is too large to fit in FLASH1 memory segment)
-                0x000000000001895c                __log_dynamic_data_load_start__ = ALIGN (__nrf_sections_end__, 0x4)
+                0x0000000000018a0c                __log_dynamic_data_load_start__ = ALIGN (__nrf_sections_end__, 0x4)
 
 .log_dynamic_data
-                0x0000000020000000        0x0 load address 0x000000000001895c
+                0x0000000020000000        0x0 load address 0x0000000000018a0c
                 0x0000000020000000                __log_dynamic_data_start__ = .
  *(SORT_BY_NAME(.log_dynamic_data*))
                 0x0000000020000000                __log_dynamic_data_end__ = (__log_dynamic_data_start__ + SIZEOF (.log_dynamic_data))
                 0x0000000000000000                __log_dynamic_data_size__ = SIZEOF (.log_dynamic_data)
-                0x000000000001895c                __log_dynamic_data_load_end__ = (__log_dynamic_data_load_start__ + SIZEOF (.log_dynamic_data))
+                0x0000000000018a0c                __log_dynamic_data_load_end__ = (__log_dynamic_data_load_start__ + SIZEOF (.log_dynamic_data))
                 0x0000000000000001                . = ASSERT (((__log_dynamic_data_load_start__ == __log_dynamic_data_load_end__) || ((__log_dynamic_data_load_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .log_dynamic_data is too large to fit in FLASH1 memory segment)
 
 .log_dynamic_data_run
@@ -19936,15 +19937,15 @@ Linker script and memory map
                 0x0000000020000000                __stop_log_dynamic_data = __log_dynamic_data_run_end__
                 0x0000000020000000                __log_dynamic_data_run_load_end__ = __log_dynamic_data_run_end__
                 0x0000000000000001                . = ASSERT (((__log_dynamic_data_run_start__ == __log_dynamic_data_run_end__) || ((__log_dynamic_data_run_end__ - __RAM1_segment_start__) <= __RAM1_segment_size__)), error: .log_dynamic_data_run is too large to fit in RAM1 memory segment)
-                0x000000000001895c                __log_filter_data_load_start__ = ALIGN ((__log_dynamic_data_load_start__ + SIZEOF (.log_dynamic_data)), 0x4)
+                0x0000000000018a0c                __log_filter_data_load_start__ = ALIGN ((__log_dynamic_data_load_start__ + SIZEOF (.log_dynamic_data)), 0x4)
 
 .log_filter_data
-                0x0000000020000000        0x0 load address 0x000000000001895c
+                0x0000000020000000        0x0 load address 0x0000000000018a0c
                 0x0000000020000000                __log_filter_data_start__ = .
  *(SORT_BY_NAME(.log_filter_data*))
                 0x0000000020000000                __log_filter_data_end__ = (__log_filter_data_start__ + SIZEOF (.log_filter_data))
                 0x0000000000000000                __log_filter_data_size__ = SIZEOF (.log_filter_data)
-                0x000000000001895c                __log_filter_data_load_end__ = (__log_filter_data_load_start__ + SIZEOF (.log_filter_data))
+                0x0000000000018a0c                __log_filter_data_load_end__ = (__log_filter_data_load_start__ + SIZEOF (.log_filter_data))
                 0x0000000000000001                . = ASSERT (((__log_filter_data_load_start__ == __log_filter_data_load_end__) || ((__log_filter_data_load_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .log_filter_data is too large to fit in FLASH1 memory segment)
 
 .log_filter_data_run
@@ -19967,343 +19968,343 @@ Linker script and memory map
                 0x0000000000000000                __nrf_sections_run_end_size__ = SIZEOF (.nrf_sections_run_end)
                 0x0000000020000000                __nrf_sections_run_end_load_end__ = __nrf_sections_run_end_end__
                 0x0000000000000001                . = ASSERT (((__nrf_sections_run_end_start__ == __nrf_sections_run_end_end__) || ((__nrf_sections_run_end_end__ - __RAM1_segment_start__) <= __RAM1_segment_size__)), error: .nrf_sections_run_end is too large to fit in RAM1 memory segment)
-                0x000000000001895c                __dtors_load_start__ = ALIGN ((__log_filter_data_load_start__ + SIZEOF (.log_filter_data)), 0x4)
+                0x0000000000018a0c                __dtors_load_start__ = ALIGN ((__log_filter_data_load_start__ + SIZEOF (.log_filter_data)), 0x4)
 
-.dtors          0x000000000001895c        0x0
-                0x000000000001895c                __dtors_start__ = .
+.dtors          0x0000000000018a0c        0x0
+                0x0000000000018a0c                __dtors_start__ = .
  *(SORT_BY_NAME(.dtors.*))
  *(.dtors)
  *(.fini_array)
  *(SORT_BY_NAME(.fini_array.*))
-                0x000000000001895c                __dtors_end__ = (__dtors_start__ + SIZEOF (.dtors))
+                0x0000000000018a0c                __dtors_end__ = (__dtors_start__ + SIZEOF (.dtors))
                 0x0000000000000000                __dtors_size__ = SIZEOF (.dtors)
-                0x000000000001895c                __dtors_load_end__ = __dtors_end__
+                0x0000000000018a0c                __dtors_load_end__ = __dtors_end__
                 0x0000000000000001                . = ASSERT (((__dtors_start__ == __dtors_end__) || ((__dtors_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .dtors is too large to fit in FLASH1 memory segment)
-                0x000000000001895c                __ctors_load_start__ = ALIGN (__dtors_end__, 0x4)
+                0x0000000000018a0c                __ctors_load_start__ = ALIGN (__dtors_end__, 0x4)
 
-.ctors          0x000000000001895c        0x0
-                0x000000000001895c                __ctors_start__ = .
+.ctors          0x0000000000018a0c        0x0
+                0x0000000000018a0c                __ctors_start__ = .
  *(SORT_BY_NAME(.ctors.*))
  *(.ctors)
  *(.init_array)
  *(SORT_BY_NAME(.init_array.*))
-                0x000000000001895c                __ctors_end__ = (__ctors_start__ + SIZEOF (.ctors))
+                0x0000000000018a0c                __ctors_end__ = (__ctors_start__ + SIZEOF (.ctors))
                 0x0000000000000000                __ctors_size__ = SIZEOF (.ctors)
-                0x000000000001895c                __ctors_load_end__ = __ctors_end__
+                0x0000000000018a0c                __ctors_load_end__ = __ctors_end__
                 0x0000000000000001                . = ASSERT (((__ctors_start__ == __ctors_end__) || ((__ctors_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .ctors is too large to fit in FLASH1 memory segment)
-                0x000000000001895c                __rodata_load_start__ = ALIGN (__ctors_end__, 0x4)
+                0x0000000000018a0c                __rodata_load_start__ = ALIGN (__ctors_end__, 0x4)
 
-.rodata         0x000000000001895c    0x1225c
-                0x000000000001895c                __rodata_start__ = .
+.rodata         0x0000000000018a0c    0x1225c
+                0x0000000000018a0c                __rodata_start__ = .
  *(.rodata .rodata.* .gnu.linkonce.r.*)
- .rodata        0x000000000001895c       0x88 Output/Debug/Obj/NAATOS_fw/nrf_log_backend_uart.o
+ .rodata        0x0000000000018a0c       0x88 Output/Debug/Obj/NAATOS_fw/nrf_log_backend_uart.o
  .rodata.nrf_log_backend_uart_api
-                0x00000000000189e4        0xc Output/Debug/Obj/NAATOS_fw/nrf_log_backend_uart.o
-                0x00000000000189e4                nrf_log_backend_uart_api
- .rodata        0x00000000000189f0       0x7d Output/Debug/Obj/NAATOS_fw/nrf_log_default_backends.o
- *fill*         0x0000000000018a6d        0x3 
- .rodata        0x0000000000018a70       0x79 Output/Debug/Obj/NAATOS_fw/nrf_log_frontend.o
- *fill*         0x0000000000018ae9        0x3 
- .rodata        0x0000000000018aec       0xc6 Output/Debug/Obj/NAATOS_fw/nrf_log_str_formatter.o
- *fill*         0x0000000000018bb2        0x2 
- .rodata        0x0000000000018bb4       0x66 Output/Debug/Obj/NAATOS_fw/app_button.o
- *fill*         0x0000000000018c1a        0x2 
- .rodata        0x0000000000018c1c       0x70 Output/Debug/Obj/NAATOS_fw/app_error_weak.o
- .rodata        0x0000000000018c8c       0x7e Output/Debug/Obj/NAATOS_fw/app_sdcard.o
- *fill*         0x0000000000018d0a        0x2 
- .rodata.m_spi  0x0000000000018d0c       0x10 Output/Debug/Obj/NAATOS_fw/app_sdcard.o
- .rodata        0x0000000000018d1c       0x6c Output/Debug/Obj/NAATOS_fw/app_timer2.o
- .rodata        0x0000000000018d88      0x17e Output/Debug/Obj/NAATOS_fw/app_usbd.o
- *fill*         0x0000000000018f06        0x2 
- .rodata        0x0000000000018f08       0xc3 Output/Debug/Obj/NAATOS_fw/app_usbd_core.o
- *fill*         0x0000000000018fcb        0x1 
- .rodata        0x0000000000018fcc       0xe0 Output/Debug/Obj/NAATOS_fw/app_usbd_msc.o
- .rodata        0x00000000000190ac       0x5f Output/Debug/Obj/NAATOS_fw/app_util_platform.o
- *fill*         0x000000000001910b        0x1 
- .rodata        0x000000000001910c      0x617 Output/Debug/Obj/NAATOS_fw/hardfault_implementation.o
- *fill*         0x0000000000019723        0x1 
- .rodata        0x0000000000019724       0x5a Output/Debug/Obj/NAATOS_fw/nrf_balloc.o
- *fill*         0x000000000001977e        0x2 
- .rodata        0x0000000000019780       0x68 Output/Debug/Obj/NAATOS_fw/nrf_block_dev_sdc.o
+                0x0000000000018a94        0xc Output/Debug/Obj/NAATOS_fw/nrf_log_backend_uart.o
+                0x0000000000018a94                nrf_log_backend_uart_api
+ .rodata        0x0000000000018aa0       0x7d Output/Debug/Obj/NAATOS_fw/nrf_log_default_backends.o
+ *fill*         0x0000000000018b1d        0x3 
+ .rodata        0x0000000000018b20       0x79 Output/Debug/Obj/NAATOS_fw/nrf_log_frontend.o
+ *fill*         0x0000000000018b99        0x3 
+ .rodata        0x0000000000018b9c       0xc6 Output/Debug/Obj/NAATOS_fw/nrf_log_str_formatter.o
+ *fill*         0x0000000000018c62        0x2 
+ .rodata        0x0000000000018c64       0x66 Output/Debug/Obj/NAATOS_fw/app_button.o
+ *fill*         0x0000000000018cca        0x2 
+ .rodata        0x0000000000018ccc       0x70 Output/Debug/Obj/NAATOS_fw/app_error_weak.o
+ .rodata        0x0000000000018d3c       0x7e Output/Debug/Obj/NAATOS_fw/app_sdcard.o
+ *fill*         0x0000000000018dba        0x2 
+ .rodata.m_spi  0x0000000000018dbc       0x10 Output/Debug/Obj/NAATOS_fw/app_sdcard.o
+ .rodata        0x0000000000018dcc       0x6c Output/Debug/Obj/NAATOS_fw/app_timer2.o
+ .rodata        0x0000000000018e38      0x17e Output/Debug/Obj/NAATOS_fw/app_usbd.o
+ *fill*         0x0000000000018fb6        0x2 
+ .rodata        0x0000000000018fb8       0xc3 Output/Debug/Obj/NAATOS_fw/app_usbd_core.o
+ *fill*         0x000000000001907b        0x1 
+ .rodata        0x000000000001907c       0xe0 Output/Debug/Obj/NAATOS_fw/app_usbd_msc.o
+ .rodata        0x000000000001915c       0x5f Output/Debug/Obj/NAATOS_fw/app_util_platform.o
+ *fill*         0x00000000000191bb        0x1 
+ .rodata        0x00000000000191bc      0x617 Output/Debug/Obj/NAATOS_fw/hardfault_implementation.o
+ *fill*         0x00000000000197d3        0x1 
+ .rodata        0x00000000000197d4       0x5a Output/Debug/Obj/NAATOS_fw/nrf_balloc.o
+ *fill*         0x000000000001982e        0x2 
+ .rodata        0x0000000000019830       0x68 Output/Debug/Obj/NAATOS_fw/nrf_block_dev_sdc.o
  .rodata.nrf_block_device_sdc_ops
-                0x00000000000197e8       0x18 Output/Debug/Obj/NAATOS_fw/nrf_block_dev_sdc.o
-                0x00000000000197e8                nrf_block_device_sdc_ops
- .rodata        0x0000000000019800       0x50 Output/Debug/Obj/NAATOS_fw/nrf_fprintf.o
- .rodata        0x0000000000019850       0x57 Output/Debug/Obj/NAATOS_fw/nrf_fprintf_format.o
- *fill*         0x00000000000198a7        0x1 
+                0x0000000000019898       0x18 Output/Debug/Obj/NAATOS_fw/nrf_block_dev_sdc.o
+                0x0000000000019898                nrf_block_device_sdc_ops
+ .rodata        0x00000000000198b0       0x50 Output/Debug/Obj/NAATOS_fw/nrf_fprintf.o
+ .rodata        0x0000000000019900       0x57 Output/Debug/Obj/NAATOS_fw/nrf_fprintf_format.o
+ *fill*         0x0000000000019957        0x1 
  .rodata._aV2C.0
-                0x00000000000198a8       0x10 Output/Debug/Obj/NAATOS_fw/nrf_fprintf_format.o
- .rodata        0x00000000000198b8       0x5a Output/Debug/Obj/NAATOS_fw/nrf_memobj.o
- *fill*         0x0000000000019912        0x2 
- .rodata        0x0000000000019914       0x6a Output/Debug/Obj/NAATOS_fw/nrf_sortlist.o
- *fill*         0x000000000001997e        0x2 
+                0x0000000000019958       0x10 Output/Debug/Obj/NAATOS_fw/nrf_fprintf_format.o
+ .rodata        0x0000000000019968       0x5a Output/Debug/Obj/NAATOS_fw/nrf_memobj.o
+ *fill*         0x00000000000199c2        0x2 
+ .rodata        0x00000000000199c4       0x6a Output/Debug/Obj/NAATOS_fw/nrf_sortlist.o
+ *fill*         0x0000000000019a2e        0x2 
  .rodata.m_unknown_str
-                0x0000000000019980       0x13 Output/Debug/Obj/NAATOS_fw/nrf_strerror.o
- *fill*         0x0000000000019993        0x1 
- .rodata        0x0000000000019994      0x3bd Output/Debug/Obj/NAATOS_fw/nrf_strerror.o
- *fill*         0x0000000000019d51        0x3 
+                0x0000000000019a30       0x13 Output/Debug/Obj/NAATOS_fw/nrf_strerror.o
+ *fill*         0x0000000000019a43        0x1 
+ .rodata        0x0000000000019a44      0x3bd Output/Debug/Obj/NAATOS_fw/nrf_strerror.o
+ *fill*         0x0000000000019e01        0x3 
  .rodata.nrf_strerror_array
-                0x0000000000019d54      0x118 Output/Debug/Obj/NAATOS_fw/nrf_strerror.o
- .rodata        0x0000000000019e6c       0xd0 Output/Debug/Obj/NAATOS_fw/app_pwm.o
- .rodata        0x0000000000019f3c       0x61 Output/Debug/Obj/NAATOS_fw/nrf_drv_clock.o
- *fill*         0x0000000000019f9d        0x3 
- .rodata        0x0000000000019fa0       0x10 Output/Debug/Obj/NAATOS_fw/nrf_drv_spi.o
- .rodata        0x0000000000019fb0       0x58 Output/Debug/Obj/NAATOS_fw/nrf_drv_uart.o
- .rodata        0x000000000001a008       0x83 Output/Debug/Obj/NAATOS_fw/nrfx_clock.o
- *fill*         0x000000000001a08b        0x1 
- .rodata        0x000000000001a08c       0xb0 Output/Debug/Obj/NAATOS_fw/nrfx_gpiote.o
- .rodata        0x000000000001a13c       0x9f Output/Debug/Obj/NAATOS_fw/nrfx_power.o
- *fill*         0x000000000001a1db        0x1 
- .rodata        0x000000000001a1dc       0x5d Output/Debug/Obj/NAATOS_fw/nrfx_prs.o
- *fill*         0x000000000001a239        0x3 
- .rodata        0x000000000001a23c       0xa6 Output/Debug/Obj/NAATOS_fw/nrfx_uart.o
- *fill*         0x000000000001a2e2        0x2 
+                0x0000000000019e04      0x118 Output/Debug/Obj/NAATOS_fw/nrf_strerror.o
+ .rodata        0x0000000000019f1c       0xd0 Output/Debug/Obj/NAATOS_fw/app_pwm.o
+ .rodata        0x0000000000019fec       0x61 Output/Debug/Obj/NAATOS_fw/nrf_drv_clock.o
+ *fill*         0x000000000001a04d        0x3 
+ .rodata        0x000000000001a050       0x10 Output/Debug/Obj/NAATOS_fw/nrf_drv_spi.o
+ .rodata        0x000000000001a060       0x58 Output/Debug/Obj/NAATOS_fw/nrf_drv_uart.o
+ .rodata        0x000000000001a0b8       0x83 Output/Debug/Obj/NAATOS_fw/nrfx_clock.o
+ *fill*         0x000000000001a13b        0x1 
+ .rodata        0x000000000001a13c       0xb0 Output/Debug/Obj/NAATOS_fw/nrfx_gpiote.o
+ .rodata        0x000000000001a1ec       0x9f Output/Debug/Obj/NAATOS_fw/nrfx_power.o
+ *fill*         0x000000000001a28b        0x1 
+ .rodata        0x000000000001a28c       0x5d Output/Debug/Obj/NAATOS_fw/nrfx_prs.o
+ *fill*         0x000000000001a2e9        0x3 
+ .rodata        0x000000000001a2ec       0xa6 Output/Debug/Obj/NAATOS_fw/nrfx_uart.o
+ *fill*         0x000000000001a392        0x2 
  .rodata.irq_handlers.0
-                0x000000000001a2e4        0x4 Output/Debug/Obj/NAATOS_fw/nrfx_uart.o
- .rodata        0x000000000001a2e8       0xa7 Output/Debug/Obj/NAATOS_fw/nrfx_uarte.o
- *fill*         0x000000000001a38f        0x1 
+                0x000000000001a394        0x4 Output/Debug/Obj/NAATOS_fw/nrfx_uart.o
+ .rodata        0x000000000001a398       0xa7 Output/Debug/Obj/NAATOS_fw/nrfx_uarte.o
+ *fill*         0x000000000001a43f        0x1 
  .rodata.irq_handlers.0
-                0x000000000001a390        0x4 Output/Debug/Obj/NAATOS_fw/nrfx_uarte.o
- .rodata        0x000000000001a394       0xa6 Output/Debug/Obj/NAATOS_fw/nrfx_usbd.o
- *fill*         0x000000000001a43a        0x2 
- .rodata.m_isr  0x000000000001a43c       0x64 Output/Debug/Obj/NAATOS_fw/nrfx_usbd.o
+                0x000000000001a440        0x4 Output/Debug/Obj/NAATOS_fw/nrfx_uarte.o
+ .rodata        0x000000000001a444       0xa6 Output/Debug/Obj/NAATOS_fw/nrfx_usbd.o
+ *fill*         0x000000000001a4ea        0x2 
+ .rodata.m_isr  0x000000000001a4ec       0x64 Output/Debug/Obj/NAATOS_fw/nrfx_usbd.o
  .rodata.epin_endev.4
-                0x000000000001a4a0       0x12 Output/Debug/Obj/NAATOS_fw/nrfx_usbd.o
- *fill*         0x000000000001a4b2        0x2 
+                0x000000000001a550       0x12 Output/Debug/Obj/NAATOS_fw/nrfx_usbd.o
+ *fill*         0x000000000001a562        0x2 
  .rodata.epout_endev.3
-                0x000000000001a4b4       0x12 Output/Debug/Obj/NAATOS_fw/nrfx_usbd.o
- *fill*         0x000000000001a4c6        0x2 
+                0x000000000001a564       0x12 Output/Debug/Obj/NAATOS_fw/nrfx_usbd.o
+ *fill*         0x000000000001a576        0x2 
  .rodata.event_reg_offset.2
-                0x000000000001a4c8        0x4 Output/Debug/Obj/NAATOS_fw/nrfx_usbd.o
- .rodata        0x000000000001a4cc        0x4 Output/Debug/Obj/NAATOS_fw/nrfx_ppi.o
- .rodata        0x000000000001a4d0       0x83 Output/Debug/Obj/NAATOS_fw/nrfx_timer.o
- *fill*         0x000000000001a553        0x1 
- .rodata        0x000000000001a554       0xa7 Output/Debug/Obj/NAATOS_fw/nrfx_saadc.o
- *fill*         0x000000000001a5fb        0x5 
+                0x000000000001a578        0x4 Output/Debug/Obj/NAATOS_fw/nrfx_usbd.o
+ .rodata        0x000000000001a57c        0x4 Output/Debug/Obj/NAATOS_fw/nrfx_ppi.o
+ .rodata        0x000000000001a580       0x83 Output/Debug/Obj/NAATOS_fw/nrfx_timer.o
+ *fill*         0x000000000001a603        0x1 
+ .rodata        0x000000000001a604       0xa7 Output/Debug/Obj/NAATOS_fw/nrfx_saadc.o
+ *fill*         0x000000000001a6ab        0x5 
  .rodata.delay_machine_code.0
-                0x000000000001a600        0x6 Output/Debug/Obj/NAATOS_fw/nrfx_saadc.o
- *fill*         0x000000000001a606        0x2 
- .rodata        0x000000000001a608       0xa1 Output/Debug/Obj/NAATOS_fw/nrfx_twi.o
- *fill*         0x000000000001a6a9        0x3 
+                0x000000000001a6b0        0x6 Output/Debug/Obj/NAATOS_fw/nrfx_saadc.o
+ *fill*         0x000000000001a6b6        0x2 
+ .rodata        0x000000000001a6b8       0xa1 Output/Debug/Obj/NAATOS_fw/nrfx_twi.o
+ *fill*         0x000000000001a759        0x3 
  .rodata.irq_handlers.0
-                0x000000000001a6ac        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_twi.o
- .rodata        0x000000000001a6b4       0x23 Output/Debug/Obj/NAATOS_fw/nrf_drv_twi.o
- *fill*         0x000000000001a6d7        0x9 
+                0x000000000001a75c        0x8 Output/Debug/Obj/NAATOS_fw/nrfx_twi.o
+ .rodata        0x000000000001a764       0x23 Output/Debug/Obj/NAATOS_fw/nrf_drv_twi.o
+ *fill*         0x000000000001a787        0x9 
  .rodata.delay_machine_code.0
-                0x000000000001a6e0        0x6 Output/Debug/Obj/NAATOS_fw/nrf_drv_twi.o
- *fill*         0x000000000001a6e6        0x2 
- .rodata        0x000000000001a6e8       0xa6 Output/Debug/Obj/NAATOS_fw/nrfx_spim.o
- *fill*         0x000000000001a78e        0x2 
- .rodata.irq_handlers.0
-                0x000000000001a790        0x4 Output/Debug/Obj/NAATOS_fw/nrfx_spim.o
- .rodata.run_amplification_zone
-                0x000000000001a794        0x2 Output/Debug/Obj/NAATOS_fw/main.o
-                0x000000000001a794                run_amplification_zone
+                0x000000000001a790        0x6 Output/Debug/Obj/NAATOS_fw/nrf_drv_twi.o
  *fill*         0x000000000001a796        0x2 
+ .rodata        0x000000000001a798       0xa6 Output/Debug/Obj/NAATOS_fw/nrfx_spim.o
+ *fill*         0x000000000001a83e        0x2 
+ .rodata.irq_handlers.0
+                0x000000000001a840        0x4 Output/Debug/Obj/NAATOS_fw/nrfx_spim.o
+ .rodata.run_amplification_zone
+                0x000000000001a844        0x2 Output/Debug/Obj/NAATOS_fw/main.o
+                0x000000000001a844                run_amplification_zone
+ *fill*         0x000000000001a846        0x2 
  .rodata.run_valve_zone
-                0x000000000001a798        0x2 Output/Debug/Obj/NAATOS_fw/main.o
-                0x000000000001a798                run_valve_zone
- *fill*         0x000000000001a79a        0x2 
+                0x000000000001a848        0x2 Output/Debug/Obj/NAATOS_fw/main.o
+                0x000000000001a848                run_valve_zone
+ *fill*         0x000000000001a84a        0x2 
  .rodata.stop_amplification_zone
-                0x000000000001a79c        0x2 Output/Debug/Obj/NAATOS_fw/main.o
-                0x000000000001a79c                stop_amplification_zone
- *fill*         0x000000000001a79e        0x2 
+                0x000000000001a84c        0x2 Output/Debug/Obj/NAATOS_fw/main.o
+                0x000000000001a84c                stop_amplification_zone
+ *fill*         0x000000000001a84e        0x2 
  .rodata.stop_valve_zone
-                0x000000000001a7a0        0x2 Output/Debug/Obj/NAATOS_fw/main.o
-                0x000000000001a7a0                stop_valve_zone
- *fill*         0x000000000001a7a2        0x2 
- .rodata        0x000000000001a7a4      0x850 Output/Debug/Obj/NAATOS_fw/main.o
+                0x000000000001a850        0x2 Output/Debug/Obj/NAATOS_fw/main.o
+                0x000000000001a850                stop_valve_zone
+ *fill*         0x000000000001a852        0x2 
+ .rodata        0x000000000001a854      0x850 Output/Debug/Obj/NAATOS_fw/main.o
  .rodata.interrupt_log_msg
-                0x000000000001aff4       0x1c Output/Debug/Obj/NAATOS_fw/main.o
-                0x000000000001aff4                interrupt_log_msg
+                0x000000000001b0a4       0x1c Output/Debug/Obj/NAATOS_fw/main.o
+                0x000000000001b0a4                interrupt_log_msg
  .rodata.valve_start_log_msg
-                0x000000000001b010       0x1c Output/Debug/Obj/NAATOS_fw/main.o
-                0x000000000001b010                valve_start_log_msg
+                0x000000000001b0c0       0x1c Output/Debug/Obj/NAATOS_fw/main.o
+                0x000000000001b0c0                valve_start_log_msg
  .rodata.valve_stop_log_msg
-                0x000000000001b02c       0x1c Output/Debug/Obj/NAATOS_fw/main.o
-                0x000000000001b02c                valve_stop_log_msg
+                0x000000000001b0dc       0x1c Output/Debug/Obj/NAATOS_fw/main.o
+                0x000000000001b0dc                valve_stop_log_msg
  .rodata.amplification_start_log_msg
-                0x000000000001b048       0x1c Output/Debug/Obj/NAATOS_fw/main.o
-                0x000000000001b048                amplification_start_log_msg
+                0x000000000001b0f8       0x1c Output/Debug/Obj/NAATOS_fw/main.o
+                0x000000000001b0f8                amplification_start_log_msg
  .rodata.amplification_stop_log_msg
-                0x000000000001b064       0x1c Output/Debug/Obj/NAATOS_fw/main.o
-                0x000000000001b064                amplification_stop_log_msg
+                0x000000000001b114       0x1c Output/Debug/Obj/NAATOS_fw/main.o
+                0x000000000001b114                amplification_stop_log_msg
  .rodata.standby_update
-                0x000000000001b080        0x3 Output/Debug/Obj/NAATOS_fw/main.o
-                0x000000000001b080                standby_update
- *fill*         0x000000000001b083        0x1 
+                0x000000000001b130        0x3 Output/Debug/Obj/NAATOS_fw/main.o
+                0x000000000001b130                standby_update
+ *fill*         0x000000000001b133        0x1 
  .rodata.running_update
-                0x000000000001b084        0x3 Output/Debug/Obj/NAATOS_fw/main.o
-                0x000000000001b084                running_update
- *fill*         0x000000000001b087        0x1 
- .rodata        0x000000000001b088      0x11b Output/Debug/Obj/NAATOS_fw/battery.o
- *fill*         0x000000000001b1a3        0x1 
- .rodata        0x000000000001b1a4      0x11f Output/Debug/Obj/NAATOS_fw/heater.o
- *fill*         0x000000000001b2c3        0x1 
+                0x000000000001b134        0x3 Output/Debug/Obj/NAATOS_fw/main.o
+                0x000000000001b134                running_update
+ *fill*         0x000000000001b137        0x1 
+ .rodata        0x000000000001b138      0x11b Output/Debug/Obj/NAATOS_fw/battery.o
+ *fill*         0x000000000001b253        0x1 
+ .rodata        0x000000000001b254      0x11f Output/Debug/Obj/NAATOS_fw/heater.o
+ *fill*         0x000000000001b373        0x1 
  .rodata.batt_req
-                0x000000000001b2c4        0x1 Output/Debug/Obj/NAATOS_fw/logger.o
-                0x000000000001b2c4                batt_req
- *fill*         0x000000000001b2c5        0x3 
- .rodata        0x000000000001b2c8      0x2f5 Output/Debug/Obj/NAATOS_fw/logger.o
- *fill*         0x000000000001b5bd        0x3 
- .rodata        0x000000000001b5c0      0x1fa Output/Debug/Obj/NAATOS_fw/sensors.o
- *fill*         0x000000000001b7ba        0x2 
- .rodata        0x000000000001b7bc       0x44 Output/Debug/Obj/NAATOS_fw/usb.o
+                0x000000000001b374        0x1 Output/Debug/Obj/NAATOS_fw/logger.o
+                0x000000000001b374                batt_req
+ *fill*         0x000000000001b375        0x3 
+ .rodata        0x000000000001b378      0x2f5 Output/Debug/Obj/NAATOS_fw/logger.o
+ *fill*         0x000000000001b66d        0x3 
+ .rodata        0x000000000001b670      0x1fa Output/Debug/Obj/NAATOS_fw/sensors.o
+ *fill*         0x000000000001b86a        0x2 
+ .rodata        0x000000000001b86c       0x44 Output/Debug/Obj/NAATOS_fw/usb.o
  .rodata.m_pwm_PWM0_timer
-                0x000000000001b800        0x8 Output/Debug/Obj/NAATOS_fw/pwm.o
-                0x000000000001b800                m_pwm_PWM0_timer
- .rodata.PWM0   0x000000000001b808        0x8 Output/Debug/Obj/NAATOS_fw/pwm.o
-                0x000000000001b808                PWM0
+                0x000000000001b8b0        0x8 Output/Debug/Obj/NAATOS_fw/pwm.o
+                0x000000000001b8b0                m_pwm_PWM0_timer
+ .rodata.PWM0   0x000000000001b8b8        0x8 Output/Debug/Obj/NAATOS_fw/pwm.o
+                0x000000000001b8b8                PWM0
  .rodata.m_pwm_PWM2_timer
-                0x000000000001b810        0x8 Output/Debug/Obj/NAATOS_fw/pwm.o
-                0x000000000001b810                m_pwm_PWM2_timer
- .rodata.PWM2   0x000000000001b818        0x8 Output/Debug/Obj/NAATOS_fw/pwm.o
-                0x000000000001b818                PWM2
- .rodata        0x000000000001b820       0x60 Output/Debug/Obj/NAATOS_fw/pwm.o
- .rodata        0x000000000001b880       0x41 Output/Debug/Obj/NAATOS_fw/adc.o
- *fill*         0x000000000001b8c1        0x3 
+                0x000000000001b8c0        0x8 Output/Debug/Obj/NAATOS_fw/pwm.o
+                0x000000000001b8c0                m_pwm_PWM2_timer
+ .rodata.PWM2   0x000000000001b8c8        0x8 Output/Debug/Obj/NAATOS_fw/pwm.o
+                0x000000000001b8c8                PWM2
+ .rodata        0x000000000001b8d0       0x60 Output/Debug/Obj/NAATOS_fw/pwm.o
+ .rodata        0x000000000001b930       0x41 Output/Debug/Obj/NAATOS_fw/adc.o
+ *fill*         0x000000000001b971        0x3 
  .rodata.default_config.0
-                0x000000000001b8c4        0x4 Output/Debug/Obj/NAATOS_fw/adc.o
- .rodata        0x000000000001b8c8       0x68 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
- .rodata.m_i2c  0x000000000001b930       0x20 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
- .rodata        0x000000000001b950      0x224 Output/Debug/Obj/NAATOS_fw/sd_card.o
+                0x000000000001b974        0x4 Output/Debug/Obj/NAATOS_fw/adc.o
+ .rodata        0x000000000001b978       0x68 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .rodata.m_i2c  0x000000000001b9e0       0x20 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .rodata        0x000000000001ba00      0x224 Output/Debug/Obj/NAATOS_fw/sd_card.o
  .rodata.m_block_dev_sdc
-                0x000000000001bb74       0x1c Output/Debug/Obj/NAATOS_fw/sd_card.o
- .rodata        0x000000000001bb90       0x17 Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
- *fill*         0x000000000001bba7        0x1 
- .rodata        0x000000000001bba8       0x8d Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
- *fill*         0x000000000001bc35        0x3 
+                0x000000000001bc24       0x1c Output/Debug/Obj/NAATOS_fw/sd_card.o
+ .rodata        0x000000000001bc40       0x17 Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
+ *fill*         0x000000000001bc57        0x1 
+ .rodata        0x000000000001bc58       0x8d Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
+ *fill*         0x000000000001bce5        0x3 
  .rodata.LfnOfs
-                0x000000000001bc38        0xd Output/Debug/Obj/NAATOS_fw/ff.o
- *fill*         0x000000000001bc45        0x3 
- .rodata        0x000000000001bc48       0x48 Output/Debug/Obj/NAATOS_fw/ff.o
+                0x000000000001bce8        0xd Output/Debug/Obj/NAATOS_fw/ff.o
+ *fill*         0x000000000001bcf5        0x3 
+ .rodata        0x000000000001bcf8       0x48 Output/Debug/Obj/NAATOS_fw/ff.o
  .rodata.uni2sjis
-                0x000000000001bc90     0x7378 Output/Debug/Obj/NAATOS_fw/cc932.o
+                0x000000000001bd40     0x7378 Output/Debug/Obj/NAATOS_fw/cc932.o
  .rodata.sjis2uni
-                0x0000000000023008     0x7378 Output/Debug/Obj/NAATOS_fw/cc932.o
+                0x00000000000230b8     0x7378 Output/Debug/Obj/NAATOS_fw/cc932.o
  .rodata.cvt1.1
-                0x000000000002a380      0x1f2 Output/Debug/Obj/NAATOS_fw/cc932.o
- *fill*         0x000000000002a572        0x2 
+                0x000000000002a430      0x1f2 Output/Debug/Obj/NAATOS_fw/cc932.o
+ *fill*         0x000000000002a622        0x2 
  .rodata.cvt2.0
-                0x000000000002a574       0xbc Output/Debug/Obj/NAATOS_fw/cc932.o
- .rodata        0x000000000002a630       0x59 Output/Debug/Obj/NAATOS_fw/tasks.o
- *fill*         0x000000000002a689        0x3 
- .rodata        0x000000000002a68c       0x52 Output/Debug/Obj/NAATOS_fw/queue.o
- *fill*         0x000000000002a6de        0x2 
- .rodata        0x000000000002a6e0       0x61 Output/Debug/Obj/NAATOS_fw/timers.o
- *fill*         0x000000000002a741        0x3 
- .rodata        0x000000000002a744       0x65 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
- *fill*         0x000000000002a7a9        0x3 
- .rodata        0x000000000002a7ac       0x22 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
- *fill*         0x000000000002a7ce        0x2 
- .rodata        0x000000000002a7d0       0x64 Output/Debug/Obj/NAATOS_fw/heap_4.o
+                0x000000000002a624       0xbc Output/Debug/Obj/NAATOS_fw/cc932.o
+ .rodata        0x000000000002a6e0       0x59 Output/Debug/Obj/NAATOS_fw/tasks.o
+ *fill*         0x000000000002a739        0x3 
+ .rodata        0x000000000002a73c       0x52 Output/Debug/Obj/NAATOS_fw/queue.o
+ *fill*         0x000000000002a78e        0x2 
+ .rodata        0x000000000002a790       0x61 Output/Debug/Obj/NAATOS_fw/timers.o
+ *fill*         0x000000000002a7f1        0x3 
+ .rodata        0x000000000002a7f4       0x65 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
+ *fill*         0x000000000002a859        0x3 
+ .rodata        0x000000000002a85c       0x22 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
+ *fill*         0x000000000002a87e        0x2 
+ .rodata        0x000000000002a880       0x64 Output/Debug/Obj/NAATOS_fw/heap_4.o
  .rodata.libc.__RAL_find_locale.str1.4
-                0x000000000002a834        0xa C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
- *fill*         0x000000000002a83e        0x2 
+                0x000000000002a8e4        0xa C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+ *fill*         0x000000000002a8ee        0x2 
  .rodata.libc.__RAL_ascii_ctype_map
-                0x000000000002a840       0x80 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002a840                __RAL_ascii_ctype_map
+                0x000000000002a8f0       0x80 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000002a8f0                __RAL_ascii_ctype_map
  .rodata.libc.__RAL_ascii_ctype_mask
-                0x000000000002a8c0        0xd C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
- *fill*         0x000000000002a8cd        0x3 
+                0x000000000002a970        0xd C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+ *fill*         0x000000000002a97d        0x3 
  .rodata.libc.__RAL_c_locale
-                0x000000000002a8d0        0xc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002a8d0                __RAL_c_locale
+                0x000000000002a980        0xc C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000002a980                __RAL_c_locale
  .rodata.libc.__RAL_c_locale_abbrev_day_names
-                0x000000000002a8dc       0x1d C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002a8dc                __RAL_c_locale_abbrev_day_names
- *fill*         0x000000000002a8f9        0x3 
+                0x000000000002a98c       0x1d C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000002a98c                __RAL_c_locale_abbrev_day_names
+ *fill*         0x000000000002a9a9        0x3 
  .rodata.libc.__RAL_c_locale_abbrev_month_names
-                0x000000000002a8fc       0x31 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002a8fc                __RAL_c_locale_abbrev_month_names
- *fill*         0x000000000002a92d        0x3 
+                0x000000000002a9ac       0x31 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000002a9ac                __RAL_c_locale_abbrev_month_names
+ *fill*         0x000000000002a9dd        0x3 
  .rodata.libc.__RAL_c_locale_am_pm_indicator
-                0x000000000002a930        0x7 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002a930                __RAL_c_locale_am_pm_indicator
- *fill*         0x000000000002a937        0x1 
+                0x000000000002a9e0        0x7 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000002a9e0                __RAL_c_locale_am_pm_indicator
+ *fill*         0x000000000002a9e7        0x1 
  .rodata.libc.__RAL_c_locale_data
-                0x000000000002a938       0x58 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002a938                __RAL_c_locale_data
+                0x000000000002a9e8       0x58 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000002a9e8                __RAL_c_locale_data
  .rodata.libc.__RAL_c_locale_date_format
-                0x000000000002a990        0x9 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002a990                __RAL_c_locale_date_format
- *fill*         0x000000000002a999        0x3 
- .rodata.libc.__RAL_c_locale_date_time_format
-                0x000000000002a99c        0xf C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002a99c                __RAL_c_locale_date_time_format
- *fill*         0x000000000002a9ab        0x1 
- .rodata.libc.__RAL_c_locale_day_names
-                0x000000000002a9ac       0x3a C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002a9ac                __RAL_c_locale_day_names
- *fill*         0x000000000002a9e6        0x2 
- .rodata.libc.__RAL_c_locale_month_names
-                0x000000000002a9e8       0x57 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002a9e8                __RAL_c_locale_month_names
- *fill*         0x000000000002aa3f        0x1 
- .rodata.libc.__RAL_c_locale_time_format
                 0x000000000002aa40        0x9 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002aa40                __RAL_c_locale_time_format
+                0x000000000002aa40                __RAL_c_locale_date_format
  *fill*         0x000000000002aa49        0x3 
- .rodata.libc.__RAL_codeset_ascii
-                0x000000000002aa4c       0x20 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002aa4c                __RAL_codeset_ascii
- .rodata.libc.__RAL_data_empty_string
-                0x000000000002aa6c        0x1 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002aa6c                __RAL_data_empty_string
- *fill*         0x000000000002aa6d        0x3 
- .rodata.libc.__RAL_data_utf8_period
-                0x000000000002aa70        0x2 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002aa70                __RAL_data_utf8_period
- *fill*         0x000000000002aa72        0x2 
- .rodata.libc.__RAL_hex_lc
-                0x000000000002aa74       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002aa74                __RAL_hex_lc
- .rodata.libc.__RAL_hex_uc
-                0x000000000002aa84       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002aa84                __RAL_hex_uc
- .rodata.libc.__aeabi_EDOM
-                0x000000000002aa94        0x4 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002aa94                __aeabi_EDOM
- .rodata.libc.__aeabi_ERANGE
-                0x000000000002aa98        0x4 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x000000000002aa98                __aeabi_ERANGE
- *fill*         0x000000000002aa9c        0x4 
- .rodata.libc.power
-                0x000000000002aaa0       0x48 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
- .rodata.libc.__vfprintf_int.str1.4
-                0x000000000002aae8        0x7 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libvfprintf.o)
+ .rodata.libc.__RAL_c_locale_date_time_format
+                0x000000000002aa4c        0xf C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000002aa4c                __RAL_c_locale_date_time_format
+ *fill*         0x000000000002aa5b        0x1 
+ .rodata.libc.__RAL_c_locale_day_names
+                0x000000000002aa5c       0x3a C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000002aa5c                __RAL_c_locale_day_names
+ *fill*         0x000000000002aa96        0x2 
+ .rodata.libc.__RAL_c_locale_month_names
+                0x000000000002aa98       0x57 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000002aa98                __RAL_c_locale_month_names
  *fill*         0x000000000002aaef        0x1 
+ .rodata.libc.__RAL_c_locale_time_format
+                0x000000000002aaf0        0x9 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000002aaf0                __RAL_c_locale_time_format
+ *fill*         0x000000000002aaf9        0x3 
+ .rodata.libc.__RAL_codeset_ascii
+                0x000000000002aafc       0x20 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000002aafc                __RAL_codeset_ascii
+ .rodata.libc.__RAL_data_empty_string
+                0x000000000002ab1c        0x1 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000002ab1c                __RAL_data_empty_string
+ *fill*         0x000000000002ab1d        0x3 
+ .rodata.libc.__RAL_data_utf8_period
+                0x000000000002ab20        0x2 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000002ab20                __RAL_data_utf8_period
+ *fill*         0x000000000002ab22        0x2 
+ .rodata.libc.__RAL_hex_lc
+                0x000000000002ab24       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000002ab24                __RAL_hex_lc
+ .rodata.libc.__RAL_hex_uc
+                0x000000000002ab34       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000002ab34                __RAL_hex_uc
+ .rodata.libc.__aeabi_EDOM
+                0x000000000002ab44        0x4 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000002ab44                __aeabi_EDOM
+ .rodata.libc.__aeabi_ERANGE
+                0x000000000002ab48        0x4 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x000000000002ab48                __aeabi_ERANGE
+ *fill*         0x000000000002ab4c        0x4 
+ .rodata.libc.power
+                0x000000000002ab50       0x48 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+ .rodata.libc.__vfprintf_int.str1.4
+                0x000000000002ab98        0x7 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libvfprintf.o)
+ *fill*         0x000000000002ab9f        0x1 
  .rodata.libc.__vfprintf_float_long.str1.4
-                0x000000000002aaf0       0x28 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libvfprintf.o)
+                0x000000000002aba0       0x28 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libvfprintf.o)
  .rodata.libc.ipow10
-                0x000000000002ab18       0xa0 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libvfprintf.o)
-                0x000000000002abb8                . = ALIGN (MAX ((__rodata_start__ + 0x4), .), 0x4)
-                0x000000000002abb8                __rodata_end__ = (__rodata_start__ + SIZEOF (.rodata))
+                0x000000000002abc8       0xa0 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libvfprintf.o)
+                0x000000000002ac68                . = ALIGN (MAX ((__rodata_start__ + 0x4), .), 0x4)
+                0x000000000002ac68                __rodata_end__ = (__rodata_start__ + SIZEOF (.rodata))
                 0x000000000001225c                __rodata_size__ = SIZEOF (.rodata)
-                0x000000000002abb8                __rodata_load_end__ = __rodata_end__
+                0x000000000002ac68                __rodata_load_end__ = __rodata_end__
 
-.rel.dyn        0x000000000002abb8        0x0
- .rel.iplt      0x000000000002abb8        0x0 Output/Debug/Obj/NAATOS_fw/thumb_crt0.o
+.rel.dyn        0x000000000002ac68        0x0
+ .rel.iplt      0x000000000002ac68        0x0 Output/Debug/Obj/NAATOS_fw/thumb_crt0.o
                 0x0000000000000001                . = ASSERT (((__rodata_start__ == __rodata_end__) || ((__rodata_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .rodata is too large to fit in FLASH1 memory segment)
-                0x000000000002abb8                __ARM.exidx_load_start__ = ALIGN (__rodata_end__, 0x4)
+                0x000000000002ac68                __ARM.exidx_load_start__ = ALIGN (__rodata_end__, 0x4)
 
-.ARM.exidx      0x000000000002abb8        0x0
-                0x000000000002abb8                __ARM.exidx_start__ = .
-                0x000000000002abb8                __exidx_start = __ARM.exidx_start__
+.ARM.exidx      0x000000000002ac68        0x0
+                0x000000000002ac68                __ARM.exidx_start__ = .
+                0x000000000002ac68                __exidx_start = __ARM.exidx_start__
  *(.ARM.exidx .ARM.exidx.*)
-                0x000000000002abb8                __ARM.exidx_end__ = (__ARM.exidx_start__ + SIZEOF (.ARM.exidx))
+                0x000000000002ac68                __ARM.exidx_end__ = (__ARM.exidx_start__ + SIZEOF (.ARM.exidx))
                 0x0000000000000000                __ARM.exidx_size__ = SIZEOF (.ARM.exidx)
-                0x000000000002abb8                __exidx_end = __ARM.exidx_end__
-                0x000000000002abb8                __ARM.exidx_load_end__ = __ARM.exidx_end__
+                0x000000000002ac68                __exidx_end = __ARM.exidx_end__
+                0x000000000002ac68                __ARM.exidx_load_end__ = __ARM.exidx_end__
                 0x0000000000000001                . = ASSERT (((__ARM.exidx_start__ == __ARM.exidx_end__) || ((__ARM.exidx_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .ARM.exidx is too large to fit in FLASH1 memory segment)
-                0x000000000002abb8                __fast_load_start__ = ALIGN (__ARM.exidx_end__, 0x4)
+                0x000000000002ac68                __fast_load_start__ = ALIGN (__ARM.exidx_end__, 0x4)
 
-.fast           0x0000000020000000        0x0 load address 0x000000000002abb8
+.fast           0x0000000020000000        0x0 load address 0x000000000002ac68
                 0x0000000020000000                __fast_start__ = .
  *(.fast .fast.*)
                 0x0000000020000000                __fast_end__ = (__fast_start__ + SIZEOF (.fast))
                 0x0000000000000000                __fast_size__ = SIZEOF (.fast)
-                0x000000000002abb8                __fast_load_end__ = (__fast_load_start__ + SIZEOF (.fast))
+                0x000000000002ac68                __fast_load_end__ = (__fast_load_start__ + SIZEOF (.fast))
                 0x0000000000000001                . = ASSERT (((__fast_load_start__ == __fast_load_end__) || ((__fast_load_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .fast is too large to fit in FLASH1 memory segment)
 
 .fast_run       0x0000000020000000        0x0
@@ -20312,9 +20313,9 @@ Linker script and memory map
                 0x0000000000000000                __fast_run_size__ = (__fast_run_end__ - __fast_run_start__)
                 0x0000000020000000                __fast_run_load_end__ = __fast_run_end__
                 0x0000000000000001                . = ASSERT (((__fast_run_start__ == __fast_run_end__) || ((__fast_run_end__ - __RAM1_segment_start__) <= __RAM1_segment_size__)), error: .fast_run is too large to fit in RAM1 memory segment)
-                0x000000000002abb8                __data_load_start__ = ALIGN ((__fast_load_start__ + SIZEOF (.fast)), 0x4)
+                0x000000000002ac68                __data_load_start__ = ALIGN ((__fast_load_start__ + SIZEOF (.fast)), 0x4)
 
-.data           0x0000000020000000       0xec load address 0x000000000002abb8
+.data           0x0000000020000000       0xec load address 0x000000000002ac68
                 0x0000000020000000                __data_start__ = .
  *(.data .data.* .gnu.linkonce.d.*)
  .data.m_uart   0x0000000020000000       0x14 Output/Debug/Obj/NAATOS_fw/nrf_log_backend_uart.o
@@ -20351,7 +20352,7 @@ Linker script and memory map
                 0x00000000200000d8                __RAL_global_locale
                 0x00000000200000ec                __data_end__ = (__data_start__ + SIZEOF (.data))
                 0x00000000000000ec                __data_size__ = SIZEOF (.data)
-                0x000000000002aca4                __data_load_end__ = (__data_load_start__ + SIZEOF (.data))
+                0x000000000002ad54                __data_load_end__ = (__data_load_start__ + SIZEOF (.data))
 
 .igot.plt       0x0000000100000000        0x0
  .igot.plt      0x0000000100000000        0x0 Output/Debug/Obj/NAATOS_fw/thumb_crt0.o
@@ -20363,16 +20364,16 @@ Linker script and memory map
                 0x00000000000000ec                __data_run_size__ = (__data_run_end__ - __data_run_start__)
                 0x00000000200000ec                __data_run_load_end__ = __data_run_end__
                 0x0000000000000001                . = ASSERT (((__data_run_start__ == __data_run_end__) || ((__data_run_end__ - __RAM1_segment_start__) <= __RAM1_segment_size__)), error: .data_run is too large to fit in RAM1 memory segment)
-                0x000000000002aca4                __tdata_load_start__ = ALIGN ((__data_load_start__ + SIZEOF (.data)), 0x4)
+                0x000000000002ad54                __tdata_load_start__ = ALIGN ((__data_load_start__ + SIZEOF (.data)), 0x4)
 
-.tdata          0x00000000200000ec        0x0 load address 0x000000000002aca4
+.tdata          0x00000000200000ec        0x0 load address 0x000000000002ad54
                 0x00000000200000ec                __tdata_start__ = .
  *(.tdata .tdata.*)
                 0x00000000200000ec                __tdata_end__ = (__tdata_start__ + SIZEOF (.tdata))
                 0x0000000000000000                __tdata_size__ = SIZEOF (.tdata)
-                0x000000000002aca4                __tdata_load_end__ = (__tdata_load_start__ + SIZEOF (.tdata))
-                0x000000000002aca4                __FLASH1_segment_used_end__ = (ALIGN ((__data_load_start__ + SIZEOF (.data)), 0x4) + SIZEOF (.tdata))
-                0x000000000002aca4                __FLASH1_segment_used_size__ = (__FLASH1_segment_used_end__ - __FLASH1_segment_start__)
+                0x000000000002ad54                __tdata_load_end__ = (__tdata_load_start__ + SIZEOF (.tdata))
+                0x000000000002ad54                __FLASH1_segment_used_end__ = (ALIGN ((__data_load_start__ + SIZEOF (.data)), 0x4) + SIZEOF (.tdata))
+                0x000000000002ad54                __FLASH1_segment_used_size__ = (__FLASH1_segment_used_end__ - __FLASH1_segment_start__)
                 0x0000000000000001                . = ASSERT (((__tdata_load_start__ == __tdata_load_end__) || ((__tdata_load_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .tdata is too large to fit in FLASH1 memory segment)
 
 .tdata_run      0x00000000200000ec        0x0
@@ -21175,7 +21176,7 @@ LOAD linker stubs
  .comment       0x0000000000000025       0x26 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
  .comment       0x0000000000000025       0x26 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libvfprintf.o)
 
-.debug_line     0x0000000000000000    0x4146a
+.debug_line     0x0000000000000000    0x4148a
  .debug_line    0x0000000000000000      0x21e Output/Debug/Obj/NAATOS_fw/thumb_crt0.o
  .debug_line    0x000000000000021e      0x5e0 Output/Debug/Obj/NAATOS_fw/nrf_log_backend_serial.o
  .debug_line    0x00000000000007fe      0x84b Output/Debug/Obj/NAATOS_fw/nrf_log_backend_uart.o
@@ -21226,33 +21227,33 @@ LOAD linker stubs
  .debug_line    0x000000000002cd92      0xf9c Output/Debug/Obj/NAATOS_fw/nrfx_spim.o
  .debug_line    0x000000000002dd2e      0xf66 Output/Debug/Obj/NAATOS_fw/main.o
  .debug_line    0x000000000002ec94      0x4ce Output/Debug/Obj/NAATOS_fw/battery.o
- .debug_line    0x000000000002f162      0x848 Output/Debug/Obj/NAATOS_fw/heater.o
- .debug_line    0x000000000002f9aa      0xb7f Output/Debug/Obj/NAATOS_fw/logger.o
- .debug_line    0x0000000000030529      0x979 Output/Debug/Obj/NAATOS_fw/sensors.o
- .debug_line    0x0000000000030ea2      0x49f Output/Debug/Obj/NAATOS_fw/usb.o
- .debug_line    0x0000000000031341      0x107 Output/Debug/Obj/NAATOS_fw/pid.o
- .debug_line    0x0000000000031448      0x8f9 Output/Debug/Obj/NAATOS_fw/pwm.o
- .debug_line    0x0000000000031d41      0x563 Output/Debug/Obj/NAATOS_fw/adc.o
- .debug_line    0x00000000000322a4      0x8d1 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
- .debug_line    0x0000000000032b75      0x793 Output/Debug/Obj/NAATOS_fw/tsys01.o
- .debug_line    0x0000000000033308      0xad4 Output/Debug/Obj/NAATOS_fw/sd_card.o
- .debug_line    0x0000000000033ddc      0x22f Output/Debug/Obj/NAATOS_fw/calendar_rtc.o
- .debug_line    0x000000000003400b      0xb03 Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
- .debug_line    0x0000000000034b0e      0x3ec Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_Syscalls_SES.o
- .debug_line    0x0000000000034efa      0x835 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
- .debug_line    0x000000000003572f     0x2dc0 Output/Debug/Obj/NAATOS_fw/ff.o
- .debug_line    0x00000000000384ef      0x204 Output/Debug/Obj/NAATOS_fw/cc932.o
- .debug_line    0x00000000000386f3       0x8e Output/Debug/Obj/NAATOS_fw/ses_startup_nrf52840.o
- .debug_line    0x0000000000038781       0xad Output/Debug/Obj/NAATOS_fw/ses_startup_nrf_common.o
- .debug_line    0x000000000003882e     0x397c Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
- .debug_line    0x000000000003c1aa     0x182a Output/Debug/Obj/NAATOS_fw/tasks.o
- .debug_line    0x000000000003d9d4      0x54e Output/Debug/Obj/NAATOS_fw/list.o
- .debug_line    0x000000000003df22     0x1189 Output/Debug/Obj/NAATOS_fw/queue.o
- .debug_line    0x000000000003f0ab      0x968 Output/Debug/Obj/NAATOS_fw/timers.o
- .debug_line    0x000000000003fa13      0x490 Output/Debug/Obj/NAATOS_fw/port.o
- .debug_line    0x000000000003fea3      0x690 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
- .debug_line    0x0000000000040533      0x869 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
- .debug_line    0x0000000000040d9c      0x6ce Output/Debug/Obj/NAATOS_fw/heap_4.o
+ .debug_line    0x000000000002f162      0x868 Output/Debug/Obj/NAATOS_fw/heater.o
+ .debug_line    0x000000000002f9ca      0xb7f Output/Debug/Obj/NAATOS_fw/logger.o
+ .debug_line    0x0000000000030549      0x979 Output/Debug/Obj/NAATOS_fw/sensors.o
+ .debug_line    0x0000000000030ec2      0x49f Output/Debug/Obj/NAATOS_fw/usb.o
+ .debug_line    0x0000000000031361      0x107 Output/Debug/Obj/NAATOS_fw/pid.o
+ .debug_line    0x0000000000031468      0x8f9 Output/Debug/Obj/NAATOS_fw/pwm.o
+ .debug_line    0x0000000000031d61      0x563 Output/Debug/Obj/NAATOS_fw/adc.o
+ .debug_line    0x00000000000322c4      0x8d1 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_line    0x0000000000032b95      0x793 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_line    0x0000000000033328      0xad4 Output/Debug/Obj/NAATOS_fw/sd_card.o
+ .debug_line    0x0000000000033dfc      0x22f Output/Debug/Obj/NAATOS_fw/calendar_rtc.o
+ .debug_line    0x000000000003402b      0xb03 Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
+ .debug_line    0x0000000000034b2e      0x3ec Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_Syscalls_SES.o
+ .debug_line    0x0000000000034f1a      0x835 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
+ .debug_line    0x000000000003574f     0x2dc0 Output/Debug/Obj/NAATOS_fw/ff.o
+ .debug_line    0x000000000003850f      0x204 Output/Debug/Obj/NAATOS_fw/cc932.o
+ .debug_line    0x0000000000038713       0x8e Output/Debug/Obj/NAATOS_fw/ses_startup_nrf52840.o
+ .debug_line    0x00000000000387a1       0xad Output/Debug/Obj/NAATOS_fw/ses_startup_nrf_common.o
+ .debug_line    0x000000000003884e     0x397c Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
+ .debug_line    0x000000000003c1ca     0x182a Output/Debug/Obj/NAATOS_fw/tasks.o
+ .debug_line    0x000000000003d9f4      0x54e Output/Debug/Obj/NAATOS_fw/list.o
+ .debug_line    0x000000000003df42     0x1189 Output/Debug/Obj/NAATOS_fw/queue.o
+ .debug_line    0x000000000003f0cb      0x968 Output/Debug/Obj/NAATOS_fw/timers.o
+ .debug_line    0x000000000003fa33      0x490 Output/Debug/Obj/NAATOS_fw/port.o
+ .debug_line    0x000000000003fec3      0x690 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
+ .debug_line    0x0000000000040553      0x869 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
+ .debug_line    0x0000000000040dbc      0x6ce Output/Debug/Obj/NAATOS_fw/heap_4.o
 
 .debug_info     0x0000000000000000    0x4ee3f
  .debug_info    0x0000000000000000       0x22 Output/Debug/Obj/NAATOS_fw/thumb_crt0.o
@@ -21568,7 +21569,7 @@ LOAD linker stubs
  .debug_aranges
                 0x00000000000073d8       0x50 Output/Debug/Obj/NAATOS_fw/heap_4.o
 
-.debug_str      0x0000000000000000    0xc40fb
+.debug_str      0x0000000000000000    0xc4110
  .debug_str     0x0000000000000000       0x8b Output/Debug/Obj/NAATOS_fw/thumb_crt0.o
  .debug_str     0x000000000000008b    0x84706 Output/Debug/Obj/NAATOS_fw/nrf_log_backend_serial.o
                                       0x8617c (size before relaxing)
@@ -21664,63 +21665,63 @@ LOAD linker stubs
                                       0x89453 (size before relaxing)
  .debug_str     0x00000000000b4ccf      0x6e7 Output/Debug/Obj/NAATOS_fw/nrfx_spim.o
                                       0x8bff2 (size before relaxing)
- .debug_str     0x00000000000b53b6     0x8059 Output/Debug/Obj/NAATOS_fw/main.o
-                                      0x963b3 (size before relaxing)
- .debug_str     0x00000000000bd40f       0xb6 Output/Debug/Obj/NAATOS_fw/battery.o
+ .debug_str     0x00000000000b53b6     0x806e Output/Debug/Obj/NAATOS_fw/main.o
+                                      0x963c8 (size before relaxing)
+ .debug_str     0x00000000000bd424       0xb6 Output/Debug/Obj/NAATOS_fw/battery.o
                                       0x82e49 (size before relaxing)
- .debug_str     0x00000000000bd4c5       0xe7 Output/Debug/Obj/NAATOS_fw/heater.o
-                                      0x8ede5 (size before relaxing)
- .debug_str     0x00000000000bd5ac      0x230 Output/Debug/Obj/NAATOS_fw/logger.o
+ .debug_str     0x00000000000bd4da       0xe7 Output/Debug/Obj/NAATOS_fw/heater.o
+                                      0x8edfa (size before relaxing)
+ .debug_str     0x00000000000bd5c1      0x230 Output/Debug/Obj/NAATOS_fw/logger.o
                                       0x913fc (size before relaxing)
- .debug_str     0x00000000000bd7dc      0x192 Output/Debug/Obj/NAATOS_fw/sensors.o
+ .debug_str     0x00000000000bd7f1      0x192 Output/Debug/Obj/NAATOS_fw/sensors.o
                                       0x8e91e (size before relaxing)
- .debug_str     0x00000000000bd96e       0x80 Output/Debug/Obj/NAATOS_fw/usb.o
+ .debug_str     0x00000000000bd983       0x80 Output/Debug/Obj/NAATOS_fw/usb.o
                                       0x8193d (size before relaxing)
- .debug_str     0x00000000000bd9ee       0x81 Output/Debug/Obj/NAATOS_fw/pid.o
+ .debug_str     0x00000000000bda03       0x81 Output/Debug/Obj/NAATOS_fw/pid.o
                                        0x2c79 (size before relaxing)
- .debug_str     0x00000000000bda6f      0x17d Output/Debug/Obj/NAATOS_fw/pwm.o
+ .debug_str     0x00000000000bda84      0x17d Output/Debug/Obj/NAATOS_fw/pwm.o
                                       0x8e7f7 (size before relaxing)
- .debug_str     0x00000000000bdbec       0xae Output/Debug/Obj/NAATOS_fw/adc.o
+ .debug_str     0x00000000000bdc01       0xae Output/Debug/Obj/NAATOS_fw/adc.o
                                       0x885e0 (size before relaxing)
- .debug_str     0x00000000000bdc9a      0x141 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_str     0x00000000000bdcaf      0x141 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
                                       0x8e335 (size before relaxing)
- .debug_str     0x00000000000bdddb      0xa96 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_str     0x00000000000bddf0      0xa96 Output/Debug/Obj/NAATOS_fw/tsys01.o
                                       0x874c8 (size before relaxing)
- .debug_str     0x00000000000be871      0x2e2 Output/Debug/Obj/NAATOS_fw/sd_card.o
+ .debug_str     0x00000000000be886      0x2e2 Output/Debug/Obj/NAATOS_fw/sd_card.o
                                       0x8e1ad (size before relaxing)
- .debug_str     0x00000000000beb53       0x9b Output/Debug/Obj/NAATOS_fw/calendar_rtc.o
+ .debug_str     0x00000000000beb68       0x9b Output/Debug/Obj/NAATOS_fw/calendar_rtc.o
                                        0x4219 (size before relaxing)
- .debug_str     0x00000000000bebee      0xd19 Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
+ .debug_str     0x00000000000bec03      0xd19 Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
                                       0x7b731 (size before relaxing)
- .debug_str     0x00000000000bf907      0xbb1 Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_Syscalls_SES.o
+ .debug_str     0x00000000000bf91c      0xbb1 Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_Syscalls_SES.o
                                       0x7bd9d (size before relaxing)
- .debug_str     0x00000000000c04b8      0x14c Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
+ .debug_str     0x00000000000c04cd      0x14c Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
                                       0x829df (size before relaxing)
- .debug_str     0x00000000000c0604      0xd9a Output/Debug/Obj/NAATOS_fw/ff.o
+ .debug_str     0x00000000000c0619      0xd9a Output/Debug/Obj/NAATOS_fw/ff.o
                                        0x4245 (size before relaxing)
- .debug_str     0x00000000000c139e       0x94 Output/Debug/Obj/NAATOS_fw/cc932.o
+ .debug_str     0x00000000000c13b3       0x94 Output/Debug/Obj/NAATOS_fw/cc932.o
                                        0x3106 (size before relaxing)
- .debug_str     0x00000000000c1432       0x50 Output/Debug/Obj/NAATOS_fw/ses_startup_nrf52840.o
+ .debug_str     0x00000000000c1447       0x50 Output/Debug/Obj/NAATOS_fw/ses_startup_nrf52840.o
                                          0x8b (size before relaxing)
- .debug_str     0x00000000000c1482       0x52 Output/Debug/Obj/NAATOS_fw/ses_startup_nrf_common.o
+ .debug_str     0x00000000000c1497       0x52 Output/Debug/Obj/NAATOS_fw/ses_startup_nrf_common.o
                                          0x8d (size before relaxing)
- .debug_str     0x00000000000c14d4      0x3af Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
+ .debug_str     0x00000000000c14e9      0x3af Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
                                       0x7f76e (size before relaxing)
- .debug_str     0x00000000000c1883     0x1459 Output/Debug/Obj/NAATOS_fw/tasks.o
+ .debug_str     0x00000000000c1898     0x1459 Output/Debug/Obj/NAATOS_fw/tasks.o
                                       0x83851 (size before relaxing)
- .debug_str     0x00000000000c2cdc       0xe5 Output/Debug/Obj/NAATOS_fw/list.o
+ .debug_str     0x00000000000c2cf1       0xe5 Output/Debug/Obj/NAATOS_fw/list.o
                                       0x816ed (size before relaxing)
- .debug_str     0x00000000000c2dc1      0x75f Output/Debug/Obj/NAATOS_fw/queue.o
+ .debug_str     0x00000000000c2dd6      0x75f Output/Debug/Obj/NAATOS_fw/queue.o
                                       0x82c54 (size before relaxing)
- .debug_str     0x00000000000c3520      0x527 Output/Debug/Obj/NAATOS_fw/timers.o
+ .debug_str     0x00000000000c3535      0x527 Output/Debug/Obj/NAATOS_fw/timers.o
                                       0x83130 (size before relaxing)
- .debug_str     0x00000000000c3a47       0x71 Output/Debug/Obj/NAATOS_fw/port.o
+ .debug_str     0x00000000000c3a5c       0x71 Output/Debug/Obj/NAATOS_fw/port.o
                                       0x81b25 (size before relaxing)
- .debug_str     0x00000000000c3ab8      0x329 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
+ .debug_str     0x00000000000c3acd      0x329 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
                                       0x8223b (size before relaxing)
- .debug_str     0x00000000000c3de1       0xaa Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
+ .debug_str     0x00000000000c3df6       0xaa Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
                                       0x8b797 (size before relaxing)
- .debug_str     0x00000000000c3e8b      0x270 Output/Debug/Obj/NAATOS_fw/heap_4.o
+ .debug_str     0x00000000000c3ea0      0x270 Output/Debug/Obj/NAATOS_fw/heap_4.o
                                       0x81de5 (size before relaxing)
 
 .debug_ranges   0x0000000000000000     0x7088

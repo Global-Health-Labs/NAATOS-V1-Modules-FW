@@ -230,7 +230,7 @@ void main_task(void * pvParameters) {
             break;
           }
           i++;
-        } while ( i < 500/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
+        } while ( i < 5/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
         i = 0;
         
         /* ***** Valve Zone Run **** */
@@ -264,7 +264,7 @@ void main_task(void * pvParameters) {
             break;
           }
           i++;
-        } while (i < 50/*TODO: Compare current time against VALVE_ON_TIME*/);
+        } while (i < 500/*TODO: Compare current time against VALVE_ON_TIME*/);
         i=0;
         // Stop the valve zone
         end_valve_zone();
@@ -513,7 +513,7 @@ void create_queues() {
 *
 *   Application entry point.
 */
-int main(void) {
+ int main(void) {
   ret_code_t err_code;
 
   // Initialize clock driver for better time accuracy in FREERTOS

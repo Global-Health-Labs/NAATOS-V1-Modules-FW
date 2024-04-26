@@ -42,9 +42,21 @@ void heater_task(void * pvParameters) {
       // Set zones enabled
       if (zone_req.zone == AMPLIFICATION) {
         amplification_zone_running = zone_req.on;
+        if (!amplification_zone_running)  {
+          amp0_pid.out = 1;
+          amp1_pid.out = 1;
+          amp2_pid.out = 1;
+          update_amp0_duty(amp0_pid.out);
+          update_amp1_duty(amp1_pid.out);
+          update_amp2_duty(amp2_pid.out);
+        }
       }
       else if (zone_req.zone = VALVE) {
         valve_zone_running = zone_req.on;
+        if (!valve_zone_running) {
+          valve_pid.out = 1;
+          update_valve_duty(valve_pid.out);
+        }
       }
     }
 
@@ -78,7 +90,7 @@ void heater_task(void * pvParameters) {
       // Update Valve PID loop with new temperatures
       pid_controller_compute(&valve_pid, temperature_data.valve_zone_temp);
       // Update Valve PWM with PID output
-      update_amp0_duty(valve_pid.out);
+      update_valve_duty(valve_pid.out);
     }
 
 #if VERBOSE_PID 
@@ -86,7 +98,6 @@ void heater_task(void * pvParameters) {
       printf("Amp0: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp0_zone_temp, amp0_pid.out);
       printf("Amp1: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp1_zone_temp, amp1_pid.out);
       printf("Amp2: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp2_zone_temp, amp2_pid.out);
-      printf("Valv: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.valve_zone_temp, valve_pid.out);
     }
     if (valve_zone_running) {
       printf("Valv: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.valve_zone_temp, valve_pid.out);
