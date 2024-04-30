@@ -23,9 +23,15 @@ static log_data_message_t log_msg = {
 void sensors_task(void * pvParameters) {
   BaseType_t xReturned;
   uint32_t sample_log_index = 0;
-  uint32_t sample_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE); // TODO: Update to be based on config.txt
-
-  // TODO: Get Configuration Settings
+  uint32_t sample_log_max = 0;
+  
+  // Set the last sample based on config
+  if (use_default_configuration_parameters) {
+    sample_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE); 
+  }
+  else {
+    sample_log_max = (config.logging_rate / config.sample_rate);
+  }
 
   /* Get TSYS01 Calibration Values */
 #if I2C_CONNECTED
@@ -36,10 +42,6 @@ void sensors_task(void * pvParameters) {
 #endif
 
   for (;;) {
-    // Get Start Time in ms, testing for timings
-    //uint32_t time = pdTICKS_TO_MS(xTaskGetTickCount());
-    //printf("Start Time: %dms \n", time);
-
     // Check to see if the main task state has changed
     if (uxQueueMessagesWaiting(sensor_mainStateQueue) > 0) {
       xReturned = xQueueReceive(sensor_mainStateQueue, &s_main_state, 0);
@@ -131,11 +133,12 @@ void sensors_task(void * pvParameters) {
     
     // Delay based on the given sample rate
     // Remove 48 ms delay when running for temperature read delays
-    vTaskDelay(pdMS_TO_TICKS((DEFAULT_SAMPLE_RATE*1000) - (12 * 4) + 1)); // TODO: Update sample rate to be based on config file
-    
-    // Get Stop Time in ms, testing for timings
-    //time = pdTICKS_TO_MS(xTaskGetTickCount());
-    //printf("End Time: %dms\n", time);
+    if (use_default_configuration_parameters) {
+      vTaskDelay(pdMS_TO_TICKS((DEFAULT_SAMPLE_RATE*1000) - (12 * 4) + 1)); 
+    }
+    else {
+      vTaskDelay(pdMS_TO_TICKS((config.sample_rate*1000) - (12 * 4) + 1));
+    }
   }
 }
 

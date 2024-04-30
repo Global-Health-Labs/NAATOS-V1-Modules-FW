@@ -6,7 +6,6 @@
   <BreakpointListItem trigger="" line="513" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="../src/composite_usb.h" useHWbreakpoint="false"/>
   <BreakpointListItem trigger="" line="3273" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="../sdk/external/fatfs/src/ff.c" useHWbreakpoint="false"/>
   <BreakpointListItem trigger="" line="15" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="heater.c" useHWbreakpoint="false"/>
-  <BreakpointListItem trigger="" line="6" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="../src/pwm.h" useHWbreakpoint="false"/>
   <Exceptions set="MemManage;UsageFault_Coprocessor;UsageFault_CheckingError;UsageFault_StateError;BusFault;ExceptionEntryReturnFault;HardFault"/>
  </Breakpoints>
  <ExecutionProfileWindow/>
@@ -29,7 +28,6 @@
   <ProjectSessionItem path="NAATOS_fw"/>
   <ProjectSessionItem path="NAATOS_fw;NAATOS_fw"/>
   <ProjectSessionItem path="NAATOS_fw;NAATOS_fw;Application"/>
-  <ProjectSessionItem path="NAATOS_fw;NAATOS_fw;FATFS"/>
   <ProjectSessionItem path="NAATOS_fw;NAATOS_fw;FreeRTOS"/>
   <ProjectSessionItem path="NAATOS_fw;NAATOS_fw;nRF_Libraries"/>
  </Project>
@@ -59,6 +57,7 @@
    <Watchpoint expression="fs" name="fs" radix="-1" linenumber="14" filename="../src/sd_card.c"/>
    <Watchpoint expression="file" name="file" radix="-1" linenumber="103" filename="../src/sd_card.c"/>
    <Watchpoint expression="logFileName" name="logFileName" radix="-1" linenumber="57" filename="../src/logger.c"/>
+   <Watchpoint expression="temperatures" name="temperatures" radix="-1" linenumber="94" filename="../src/sensors.c"/>
   </Watches>
  </Watch1>
  <Watch2>
@@ -71,11 +70,18 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="19" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/naatos_queues.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="10" y="49" useTextEdit="1" openedFrom="D:/NAATOS/Source Code/GHL-NAATOS/application/src/main.c" useBinaryEdit="0" left="0" path="../src/naatos_config.h" selected="1" top="24" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="117" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/logger.c" selected="0" top="87" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="15" y="35" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/main.c" selected="0" top="23" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="34" y="23" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/usb.c" selected="0" top="6" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="71" y="501" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/main.c" selected="1" top="491" codecName=""/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="93" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/heater.c" selected="0" top="27" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="21" y="15" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/heater.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="50" y="84" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/sensors.c" selected="0" top="56" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="48" y="16" useTextEdit="1" openedFrom="D:/NAATOS/Source Code/GHL-NAATOS/application/src/sensors.c" useBinaryEdit="0" left="0" path="../src/sensors.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="51" y="27" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/calendar_rtc.c" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="35" useTextEdit="1" openedFrom="D:/NAATOS/Source Code/GHL-NAATOS/application/src/calendar_rtc.c" useBinaryEdit="0" left="0" path="../src/naatos_config.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="50" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../sdk/components/libraries/hardfault/nrf52/handler/hardfault_handler_gcc.c" selected="0" top="2" codecName=""/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="79" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/i2c_hal_freertos.c" selected="0" top="49" codecName=""/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="139" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/tsys01.c" selected="0" top="104" codecName=""/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="17" useTextEdit="1" openedFrom="D:/NAATOS/Source Code/GHL-NAATOS/application/src/calendar_rtc.c" useBinaryEdit="0" left="0" path="../src/calendar_rtc.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="57" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/logger.c" selected="0" top="32" codecName=""/>
  </Files>
- <ARMCrossStudioWindow activeProject="NAATOS_fw" fileDialogDefaultFilter="*" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="C:/Nordic/NAATOS_fw_src/application/sdk/components/libraries/hardfault/nrf52/handler/hardfault_handler_gcc.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/components/libraries/timer/drv_rtc.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/portable/CMSIS/nrf52/port_cmsis.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/source/list.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/source/portable/MemMang/heap_4.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/source/queue.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/source/tasks.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/modules/nrfx/mdk/ses_startup_nrf52840.s&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/modules/nrfx/mdk/ses_startup_nrf_common.s&#xa;" fileDialogInitialDirectory="D:/NAATOS/Source Code/GHL-NAATOS/application/sdk/external/fatfs/src/option" debugSearchPath="" autoConnectCapabilities="3199"/>
+ <ARMCrossStudioWindow activeProject="NAATOS_fw" fileDialogDefaultFilter="*" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="C:/Nordic/NAATOS_fw_src/application/sdk/components/libraries/hardfault/nrf52/handler/hardfault_handler_gcc.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/components/libraries/timer/drv_rtc.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/portable/CMSIS/nrf52/port_cmsis.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/source/list.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/source/portable/MemMang/heap_4.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/source/queue.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/source/tasks.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/modules/nrfx/mdk/ses_startup_nrf52840.s&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/modules/nrfx/mdk/ses_startup_nrf_common.s&#xa;" fileDialogInitialDirectory="D:/NAATOS/Source Code/GHL-NAATOS/application/sdk/external/fatfs/src/option" debugSearchPath="" autoConnectCapabilities="3711"/>
 </session>

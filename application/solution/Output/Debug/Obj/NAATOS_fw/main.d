@@ -69,13 +69,13 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/external/freertos/source/include/queue.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\logger.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sd_card.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
  ../sdk/external/fatfs/src/ff.h ../sdk/external/fatfs/src/integer.h \
  ../sdk/external/fatfs/src/ffconf.h \
  ../sdk/external/fatfs/port/diskio_blkdev.h \
  ../sdk/external/fatfs/src/diskio.h \
  ../sdk/components/libraries/block_dev/nrf_block_dev.h \
  ../sdk/components/libraries/util/sdk_common.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
  ../sdk/components/libraries/util/sdk_os.h \
  ../sdk/components/libraries/util/app_util.h \
  ../sdk/components/libraries/util/sdk_macros.h \
@@ -94,14 +94,6 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/components/libraries/memobj/nrf_memobj.h \
  ../sdk/components/libraries/balloc/nrf_balloc.h \
  ../sdk/components/libraries/log/nrf_log_default_backends.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\calendar_rtc.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\i2c_hal_freertos.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sensors.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\adc.h \
- ../sdk/integration/nrfx/legacy/nrf_drv_saadc.h \
- ../sdk/modules/nrfx/drivers/include/nrfx_saadc.h \
- ../sdk/modules/nrfx/hal/nrf_saadc.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\tsys01.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\heater.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pid.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pwm.h \
@@ -112,6 +104,14 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/integration/nrfx/legacy/nrf_drv_ppi.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_ppi.h \
  ../sdk/modules/nrfx/hal/nrf_ppi.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\calendar_rtc.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\i2c_hal_freertos.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sensors.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\adc.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_saadc.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_saadc.h \
+ ../sdk/modules/nrfx/hal/nrf_saadc.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\tsys01.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\usb.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\spi.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_spi.h \

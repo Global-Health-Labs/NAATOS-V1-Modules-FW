@@ -243,7 +243,109 @@ FRESULT check_for_config_file(void) {
     return res;
   }
   // Write logging rate
-  configBufferSize = sprintf(configBuffer, "logging_rate:%0.2f\n", DEFAULT_SAMPLE_RATE);
+  configBufferSize = sprintf(configBuffer, "logging_rate:%0.2f\n", DEFAULT_LOGGING_RATE);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amplification Zone Run Time
+  configBufferSize = sprintf(configBuffer, "amp_zone_run_time:%d\n", DEFAULT_AMPLIFICATION_ZONE_ON_TIME);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Valve Zone Run Time
+  configBufferSize = sprintf(configBuffer, "valve_zone_run_time:%d\n", DEFAULT_VALVE_ZONE_ON_TIME);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Low Power Threshold
+  configBufferSize = sprintf(configBuffer, "low_power_threshold:%d\n", DEFAULT_LOW_POWER_THRESHOLD);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Valve Zone Setpoint
+  configBufferSize = sprintf(configBuffer, "valve_setpoint:%0.2f\n", VALVE_SETPOINT);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amplification Zone Setpoint
+  configBufferSize = sprintf(configBuffer, "amplification_setpoint:%0.2f\n", AMP0_SETPOINT);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Valve Kp
+  configBufferSize = sprintf(configBuffer, "valve_kp:%0.3f\n", V_KP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Valve Ki
+  configBufferSize = sprintf(configBuffer, "valve_ki:%0.3f\n", V_KI);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Valve Kd
+  configBufferSize = sprintf(configBuffer, "valve_kd:%0.3f\n", V_KD);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp0 Kp
+  configBufferSize = sprintf(configBuffer, "amp0_kp:%0.3f\n", A0_KP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp0 Ki
+  configBufferSize = sprintf(configBuffer, "amp0_ki:%0.3f\n", A0_KI);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp0 Kd
+  configBufferSize = sprintf(configBuffer, "amp0_kd:%0.3f\n", A0_KD);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp1 Kp
+  configBufferSize = sprintf(configBuffer, "amp1_kp:%0.3f\n", A1_KP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp1 Ki
+  configBufferSize = sprintf(configBuffer, "amp1_ki:%0.3f\n", A1_KI);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp1 Kd
+  configBufferSize = sprintf(configBuffer, "amp1_kd:%0.3f\n", A1_KD);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp2 Kp
+  configBufferSize = sprintf(configBuffer, "amp2_kp:%0.3f\n", A2_KP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp2 Ki
+  configBufferSize = sprintf(configBuffer, "amp2_ki:%0.3f\n", A2_KI);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp2 Kd
+  configBufferSize = sprintf(configBuffer, "amp2_kd:%0.3f\n", A2_KD);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -262,4 +364,112 @@ FRESULT check_for_config_file(void) {
   }
 
   return res;
+}
+
+FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameters) {
+  char configBuffer[50];
+  FRESULT res;
+  char * pch;
+  char * val;
+
+  // Re-Mount SD Card
+  res = sd_card_mount();
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Open root directory
+  res = f_opendir(&dir, "/");
+  if (res != FR_OK) {
+      return res;
+  }
+
+  // Change directory into configs
+  res = f_chdir(CONFIG_DIR);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Open naatos config file
+  res = f_open(&file, NAATOS_CONFIG_FILE, FA_READ);
+  if (res != FR_OK) {              
+    // Return that it already exists  
+    return res; 
+  }
+  
+  // Set the struct
+  for (int i = 0; i < NUM_PARAMETERS; i ++) {
+    pch = f_gets(configBuffer, 50, &file);
+    pch = strtok(configBuffer, ":");
+    sprintf(val, "%s", pch);
+    pch = strtok(NULL, ":");
+    sprintf(val, "%s", pch);
+    switch((naatos_config_params_t)i) {
+      case SAMPLE_RATE:
+            parameters->sample_rate = atof(val);
+            if (parameters->sample_rate < 0.048) {
+              printf("Warning: Sample rate lower than minimum (0.048), setting sample rate to minimum.");
+              parameters->sample_rate = 0.048;
+              break;
+            }
+            break;
+        case LOGGING_RATE:
+            parameters->logging_rate = atof(val);
+            break;
+        case VALVE_ZONE_RUN_TIME:
+            parameters->valve_zone_run_time_m = atoi(val);
+            break;
+        case AMP_ZONE_RUN_TIME:
+            parameters->amplification_zone_run_time_m = atoi(val);
+            break;
+        case LOW_POWER_THRESHOLD:
+            parameters->low_power_threshold = atoi(val);
+            break;
+        case VALVE_SETPOINT_C:
+            parameters->valve_setpoint = atof(val);
+            break;
+        case AMP_SETPOINT_C:
+            parameters->amplification_setpoint = atof(val);
+            break;
+        case VALVE_KP:
+            parameters->valve_kp = atof(val);
+            break;
+        case VALVE_KI:
+            parameters->valve_ki = atof(val);
+            break;
+        case VALVE_KD:
+            parameters->valve_kd = atof(val);
+            break;
+        case AMP0_KP:
+            parameters->amp0_kp = atof(val);
+            break;
+        case AMP0_KI:
+            parameters->amp0_ki = atof(val);
+            break;
+        case AMP0_KD:
+            parameters->amp0_kd = atof(val);
+            break;
+        case AMP1_KP:
+            parameters->amp1_kp = atof(val);
+            break;
+        case AMP1_KI:
+            parameters->amp1_ki = atof(val);
+            break;
+        case AMP1_KD:
+            parameters->amp1_kd = atof(val);
+            break;
+        case AMP2_KP:
+            parameters->amp2_kp = atof(val);
+            break;
+        case AMP2_KI:
+            parameters->amp2_ki = atof(val);
+            break;
+        case AMP2_KD:
+            parameters->amp2_kd = atof(val);
+            break;
+        default:
+            // Handle default case
+            break;
+    }
+  }
+  return FR_OK;
 }

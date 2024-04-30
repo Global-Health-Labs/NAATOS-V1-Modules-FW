@@ -6,11 +6,11 @@
 #define pdTICKS_TO_MS( xTimeInTicks )    ( ( TickType_t ) ( ( ( uint64_t ) ( xTimeInTicks ) * ( uint64_t ) 1000U ) / ( uint64_t ) configTICK_RATE_HZ ) )
 
 /* Battery Parameters */
-#define LOW_POWER_THRESHOLD     20
+#define DEFAULT_LOW_POWER_THRESHOLD     20
 
 /* Heater Zones' Parameters */
-#define AMPLIFICATION_ZONE_ON_TIME  30    // Minutes
-#define VALVE_ZONE_ON_TIME          3     // Minutes
+#define DEFAULT_AMPLIFICATION_ZONE_ON_TIME  30    // Minutes
+#define DEFAULT_VALVE_ZONE_ON_TIME          3     // Minutes
 
 /* I2C Pins */
 #define I2C0_SDA_PIN    17
@@ -151,3 +151,30 @@ typedef struct {
   uint8_t month;
   uint8_t year;
 } calendar_time_t;
+
+// Config parameters
+typedef struct {
+  float sample_rate;
+  float logging_rate;
+  uint16_t valve_zone_run_time_m;
+  uint16_t amplification_zone_run_time_m;
+  uint16_t low_power_threshold;
+  float valve_setpoint;
+  float amplification_setpoint;
+  float valve_kp;
+  float valve_ki;
+  float valve_kd;
+  float amp0_kp;
+  float amp0_ki;
+  float amp0_kd;
+  float amp1_kp;
+  float amp1_ki;
+  float amp1_kd;
+  float amp2_kp;
+  float amp2_ki;
+  float amp2_kd;
+} naatos_config_parameters;
+
+/* Configuration Parameters Variables */
+extern bool use_default_configuration_parameters;
+extern naatos_config_parameters config;

@@ -1,6 +1,8 @@
 Output/Debug/Obj/NAATOS_fw/sd_card.o: \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sd_card.c \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sd_card.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
  ../sdk/modules/nrfx/mdk/nrf.h ../sdk/modules/nrfx/mdk/nrf52840.h \
  ../sdk/components/toolchain/cmsis/include/core_cm4.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
@@ -19,7 +21,6 @@ Output/Debug/Obj/NAATOS_fw/sd_card.o: \
  ../sdk/modules/nrfx/nrfx.h ../sdk/integration/nrfx/nrfx_config.h \
  ../src/config/sdk_config.h ../sdk/modules/nrfx/drivers/nrfx_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stddef.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
  ../sdk/modules/nrfx/mdk/nrf_peripherals.h \
  ../sdk/modules/nrfx/mdk/nrf52840_peripherals.h \
  ../sdk/integration/nrfx/nrfx_glue.h \
@@ -52,7 +53,6 @@ Output/Debug/Obj/NAATOS_fw/sd_card.o: \
  ../sdk/external/fatfs/src/diskio.h \
  ../sdk/components/libraries/block_dev/nrf_block_dev.h \
  ../sdk/components/libraries/util/sdk_common.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
  ../sdk/components/libraries/util/sdk_os.h \
  ../sdk/components/libraries/util/app_util.h \
  ../sdk/components/libraries/util/sdk_macros.h \
@@ -72,4 +72,24 @@ Output/Debug/Obj/NAATOS_fw/sd_card.o: \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdlib.h \
  ../sdk/components/libraries/balloc/nrf_balloc.h \
  ../sdk/components/libraries/log/nrf_log_default_backends.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_config.h
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_config.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\heater.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_queues.h \
+ ../sdk/external/freertos/source/include/FreeRTOS.h \
+ ../sdk/external/freertos/config/FreeRTOSConfig.h \
+ ../sdk/external/freertos/source/include/projdefs.h \
+ ../sdk/external/freertos/source/include/portable.h \
+ ../sdk/external/freertos/source/include/deprecated_definitions.h \
+ ../sdk/external/freertos/portable/GCC/nrf52/portmacro.h \
+ ../sdk/external/freertos/portable/CMSIS/nrf52/portmacro_cmsis.h \
+ ../sdk/external/freertos/source/include/mpu_wrappers.h \
+ ../sdk/external/freertos/source/include/queue.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pid.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pwm.h \
+ ../sdk/components/libraries/pwm/app_pwm.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_timer.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_timer.h \
+ ../sdk/modules/nrfx/hal/nrf_timer.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_ppi.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_ppi.h \
+ ../sdk/modules/nrfx/hal/nrf_ppi.h

@@ -117,7 +117,7 @@ void pwm_task(void * pvParameters) {
     
     // PWM2 Control
     if (pwm2_ready_flag) {
-      if (amp1_zone_active | amp2_zone_active)
+      if (amp1_zone_active || amp2_zone_active)
         pwm2_ready_flag = false;
       if (amp1_zone_active) 
         app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  amp1_duty);
