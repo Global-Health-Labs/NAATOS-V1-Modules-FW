@@ -62,9 +62,9 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="48" y="359" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/main.c" selected="0" top="324" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="359" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/main.c" selected="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/heater.c" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="52" y="95" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/i2c_hal.c" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="95" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/i2c_hal.c" selected="0" top="92" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="24" useTextEdit="1" openedFrom="C:/Nordic/NAATOS_fw_src/application/src/tsys01.c" useBinaryEdit="0" left="0" path="../src/i2c_hal.h" selected="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="4298" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/config/sdk_config.h" selected="0" top="3823" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="83" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../sdk/external/segger_rtt/SEGGER_RTT_Conf.h" selected="0" top="63" codecName="Default"/>
@@ -75,19 +75,21 @@
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/heater.h" selected="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/logger.c" selected="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/logger.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="8" y="12" useTextEdit="1" openedFrom="C:/Nordic/NAATOS_fw_src/application/src/main.c" useBinaryEdit="0" left="0" path="../src/naatos_config.h" selected="1" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="16" y="24" useTextEdit="1" openedFrom="C:/Nordic/NAATOS_fw_src/application/src/main.c" useBinaryEdit="0" left="0" path="../src/naatos_config.h" selected="0" top="10" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/sensors.c" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="9" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/states.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="25" y="7" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/naatos_structs.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="18" y="170" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/tsys01.c" selected="0" top="144" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="20" y="7" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/tsys01.h" selected="0" top="9" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="24" y="83" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/i2c_hal_freertos.c" selected="0" top="66" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="4" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/states.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="165" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/tsys01.c" selected="0" top="163" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="7" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/tsys01.h" selected="0" top="7" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="83" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/i2c_hal_freertos.c" selected="0" top="66" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="19" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/i2c_hal_freertos.h" selected="0" top="6" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="43" y="902" useTextEdit="1" openedFrom="C:/Nordic/NAATOS_fw_src/application/src/i2c_hal_freertos.c" useBinaryEdit="0" left="0" path="../sdk/external/freertos/source/include/FreeRTOS.h" selected="0" top="875" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="902" useTextEdit="1" openedFrom="C:/Nordic/NAATOS_fw_src/application/src/i2c_hal_freertos.c" useBinaryEdit="0" left="0" path="../sdk/external/freertos/source/include/FreeRTOS.h" selected="0" top="900" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="39" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../sdk/external/freertos/source/tasks.c" selected="0" top="6" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="2035" useTextEdit="1" openedFrom="C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/source/tasks.c" useBinaryEdit="0" left="0" path="../sdk/external/freertos/source/include/task.h" selected="0" top="2021" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="32" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../sdk/external/freertos/source/include/semphr.h" selected="0" top="9" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="119" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../sdk/integration/nrfx/legacy/nrf_drv_twi.h" selected="0" top="83" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/usb.c" selected="0" top="9" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/usb.h" selected="1" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockBottom" x="0" y="2" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="C:/Users/Dylan Derose/OneDrive - Odic Inc/Attachments/Desktop/fuel.c" selected="0" top="0" codecName="Default"/>
  </Files>
  <ARMCrossStudioWindow activeProject="NAATOS_fw" fileDialogDefaultFilter="*.c;*.cpp;*.cxx;*.cc;*.h;*.hpp;*.hxx" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/source/include" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

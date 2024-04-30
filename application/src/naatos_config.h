@@ -2,6 +2,8 @@
 
 #include "stdbool.h"
 #include <stdint.h>
+#include "FreeRTOS.h"
+#include  "task.h"
 
 #define pdTICKS_TO_MS( xTimeInTicks )    ( ( TickType_t ) ( ( ( uint64_t ) ( xTimeInTicks ) * ( uint64_t ) 1000U ) / ( uint64_t ) configTICK_RATE_HZ ) )
 
@@ -13,8 +15,8 @@
 #define VALVE_ZONE_ON_TIME          3     // Minutes
 
 /* I2C Pins */
-#define I2C0_SDA_PIN    25
-#define I2C0_SCL_PIN    24
+#define I2C0_SDA_PIN    16
+#define I2C0_SCL_PIN    17
 
 /* SPI Pins */
 #define SPI_SCK_PIN     15    /* P0.15 */
@@ -148,3 +150,12 @@ typedef struct {
   uint8_t month;
   uint8_t year;
 } calendar_time_t;
+
+// Task Handles
+extern xTaskHandle mainTaskHandle;
+extern xTaskHandle heaterTaskHandle;
+extern xTaskHandle loggerTaskHandle;
+extern xTaskHandle sensorsTaskHandle;
+extern xTaskHandle batteryTaskHandle;
+extern xTaskHandle usbTaskHandle;
+extern xTaskHandle pwmTaskHandle;

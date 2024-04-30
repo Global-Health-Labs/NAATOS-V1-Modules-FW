@@ -145,6 +145,8 @@ void sensors_task(void * pvParameters) {
 void init_sensors_gpios(void) {
   /* Setup Hal Sensor */
   nrf_gpio_cfg_input(HAL_INPUT_PIN, NRF_GPIO_PIN_PULLDOWN);
+  nrf_gpio_cfg_output(NRF_GPIO_PIN_MAP(1,7));
+  nrf_gpio_pin_write(NRF_GPIO_PIN_MAP(1,7), 1);
 }
 
 void readTemp(sensor_selection_t sensor, double * temperature) {

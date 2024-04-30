@@ -7,12 +7,283 @@
 */
 
 #include "usb.h"
+#include "sd_card.h"
+#include "nrf_drv_usbd.h"
+#include "nrf_drv_power.h"
+#include "naatos_config.h"
+
+#include "app_usbd.h"
+#include "app_usbd_core.h"
+#include "app_usbd_string_desc.h"
+#include "app_usbd_msc.h"
+#include "app_usbd_cdc_acm.h"
+#include "app_usbd_serial_num.h"
+#include "app_error.h"
+#include "app_timer.h"
+
+#include "nrf_cli.h"
+#include "nrf_cli_uart.h"
+
+#define ENDLINE_STRING "\r\n"
+
+/**
+ * The maximum delay inside the USB task to wait for an event.
+ */
+#define USB_THREAD_MAX_BLOCK_TIME portMAX_DELAY
+
+/**
+ * @brief Enable power USB detection
+ *
+ * Configure if example supports USB port connection
+ */
+#ifndef USBD_POWER_DETECTION
+#define USBD_POWER_DETECTION true
+#endif
+
+/**
+ * @brief SD card enable/disable
+ */
+#define USE_SD_CARD       1
+
+static void cdc_acm_user_ev_handler(app_usbd_class_inst_t const * p_inst,
+                                    app_usbd_cdc_acm_user_event_t event);
+
+#define CDC_ACM_COMM_INTERFACE  1
+#define CDC_ACM_COMM_EPIN       NRF_DRV_USBD_EPIN2
+
+#define CDC_ACM_DATA_INTERFACE  2
+#define CDC_ACM_DATA_EPIN       NRF_DRV_USBD_EPIN1
+#define CDC_ACM_DATA_EPOUT      NRF_DRV_USBD_EPOUT1
+
+#define CDC_DATA_LEN 64
+static char m_cdc_data_array[CDC_DATA_LEN];
+
+
+/**
+ * @brief CDC_ACM class instance
+ * */
+APP_USBD_CDC_ACM_GLOBAL_DEF(m_app_cdc_acm,
+                            cdc_acm_user_ev_handler,
+                            CDC_ACM_COMM_INTERFACE,
+                            CDC_ACM_DATA_INTERFACE,
+                            CDC_ACM_COMM_EPIN,
+                            CDC_ACM_DATA_EPIN,
+                            CDC_ACM_DATA_EPOUT,
+                            APP_USBD_CDC_COMM_PROTOCOL_AT_V250);
+
+
+
+static char m_rx_buffer[NRF_DRV_USBD_EPSIZE];
+static char m_tx_buffer[NRF_DRV_USBD_EPSIZE];
+static bool m_send_flag = 0;
+
+/**
+ * @brief Mass storage class user event handler
+ */
+static void msc_user_ev_handler(app_usbd_class_inst_t const * p_inst,
+                                app_usbd_msc_user_event_t     event);
+
+// REMOVE BEFORE TESTING
+/* SDC block device definition */
+NRF_BLOCK_DEV_SDC_DEFINE(
+        m_block_dev_sdc,
+        NRF_BLOCK_DEV_SDC_CONFIG(
+                SDC_SECTOR_SIZE,
+                APP_SDCARD_CONFIG(SPI_MOSI_PIN, SPI_MISO_PIN, SPI_SCK_PIN, SPI_SD_SS_PIN)
+         ),
+         NFR_BLOCK_DEV_INFO_CONFIG("NAATOS", "SDC", "1.00")
+);
+
+/**
+ * @brief Block devices list passed to @ref APP_USBD_MSC_GLOBAL_DEF
+ */
+#define BLOCKDEV_LIST() (                                   \
+    NRF_BLOCKDEV_BASE_ADDR(m_block_dev_sdc, block_dev)      \
+)
+
+/**
+ * @brief Endpoint list passed to @ref APP_USBD_MSC_GLOBAL_DEF
+ */
+#define ENDPOINT_LIST() APP_USBD_MSC_ENDPOINT_LIST(3, 3)
+
+/**
+ * @brief Mass storage class work buffer size
+ */
+#define MSC_WORKBUFFER_SIZE (1024)
+
+/*lint -save -e26 -e64 -e123 -e505 -e651*/
+/**
+ * @brief Mass storage class instance
+ */
+APP_USBD_MSC_GLOBAL_DEF(m_app_msc,
+                        0,
+                        msc_user_ev_handler,
+                        ENDPOINT_LIST(),
+                        BLOCKDEV_LIST(),
+                        MSC_WORKBUFFER_SIZE);
+
+/*lint -restore*/
+
+/**
+ * @brief  USB connection status
+ */
+static bool m_usb_connected = false;
+
+/**
+ * @brief Class specific event handler.
+ *
+ * @param p_inst    Class instance.
+ * @param event     Class specific event.
+ */
+static void msc_user_ev_handler(app_usbd_class_inst_t const * p_inst,
+                                app_usbd_msc_user_event_t     event)
+{
+    UNUSED_PARAMETER(p_inst);
+    UNUSED_PARAMETER(event);
+}
+
+/** @brief User event handler @ref app_usbd_cdc_acm_user_ev_handler_t */
+static void cdc_acm_user_ev_handler(app_usbd_class_inst_t const * p_inst,
+                                    app_usbd_cdc_acm_user_event_t event)
+{
+    app_usbd_cdc_acm_t const * p_cdc_acm = app_usbd_cdc_acm_class_get(p_inst);
+
+    switch (event)
+    {
+        case APP_USBD_CDC_ACM_USER_EVT_PORT_OPEN:
+        {
+            /*Set up the first transfer*/
+            ret_code_t ret = app_usbd_cdc_acm_read(&m_app_cdc_acm,
+                                                   m_cdc_data_array,
+                                                   1);
+            UNUSED_VARIABLE(ret);
+            NRF_LOG_INFO("CDC ACM port opened");
+            break;
+        }
+
+        case APP_USBD_CDC_ACM_USER_EVT_PORT_CLOSE:
+            NRF_LOG_INFO("CDC ACM port closed");
+            
+            break;
+
+        case APP_USBD_CDC_ACM_USER_EVT_TX_DONE:
+            break;
+
+        case APP_USBD_CDC_ACM_USER_EVT_RX_DONE:
+        {
+            ret_code_t ret;
+            static uint8_t index = 0;
+            index++;
+
+            do
+            {
+                if ((m_cdc_data_array[index - 1] == '\n') ||
+                    (m_cdc_data_array[index - 1] == '\r') ||
+                    (index >= (CDC_DATA_LEN)))
+                {
+                    if (index > 1)
+                    {
+                       
+                        NRF_LOG_HEXDUMP_DEBUG(m_cdc_data_array, index);
+
+
+                        uint16_t length = (uint16_t)index;
+                        if (length + sizeof(ENDLINE_STRING) < CDC_DATA_LEN)
+                        {
+                            memcpy(m_cdc_data_array + length, ENDLINE_STRING, sizeof(ENDLINE_STRING));
+                            length += sizeof(ENDLINE_STRING);
+                        }
+
+                    }
+
+                    index = 0;
+                }
+
+                /*Get amount of data transferred*/
+                size_t size = app_usbd_cdc_acm_rx_size(p_cdc_acm);
+                NRF_LOG_DEBUG("RX: size: %lu char: %c", size, m_cdc_data_array[index - 1]);
+
+                /* Fetch data until internal buffer is empty */
+                ret = app_usbd_cdc_acm_read(&m_app_cdc_acm,
+                                            &m_cdc_data_array[index],
+                                            1);
+                if (ret == NRF_SUCCESS)
+                {
+                    index++;
+                }
+            }
+            while (ret == NRF_SUCCESS);
+
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+
+/**
+ * @brief USBD library specific event handler.
+ *
+ * @param event     USBD library event.
+ */
+static void usbd_user_ev_handler(app_usbd_event_type_t event)
+{
+    switch (event)
+    {
+        case APP_USBD_EVT_DRV_SUSPEND:
+            
+            break;
+        case APP_USBD_EVT_DRV_RESUME:
+            
+            break;
+        case APP_USBD_EVT_STARTED:
+            
+            break;
+        case APP_USBD_EVT_STOPPED:
+            //UNUSED_RETURN_VALUE(sd_card_mount());
+            app_usbd_disable();
+            break;
+        case APP_USBD_EVT_POWER_DETECTED:
+            //NRF_LOG_INFO("USB power detected");
+
+            if (!nrf_drv_usbd_is_enabled())
+            {
+                //sd_card_unmount();
+                app_usbd_enable();
+            }
+            break;
+        case APP_USBD_EVT_POWER_REMOVED:
+            NRF_LOG_INFO("USB power removed");
+            app_usbd_stop();
+            m_usb_connected = false;
+            break;
+        case APP_USBD_EVT_POWER_READY:
+            NRF_LOG_INFO("USB ready");
+            app_usbd_start();
+            m_usb_connected = true;
+            break;
+        default:
+            break;
+    }
+}
+
+void usb_new_event_isr_handler(app_usbd_internal_evt_t const * const p_event, bool queued)
+{
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    UNUSED_PARAMETER(p_event);
+    UNUSED_PARAMETER(queued);
+    /* Release the semaphore */
+    vTaskNotifyGiveFromISR(usbTaskHandle, &xHigherPriorityTaskWoken);
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
 
 xQueueHandle usb_stateChangeQueue;
 
 usb_message_t recv_msg;
 charge_state_t connection_state;
 main_state_t main_state;
+
 
 void usb_task(void * pvParameters) {
   BaseType_t xReturned;
@@ -23,7 +294,47 @@ void usb_task(void * pvParameters) {
   // Set connection state to not charging
   connection_state = NOT_CHARGING;
 
+  ret_code_t ret;
+  static const app_usbd_config_t usbd_config = {
+      .ev_isr_handler = usb_new_event_isr_handler,
+      .ev_state_proc = usbd_user_ev_handler
+  };
+
+  app_usbd_serial_num_generate();
+
+  ret = nrf_drv_power_init(NULL);
+  APP_ERROR_CHECK(ret);
+  
+  ret = app_usbd_init(&usbd_config);
+  APP_ERROR_CHECK(ret);
+
+  
+
+  
+  app_usbd_class_inst_t const * class_cdc_acm = app_usbd_cdc_acm_class_inst_get(&m_app_cdc_acm);
+  ret = app_usbd_class_append(class_cdc_acm);
+  APP_ERROR_CHECK(ret);
+  /*
+  app_usbd_class_inst_t const * class_inst_msc = app_usbd_msc_class_inst_get(&m_app_msc);
+  ret = app_usbd_class_append(class_inst_msc);
+  APP_ERROR_CHECK(ret);
+  */
+
+  ret = app_usbd_power_events_enable();
+  APP_ERROR_CHECK(ret);
+  
+  // Set the first event to make sure that USB queue is processed after it is started
+  UNUSED_RETURN_VALUE(xTaskNotifyGive(xTaskGetCurrentTaskHandle()));
   for (;;) {
+
+    /* Waiting for event */
+    UNUSED_RETURN_VALUE(ulTaskNotifyTake(pdTRUE, USB_THREAD_MAX_BLOCK_TIME));
+    while (app_usbd_event_queue_process())
+    {
+    
+    }
+    
+
     // Check the USB queue for an update message
     xReturned = xQueueReceive(usb_stateChangeQueue, &recv_msg, portMAX_DELAY);
     if (xReturned != pdPASS) {

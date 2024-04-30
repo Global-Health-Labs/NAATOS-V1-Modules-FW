@@ -148,6 +148,11 @@ void end_amplification_zone(void);
 void begin_valve_zone(void);
 void end_valve_zone(void);
 
+xTaskHandle get_usb_task_handle(void)
+{
+    return usbTaskHandle;
+}
+
 /*********************************************************************
 *
 *       main_task()
@@ -439,7 +444,7 @@ void create_tasks() {
       vTaskDelete( batteryTaskHandle );
   }
   // USB Management Task
-  xReturned = xTaskCreate(usb_task, "USBTask", 100, NULL, 0, &usbTaskHandle);
+  xReturned = xTaskCreate(usb_task, "USBTask", 300, NULL, 2, &usbTaskHandle);
   if( xReturned != pdPASS ) {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating usb management task. Error: %d\n", xReturned);
@@ -519,6 +524,14 @@ int main(void) {
   // Initialize clock driver for better time accuracy in FREERTOS
   err_code = nrf_drv_clock_init();
   APP_ERROR_CHECK(err_code);
+
+  nrf_drv_clock_lfclk_request(NULL);
+
+  while(!nrf_drv_clock_lfclk_is_running())
+  {
+      /* Just waiting */
+  }
+
 
   // Full Peripheral Initalizations
   init_adc();             // ADC

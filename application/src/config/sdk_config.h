@@ -92,7 +92,7 @@
 // <196609=> External Full Swing 
 
 #ifndef NRFX_CLOCK_CONFIG_LF_SRC
-#define NRFX_CLOCK_CONFIG_LF_SRC 1
+#define NRFX_CLOCK_CONFIG_LF_SRC 0
 #endif
 
 // <o> NRFX_CLOCK_CONFIG_IRQ_PRIORITY  - Interrupt priority
@@ -1645,6 +1645,140 @@
 #endif
 
 // </e>
+
+//==========================================================
+
+// <h> app_usbd_cdc_acm - USB CDC ACM class
+
+//==========================================================
+// <q> APP_USBD_CDC_ACM_ENABLED  - Enabling USBD CDC ACM Class library
+ 
+
+#ifndef APP_USBD_CDC_ACM_ENABLED
+#define APP_USBD_CDC_ACM_ENABLED 1
+#endif
+
+// <q> APP_USBD_CDC_ACM_ZLP_ON_EPSIZE_WRITE  - Send ZLP on write with same size as endpoint
+ 
+
+// <i> If enabled, CDC ACM class will automatically send a zero length packet after transfer which has the same size as endpoint.
+// <i> This may limit throughput if a lot of binary data is sent, but in terminal mode operation it makes sure that the data is always displayed right after it is sent.
+
+#ifndef APP_USBD_CDC_ACM_ZLP_ON_EPSIZE_WRITE
+#define APP_USBD_CDC_ACM_ZLP_ON_EPSIZE_WRITE 1
+#endif
+
+// </h> 
+
+// </h> 
+//==========================================================
+
+// <h> nrf_cli - Command line interface
+
+//==========================================================
+// <q> NRF_CLI_ENABLED  - Enable/disable the CLI module.
+ 
+
+#ifndef NRF_CLI_ENABLED
+#define NRF_CLI_ENABLED 1
+#endif
+
+// <o> NRF_CLI_ARGC_MAX - Maximum number of parameters passed to the command handler. 
+#ifndef NRF_CLI_ARGC_MAX
+#define NRF_CLI_ARGC_MAX 12
+#endif
+
+// <q> NRF_CLI_BUILD_IN_CMDS_ENABLED  - CLI built-in commands.
+ 
+
+#ifndef NRF_CLI_BUILD_IN_CMDS_ENABLED
+#define NRF_CLI_BUILD_IN_CMDS_ENABLED 1
+#endif
+
+// <o> NRF_CLI_CMD_BUFF_SIZE - Maximum buffer size for a single command. 
+#ifndef NRF_CLI_CMD_BUFF_SIZE
+#define NRF_CLI_CMD_BUFF_SIZE 128
+#endif
+
+// <q> NRF_CLI_ECHO_STATUS  - CLI echo status. If set, echo is ON.
+ 
+
+#ifndef NRF_CLI_ECHO_STATUS
+#define NRF_CLI_ECHO_STATUS 1
+#endif
+
+// <q> NRF_CLI_WILDCARD_ENABLED  - Enable wildcard functionality for CLI commands.
+ 
+
+#ifndef NRF_CLI_WILDCARD_ENABLED
+#define NRF_CLI_WILDCARD_ENABLED 0
+#endif
+
+// <q> NRF_CLI_METAKEYS_ENABLED  - Enable additional control keys for CLI commands like ctrl+a, ctrl+e, ctrl+w, ctrl+u
+ 
+
+#ifndef NRF_CLI_METAKEYS_ENABLED
+#define NRF_CLI_METAKEYS_ENABLED 0
+#endif
+
+// <o> NRF_CLI_PRINTF_BUFF_SIZE - Maximum print buffer size. 
+#ifndef NRF_CLI_PRINTF_BUFF_SIZE
+#define NRF_CLI_PRINTF_BUFF_SIZE 23
+#endif
+
+// <e> NRF_CLI_HISTORY_ENABLED - Enable CLI history mode.
+//==========================================================
+#ifndef NRF_CLI_HISTORY_ENABLED
+#define NRF_CLI_HISTORY_ENABLED 1
+#endif
+// <o> NRF_CLI_HISTORY_ELEMENT_SIZE - Size of one memory object reserved for CLI history. 
+#ifndef NRF_CLI_HISTORY_ELEMENT_SIZE
+#define NRF_CLI_HISTORY_ELEMENT_SIZE 32
+#endif
+
+// <o> NRF_CLI_HISTORY_ELEMENT_COUNT - Number of history memory objects. 
+#ifndef NRF_CLI_HISTORY_ELEMENT_COUNT
+#define NRF_CLI_HISTORY_ELEMENT_COUNT 8
+#endif
+
+// </e>
+
+// <q> NRF_CLI_VT100_COLORS_ENABLED  - CLI VT100 colors.
+ 
+
+#ifndef NRF_CLI_VT100_COLORS_ENABLED
+#define NRF_CLI_VT100_COLORS_ENABLED 1
+#endif
+
+// <q> NRF_CLI_STATISTICS_ENABLED  - Enable CLI statistics.
+ 
+
+#ifndef NRF_CLI_STATISTICS_ENABLED
+#define NRF_CLI_STATISTICS_ENABLED 1
+#endif
+
+// <q> NRF_CLI_LOG_BACKEND  - Enable logger backend interface.
+ 
+
+#ifndef NRF_CLI_LOG_BACKEND
+#define NRF_CLI_LOG_BACKEND 1
+#endif
+
+// <q> NRF_CLI_USES_TASK_MANAGER_ENABLED  - Enable CLI to use task_manager
+ 
+
+#ifndef NRF_CLI_USES_TASK_MANAGER_ENABLED
+#define NRF_CLI_USES_TASK_MANAGER_ENABLED 0
+#endif
+
+// </h> 
+
+// <q> NRF_CLI_UART_ENABLED  - nrf_cli_uart - UART command line interface transport
+ 
+
+#ifndef NRF_CLI_UART_ENABLED
+#define NRF_CLI_UART_ENABLED 1
+#endif
 
 // <e> NRF_CLOCK_ENABLED - nrf_drv_clock - CLOCK peripheral driver - legacy layer
 //==========================================================
