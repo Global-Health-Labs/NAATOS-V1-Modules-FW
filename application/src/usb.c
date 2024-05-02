@@ -41,9 +41,9 @@
 #define USE_SD_CARD       1
 
 // CDC ACM Defines
-#define CDC_ACM_COMM_INTERFACE  1
+#define CDC_ACM_COMM_INTERFACE  0
 #define CDC_ACM_COMM_EPIN       NRF_DRV_USBD_EPIN2
-#define CDC_ACM_DATA_INTERFACE  2
+#define CDC_ACM_DATA_INTERFACE  1
 #define CDC_ACM_DATA_EPIN       NRF_DRV_USBD_EPIN1
 #define CDC_ACM_DATA_EPOUT      NRF_DRV_USBD_EPOUT1
 #define CDC_DATA_LEN 64
@@ -114,12 +114,12 @@ static void cdc_acm_user_ev_handler(app_usbd_class_inst_t const * p_inst,
                                                    m_cdc_data_array,
                                                    1);
             UNUSED_VARIABLE(ret);
-            NRF_LOG_INFO("CDC ACM port opened");
+            printf("CDC ACM port opened");
             break;
         }
 
         case APP_USBD_CDC_ACM_USER_EVT_PORT_CLOSE:
-            NRF_LOG_INFO("CDC ACM port closed");
+            printf("CDC ACM port closed");
             
             break;
 
@@ -149,7 +149,7 @@ static void cdc_acm_user_ev_handler(app_usbd_class_inst_t const * p_inst,
 
                 /*Get amount of data transferred*/
                 size_t size = app_usbd_cdc_acm_rx_size(p_cdc_acm);
-                NRF_LOG_DEBUG("RX: size: %lu char: %c", size, m_cdc_data_array[index - 1]);
+                printf("RX: size: %lu char: %c", size, m_cdc_data_array[index - 1]);
 
                 /* Fetch data until internal buffer is empty */
                 ret = app_usbd_cdc_acm_read(&m_app_cdc_acm,
@@ -173,36 +173,26 @@ static void usbd_user_ev_handler(app_usbd_event_type_t event)
 {
     switch (event) {
         case APP_USBD_EVT_DRV_SUSPEND:
-            
+            printf("USB Event: APP_USBD_EVT_DRV_SUSPEND\n");
             break;
         case APP_USBD_EVT_DRV_RESUME:
-            
+            printf("USB Event: APP_USBD_EVT_DRV_RESUME\n");
             break;
         case APP_USBD_EVT_STARTED:
-            
+            printf("USB Event: APP_USBD_EVT_STARTED\n");
             break;
         case APP_USBD_EVT_STOPPED:
-            //UNUSED_RETURN_VALUE(sd_card_mount());
-            app_usbd_disable();
+            printf("USB Event: APP_USBD_EVT_STOPPED\n");
             break;
-            /*
         case APP_USBD_EVT_POWER_DETECTED:
-            printf("USB power detected.\n");
-            if (!nrf_drv_usbd_is_enabled()) {
-                app_usbd_enable();
-            }
+            printf("USB Event: APP_USBD_EVT_POWER_DETECTED\n");
             break;
         case APP_USBD_EVT_POWER_REMOVED:
-            printf("USB power removed.\n");
-            app_usbd_stop();
-            m_usb_connected = false;
+            printf("USB Event: APP_USBD_EVT_POWER_REMOVED\n");
             break;
         case APP_USBD_EVT_POWER_READY:
-            printf("USB ready.\n");
-            app_usbd_start();
-            m_usb_connected = true;
+            printf("USB Event: APP_USBD_EVT_POWER_READY\n");
             break;
-            */
         default:
             break;
     }
@@ -257,9 +247,16 @@ static void usb_start(void) {
     static const nrf_drv_power_usbevt_config_t config = {
         .handler = power_usb_event_handler
     };
+    
+    //ret = nrf_drv_power_usbevt_init(&config);
+    //APP_ERROR_CHECK(ret);
 
-    ret = nrf_drv_power_usbevt_init(&config);
+    ret = app_usbd_power_events_enable();
     APP_ERROR_CHECK(ret);
+
+    app_usbd_enable();
+    app_usbd_start();
+    m_usb_connected = true;
   }
   else {
     printf("No USB power detection enabled\r\nStarting USB now\r\n");
@@ -282,7 +279,7 @@ void usb_task(void * pvParameters) {
 
   ret_code_t ret;
   static const app_usbd_config_t usbd_config = {
-      .ev_isr_handler = usb_new_event_isr_handler,
+      //.ev_isr_handler = usb_new_event_isr_handler,
       .ev_state_proc = usbd_user_ev_handler
   };
 
@@ -304,19 +301,19 @@ void usb_task(void * pvParameters) {
   
   usb_start();
 
-  //ret = app_usbd_power_events_enable();
-  //APP_ERROR_CHECK(ret);
-  
+
   // Set the first event to make sure that USB queue is processed after it is started
-  UNUSED_RETURN_VALUE(xTaskNotifyGive(xTaskGetCurrentTaskHandle()));
+  //UNUSED_RETURN_VALUE(xTaskNotifyGive(xTaskGetCurrentTaskHandle()));
   for (;;) {
 
     /* Waiting for event */
-    UNUSED_RETURN_VALUE(ulTaskNotifyTake(pdTRUE, USB_THREAD_MAX_BLOCK_TIME));
+    //UNUSED_RETURN_VALUE(ulTaskNotifyTake(pdTRUE, USB_THREAD_MAX_BLOCK_TIME));
     while (app_usbd_event_queue_process())
     {
       
     }
+
+    //ret = app_usbd_cdc_acm_write(&m_app_cdc_acm, "HELLO", 6);
     
 
     // Check the USB queue for an update message
