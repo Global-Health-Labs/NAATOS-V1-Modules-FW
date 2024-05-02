@@ -6,5 +6,6 @@
 #include "task.h"
 #include "FreeRTOS.h"
 #include "queue.h"
+#include "sd_card.h"
 
 void usb_task(void * pvParameters);

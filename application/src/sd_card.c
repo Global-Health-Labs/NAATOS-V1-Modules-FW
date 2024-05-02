@@ -1,15 +1,5 @@
 #include "sd_card.h"
 
-/* SDC block device definition */
-NRF_BLOCK_DEV_SDC_DEFINE(
-        m_block_dev_sdc,
-        NRF_BLOCK_DEV_SDC_CONFIG(
-                SDC_SECTOR_SIZE,
-                APP_SDCARD_CONFIG(SPI_MOSI_PIN, SPI_MISO_PIN, SPI_SCK_PIN, SPI_SD_SS_PIN)
-         ),
-         NFR_BLOCK_DEV_INFO_CONFIG("NAATOS", "SDC", "1.00")
-);
-
 /* SD Card Variables */
 static FATFS fs;
 static DIR dir;

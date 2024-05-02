@@ -19,6 +19,20 @@
 #define CSV_HEADER        "Time,ValveTemp,Amp0Temp,Amp1Temp,Amp2Temp,Batt,Event\n"
 #define CSV_HEADER_SIZE   53
 
+/* SDC block device definition */
+NRF_BLOCK_DEV_SDC_DEFINE(
+        m_block_dev_sdc,
+        NRF_BLOCK_DEV_SDC_CONFIG(
+                SDC_SECTOR_SIZE,
+                APP_SDCARD_CONFIG(SPI_MOSI_PIN, SPI_MISO_PIN, SPI_SCK_PIN, SPI_SD_SS_PIN)
+         ),
+         NFR_BLOCK_DEV_INFO_CONFIG("NAATOS", "SDC", "1.00")
+);
+
+#define BLOCKDEV_LIST() (                                   \
+    NRF_BLOCKDEV_BASE_ADDR(m_block_dev_sdc, block_dev)      \
+)
+
 typedef struct {
   bool log_dir_needed;
   bool config_dir_needed;

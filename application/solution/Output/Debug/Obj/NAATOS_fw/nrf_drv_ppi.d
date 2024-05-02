@@ -1,13 +1,13 @@
 Output/Debug/Obj/NAATOS_fw/nrf_drv_ppi.o: \
- C\:\Nordic\NAATOS_fw_src\application\sdk\integration\nrfx\legacy\nrf_drv_ppi.c \
- C\:\Nordic\NAATOS_fw_src\application\sdk\integration\nrfx\legacy\nrf_drv_ppi.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\integration\nrfx\legacy\nrf_drv_ppi.c \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\integration\nrfx\legacy\nrf_drv_ppi.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_ppi.h \
  ../sdk/modules/nrfx/nrfx.h ../sdk/integration/nrfx/nrfx_config.h \
  ../src/config/sdk_config.h ../sdk/modules/nrfx/drivers/nrfx_common.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stddef.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stddef.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdbool.h \
  ../sdk/modules/nrfx/mdk/nrf.h ../sdk/modules/nrfx/mdk/nrf52840.h \
  ../sdk/components/toolchain/cmsis/include/core_cm4.h \
  ../sdk/components/toolchain/cmsis/include/cmsis_version.h \
@@ -33,7 +33,7 @@ Output/Debug/Obj/NAATOS_fw/nrf_drv_ppi.o: \
  ../sdk/components/libraries/util/app_util_platform.h \
  ../sdk/components/libraries/util/nrf_assert.h \
  ../sdk/components/libraries/util/app_error.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdio.h \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../sdk/components/libraries/util/app_error_weak.h \
