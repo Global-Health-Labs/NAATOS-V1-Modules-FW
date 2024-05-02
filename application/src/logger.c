@@ -42,8 +42,11 @@ void logger_task(void * pvParameters) {
   FRESULT res;
   bool run_stopped = false;
 
-  // TODO: Get the configuration settings 
-  // TODO: Check the log rate (if its less than 1 set to UART Logging only)
+  // If logging rate is less than once a second, do UART only
+  if (config.logging_rate < 1.0) {
+    uart_only = true;
+  }
+
   for (;;) {
     run_stopped = false;
     // Wait for running state from main task update (blocking)

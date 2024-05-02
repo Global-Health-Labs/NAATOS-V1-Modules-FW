@@ -370,7 +370,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
   char configBuffer[50];
   FRESULT res;
   char * pch;
-  char * val;
+  char * val = (char *)malloc(50 * sizeof(char));
 
   // Re-Mount SD Card
   res = sd_card_mount();
@@ -395,7 +395,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
     // Return that it already exists  
     return res; 
   }
-  
+
   // Set the struct
   for (int i = 0; i < NUM_PARAMETERS; i ++) {
     pch = f_gets(configBuffer, 50, &file);
@@ -471,5 +471,20 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
             break;
     }
   }
+
+  // Close the file
+  res = f_close(&file);
+  if (res != FR_OK) {
+      return res;
+  }
+
+  // Change back directories
+  res = f_chdir("..");
+  if (res != FR_OK) {
+      return res;
+  }
+
+  free(val);
+
   return FR_OK;
 }

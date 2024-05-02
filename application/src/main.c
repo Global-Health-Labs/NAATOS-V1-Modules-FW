@@ -142,7 +142,27 @@ const usb_message_t running_update = {
 };
 
 // Configuration Parameters
-naatos_config_parameters config;
+naatos_config_parameters config = {
+  .logging_rate = 0,
+  .sample_rate = 0,
+  .amplification_zone_run_time_m = 0,
+  .valve_zone_run_time_m = 0,
+  .low_power_threshold = 0,
+  .valve_setpoint = 0,
+  .amplification_setpoint = 0,
+  .valve_kp = 0,
+  .valve_ki = 0, 
+  .valve_kp = 0,
+  .amp0_kp = 0,
+  .amp0_ki = 0,
+  .amp0_kd = 0,
+  .amp1_kp = 0,
+  .amp1_ki = 0,
+  .amp1_kd = 0,
+  .amp2_kp = 0,
+  .amp2_ki = 0,
+  .amp2_kd = 0
+};
 bool use_default_configuration_parameters;
 
 // Function defs
@@ -316,6 +336,12 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   else if (new_state == STANDBY)
     msg = standby_update;
 
+  // Send the state to the logger
+  xReturned = xQueueSend(logger_mainStateChangeQueue, &new_state, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send main state change to logger_mainStateChangeQueue.\n");
+  }
+
   // Send the state to the battery task
   xReturned = xQueueSend(battery_mainStateQueue, &new_state, 0);
   if (xReturned != pdPASS) {
@@ -328,12 +354,6 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
     printf("MAIN_TASK: Unable to send main state change to usb_stateChangeQueue.\n");
   }
 
-  // Send the state to the logger
-  xReturned = xQueueSend(logger_mainStateChangeQueue, &new_state, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send main state change to logger_mainStateChangeQueue.\n");
-  }
-  
   // Send the state to the sensor task
   xReturned = xQueueSend(sensor_mainStateQueue, &new_state, 0);
   if (xReturned != pdPASS) {
