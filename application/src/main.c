@@ -545,9 +545,6 @@ int main(void) {
       // Just waiting
   }
 
-  // Start the USB
-  start_usb();
-
   // Full Peripheral Initalizations
   init_adc();             // ADC
   init_sensors_gpios();   // Sensor GPIOs
@@ -560,8 +557,6 @@ int main(void) {
 
   // Create Queues
   create_queues();
-
-  
 
   // Start Tasks
   vTaskStartScheduler();

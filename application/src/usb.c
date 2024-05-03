@@ -98,12 +98,15 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
     switch (event)
     {
         case APP_USBD_EVT_DRV_SUSPEND:
-            //bsp_board_led_off(LED_USB_RESUME);
+            printf("USB suspended\n");
+            //usb_started = true;
             break;
         case APP_USBD_EVT_DRV_RESUME:
             //bsp_board_led_on(LED_USB_RESUME);
             break;
         case APP_USBD_EVT_STARTED:
+            printf("USB started\n");
+            app_usbd_suspend_req();
             break;
         case APP_USBD_EVT_STOPPED:
             app_usbd_disable();
@@ -124,7 +127,6 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
         case APP_USBD_EVT_POWER_READY:
             printf("USB ready\n");
             app_usbd_start();
-            //usb_started = true;
             break;
         default:
             break;
@@ -218,6 +220,9 @@ void usb_task(void * pvParameters) {
   main_state = STANDBY;
   // Set connection state to not charging
   connection_state = NOT_CHARGING;
+
+  // Start the USB
+  start_usb();
 
   // Set the first event to make sure that USB queue is processed after it is started
   //UNUSED_RETURN_VALUE(xTaskNotifyGive(xTaskGetCurrentTaskHandle()));
