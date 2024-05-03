@@ -136,7 +136,9 @@
       <file file_name="../src/sensors.c" />
       <file file_name="../src/sensors.h" />
       <file file_name="../src/states.h" />
-      <file file_name="../src/usb.c" />
+      <file file_name="../src/usb.c">
+        <configuration Name="Debug" build_exclude_from_build="No" />
+      </file>
       <file file_name="../src/usb.h" />
       <file file_name="../src/naatos_queues.h" />
       <file file_name="../src/naatos_config.h" />

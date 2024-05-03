@@ -43,10 +43,12 @@
 // CDC ACM Defines
 #define CDC_ACM_COMM_INTERFACE  0
 #define CDC_ACM_COMM_EPIN       NRF_DRV_USBD_EPIN2
+
 #define CDC_ACM_DATA_INTERFACE  1
 #define CDC_ACM_DATA_EPIN       NRF_DRV_USBD_EPIN1
 #define CDC_ACM_DATA_EPOUT      NRF_DRV_USBD_EPOUT1
-#define CDC_DATA_LEN 64
+
+#define READ_SIZE 1
 
 // Endpoint list passed to APP_USBD_MSC_GLOBAL_DEF
 #define ENDPOINT_LIST() APP_USBD_MSC_ENDPOINT_LIST(3, 3)
@@ -66,6 +68,7 @@ static void msc_user_ev_handler(app_usbd_class_inst_t const * p_inst,
 /* ***** Instances ***** */
 
 // CDC_ACM class instance
+/*
 APP_USBD_CDC_ACM_GLOBAL_DEF(m_app_cdc_acm,
                             cdc_acm_user_ev_handler,
                             CDC_ACM_COMM_INTERFACE,
@@ -73,8 +76,9 @@ APP_USBD_CDC_ACM_GLOBAL_DEF(m_app_cdc_acm,
                             CDC_ACM_COMM_EPIN,
                             CDC_ACM_DATA_EPIN,
                             CDC_ACM_DATA_EPOUT,
-                            APP_USBD_CDC_COMM_PROTOCOL_AT_V250);
-
+                            APP_USBD_CDC_COMM_PROTOCOL_AT_V250
+);
+*/
 // Mass storage class instance
 APP_USBD_MSC_GLOBAL_DEF(m_app_msc,
                         0,
@@ -87,8 +91,7 @@ APP_USBD_MSC_GLOBAL_DEF(m_app_msc,
 /* ***** Variables ***** */
 
 // CDC ACM Variables
-static char m_cdc_data_array[CDC_DATA_LEN];
-static char m_rx_buffer[NRF_DRV_USBD_EPSIZE];
+static char m_rx_buffer[READ_SIZE];
 static char m_tx_buffer[NRF_DRV_USBD_EPSIZE];
 static bool m_send_flag = 0;
 // USB connection status
@@ -100,103 +103,98 @@ usb_message_t recv_msg;
 charge_state_t connection_state;
 main_state_t main_state;
 
+bool usb_started = false;
+
 // User event handler -- app_usbd_cdc_acm_user_ev_handler_t 
+/*
 static void cdc_acm_user_ev_handler(app_usbd_class_inst_t const * p_inst,
                                     app_usbd_cdc_acm_user_event_t event)
 {
     app_usbd_cdc_acm_t const * p_cdc_acm = app_usbd_cdc_acm_class_get(p_inst);
 
-    switch (event)  {
+    switch (event)
+    {
         case APP_USBD_CDC_ACM_USER_EVT_PORT_OPEN:
         {
-            /*Set up the first transfer*/
+            //bsp_board_led_on(LED_CDC_ACM_OPEN);
+
+            //Setup first transfer
             ret_code_t ret = app_usbd_cdc_acm_read(&m_app_cdc_acm,
-                                                   m_cdc_data_array,
-                                                   1);
+                                                   m_rx_buffer,
+                                                   READ_SIZE);
             UNUSED_VARIABLE(ret);
-            printf("CDC ACM port opened");
             break;
         }
-
         case APP_USBD_CDC_ACM_USER_EVT_PORT_CLOSE:
-            printf("CDC ACM port closed");
-            
+            //bsp_board_led_off(LED_CDC_ACM_OPEN);
             break;
-
         case APP_USBD_CDC_ACM_USER_EVT_TX_DONE:
+            //bsp_board_led_invert(LED_CDC_ACM_TX);
             break;
-
         case APP_USBD_CDC_ACM_USER_EVT_RX_DONE:
         {
             ret_code_t ret;
-            static uint8_t index = 0;
-            index++;
-
-            do {
-                if ((m_cdc_data_array[index - 1] == '\n') ||
-                    (m_cdc_data_array[index - 1] == '\r') ||
-                    (index >= (CDC_DATA_LEN))) {
-                    if (index > 1) {
-                        NRF_LOG_HEXDUMP_DEBUG(m_cdc_data_array, index);
-                        uint16_t length = (uint16_t)index;
-                        if (length + sizeof(ENDLINE_STRING) < CDC_DATA_LEN) {
-                            memcpy(m_cdc_data_array + length, ENDLINE_STRING, sizeof(ENDLINE_STRING));
-                            length += sizeof(ENDLINE_STRING);
-                        }
-                    }
-                    index = 0;
-                }
-
-                /*Get amount of data transferred*/
+            printf("Bytes waiting: %d", app_usbd_cdc_acm_bytes_stored(p_cdc_acm));
+            do
+            {
+                //Get amount of data transfered
                 size_t size = app_usbd_cdc_acm_rx_size(p_cdc_acm);
-                printf("RX: size: %lu char: %c", size, m_cdc_data_array[index - 1]);
+                printf("RX: size: %lu char: %c", size, m_rx_buffer[0]);
 
-                /* Fetch data until internal buffer is empty */
+                // Fetch data until internal buffer is empty 
                 ret = app_usbd_cdc_acm_read(&m_app_cdc_acm,
-                                            &m_cdc_data_array[index],
-                                            1);
-                if (ret == NRF_SUCCESS) {
-                    index++;
-                }
-            }
-            while (ret == NRF_SUCCESS);
+                                            m_rx_buffer,
+                                            READ_SIZE);
+            } while (ret == NRF_SUCCESS);
 
+            //bsp_board_led_invert(LED_CDC_ACM_RX);
             break;
         }
         default:
             break;
     }
 }
+*/
 
 // USBD library specific event handler.
+/*
 static void usbd_user_ev_handler(app_usbd_event_type_t event)
 {
-    switch (event) {
+    switch (event)
+    {
         case APP_USBD_EVT_DRV_SUSPEND:
-            printf("USB Event: APP_USBD_EVT_DRV_SUSPEND\n");
+            //bsp_board_led_off(LED_USB_RESUME);
             break;
         case APP_USBD_EVT_DRV_RESUME:
-            printf("USB Event: APP_USBD_EVT_DRV_RESUME\n");
+            //bsp_board_led_on(LED_USB_RESUME);
             break;
         case APP_USBD_EVT_STARTED:
-            printf("USB Event: APP_USBD_EVT_STARTED\n");
             break;
         case APP_USBD_EVT_STOPPED:
-            printf("USB Event: APP_USBD_EVT_STOPPED\n");
+            app_usbd_disable();
             break;
         case APP_USBD_EVT_POWER_DETECTED:
-            printf("USB Event: APP_USBD_EVT_POWER_DETECTED\n");
+            printf("USB power detected\n");
+
+            if (!nrf_drv_usbd_is_enabled())
+            {
+                app_usbd_enable();
+            }
             break;
         case APP_USBD_EVT_POWER_REMOVED:
-            printf("USB Event: APP_USBD_EVT_POWER_REMOVED\n");
+            printf("USB power removed");
+            app_usbd_stop();
             break;
         case APP_USBD_EVT_POWER_READY:
-            printf("USB Event: APP_USBD_EVT_POWER_READY\n");
+            printf("USB ready\n");
+            app_usbd_start();
+            usb_started = true;
             break;
         default:
             break;
     }
 }
+*/
 
 static void msc_user_ev_handler(app_usbd_class_inst_t const * p_inst,
                                 app_usbd_msc_user_event_t     event)
@@ -239,34 +237,46 @@ static void power_usb_event_handler(nrf_drv_power_usb_evt_t event)
             ASSERT(false);
     }
 }
-
-
-static void usb_start(void) {
+/*
+void usb_start(void) {
   ret_code_t ret;
-  if (USBD_POWER_DETECTION) {
-    static const nrf_drv_power_usbevt_config_t config = {
-        .handler = power_usb_event_handler
-    };
-    
-    //ret = nrf_drv_power_usbevt_init(&config);
-    //APP_ERROR_CHECK(ret);
+  static const app_usbd_config_t usbd_config = {
+      //.ev_isr_handler = usb_new_event_isr_handler,
+      .ev_state_proc = usbd_user_ev_handler
+  };
 
-    ret = app_usbd_power_events_enable();
-    APP_ERROR_CHECK(ret);
+  app_usbd_serial_num_generate();
+  
+  ret = app_usbd_init(&usbd_config);
+  APP_ERROR_CHECK(ret);
+  
+  app_usbd_class_inst_t const * class_cdc_acm = app_usbd_cdc_acm_class_inst_get(&m_app_cdc_acm);
+  ret = app_usbd_class_append(class_cdc_acm);
+  APP_ERROR_CHECK(ret);
+  
+  //app_usbd_class_inst_t const * class_inst_msc = app_usbd_msc_class_inst_get(&m_app_msc);
+  //ret = app_usbd_class_append(class_inst_msc);
+  //APP_ERROR_CHECK(ret);
 
-    app_usbd_enable();
-    app_usbd_start();
-    m_usb_connected = true;
+  if (USBD_POWER_DETECTION)
+  {
+      ret = app_usbd_power_events_enable();
+      APP_ERROR_CHECK(ret);
   }
-  else {
-    printf("No USB power detection enabled\r\nStarting USB now\r\n");
+  else
+  {
+      NRF_LOG_INFO("No USB power detection enabled\r\nStarting USB now");
 
-    app_usbd_enable();
-    app_usbd_start();
-    m_usb_connected = true;
+      app_usbd_enable();
+      app_usbd_start();
   }
+
+   while (app_usbd_event_queue_process())
+   {
+        // Nothing to do 
+   }
 }
-
+*/
 
 void usb_task(void * pvParameters) {
   BaseType_t xReturned;
@@ -276,31 +286,6 @@ void usb_task(void * pvParameters) {
   main_state = STANDBY;
   // Set connection state to not charging
   connection_state = NOT_CHARGING;
-
-  ret_code_t ret;
-  static const app_usbd_config_t usbd_config = {
-      //.ev_isr_handler = usb_new_event_isr_handler,
-      .ev_state_proc = usbd_user_ev_handler
-  };
-
-  app_usbd_serial_num_generate();
-
-  ret = nrf_drv_power_init(NULL);
-  APP_ERROR_CHECK(ret);
-  
-  ret = app_usbd_init(&usbd_config);
-  APP_ERROR_CHECK(ret);
-  
-  app_usbd_class_inst_t const * class_cdc_acm = app_usbd_cdc_acm_class_inst_get(&m_app_cdc_acm);
-  ret = app_usbd_class_append(class_cdc_acm);
-  APP_ERROR_CHECK(ret);
-  
-  app_usbd_class_inst_t const * class_inst_msc = app_usbd_msc_class_inst_get(&m_app_msc);
-  ret = app_usbd_class_append(class_inst_msc);
-  APP_ERROR_CHECK(ret);
-  
-  usb_start();
-
 
   // Set the first event to make sure that USB queue is processed after it is started
   //UNUSED_RETURN_VALUE(xTaskNotifyGive(xTaskGetCurrentTaskHandle()));

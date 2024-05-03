@@ -65,12 +65,12 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="33" y="500" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/main.c" selected="1" top="521" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="500" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/main.c" selected="1" top="467" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="34" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/naatos_config.h" selected="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="53" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/logger.c" selected="0" top="30" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="487" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/sd_card.c" selected="0" top="464" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="61" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/sd_card.h" selected="0" top="33" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="50" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../sdk/components/libraries/hardfault/nrf52/handler/hardfault_handler_gcc.c" selected="0" top="2" codecName=""/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="254" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/sd_card.c" selected="0" top="254" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="48" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/sd_card.h" selected="0" top="33" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="50" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../sdk/components/libraries/hardfault/nrf52/handler/hardfault_handler_gcc.c" selected="0" top="2" codecName="Default"/>
  </Files>
  <ARMCrossStudioWindow activeProject="NAATOS_fw" fileDialogDefaultFilter="*" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="C:/Nordic/NAATOS_fw_src/application/sdk/components/libraries/hardfault/nrf52/handler/hardfault_handler_gcc.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/components/libraries/timer/drv_rtc.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/portable/CMSIS/nrf52/port_cmsis.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/source/list.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/source/portable/MemMang/heap_4.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/source/queue.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/external/freertos/source/tasks.c&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/modules/nrfx/mdk/ses_startup_nrf52840.s&#xa;&#xa;C:/Nordic/NAATOS_fw_src/application/sdk/modules/nrfx/mdk/ses_startup_nrf_common.s&#xa;" fileDialogInitialDirectory="D:/NAATOS/Source Code/GHL-NAATOS/application/sdk/external/fatfs/src/option" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

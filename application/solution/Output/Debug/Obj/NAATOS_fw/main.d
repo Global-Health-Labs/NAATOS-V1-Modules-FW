@@ -120,4 +120,34 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/modules/nrfx/drivers/include/nrfx_spi.h \
  ../sdk/modules/nrfx/hal/nrf_spi.h \
  ../sdk/external/freertos/source/include/semphr.h \
- ../sdk/external/freertos/source/include/queue.h
+ ../sdk/external/freertos/source/include/queue.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_power.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_power.h \
+ ../sdk/modules/nrfx/hal/nrf_power.h \
+ ../sdk/components/libraries/usbd/app_usbd_core.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_usbd.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_usbd.h \
+ ../sdk/modules/nrfx/hal/nrf_usbd.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_usbd_errata.h \
+ ../sdk/modules/nrfx/drivers/include/../src/nrfx_usbd_errata.h \
+ ../sdk/modules/nrfx/mdk/nrf_erratas.h ../sdk/modules/nrfx/mdk/nrf.h \
+ ../sdk/modules/nrfx/mdk/nrf51_erratas.h \
+ ../sdk/modules/nrfx/mdk/nrf52_erratas.h \
+ ../sdk/modules/nrfx/mdk/nrf53_erratas.h \
+ ../sdk/modules/nrfx/mdk/nrf91_erratas.h \
+ ../sdk/components/libraries/usbd/app_usbd_types.h \
+ ../sdk/components/libraries/usbd/app_usbd_request.h \
+ ../sdk/components/libraries/usbd/app_usbd_descriptor.h \
+ ../sdk/components/libraries/usbd/app_usbd_langid.h \
+ ../sdk/components/libraries/usbd/app_usbd_class_base.h \
+ ../sdk/components/libraries/usbd/app_usbd.h \
+ ../sdk/components/libraries/usbd/app_usbd_string_desc.h \
+ ../sdk/components/libraries/usbd/app_usbd.h \
+ ../sdk/components/libraries/usbd/class/cdc/acm/app_usbd_cdc_acm.h \
+ ../sdk/components/libraries/usbd/app_usbd_class_base.h \
+ ../sdk/components/libraries/usbd/app_usbd_descriptor.h \
+ ../sdk/components/libraries/usbd/class/cdc/app_usbd_cdc_desc.h \
+ ../sdk/components/libraries/usbd/class/cdc/app_usbd_cdc_types.h \
+ ../sdk/components/libraries/usbd/class/cdc/app_usbd_cdc_types.h \
+ ../sdk/components/libraries/usbd/class/cdc/acm/app_usbd_cdc_acm_internal.h \
+ ../sdk/components/libraries/usbd/app_usbd_serial_num.h
