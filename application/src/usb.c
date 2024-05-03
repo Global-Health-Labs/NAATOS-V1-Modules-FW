@@ -99,18 +99,18 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
     {
         case APP_USBD_EVT_DRV_SUSPEND:
             printf("USB suspended\n");
-            //usb_started = true;
             break;
         case APP_USBD_EVT_DRV_RESUME:
+            printf("USB resumed\n");
             //bsp_board_led_on(LED_USB_RESUME);
             break;
         case APP_USBD_EVT_STARTED:
             printf("USB started\n");
-            app_usbd_suspend_req();
+            usb_started = true;
             break;
         case APP_USBD_EVT_STOPPED:
+          printf("USB stopped\n");
             app_usbd_disable();
-            bsp_board_leds_off();
             break;
         case APP_USBD_EVT_POWER_DETECTED:
             printf("USB power detected\n");
@@ -209,7 +209,6 @@ void start_usb(void) {
           // Nothing to do 
       }
     }
-
 }
 
 void usb_task(void * pvParameters) {
@@ -221,15 +220,19 @@ void usb_task(void * pvParameters) {
   // Set connection state to not charging
   connection_state = NOT_CHARGING;
 
-  // Start the USB
-  start_usb();
+  
 
   // Set the first event to make sure that USB queue is processed after it is started
   //UNUSED_RETURN_VALUE(xTaskNotifyGive(xTaskGetCurrentTaskHandle()));
   for (;;) {
 
+    // Start the USB
+    if (!usb_started) {
+      start_usb();
+    }
+
     /* Waiting for event */
-    //UNUSED_RETURN_VALUE(ulTaskNotifyTake(pdTRUE, USB_THREAD_MAX_BLOCK_TIME));
+    //app_usbd_enable();
     while (app_usbd_event_queue_process())
     {
       
@@ -239,9 +242,15 @@ void usb_task(void * pvParameters) {
     
 
     // Check the USB queue for an update message
-    xReturned = xQueueReceive(usb_stateChangeQueue, &recv_msg, portMAX_DELAY);
-    if (xReturned != pdPASS) {
-      printf("USB_TASK: Unable to receive usb message from usb_stateChangeQueue.\n");
+    if (uxQueueMessagesWaiting(usb_stateChangeQueue) > 0) {
+      xReturned = xQueueReceive(usb_stateChangeQueue, &recv_msg, 0);
+      if (xReturned != pdPASS) {
+        printf("USB_TASK: Unable to receive usb message from usb_stateChangeQueue.\n");
+      }
+    }
+    else {
+      vTaskDelay(pdMS_TO_TICKS(100));
+      continue;
     }
 
     // Update from received message
