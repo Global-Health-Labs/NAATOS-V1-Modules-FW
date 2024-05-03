@@ -113,18 +113,7 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/modules/nrfx/drivers/include/nrfx_ppi.h \
  ../sdk/modules/nrfx/hal/nrf_ppi.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\usb.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\spi.h \
- ../sdk/integration/nrfx/legacy/nrf_drv_spi.h \
- ../sdk/modules/nrfx/drivers/include/nrfx_spim.h \
- ../sdk/modules/nrfx/hal/nrf_spim.h \
- ../sdk/modules/nrfx/drivers/include/nrfx_spi.h \
- ../sdk/modules/nrfx/hal/nrf_spi.h \
- ../sdk/external/freertos/source/include/semphr.h \
- ../sdk/external/freertos/source/include/queue.h \
- ../sdk/integration/nrfx/legacy/nrf_drv_power.h \
- ../sdk/modules/nrfx/drivers/include/nrfx_power.h \
- ../sdk/modules/nrfx/hal/nrf_power.h \
- ../sdk/components/libraries/usbd/app_usbd_core.h \
+ ../sdk/components/libraries/usbd/app_usbd.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_usbd.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_usbd.h \
  ../sdk/modules/nrfx/hal/nrf_usbd.h \
@@ -140,14 +129,49 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/components/libraries/usbd/app_usbd_descriptor.h \
  ../sdk/components/libraries/usbd/app_usbd_langid.h \
  ../sdk/components/libraries/usbd/app_usbd_class_base.h \
- ../sdk/components/libraries/usbd/app_usbd.h \
+ ../sdk/components/libraries/usbd/app_usbd_core.h \
  ../sdk/components/libraries/usbd/app_usbd_string_desc.h \
  ../sdk/components/libraries/usbd/app_usbd.h \
- ../sdk/components/libraries/usbd/class/cdc/acm/app_usbd_cdc_acm.h \
+ ../sdk/components/libraries/usbd/class/msc/app_usbd_msc.h \
  ../sdk/components/libraries/usbd/app_usbd_class_base.h \
  ../sdk/components/libraries/usbd/app_usbd_descriptor.h \
+ ../sdk/components/libraries/usbd/class/msc/app_usbd_msc_types.h \
+ ../sdk/components/libraries/usbd/class/msc/app_usbd_msc_desc.h \
+ ../sdk/components/libraries/usbd/class/msc/app_usbd_msc_scsi.h \
+ ../sdk/components/libraries/usbd/class/msc/app_usbd_msc_internal.h \
+ ../sdk/components/libraries/usbd/class/cdc/acm/app_usbd_cdc_acm.h \
  ../sdk/components/libraries/usbd/class/cdc/app_usbd_cdc_desc.h \
  ../sdk/components/libraries/usbd/class/cdc/app_usbd_cdc_types.h \
  ../sdk/components/libraries/usbd/class/cdc/app_usbd_cdc_types.h \
  ../sdk/components/libraries/usbd/class/cdc/acm/app_usbd_cdc_acm_internal.h \
- ../sdk/components/libraries/usbd/app_usbd_serial_num.h
+ ../sdk/components/libraries/usbd/app_usbd_serial_num.h \
+ ../sdk/components/libraries/timer/app_timer.h \
+ ../sdk/components/libraries/sortlist/nrf_sortlist.h \
+ ../sdk/components/libraries/cli/nrf_cli.h \
+ ../sdk/components/libraries/cli/nrf_cli_types.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/inttypes.h \
+ ../sdk/components/libraries/log/nrf_log_backend_interface.h \
+ ../sdk/components/libraries/queue/nrf_queue.h \
+ ../sdk/external/fprintf/nrf_fprintf.h \
+ ../sdk/external/fprintf/nrf_fprintf_format.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdarg.h \
+ ../sdk/external/fprintf/nrf_fprintf.h \
+ ../sdk/components/libraries/cli/uart/nrf_cli_uart.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_uart.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_uarte.h \
+ ../sdk/modules/nrfx/hal/nrf_uarte.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_uart.h \
+ ../sdk/modules/nrfx/hal/nrf_uart.h \
+ ../sdk/components/libraries/ringbuf/nrf_ringbuf.h \
+ ../sdk/components/libraries/atomic/nrf_atomic.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\spi.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_spi.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_spim.h \
+ ../sdk/modules/nrfx/hal/nrf_spim.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_spi.h \
+ ../sdk/modules/nrfx/hal/nrf_spi.h \
+ ../sdk/external/freertos/source/include/semphr.h \
+ ../sdk/external/freertos/source/include/queue.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_power.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_power.h \
+ ../sdk/modules/nrfx/hal/nrf_power.h

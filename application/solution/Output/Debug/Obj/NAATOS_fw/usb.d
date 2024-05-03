@@ -87,6 +87,7 @@ Output/Debug/Obj/NAATOS_fw/usb.o: \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdlib.h \
  ../sdk/components/libraries/balloc/nrf_balloc.h \
  ../sdk/components/libraries/log/nrf_log_default_backends.h \
+ ../sdk/components/libraries/usbd/app_usbd.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_usbd.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_usbd.h \
  ../sdk/modules/nrfx/hal/nrf_usbd.h \
@@ -97,11 +98,6 @@ Output/Debug/Obj/NAATOS_fw/usb.o: \
  ../sdk/modules/nrfx/mdk/nrf52_erratas.h \
  ../sdk/modules/nrfx/mdk/nrf53_erratas.h \
  ../sdk/modules/nrfx/mdk/nrf91_erratas.h \
- ../sdk/integration/nrfx/legacy/nrf_drv_power.h \
- ../sdk/modules/nrfx/drivers/include/nrfx_power.h \
- ../sdk/modules/nrfx/hal/nrf_power.h \
- ../sdk/modules/nrfx/drivers/include/nrfx_power_clock.h \
- ../sdk/components/libraries/usbd/app_usbd.h \
  ../sdk/components/libraries/usbd/app_usbd_types.h \
  ../sdk/components/libraries/usbd/app_usbd_request.h \
  ../sdk/components/libraries/usbd/app_usbd_descriptor.h \
@@ -141,4 +137,8 @@ Output/Debug/Obj/NAATOS_fw/usb.o: \
  ../sdk/modules/nrfx/drivers/include/nrfx_uart.h \
  ../sdk/modules/nrfx/hal/nrf_uart.h \
  ../sdk/components/libraries/ringbuf/nrf_ringbuf.h \
- ../sdk/components/libraries/atomic/nrf_atomic.h
+ ../sdk/components/libraries/atomic/nrf_atomic.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_power.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_power.h \
+ ../sdk/modules/nrfx/hal/nrf_power.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_power_clock.h
