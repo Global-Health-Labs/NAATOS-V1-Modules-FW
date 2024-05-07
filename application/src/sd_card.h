@@ -5,10 +5,17 @@
 #include "bsp.h"
 #include "ff.h"
 #include "diskio_blkdev.h"
+
+#include "nrf_block_dev.h"
 #include "nrf_block_dev_sdc.h"
+#include "nrf_block_dev_ram.h"
+#include "nrf_block_dev_empty.h"
+#include "nrf_block_dev_qspi.h"
+
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
+
 #include "naatos_config.h"
 
 #define LOGS_DIR      "logs"
@@ -18,6 +25,19 @@
 
 #define CSV_HEADER        "Time,ValveTemp,Amp0Temp,Amp1Temp,Amp2Temp,Batt,Event\n"
 #define CSV_HEADER_SIZE   53
+
+/**
+ * @brief  QSPI block device definition
+ */
+NRF_BLOCK_DEV_QSPI_DEFINE(
+    m_block_dev_qspi,
+    NRF_BLOCK_DEV_QSPI_CONFIG(
+        512,
+        NRF_BLOCK_DEV_QSPI_FLAG_CACHE_WRITEBACK,
+        NRF_DRV_QSPI_DEFAULT_CONFIG
+     ),
+     NFR_BLOCK_DEV_INFO_CONFIG("Nordic", "QSPI", "1.00")
+);
 
 /* SDC block device definition */
 NRF_BLOCK_DEV_SDC_DEFINE(

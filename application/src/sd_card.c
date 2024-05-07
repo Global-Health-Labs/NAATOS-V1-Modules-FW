@@ -21,7 +21,9 @@ FRESULT check_for_config_file(void);
 
 // Initalize Function
 void init_sd_card(void) {
-  // Register the drives we have -- Should only be the one
+  memset(&fs, 0, sizeof(FATFS));
+
+  // Register the drives we have 
   diskio_blockdev_register(drives, ARRAY_SIZE(drives));
 
   // Initalize the disk on the SD
@@ -42,6 +44,7 @@ void init_sd_card(void) {
   if (ff_result != FR_OK) {
     printf("Unable to mount SD Card!\n");
   }
+
   // Create directories if needed
   create_naatos_directories();
 }

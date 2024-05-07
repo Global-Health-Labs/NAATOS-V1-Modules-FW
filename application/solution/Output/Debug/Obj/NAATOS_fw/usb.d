@@ -73,12 +73,18 @@ Output/Debug/Obj/NAATOS_fw/usb.o: \
  ../sdk/components/libraries/util/sdk_macros.h \
  ../sdk/components/libraries/block_dev/sdc/nrf_block_dev_sdc.h \
  ../sdk/components/libraries/sdcard/app_sdcard.h \
- ../sdk/components/libraries/log/nrf_log.h \
+ ../sdk/components/libraries/block_dev/ram/nrf_block_dev_ram.h \
+ ../sdk/components/libraries/log/nrf_log_instance.h \
  ../sdk/components/libraries/experimental_section_vars/nrf_section.h \
+ ../sdk/components/libraries/log/nrf_log_types.h \
+ ../sdk/components/libraries/block_dev/empty/nrf_block_dev_empty.h \
+ ../sdk/components/libraries/block_dev/qspi/nrf_block_dev_qspi.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_qspi.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_qspi.h \
+ ../sdk/modules/nrfx/hal/nrf_qspi.h \
+ ../sdk/components/libraries/log/nrf_log.h \
  ../sdk/components/libraries/strerror/nrf_strerror.h \
  ../sdk/components/libraries/log/src/nrf_log_internal.h \
- ../sdk/components/libraries/log/nrf_log_instance.h \
- ../sdk/components/libraries/log/nrf_log_types.h \
  ../sdk/components/libraries/log/nrf_log_types.h \
  ../sdk/components/libraries/log/nrf_log_ctrl.h \
  ../sdk/components/libraries/log/src/nrf_log_ctrl_internal.h \

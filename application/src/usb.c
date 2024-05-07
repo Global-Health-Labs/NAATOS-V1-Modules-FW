@@ -24,6 +24,8 @@ main_state_t main_state;
 
 bool usb_started = false;
 
+
+
 /* ***** Instances ***** */
 
 // Mass storage class instance
@@ -140,16 +142,6 @@ void msc_user_ev_handler(app_usbd_class_inst_t const * p_inst,
     UNUSED_PARAMETER(event);
 }
 
-
-void usb_new_event_isr_handler(app_usbd_internal_evt_t const * const p_event, bool queued) {
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    UNUSED_PARAMETER(p_event);
-    UNUSED_PARAMETER(queued);
-    /* Release the semaphore */
-    vTaskNotifyGiveFromISR(usbTaskHandle, &xHigherPriorityTaskWoken);
-    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-}
-
 static void power_usb_event_handler(nrf_drv_power_usb_evt_t event)
 {
     switch(event)
@@ -181,9 +173,17 @@ void start_usb(void) {
         .ev_state_proc = usbd_user_ev_handler
     };
 
+    ret = NRF_LOG_INIT(app_usbd_sof_timestamp_get);
+    APP_ERROR_CHECK(ret);
+    NRF_LOG_DEFAULT_BACKENDS_INIT();
+
     app_usbd_serial_num_generate();
 
     ret = app_usbd_init(&usbd_config);
+    APP_ERROR_CHECK(ret);
+
+    app_usbd_class_inst_t const * class_inst_msc = app_usbd_msc_class_inst_get(&m_app_msc);
+    ret = app_usbd_class_append(class_inst_msc);
     APP_ERROR_CHECK(ret);
 
     app_usbd_class_inst_t const * class_cdc_acm = app_usbd_cdc_acm_class_inst_get(&m_app_cdc_acm);
@@ -201,6 +201,7 @@ void start_usb(void) {
 
         app_usbd_enable();
         app_usbd_start();
+        m_usb_connected = true;
     }
 
     while(!usb_started) {
@@ -209,6 +210,7 @@ void start_usb(void) {
           // Nothing to do 
       }
     }
+
 }
 
 void usb_task(void * pvParameters) {
@@ -220,10 +222,7 @@ void usb_task(void * pvParameters) {
   // Set connection state to not charging
   connection_state = NOT_CHARGING;
 
-  
-
   // Set the first event to make sure that USB queue is processed after it is started
-  //UNUSED_RETURN_VALUE(xTaskNotifyGive(xTaskGetCurrentTaskHandle()));
   for (;;) {
 
     // Start the USB
@@ -232,15 +231,10 @@ void usb_task(void * pvParameters) {
     }
 
     /* Waiting for event */
-    //app_usbd_enable();
-    while (app_usbd_event_queue_process())
-    {
-      
-    }
+    while (app_usbd_event_queue_process()) { }
 
     //ret = app_usbd_cdc_acm_write(&m_app_cdc_acm, "HELLO", 6);
     
-
     // Check the USB queue for an update message
     if (uxQueueMessagesWaiting(usb_stateChangeQueue) > 0) {
       xReturned = xQueueReceive(usb_stateChangeQueue, &recv_msg, 0);

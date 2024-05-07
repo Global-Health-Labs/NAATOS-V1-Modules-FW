@@ -522,9 +522,6 @@ void create_queues() {
     printf("Unable to create logger_mainStateChangeQueue queue\n");
 }
 
-
-
-
 /*********************************************************************
 *
 *       main()
@@ -532,11 +529,58 @@ void create_queues() {
 *   Application entry point.
 */
 int main(void) {
-  ret_code_t err_code;
+  ret_code_t ret;
+  /*
 
+    static const app_usbd_config_t usbd_config = {
+        .ev_state_proc = usbd_user_ev_handler
+    };
+
+    ret = NRF_LOG_INIT(app_usbd_sof_timestamp_get);
+    APP_ERROR_CHECK(ret);
+    NRF_LOG_DEFAULT_BACKENDS_INIT();
+
+    ret = nrf_drv_clock_init();
+    APP_ERROR_CHECK(ret);
+
+    // Configure LEDs and buttons
+    nrf_drv_clock_lfclk_request(NULL);
+    ret = app_timer_init();
+    APP_ERROR_CHECK(ret);
+
+    ret = app_usbd_init(&usbd_config);
+    APP_ERROR_CHECK(ret);
+
+    app_usbd_class_inst_t const * class_inst_msc = app_usbd_msc_class_inst_get(&m_app_msc);
+    ret = app_usbd_class_append(class_inst_msc);
+    APP_ERROR_CHECK(ret);
+
+
+    if (USBD_POWER_DETECTION)
+    {
+        ret = app_usbd_power_events_enable();
+        APP_ERROR_CHECK(ret);
+    }
+    else
+    {
+
+        app_usbd_enable();
+        app_usbd_start();
+        //m_usb_connected = true;
+    }
+
+    while (true)
+    {
+        while (app_usbd_event_queue_process())
+        {
+            // Nothing to do
+        }
+    }
+
+  */
   // Initialize clock driver for better time accuracy in FREERTOS
-  err_code = nrf_drv_clock_init();
-  APP_ERROR_CHECK(err_code);
+  ret = nrf_drv_clock_init();
+  APP_ERROR_CHECK(ret);
 
   nrf_drv_clock_lfclk_request(NULL);
 
@@ -560,7 +604,6 @@ int main(void) {
 
   // Start Tasks
   vTaskStartScheduler();
-
 }
 
 
