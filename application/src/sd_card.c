@@ -40,13 +40,13 @@ void init_sd_card(void) {
   printf("SD Card initalized. Capactity: %d MB\n", capacity);
   
   // Mount SD Card
-  ff_result = sd_card_mount();
-  if (ff_result != FR_OK) {
-    printf("Unable to mount SD Card!\n");
-  }
+  //ff_result = sd_card_mount();
+  //if (ff_result != FR_OK) {
+  //  printf("Unable to mount SD Card!\n");
+  //}
 
   // Create directories if needed
-  create_naatos_directories();
+  //create_naatos_directories();
 }
 
 // Mount the SD card volume

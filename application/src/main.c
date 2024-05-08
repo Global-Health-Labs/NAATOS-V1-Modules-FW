@@ -522,6 +522,15 @@ void create_queues() {
     printf("Unable to create logger_mainStateChangeQueue queue\n");
 }
 
+// Mass storage class instance
+/*
+APP_USBD_MSC_GLOBAL_DEF(m_app_msc,
+                        0,
+                        msc_user_ev_handler,
+                        ENDPOINT_LIST(),
+                        BLOCKDEV_LIST(),
+                        MSC_WORKBUFFER_SIZE);
+*/
 /*********************************************************************
 *
 *       main()
@@ -529,55 +538,8 @@ void create_queues() {
 *   Application entry point.
 */
 int main(void) {
-  ret_code_t ret;
-  /*
-
-    static const app_usbd_config_t usbd_config = {
-        .ev_state_proc = usbd_user_ev_handler
-    };
-
-    ret = NRF_LOG_INIT(app_usbd_sof_timestamp_get);
-    APP_ERROR_CHECK(ret);
-    NRF_LOG_DEFAULT_BACKENDS_INIT();
-
-    ret = nrf_drv_clock_init();
-    APP_ERROR_CHECK(ret);
-
-    // Configure LEDs and buttons
-    nrf_drv_clock_lfclk_request(NULL);
-    ret = app_timer_init();
-    APP_ERROR_CHECK(ret);
-
-    ret = app_usbd_init(&usbd_config);
-    APP_ERROR_CHECK(ret);
-
-    app_usbd_class_inst_t const * class_inst_msc = app_usbd_msc_class_inst_get(&m_app_msc);
-    ret = app_usbd_class_append(class_inst_msc);
-    APP_ERROR_CHECK(ret);
-
-
-    if (USBD_POWER_DETECTION)
-    {
-        ret = app_usbd_power_events_enable();
-        APP_ERROR_CHECK(ret);
-    }
-    else
-    {
-
-        app_usbd_enable();
-        app_usbd_start();
-        //m_usb_connected = true;
-    }
-
-    while (true)
-    {
-        while (app_usbd_event_queue_process())
-        {
-            // Nothing to do
-        }
-    }
-
-  */
+  ret_code_t ret;  
+  
   // Initialize clock driver for better time accuracy in FREERTOS
   ret = nrf_drv_clock_init();
   APP_ERROR_CHECK(ret);
@@ -594,7 +556,7 @@ int main(void) {
   init_sensors_gpios();   // Sensor GPIOs
   vInit_TWI_Hardware(i2c_interface_system, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
   //vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
-  init_sd_card();
+  //init_sd_card();
 
   // Create Tasks
   create_tasks();

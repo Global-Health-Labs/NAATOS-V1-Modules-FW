@@ -35,7 +35,6 @@ APP_USBD_MSC_GLOBAL_DEF(m_app_msc,
                         ENDPOINT_LIST(),
                         BLOCKDEV_LIST(),
                         MSC_WORKBUFFER_SIZE);
-
 // CDC_ACM class instance
 APP_USBD_CDC_ACM_GLOBAL_DEF(m_app_cdc_acm,
                             cdc_acm_user_ev_handler,
@@ -173,9 +172,12 @@ void start_usb(void) {
         .ev_state_proc = usbd_user_ev_handler
     };
 
-    ret = NRF_LOG_INIT(app_usbd_sof_timestamp_get);
-    APP_ERROR_CHECK(ret);
-    NRF_LOG_DEFAULT_BACKENDS_INIT();
+    //ret = sd_card_unmount();
+    //APP_ERROR_CHECK(ret);
+
+    //ret = NRF_LOG_INIT(app_usbd_sof_timestamp_get);
+    //APP_ERROR_CHECK(ret);
+   // NRF_LOG_DEFAULT_BACKENDS_INIT();
 
     app_usbd_serial_num_generate();
 
@@ -204,7 +206,7 @@ void start_usb(void) {
         m_usb_connected = true;
     }
 
-    while(!usb_started) {
+    while(true) {
       while (app_usbd_event_queue_process())
       {
           // Nothing to do 
