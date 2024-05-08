@@ -175,10 +175,6 @@ void start_usb(void) {
     //ret = sd_card_unmount();
     //APP_ERROR_CHECK(ret);
 
-    //ret = NRF_LOG_INIT(app_usbd_sof_timestamp_get);
-    //APP_ERROR_CHECK(ret);
-   // NRF_LOG_DEFAULT_BACKENDS_INIT();
-
     app_usbd_serial_num_generate();
 
     ret = app_usbd_init(&usbd_config);
@@ -205,14 +201,15 @@ void start_usb(void) {
         app_usbd_start();
         m_usb_connected = true;
     }
+}
 
-    while(true) {
+void composite_usb_task(void * pvParameters) {
+  for (;;) {
       while (app_usbd_event_queue_process())
       {
           // Nothing to do 
       }
-    }
-
+  }
 }
 
 void usb_task(void * pvParameters) {

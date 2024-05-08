@@ -51,6 +51,7 @@ xTaskHandle sensorsTaskHandle;
 xTaskHandle batteryTaskHandle;
 xTaskHandle usbTaskHandle;
 xTaskHandle pwmTaskHandle;
+xTaskHandle compositeTaskHandle;
 
 xQueueHandle main_batteryDataQueue;
 xQueueHandle main_switchQueue;
@@ -467,6 +468,13 @@ void create_tasks() {
       printf("Error creating PWM task. Error: %d\n", xReturned);
       vTaskDelete( pwmTaskHandle );
   }
+  // USB Composite Task
+  xReturned = xTaskCreate(composite_usb_task, "CompositeUSBTask", 100, NULL, 0, &compositeTaskHandle);
+  if ( xReturned != pdPASS ) {
+      /* The task was created.  Use the task's handle to delete the task. */
+      printf("Error creating Composite USB task. Error: %d\n", xReturned);
+      vTaskDelete( compositeTaskHandle );
+  }
 }
 
 /*********************************************************************
@@ -522,15 +530,6 @@ void create_queues() {
     printf("Unable to create logger_mainStateChangeQueue queue\n");
 }
 
-// Mass storage class instance
-/*
-APP_USBD_MSC_GLOBAL_DEF(m_app_msc,
-                        0,
-                        msc_user_ev_handler,
-                        ENDPOINT_LIST(),
-                        BLOCKDEV_LIST(),
-                        MSC_WORKBUFFER_SIZE);
-*/
 /*********************************************************************
 *
 *       main()
