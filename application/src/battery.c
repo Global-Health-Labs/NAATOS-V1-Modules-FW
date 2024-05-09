@@ -27,6 +27,10 @@ void battery_task(void * pvParameters) {
     .task = BATTERY,
     .suspended = true
   };
+  usb_suspend_over_t sus_over = {
+    .task = BATTERY,
+    .over = true
+  };
 
   // Set the charge state
   charge_state = NOT_CHARGING;
@@ -64,6 +68,11 @@ void battery_task(void * pvParameters) {
       printf("BATTERY: Suspending for 15 seconds.\n");
       // Delay Task for 15 Seconds
       vTaskDelay(pdMS_TO_TICKS(15000));
+      // Send Suspend Over
+      xReturned = xQueueSend(usb_usbWaitOverQueue, &sus_over, 0); 
+      if (xReturned != pdPASS) {
+        printf("BATTERY: Unable to send usb suspend over to usb_usbWaitOverQueue\n");
+      }
     }
 
     // Send Battery Percentage to main task if we are in standby

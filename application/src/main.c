@@ -555,6 +555,9 @@ void create_queues() {
   usb_recvUsbWaitAcceptQueue = xQueueCreate(4, sizeof(usb_suspend_acpt_t));
   if (usb_recvUsbWaitAcceptQueue == NULL)
     printf("Unable to create usb_recvUsbWaitAcceptQueue queue\n");
+  usb_usbWaitOverQueue = xQueueCreate(4, sizeof(usb_suspend_over_t));
+  if (usb_usbWaitOverQueue == NULL)
+    printf("Unable to create usb_usbWaitOverQueue queue\n");
 
   // Logger Task Queues
   logger_recvBattPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));

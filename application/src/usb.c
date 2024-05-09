@@ -15,15 +15,20 @@
 /* ***** Variables ***** */
 // USB connection status
 static bool m_usb_connected = false;
+
 // Queue Handles
 xQueueHandle usb_stateChangeQueue;
 xQueueHandle usb_recvUsbWaitAcceptQueue;
+xQueueHandle usb_usbWaitOverQueue;
+
 // Main Loop 
 usb_message_t recv_msg;
 charge_state_t connection_state;
 main_state_t main_state;
 
+// USB Suspended Vars
 bool usb_started = false;
+bool usb_suspended_tasks = false;
 
 /* ***** Instances ***** */
 
@@ -98,22 +103,21 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
     switch (event)
     {
         case APP_USBD_EVT_DRV_SUSPEND:
-            printf("USB suspended\n");
+            printf("USB: Suspended\n");
             break;
         case APP_USBD_EVT_DRV_RESUME:
-            printf("USB resumed\n");
-            //bsp_board_led_on(LED_USB_RESUME);
+            printf("USB: Resumed\n");
             break;
         case APP_USBD_EVT_STARTED:
-            printf("USB started\n");
+            printf("USB: Started\n");
             usb_started = true;
             break;
         case APP_USBD_EVT_STOPPED:
-          printf("USB stopped\n");
+          printf("USB: Stopped\n");
             app_usbd_disable();
             break;
         case APP_USBD_EVT_POWER_DETECTED:
-            printf("USB power detected\n");
+            printf("USB: Power detected\n");
 
             if (!nrf_drv_usbd_is_enabled())
             {
@@ -121,11 +125,11 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
             }
             break;
         case APP_USBD_EVT_POWER_REMOVED:
-            printf("USB power removed\n");
+            printf("USB: Power removed\n");
             app_usbd_stop();
             break;
         case APP_USBD_EVT_POWER_READY:
-            printf("USB ready\n");
+            printf("USB: Ready\n");
             app_usbd_start();
             break;
         default:
@@ -223,6 +227,9 @@ void usb_suspend_conflicting_tasks(void) {
       }
     }
   }
+
+  // Set suspended tasks to true
+  usb_suspended_tasks = true;
 }
 
 void start_usb(void) {
@@ -266,6 +273,10 @@ void start_usb(void) {
 }
 
 void composite_usb_task(void * pvParameters) {
+  BaseType_t xReturned;
+  usb_suspend_over_t sus_over;
+  bool batt_over = false, heater_over = false, pwm_over = false, sensor_over = false;
+
   vTaskDelay(pdMS_TO_TICKS(1000));
 
   // Start the USB
@@ -274,9 +285,46 @@ void composite_usb_task(void * pvParameters) {
   }
 
   for (;;) {
-      while (app_usbd_event_queue_process()) {
-          // Nothing to do 
+    
+    while (app_usbd_event_queue_process()) {
+        // Nothing to do 
+    }
+    
+    if (usb_suspended_tasks) {
+      if (uxQueueMessagesWaiting(usb_usbWaitOverQueue) > 0) {
+        xReturned = xQueueReceive(usb_usbWaitOverQueue, &sus_over, 0);
+        if (xReturned != pdPASS) {
+          printf("USB: Unable to receive usb wait over from usb_usbWaitOverQueue\n");
+        }
+        switch(sus_over.task) {
+        case BATTERY:
+          if (sus_over.over) batt_over = true;
+          printf("USB: battery task suspension over.\n");
+          break;
+        case HEATER:
+          if (sus_over.over) heater_over = true;
+          printf("USB: heater task suspension over.\n");
+          break;
+        case PWM:
+          if (sus_over.over) pwm_over = true;
+          printf("USB: pwm task suspension over.\n");
+          break;
+        case SENSORS:
+          if (sus_over.over) sensor_over = true;
+          printf("USB: sensor task suspension over.\n");
+          break;
+        default:
+          break;
+        }
       }
+
+      if (batt_over && heater_over && pwm_over && sensor_over) {
+        usb_suspended_tasks = false;
+      }
+    }
+    else {
+      vTaskDelay(100);
+    }
   }
 }
 

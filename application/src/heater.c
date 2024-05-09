@@ -23,6 +23,10 @@ void heater_task(void * pvParameters) {
     .task = HEATER,
     .suspended = true
   };
+  usb_suspend_over_t sus_over = {
+    .task = HEATER,
+    .over = true
+  };
 
   // Create PID Controllers 
   if (use_default_configuration_parameters) {
@@ -54,6 +58,11 @@ void heater_task(void * pvParameters) {
         printf("HEATER: Suspending for 15 seconds.\n");
         // Delay Task for 15 Seconds
         vTaskDelay(pdMS_TO_TICKS(15000));
+        // Send Suspend Over
+        xReturned = xQueueSend(usb_usbWaitOverQueue, &sus_over, 0); 
+        if (xReturned != pdPASS) {
+          printf("HEATER: Unable to send usb suspend over to usb_usbWaitOverQueue\n");
+        }
       }
       vTaskDelay(100);
       if (!amplification_zone_running & !valve_zone_running)

@@ -95,6 +95,10 @@ void pwm_task(void * pvParameters) {
     .task = PWM,
     .suspended = true
   };
+  usb_suspend_over_t sus_over = {
+    .task = PWM,
+    .over = true
+  };
 
   // Initalize the pwm channels
   init_pwms();
@@ -124,6 +128,11 @@ void pwm_task(void * pvParameters) {
         printf("PWM: Suspending for 15 seconds.\n");
         // Delay Task for 15 Seconds
         vTaskDelay(pdMS_TO_TICKS(15000));
+        // Send Suspend Over
+        xReturned = xQueueSend(usb_usbWaitOverQueue, &sus_over, 0); 
+        if (xReturned != pdPASS) {
+          printf("PWM: Unable to send usb suspend over to usb_usbWaitOverQueue\n");
+        }
       }
       continue;
     }

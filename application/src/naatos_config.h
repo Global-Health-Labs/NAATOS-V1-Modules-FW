@@ -167,6 +167,12 @@ typedef struct {
   bool suspended;
 } usb_suspend_acpt_t;
 
+// USB Wait Suspend Over
+typedef struct {
+  tasks_t task;
+  bool over;
+} usb_suspend_over_t;
+
 // Task Handles
 extern xTaskHandle mainTaskHandle;
 extern xTaskHandle heaterTaskHandle;

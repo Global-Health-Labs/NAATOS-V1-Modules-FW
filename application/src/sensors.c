@@ -32,6 +32,10 @@ void sensors_task(void * pvParameters) {
     .task = SENSORS,
     .suspended = true
   };
+  usb_suspend_over_t sus_over = {
+    .task = SENSORS,
+    .over = true
+  };
 
   // Set the last sample based on config
   if (use_default_configuration_parameters) {
@@ -73,6 +77,11 @@ void sensors_task(void * pvParameters) {
       printf("SENSORS: Suspending for 15 seconds.\n");
       // Delay Task for 15 Seconds
       vTaskDelay(pdMS_TO_TICKS(15000));
+      // Send Suspend Over
+      xReturned = xQueueSend(usb_usbWaitOverQueue, &sus_over, 0); 
+      if (xReturned != pdPASS) {
+        printf("SENSORS: Unable to send usb suspend over to usb_usbWaitOverQueue\n");
+      }
     }
    
  #if (GO_STRAIGHT_TO_RUNNING)
