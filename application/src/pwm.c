@@ -17,6 +17,8 @@ static bool amp0_zone_active = false;
 static bool amp1_zone_active = false;
 static bool amp2_zone_active = false;
 
+xQueueHandle pwm_usbWaitQueue;
+
 void pwm0_ready_callback(uint32_t pwm_id) {
   pwm0_ready_flag = true;
 }
@@ -87,6 +89,13 @@ void update_amp2_duty(int duty) {
 }
 
 void pwm_task(void * pvParameters) {
+  BaseType_t xReturned;
+  usb_suspend_req_t sus_req;
+  usb_suspend_acpt_t sus_acpt = {
+    .task = PWM,
+    .suspended = true
+  };
+
   // Initalize the pwm channels
   init_pwms();
 
@@ -99,8 +108,25 @@ void pwm_task(void * pvParameters) {
   // Main Task Loop
   for (;;) {
     // If not running a duty cycle do nothing
-    if (!valve_zone_active && !amp0_zone_active && !amp1_zone_active && !amp2_zone_active)
+    if (!valve_zone_active && !amp0_zone_active && !amp1_zone_active && !amp2_zone_active) {
       vTaskDelay(100);
+      // Check to see if we need to suspend for USB to be enabled
+      if (uxQueueMessagesWaiting(pwm_usbWaitQueue) > 0) {
+        xReturned = xQueueReceive(pwm_usbWaitQueue, &sus_req, 0) ;
+        if (xReturned != pdPASS) {
+          printf("PWM: Unable to receive usb suspend request from pwm_usbWaitQueue\n");
+        }
+        // Send Suspend Accepted
+        xReturned = xQueueSend(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0); 
+        if (xReturned != pdPASS) {
+          printf("PWM: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\n");
+        }
+        printf("PWM: Suspending for 15 seconds.\n");
+        // Delay Task for 15 Seconds
+        vTaskDelay(pdMS_TO_TICKS(15000));
+      }
+      continue;
+    }
   
     // PWM0 Control
     if (pwm0_ready_flag) {

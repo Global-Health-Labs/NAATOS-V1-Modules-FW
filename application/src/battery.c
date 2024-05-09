@@ -11,6 +11,8 @@
 
 xQueueHandle battery_requestPercentQueue;
 xQueueHandle battery_mainStateQueue;
+xQueueHandle battery_usbWaitQueue;
+
 charge_state_t charge_state;
 int battery_percentage = 100;
 main_state_t batt_main_state = STANDBY;
@@ -19,6 +21,12 @@ void battery_task(void * pvParameters) {
   BaseType_t xReturned;
   battery_percent_req_t recv_req;
   bool inc = false; //temp
+
+  usb_suspend_req_t sus_req;
+  usb_suspend_acpt_t sus_acpt = {
+    .task = BATTERY,
+    .suspended = true
+  };
 
   // Set the charge state
   charge_state = NOT_CHARGING;
@@ -40,6 +48,22 @@ void battery_task(void * pvParameters) {
         printf("BATT_TASK: Unable to receive state change from battery_mainStateQueue.\n");
       }
       continue;
+    }
+
+    // Check to see if we need to suspend for USB to be enabled
+    if (uxQueueMessagesWaiting(battery_usbWaitQueue) > 0) {
+      xReturned = xQueueReceive(battery_usbWaitQueue, &sus_req, 0) ;
+      if (xReturned != pdPASS) {
+        printf("BATTERY: Unable to receive usb suspend request from battery_usbWaitQueue\n");
+      }
+      // Send Suspend Accepted
+      xReturned = xQueueSend(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0); 
+      if (xReturned != pdPASS) {
+        printf("BATTERY: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\n");
+      }
+      printf("BATTERY: Suspending for 15 seconds.\n");
+      // Delay Task for 15 Seconds
+      vTaskDelay(pdMS_TO_TICKS(15000));
     }
 
     // Send Battery Percentage to main task if we are in standby

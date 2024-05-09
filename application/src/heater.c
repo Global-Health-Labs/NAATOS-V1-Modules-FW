@@ -3,6 +3,7 @@
 
 xQueueHandle heater_zoneRunQueue;
 xQueueHandle heater_temperatureDataQueue;
+xQueueHandle heater_usbWaitQueue;
 
 bool amplification_zone_running = false;
 bool valve_zone_running = false;
@@ -17,6 +18,11 @@ pid_controller_t amp2_pid;
 
 void heater_task(void * pvParameters) {
   BaseType_t xReturned;
+  usb_suspend_req_t sus_req;
+  usb_suspend_acpt_t sus_acpt = {
+    .task = HEATER,
+    .suspended = true
+  };
 
   // Create PID Controllers 
   if (use_default_configuration_parameters) {
@@ -34,6 +40,21 @@ void heater_task(void * pvParameters) {
   for (;;) {
     // Check for run heater zone message
     if (uxQueueMessagesWaiting(heater_zoneRunQueue) == 0) {
+      // Check to see if we need to suspend for USB to be enabled
+      if (uxQueueMessagesWaiting(heater_usbWaitQueue) > 0) {
+        xReturned = xQueueReceive(heater_usbWaitQueue, &sus_req, 0) ;
+        if (xReturned != pdPASS) {
+          printf("HEATER: Unable to receive usb suspend request from heater_usbWaitQueue\n");
+        }
+        // Send Suspend Accepted
+        xReturned = xQueueSend(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0); 
+        if (xReturned != pdPASS) {
+          printf("HEATER: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\n");
+        }
+        printf("HEATER: Suspending for 15 seconds.\n");
+        // Delay Task for 15 Seconds
+        vTaskDelay(pdMS_TO_TICKS(15000));
+      }
       vTaskDelay(100);
       if (!amplification_zone_running & !valve_zone_running)
         continue; // Go back to top of loop if no zones running

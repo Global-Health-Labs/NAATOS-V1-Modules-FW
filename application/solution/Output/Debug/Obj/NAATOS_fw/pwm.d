@@ -61,6 +61,10 @@ Output/Debug/Obj/NAATOS_fw/pwm.o: \
  ../sdk/external/freertos/portable/GCC/nrf52/portmacro.h \
  ../sdk/external/freertos/portable/CMSIS/nrf52/portmacro_cmsis.h \
  ../sdk/external/freertos/source/include/mpu_wrappers.h \
- ../sdk/external/freertos/source/include/timers.h \
+ ../sdk/external/freertos/source/include/queue.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_config.h \
  ../sdk/external/freertos/source/include/task.h \
- ../sdk/external/freertos/source/include/list.h
+ ../sdk/external/freertos/source/include/list.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_queues.h \
+ ../sdk/external/freertos/source/include/timers.h \
+ ../sdk/external/freertos/source/include/task.h

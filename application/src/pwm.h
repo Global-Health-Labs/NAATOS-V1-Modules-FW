@@ -7,6 +7,9 @@
 #include "app_pwm.h"
 #include "nrf_gpio.h"
 #include "FreeRTOS.h"
+#include "queue.h"
+#include "naatos_config.h"
+#include "naatos_queues.h"
 
 //#define VALVE_ZONE_PIN  20  // P0.20
 //#define AMP0_ZONE_PIN   19  // P0.19

@@ -62,7 +62,9 @@ typedef enum {
   HEATER,
   LOGGER,
   SENSORS, 
-  USB
+  USB,
+  PWM,
+  COMPOSITE
 } tasks_t;
 
 // Charging Enum
@@ -153,6 +155,17 @@ typedef struct {
   uint8_t month;
   uint8_t year;
 } calendar_time_t;
+
+// USB Wait Suspend request
+typedef struct {
+  bool suspend;
+} usb_suspend_req_t;
+
+// USB Wait Suspend Acceptance
+typedef struct {
+  tasks_t task;
+  bool suspended;
+} usb_suspend_acpt_t;
 
 // Task Handles
 extern xTaskHandle mainTaskHandle;

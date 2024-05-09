@@ -17,6 +17,7 @@
 static bool m_usb_connected = false;
 // Queue Handles
 xQueueHandle usb_stateChangeQueue;
+xQueueHandle usb_recvUsbWaitAcceptQueue;
 // Main Loop 
 usb_message_t recv_msg;
 charge_state_t connection_state;
@@ -53,7 +54,7 @@ void cdc_acm_user_ev_handler(app_usbd_class_inst_t const * p_inst,
     {
         case APP_USBD_CDC_ACM_USER_EVT_PORT_OPEN:
         {
-            //bsp_board_led_on(LED_CDC_ACM_OPEN);
+            printf("COM port opened.\n");
 
             //Setup first transfer
             ret_code_t ret = app_usbd_cdc_acm_read(&m_app_cdc_acm,
@@ -164,11 +165,73 @@ static void power_usb_event_handler(nrf_drv_power_usb_evt_t event)
     }
 }
 
+void usb_suspend_conflicting_tasks(void) {
+  BaseType_t xReturned;
+  bool batt_acpt = false, heater_acpt = false, pwm_acpt = false, sensor_acpt = false;
+  usb_suspend_req_t sus_req = {
+    .suspend = true,
+  };
+  usb_suspend_acpt_t sus_acpt;
+
+  /* Send suspend requests to conflicting tasks */
+  // Send to Battery
+  xReturned = xQueueSend(battery_usbWaitQueue, &sus_req, 0);
+  if (xReturned != pdPASS) {
+    printf("USB: Unable to send usb suspend request to battery_usbWaitQueue.\n");
+  }
+  // Send to heater 
+  xReturned = xQueueSend(heater_usbWaitQueue, &sus_req, 0);
+  if (xReturned != pdPASS) {
+    printf("USB: Unable to send usb suspend request to heater_usbWaitQueue.\n");
+  }
+  // Send to PWM task
+  xReturned = xQueueSend(pwm_usbWaitQueue, &sus_req, 0);
+  if (xReturned != pdPASS) {
+    printf("USB: Unable to send usb suspend request to pwm_usbWaitQueue.\n");
+  }
+  // Send to Sensors task
+  xReturned = xQueueSend(sensor_usbWaitQueue, &sus_req, 0);
+  if (xReturned != pdPASS) {
+    printf("USB: Unable to send usb suspend request to sensor_usbWaitQueue.\n");
+  }
+
+  /* Receive back suspend request acceptances */
+  while(!batt_acpt || !heater_acpt || !pwm_acpt || !sensor_acpt) {
+    if (uxQueueMessagesWaiting(usb_recvUsbWaitAcceptQueue) > 0) {
+      xReturned = xQueueReceive(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0);
+      if (xReturned != pdPASS) {
+        printf("USB: Unable to receive from usb_recvUsbWaitAcceptQueue queue.\n");
+        continue;
+      }
+      else {
+        switch(sus_acpt.task) {
+        case BATTERY:
+          if (sus_acpt.suspended) batt_acpt = true;
+          break;
+        case HEATER:
+          if (sus_acpt.suspended) heater_acpt = true;
+          break;
+        case PWM:
+          if (sus_acpt.suspended) pwm_acpt = true;
+          break;
+        case SENSORS:
+          if (sus_acpt.suspended) sensor_acpt = true;
+          break;
+        default:
+          break;
+        }
+      }
+    }
+  }
+}
+
 void start_usb(void) {
    ret_code_t ret;
     static const app_usbd_config_t usbd_config = {
         .ev_state_proc = usbd_user_ev_handler
     };
+
+    usb_suspend_conflicting_tasks();
     
     if (sd_card_inited) {
       uninit_sd_card();
@@ -179,12 +242,12 @@ void start_usb(void) {
     ret = app_usbd_init(&usbd_config);
     APP_ERROR_CHECK(ret);
 
-    app_usbd_class_inst_t const * class_inst_msc = app_usbd_msc_class_inst_get(&m_app_msc);
-    ret = app_usbd_class_append(class_inst_msc);
-    APP_ERROR_CHECK(ret);
-
     app_usbd_class_inst_t const * class_cdc_acm = app_usbd_cdc_acm_class_inst_get(&m_app_cdc_acm);
     ret = app_usbd_class_append(class_cdc_acm);
+    APP_ERROR_CHECK(ret);
+
+    app_usbd_class_inst_t const * class_inst_msc = app_usbd_msc_class_inst_get(&m_app_msc);
+    ret = app_usbd_class_append(class_inst_msc);
     APP_ERROR_CHECK(ret);
 
     if (USBD_POWER_DETECTION)
@@ -203,6 +266,8 @@ void start_usb(void) {
 }
 
 void composite_usb_task(void * pvParameters) {
+  vTaskDelay(pdMS_TO_TICKS(1000));
+
   // Start the USB
   if (!usb_started) {
     start_usb();

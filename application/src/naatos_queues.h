@@ -13,20 +13,27 @@ extern xQueueHandle main_switchQueue;
 // Heater Task Queue(s)
 extern xQueueHandle heater_zoneRunQueue;
 extern xQueueHandle heater_temperatureDataQueue;
+extern xQueueHandle heater_usbWaitQueue;
 
 // Sensor Task Queue(s)
 extern xQueueHandle sensor_mainStateQueue;
+extern xQueueHandle sensor_usbWaitQueue;
 
 // Battery Management Task Queue(s)
 extern xQueueHandle battery_requestPercentQueue;
 extern xQueueHandle battery_mainStateQueue;
+extern xQueueHandle battery_usbWaitQueue;
 
 // USB Management Task Queue(s)
 extern xQueueHandle usb_stateChangeQueue;
+extern xQueueHandle usb_recvUsbWaitAcceptQueue;
 
 // Logger Task Queue(s)
 extern xQueueHandle logger_recvBattPercentQueue;
 extern xQueueHandle logger_logMessageQueue;
 extern xQueueHandle logger_mainStateChangeQueue;
+
+// PWM Task Queue(s)
+extern xQueueHandle pwm_usbWaitQueue;
 
 #endif

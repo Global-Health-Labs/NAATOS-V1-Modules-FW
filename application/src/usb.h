@@ -70,3 +70,5 @@ static bool m_send_flag = 0;
 void start_usb(void);
 void usb_task(void * pvParameters);
 void composite_usb_task(void * pvParameters);
+
+void usb_suspend_conflicting_tasks(void);

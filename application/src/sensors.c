@@ -12,6 +12,8 @@ static long double amp1_temperature = 0.0;
 static long double amp2_temperature = 0.0;
 
 xQueueHandle sensor_mainStateQueue;
+xQueueHandle sensor_usbWaitQueue;
+
 main_state_t s_main_state = STANDBY;
 
 static log_data_message_t log_msg = {
@@ -24,7 +26,13 @@ void sensors_task(void * pvParameters) {
   BaseType_t xReturned;
   uint32_t sample_log_index = 0;
   uint32_t sample_log_max = 0;
-  
+
+  usb_suspend_req_t sus_req;
+  usb_suspend_acpt_t sus_acpt = {
+    .task = SENSORS,
+    .suspended = true
+  };
+
   // Set the last sample based on config
   if (use_default_configuration_parameters) {
     sample_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE); 
@@ -49,6 +57,22 @@ void sensors_task(void * pvParameters) {
         printf("BATT_TASK: Unable to receive state change from sensor_mainStateQueue.\n");
       }
       continue;
+    }
+
+    // Check to see if we need to suspend for USB to be enabled
+    if (uxQueueMessagesWaiting(sensor_usbWaitQueue) > 0) {
+      xReturned = xQueueReceive(sensor_usbWaitQueue, &sus_req, 0) ;
+      if (xReturned != pdPASS) {
+        printf("SENSORS: Unable to receive usb suspend request from sensor_usbWaitQueue\n");
+      }
+      // Send Suspend Accepted
+      xReturned = xQueueSend(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0); 
+      if (xReturned != pdPASS) {
+        printf("SENSORS: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\n");
+      }
+      printf("SENSORS: Suspending for 15 seconds.\n");
+      // Delay Task for 15 Seconds
+      vTaskDelay(pdMS_TO_TICKS(15000));
     }
    
  #if (GO_STRAIGHT_TO_RUNNING)
