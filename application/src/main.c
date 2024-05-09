@@ -152,6 +152,30 @@ const usb_message_t running_update = {
   .charge_state = NULL
 };
 
+// Configuration Parameters
+naatos_config_parameters config = {
+  .logging_rate = 0,
+  .sample_rate = 0,
+  .amplification_zone_run_time_m = 0,
+  .valve_zone_run_time_m = 0,
+  .low_power_threshold = 0,
+  .valve_setpoint = 0,
+  .amplification_setpoint = 0,
+  .valve_kp = 0,
+  .valve_ki = 0, 
+  .valve_kp = 0,
+  .amp0_kp = 0,
+  .amp0_ki = 0,
+  .amp0_kd = 0,
+  .amp1_kp = 0,
+  .amp1_ki = 0,
+  .amp1_kd = 0,
+  .amp2_kp = 0,
+  .amp2_ki = 0,
+  .amp2_kd = 0
+};
+bool use_default_configuration_parameters;
+
 // Function defs
 void sendUpdatedMainTaskState(main_state_t new_state);
 void begin_amplification_zone(void);
@@ -192,7 +216,7 @@ void main_task(void * pvParameters) {
         if (error_during_run) error_during_run = false;
         // Check for Battery Data in Battery Queue
         if (xQueueReceive(main_batteryDataQueue, &percent_recv, 0) == pdPASS) {
-          if (percent_recv < LOW_POWER_THRESHOLD) {
+          if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
              main_state = LOW_POWER;
              sendUpdatedMainTaskState(main_state);
              break;
@@ -246,7 +270,7 @@ void main_task(void * pvParameters) {
             break;
           }
           i++;
-        } while ( i < 50/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
+        } while ( i < 500/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
         i = 0;
         
         /* ***** Valve Zone Run **** */
@@ -280,7 +304,7 @@ void main_task(void * pvParameters) {
             break;
           }
           i++;
-        } while (i < 50/*TODO: Compare current time against VALVE_ON_TIME*/);
+        } while (i < 500/*TODO: Compare current time against VALVE_ON_TIME*/);
         i=0;
         // Stop the valve zone
         end_valve_zone();
@@ -328,6 +352,12 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   else if (new_state == STANDBY)
     msg = standby_update;
 
+  // Send the state to the logger
+  xReturned = xQueueSend(logger_mainStateChangeQueue, &new_state, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send main state change to logger_mainStateChangeQueue.\n");
+  }
+
   // Send the state to the battery task
   xReturned = xQueueSend(battery_mainStateQueue, &new_state, 0);
   if (xReturned != pdPASS) {
@@ -338,12 +368,6 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   xReturned = xQueueSend(usb_stateChangeQueue, &msg, 0);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send main state change to usb_stateChangeQueue.\n");
-  }
-  
-  // Send the state to the logger
-  xReturned = xQueueSend(logger_mainStateChangeQueue, &new_state, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send main state change to logger_mainStateChangeQueue.\n");
   }
 
   // Send the state to the sensor task
@@ -420,49 +444,49 @@ void end_valve_zone(void) {
 void create_tasks() {
   BaseType_t xReturned;
   // Main Task
-  xReturned = xTaskCreate(main_task, "MainTask", 300, NULL, 0, &mainTaskHandle);
+  xReturned = xTaskCreate(main_task, "MainTask", 1024, NULL, 0, &mainTaskHandle);
   if( xReturned != pdPASS ) {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating main task. Error: %d\n", xReturned);
       vTaskDelete( mainTaskHandle );
   }
   // Heater Task
-  xReturned = xTaskCreate(heater_task, "HeaterTask", 300, NULL, 0, &heaterTaskHandle);
+  xReturned = xTaskCreate(heater_task, "HeaterTask", 1024, NULL, 0, &heaterTaskHandle);
   if( xReturned != pdPASS ) {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating heater task. Error: %d\n", xReturned);
       vTaskDelete( heaterTaskHandle );
   }
   // Logger Task
-  xReturned = xTaskCreate(logger_task, "LoggerTask", 300, NULL, 0, &loggerTaskHandle);
+  xReturned = xTaskCreate(logger_task, "LoggerTask", 1024, NULL, 0, &loggerTaskHandle);
   if( xReturned != pdPASS ) {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating logger task. Error: %d\n", xReturned);
       vTaskDelete( loggerTaskHandle );
   }
   // Sensors Task
-  xReturned = xTaskCreate(sensors_task, "SensorsTask", 300, NULL, 0, &sensorsTaskHandle);
+  xReturned = xTaskCreate(sensors_task, "SensorsTask", 1024, NULL, 0, &sensorsTaskHandle);
   if( xReturned != pdPASS ) {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating sensors task. Error: %d\n", xReturned);
       vTaskDelete( sensorsTaskHandle );
   }
   // Battery Management Task
-  xReturned = xTaskCreate(battery_task, "BatteryTask", 100, NULL, 0, &batteryTaskHandle);
+  xReturned = xTaskCreate(battery_task, "BatteryTask", 1024, NULL, 0, &batteryTaskHandle);
   if( xReturned != pdPASS ) {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating battery management task. Error: %d\n", xReturned);
       vTaskDelete( batteryTaskHandle );
   }
   // USB Management Task
-  xReturned = xTaskCreate(usb_task, "USBTask", 300, NULL, 2, &usbTaskHandle);
+  xReturned = xTaskCreate(usb_task, "USBTask", 1024, NULL, 0, &usbTaskHandle);
   if( xReturned != pdPASS ) {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating usb management task. Error: %d\n", xReturned);
       vTaskDelete( usbTaskHandle );
   }
   // PWM Task
-  xReturned = xTaskCreate(pwm_task, "PWMTask", 100, NULL, 0, &pwmTaskHandle);
+  xReturned = xTaskCreate(pwm_task, "PWMTask", 1024, NULL, 0, &pwmTaskHandle);
   if ( xReturned != pdPASS ) {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating PWM task. Error: %d\n", xReturned);
@@ -530,15 +554,22 @@ void create_queues() {
     printf("Unable to create logger_mainStateChangeQueue queue\n");
 }
 
+// Stack Overflow detection.
+void vApplicationStackOverflowHook( TaskHandle_t xTask,
+                                    signed char *pcTaskName ){
+  printf("FreeRTOS Stack Overflow Has Occured.");
+}
+
 /*********************************************************************
 *
 *       main()
 *
 *   Application entry point.
 */
-int main(void) {
-  ret_code_t ret;  
-  
+ int main(void) {
+  ret_code_t err_code;
+  FRESULT res;
+
   // Initialize clock driver for better time accuracy in FREERTOS
   ret = nrf_drv_clock_init();
   APP_ERROR_CHECK(ret);
@@ -553,15 +584,22 @@ int main(void) {
   // Full Peripheral Initalizations
   init_adc();             // ADC
   init_sensors_gpios();   // Sensor GPIOs
-  vInit_TWI_Hardware(i2c_interface_system, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
-  //vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
-  //init_sd_card();
+  vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_400k);   // I2C
+  vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
+  init_sd_card();
 
   // Create Tasks
   create_tasks();
 
   // Create Queues
   create_queues();
+
+  // Get the configuration parameters
+  res = get_naatos_configuration_parameters(&config);
+  if (res != FR_OK) {
+    printf("Warning: configuration file was not able to be read. Using default configuration parameters.");
+    use_default_configuration_parameters = true;
+  }
 
   // Start Tasks
   vTaskStartScheduler();

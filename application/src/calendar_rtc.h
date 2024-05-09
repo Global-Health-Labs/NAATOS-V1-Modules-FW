@@ -5,7 +5,7 @@
 #include "naatos_config.h"
 #include <stdint.h>
 
-#define PCF85_S_ADDR    (0x51 << 1)
+#define PCF85_S_ADDR    0x51
 
 #define PCF85_REG_CTRL1_ADDR                   0x00
 #define PCF85_REG_CTRL2_ADDR                   0x01

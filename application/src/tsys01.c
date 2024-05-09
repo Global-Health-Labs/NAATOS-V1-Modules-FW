@@ -52,19 +52,19 @@ static tsys01_errors_t tsys01_writeRegister(sensor_selection_t sensor, uint8_t r
     {
         case valve_zone:
             interface = i2c_interface_system;
-            slave_addr = TSYS01_ADDR;
+            slave_addr = TSYS01_ADDR_ALT;
             break;
         case amp_zone_0:
             interface = i2c_interface_system;
-            slave_addr = TSYS01_ADDR_ALT;
+            slave_addr = TSYS01_ADDR;
             break;
         case amp_zone_1:
             interface = i2c_interface_sensors;
-            slave_addr = TSYS01_ADDR;
+            slave_addr = TSYS01_ADDR_ALT;
             break;
         case amp_zone_2:
             interface = i2c_interface_sensors;
-            slave_addr = TSYS01_ADDR_ALT;
+            slave_addr = TSYS01_ADDR;
             break;
     }
     err_code = xUtil_TWI_Write( interface, slave_addr, reg, &writeBuffer, 1 );

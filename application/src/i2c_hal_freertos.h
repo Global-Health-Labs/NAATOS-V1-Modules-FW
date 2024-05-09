@@ -8,6 +8,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include "sdk_errors.h"
+#include "naatos_config.h"
 
 #define I2C_SYSTEM_INSTANCE_ID 0
 #define I2C_SENSOR_INSTANCE_ID 1

@@ -6,10 +6,10 @@ temperature_data_t temperatures;
 
 static tsys01_errors_t tsys01_err;
 
-static double valve_temperature;
-static double amp0_temperature;
-static double amp1_temperature;
-static double amp2_temperature;
+static long double valve_temperature = 0.0;
+static long double amp0_temperature = 0.0;
+static long double amp1_temperature = 0.0;
+static long double amp2_temperature = 0.0;
 
 xQueueHandle sensor_mainStateQueue;
 main_state_t s_main_state = STANDBY;
@@ -23,9 +23,15 @@ static log_data_message_t log_msg = {
 void sensors_task(void * pvParameters) {
   BaseType_t xReturned;
   uint32_t sample_log_index = 0;
-  uint32_t sample_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE); // TODO: Update to be based on config.txt
-
-  // TODO: Get Configuration Settings
+  uint32_t sample_log_max = 0;
+  
+  // Set the last sample based on config
+  if (use_default_configuration_parameters) {
+    sample_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE); 
+  }
+  else {
+    sample_log_max = (config.logging_rate / config.sample_rate);
+  }
 
   /* Get TSYS01 Calibration Values */
 #if I2C_CONNECTED
@@ -36,10 +42,6 @@ void sensors_task(void * pvParameters) {
 #endif
 
   for (;;) {
-    // Get Start Time in ms, testing for timings
-    //uint32_t time = pdTICKS_TO_MS(xTaskGetTickCount());
-    //printf("Start Time: %dms \n", time);
-
     // Check to see if the main task state has changed
     if (uxQueueMessagesWaiting(sensor_mainStateQueue) > 0) {
       xReturned = xQueueReceive(sensor_mainStateQueue, &s_main_state, 0);
@@ -82,20 +84,17 @@ void sensors_task(void * pvParameters) {
 
  #if I2C_CONNECTED
     // I2C Read for Valve Zone
-    readTemp(valve_zone, &valve_temperature);
-    temperatures.valve_zone_temp = valve_temperature;    
+    temperatures.valve_zone_temp = readTemp(valve_zone);
 
-    // I2C Read for Amplification Zone 0 (valve zone enum is acutally amp zone, changing the define was causing hard fault)
-    readTemp(amp_zone_0, &amp0_temperature);
-    temperatures.amp0_zone_temp = amp0_temperature; 
+    // I2C Read for Amplification Zone 0 
+    temperatures.amp0_zone_temp = readTemp(amp_zone_0); 
   
     // I2C Read for Amplification Zone 1 
-    readTemp(amp_zone_1, &amp1_temperature);
-    temperatures.amp1_zone_temp = amp1_temperature;  
+    temperatures.amp1_zone_temp = readTemp(amp_zone_1);
 
     // I2C Read for Amplification Zone 2 
-    readTemp(amp_zone_2, &amp2_temperature);
-    temperatures.amp2_zone_temp = amp2_temperature;
+    temperatures.amp2_zone_temp = readTemp(amp_zone_2);
+    
 #else
     // Set temps to their setpoints if i2c is not connected
     temperatures.valve_zone_temp = 85;
@@ -134,11 +133,12 @@ void sensors_task(void * pvParameters) {
     
     // Delay based on the given sample rate
     // Remove 48 ms delay when running for temperature read delays
-    vTaskDelay(pdMS_TO_TICKS((DEFAULT_SAMPLE_RATE*1000) - (12 * 4) + 1)); // TODO: Update sample rate to be based on config file
-    
-    // Get Stop Time in ms, testing for timings
-    //time = pdTICKS_TO_MS(xTaskGetTickCount());
-    //printf("End Time: %dms\n", time);
+    if (use_default_configuration_parameters) {
+      vTaskDelay(pdMS_TO_TICKS((DEFAULT_SAMPLE_RATE*1000) - (12 * 4) + 1)); 
+    }
+    else {
+      vTaskDelay(pdMS_TO_TICKS((config.sample_rate*1000) - (12 * 4) + 1));
+    }
   }
 }
 
@@ -147,10 +147,13 @@ void init_sensors_gpios(void) {
   nrf_gpio_cfg_input(HAL_INPUT_PIN, NRF_GPIO_PIN_PULLDOWN);
   nrf_gpio_cfg_output(NRF_GPIO_PIN_MAP(1,7));
   nrf_gpio_pin_write(NRF_GPIO_PIN_MAP(1,7), 1);
+  nrf_gpio_cfg_output(SENSORS_EN);
+  nrf_gpio_pin_set(SENSORS_EN);
 }
 
-void readTemp(sensor_selection_t sensor, double * temperature) {
+long double readTemp(sensor_selection_t sensor) {
   tsys01_errors_t tsys_err;
+  long double temperature;
 
   tsys01_startConversion(sensor);
   vTaskDelay(pdMS_TO_TICKS(12));  // 12ms conversion time
@@ -158,4 +161,5 @@ void readTemp(sensor_selection_t sensor, double * temperature) {
   if (tsys_err != tsys01_success) {
     printf("HEATER_TASK: Unable to read temperature!\n");
   }
+  return temperature;
 }
