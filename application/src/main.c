@@ -594,7 +594,8 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
     printf("Warning: configuration file was not able to be read. Using default configuration parameters.");
     use_default_configuration_parameters = true;
   }
-
+  
+  // Uninitalize the SD card
   uninit_sd_card();
 
   // Create Tasks
