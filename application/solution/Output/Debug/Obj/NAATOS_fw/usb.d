@@ -42,6 +42,7 @@ Output/Debug/Obj/NAATOS_fw/usb.o: \
  ../sdk/external/freertos/source/include/list.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\states.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sd_card.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
  ../sdk/components/libraries/bsp/bsp.h ../sdk/components/boards/boards.h \
  ../sdk/modules/nrfx/hal/nrf_gpio.h ../sdk/modules/nrfx/nrfx.h \
  ../sdk/integration/nrfx/nrfx_config.h ../src/config/sdk_config.h \
@@ -67,7 +68,6 @@ Output/Debug/Obj/NAATOS_fw/usb.o: \
  ../sdk/external/fatfs/src/diskio.h \
  ../sdk/components/libraries/block_dev/nrf_block_dev.h \
  ../sdk/components/libraries/util/sdk_common.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
  ../sdk/components/libraries/util/sdk_os.h \
  ../sdk/components/libraries/util/app_util.h \
  ../sdk/components/libraries/util/sdk_macros.h \
@@ -93,6 +93,16 @@ Output/Debug/Obj/NAATOS_fw/usb.o: \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdlib.h \
  ../sdk/components/libraries/balloc/nrf_balloc.h \
  ../sdk/components/libraries/log/nrf_log_default_backends.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\heater.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pid.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pwm.h \
+ ../sdk/components/libraries/pwm/app_pwm.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_timer.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_timer.h \
+ ../sdk/modules/nrfx/hal/nrf_timer.h \
+ ../sdk/integration/nrfx/legacy/nrf_drv_ppi.h \
+ ../sdk/modules/nrfx/drivers/include/nrfx_ppi.h \
+ ../sdk/modules/nrfx/hal/nrf_ppi.h \
  ../sdk/components/libraries/usbd/app_usbd.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_usbd.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_usbd.h \

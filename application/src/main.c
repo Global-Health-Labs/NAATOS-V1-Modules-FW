@@ -571,8 +571,8 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
   FRESULT res;
 
   // Initialize clock driver for better time accuracy in FREERTOS
-  ret = nrf_drv_clock_init();
-  APP_ERROR_CHECK(ret);
+  err_code = nrf_drv_clock_init();
+  APP_ERROR_CHECK(err_code);
 
   nrf_drv_clock_lfclk_request(NULL);
 
@@ -588,18 +588,20 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
   vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
   init_sd_card();
 
-  // Create Tasks
-  create_tasks();
-
-  // Create Queues
-  create_queues();
-
   // Get the configuration parameters
   res = get_naatos_configuration_parameters(&config);
   if (res != FR_OK) {
     printf("Warning: configuration file was not able to be read. Using default configuration parameters.");
     use_default_configuration_parameters = true;
   }
+
+  uninit_sd_card();
+
+  // Create Tasks
+  create_tasks();
+
+  // Create Queues
+  create_queues();
 
   // Start Tasks
   vTaskStartScheduler();

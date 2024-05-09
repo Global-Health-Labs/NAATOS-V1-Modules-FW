@@ -24,8 +24,6 @@ main_state_t main_state;
 
 bool usb_started = false;
 
-
-
 /* ***** Instances ***** */
 
 // Mass storage class instance
@@ -171,9 +169,10 @@ void start_usb(void) {
     static const app_usbd_config_t usbd_config = {
         .ev_state_proc = usbd_user_ev_handler
     };
-
-    //ret = sd_card_unmount();
-    //APP_ERROR_CHECK(ret);
+    
+    if (sd_card_inited) {
+      uninit_sd_card();
+    }
 
     app_usbd_serial_num_generate();
 

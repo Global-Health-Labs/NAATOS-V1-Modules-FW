@@ -84,7 +84,10 @@ typedef struct {
   bool config_dir_needed;
 } directories_needed_t;
 
+extern bool sd_card_inited;
+
 void init_sd_card(void);
+void uninit_sd_card(void);
 void sd_card_list_contents(void); 
 void create_naatos_directories(void);
 FRESULT sd_card_create_log_file(const char * file_name);

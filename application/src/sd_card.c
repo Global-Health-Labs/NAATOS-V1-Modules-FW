@@ -12,6 +12,8 @@ uint32_t blocks_per_mb;
 uint32_t capacity;
 uint32_t b_written;
 
+bool sd_card_inited = false;
+
 // Initialize FATFS disk I/O interface by providing the block device.
 static diskio_blkdev_t drives[] = { DISKIO_BLOCKDEV_CONFIG(NRF_BLOCKDEV_BASE_ADDR(m_block_dev_sdc, block_dev), NULL) };
 
@@ -47,6 +49,17 @@ void init_sd_card(void) {
 
   // Create directories if needed
   create_naatos_directories();
+
+  sd_card_inited = true;
+}
+
+void uninit_sd_card(void) {
+
+  UNUSED_RETURN_VALUE(sd_card_unmount());
+  UNUSED_RETURN_VALUE(disk_uninitialize(0));
+  
+  sd_card_inited = false;
+  printf("SD Card Uninitalized.\n");
 }
 
 // Mount the SD card volume
