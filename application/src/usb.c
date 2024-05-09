@@ -203,9 +203,13 @@ void start_usb(void) {
 }
 
 void composite_usb_task(void * pvParameters) {
+  // Start the USB
+  if (!usb_started) {
+    start_usb();
+  }
+
   for (;;) {
-      while (app_usbd_event_queue_process())
-      {
+      while (app_usbd_event_queue_process()) {
           // Nothing to do 
       }
   }
@@ -222,11 +226,6 @@ void usb_task(void * pvParameters) {
 
   // Set the first event to make sure that USB queue is processed after it is started
   for (;;) {
-
-    // Start the USB
-    if (!usb_started) {
-      start_usb();
-    }
     
     // Check the USB queue for an update message
     xReturned = xQueueReceive(usb_stateChangeQueue, &recv_msg, portMAX_DELAY);
