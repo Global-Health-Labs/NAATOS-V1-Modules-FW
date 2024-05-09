@@ -228,22 +228,11 @@ void usb_task(void * pvParameters) {
     if (!usb_started) {
       start_usb();
     }
-
-    /* Waiting for event */
-    while (app_usbd_event_queue_process()) { }
-
-    //ret = app_usbd_cdc_acm_write(&m_app_cdc_acm, "HELLO", 6);
     
     // Check the USB queue for an update message
-    if (uxQueueMessagesWaiting(usb_stateChangeQueue) > 0) {
-      xReturned = xQueueReceive(usb_stateChangeQueue, &recv_msg, 0);
-      if (xReturned != pdPASS) {
-        printf("USB_TASK: Unable to receive usb message from usb_stateChangeQueue.\n");
-      }
-    }
-    else {
-      vTaskDelay(pdMS_TO_TICKS(100));
-      continue;
+    xReturned = xQueueReceive(usb_stateChangeQueue, &recv_msg, portMAX_DELAY);
+    if (xReturned != pdPASS) {
+      printf("USB_TASK: Unable to receive usb message from usb_stateChangeQueue.\n");
     }
 
     // Update from received message

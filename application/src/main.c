@@ -469,7 +469,7 @@ void create_tasks() {
       vTaskDelete( pwmTaskHandle );
   }
   // USB Composite Task
-  xReturned = xTaskCreate(composite_usb_task, "CompositeUSBTask", 100, NULL, 0, &compositeTaskHandle);
+  xReturned = xTaskCreate(composite_usb_task, "CompositeUSBTask", 1024, NULL, 0, &compositeTaskHandle);
   if ( xReturned != pdPASS ) {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating Composite USB task. Error: %d\n", xReturned);
