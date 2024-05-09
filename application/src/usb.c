@@ -110,7 +110,7 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
             usb_started = true;
             break;
         case APP_USBD_EVT_STOPPED:
-          printf("USB: Stopped\n");
+            printf("USB: Stopped\n");
             app_usbd_disable();
             break;
         case APP_USBD_EVT_POWER_DETECTED:
@@ -139,31 +139,6 @@ void msc_user_ev_handler(app_usbd_class_inst_t const * p_inst,
 {
     UNUSED_PARAMETER(p_inst);
     UNUSED_PARAMETER(event);
-}
-
-static void power_usb_event_handler(nrf_drv_power_usb_evt_t event)
-{
-    switch(event)
-    {
-        case NRF_DRV_POWER_USB_EVT_DETECTED:
-            printf("USB power detected\r\n");
-
-            if (!nrf_drv_usbd_is_enabled())
-            {
-                app_usbd_enable();
-            }
-            break;
-        case NRF_DRV_POWER_USB_EVT_REMOVED:
-            printf("USB power removed\r\n");
-            m_usb_connected = false;
-            break;
-        case NRF_DRV_POWER_USB_EVT_READY:
-            printf("USB ready\r\n");
-            m_usb_connected = true;
-            break;
-        default:
-            ASSERT(false);
-    }
 }
 
 void usb_suspend_conflicting_tasks(void) {
@@ -229,13 +204,15 @@ void usb_suspend_conflicting_tasks(void) {
   usb_suspended_tasks = true;
 }
 
-void start_usb(void) {
+void start_usb(bool cdc_acm, bool msc) {
    ret_code_t ret;
     static const app_usbd_config_t usbd_config = {
         .ev_state_proc = usbd_user_ev_handler
     };
-
-    usb_suspend_conflicting_tasks();
+    
+    if (msc) {
+      usb_suspend_conflicting_tasks();
+    }
     
     if (sd_card_inited) {
       uninit_sd_card();
@@ -245,14 +222,18 @@ void start_usb(void) {
 
     ret = app_usbd_init(&usbd_config);
     APP_ERROR_CHECK(ret);
-
-    app_usbd_class_inst_t const * class_cdc_acm = app_usbd_cdc_acm_class_inst_get(&m_app_cdc_acm);
-    ret = app_usbd_class_append(class_cdc_acm);
-    APP_ERROR_CHECK(ret);
-
-    app_usbd_class_inst_t const * class_inst_msc = app_usbd_msc_class_inst_get(&m_app_msc);
-    ret = app_usbd_class_append(class_inst_msc);
-    APP_ERROR_CHECK(ret);
+    
+    if (cdc_acm) {
+      app_usbd_class_inst_t const * class_cdc_acm = app_usbd_cdc_acm_class_inst_get(&m_app_cdc_acm);
+      ret = app_usbd_class_append(class_cdc_acm);
+      APP_ERROR_CHECK(ret);
+    }
+    
+    if (msc) {
+      app_usbd_class_inst_t const * class_inst_msc = app_usbd_msc_class_inst_get(&m_app_msc);
+      ret = app_usbd_class_append(class_inst_msc);
+      APP_ERROR_CHECK(ret);
+    }
 
     if (USBD_POWER_DETECTION)
     {
@@ -269,6 +250,12 @@ void start_usb(void) {
     }
 }
 
+void restart_usb_only_cdc_acm(void) {
+  printf("USB: Restarting USB to only have Virtual COM Port.\n");
+  app_usbd_suspend_req();
+  m_usb_connected = false;
+}
+
 void composite_usb_task(void * pvParameters) {
   BaseType_t xReturned;
   usb_suspend_over_t sus_over;
@@ -278,7 +265,7 @@ void composite_usb_task(void * pvParameters) {
 
   // Start the USB
   if (!usb_started) {
-    start_usb();
+    start_usb(true, true);
   }
 
   for (;;) {
@@ -328,6 +315,7 @@ void composite_usb_task(void * pvParameters) {
 void usb_task(void * pvParameters) {
   BaseType_t xReturned;
   bool conn_state_updated = false, main_state_updated = false;
+  tasks_t usb_task = USB;
 
   // Set Current State to Standby
   main_state = STANDBY;
@@ -350,8 +338,8 @@ void usb_task(void * pvParameters) {
       main_state = recv_msg.current_state;
 
     // Check USB Connection Status 
-    if (connection_state != CHARGING)
-      continue;
+    //if (connection_state != CHARGING)
+      //continue;
 
     // File System Update Based on the main state
     if (main_state == STANDBY) {
@@ -360,9 +348,11 @@ void usb_task(void * pvParameters) {
       // TODO: Enable Logging
     }
     else if (main_state == RUNNING) {
-      // TODO: Uninit FatFS
-      // TODO: Enable UART Stream
-      // TODO: Enable Logging
+      restart_usb_only_cdc_acm();
+      xReturned = xQueueSend(main_mainStateRespQueue, &usb_task, 0);
+      if (xReturned != pdPASS) {
+        printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
+      }
     }
   }
 }

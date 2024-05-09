@@ -9,6 +9,7 @@
 // Main Task Queue(s)
 extern xQueueHandle main_batteryDataQueue;
 extern xQueueHandle main_switchQueue;
+extern xQueueHandle main_mainStateRespQueue;
 
 // Heater Task Queue(s)
 extern xQueueHandle heater_zoneRunQueue;

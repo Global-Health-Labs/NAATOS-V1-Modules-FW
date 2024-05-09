@@ -55,7 +55,7 @@ xTaskHandle compositeTaskHandle;
 
 xQueueHandle main_batteryDataQueue;
 xQueueHandle main_switchQueue;
-xQueueHandle main_usbWaitQueue;
+xQueueHandle main_mainStateRespQueue;
 
 // Zone Request Constants
 const zone_run_req_t run_amplification_zone = {
@@ -346,12 +346,16 @@ void main_task(void * pvParameters) {
 void sendUpdatedMainTaskState(main_state_t new_state) {
   BaseType_t xReturned;
   usb_message_t msg;
+  bool logger_resp = false, batt_resp = false, usb_resp = false, sensor_resp = false;
+  tasks_t task_recv;
   
   // Get the update to send
   if (new_state == RUNNING)
     msg = running_update;
   else if (new_state == STANDBY)
     msg = standby_update;
+
+  printf("MAIN: Sending Main State Update Messages.\n");
 
   // Send the state to the logger
   xReturned = xQueueSend(logger_mainStateChangeQueue, &new_state, 0);
@@ -377,7 +381,35 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
     printf("MAIN_TASK: Unable to send main state change to heater_mainStateQueue.\n");
   }
 
-  // TODO: might have to do small delay here for usb task to update
+  /* Get responses from the states to ensure all configurations for the run or standby have been made */
+  while(!logger_resp || !batt_resp || !usb_resp || !sensor_resp) {
+    if (uxQueueMessagesWaiting(main_mainStateRespQueue) > 0) {
+        xReturned = xQueueReceive(main_mainStateRespQueue, &task_recv, 0);
+        if (xReturned != pdPASS) {
+          printf("USB: Unable to receive main state update response from main_mainStateRespQueue\n");
+        }
+        switch(task_recv) {
+        case LOGGER:
+          logger_resp = true;
+          printf("MAIN: Logger Task has updated its main state.\n");
+          break;
+        case BATTERY:
+          batt_resp = true;
+          printf("MAIN: Battery Task has updated its main state.\n");
+          break;
+        case USB:
+          usb_resp = true;
+          printf("MAIN: USB Task has updated its main state.\n");
+          break;
+        case SENSORS:
+          sensor_resp = true;
+          printf("MAIN: Sensor Task has updated its main state.\n");
+          break;
+        default:
+          break;
+        }
+    }
+  }
 }
 
 void begin_amplification_zone(void) {
@@ -517,6 +549,9 @@ void create_queues() {
   main_switchQueue = xQueueCreate(QUEUE_SIZE, sizeof(sensor_switches_t));
   if (main_switchQueue == NULL)
     printf("Unable to create main_switchQueue queue\n");
+  main_mainStateRespQueue = xQueueCreate(4, sizeof(tasks_t));
+  if (main_switchQueue == NULL)
+    printf("Unable to create main_mainStateRespQueue queue\n");
 
   // Heater Task Queues
   heater_zoneRunQueue = xQueueCreate(QUEUE_SIZE, sizeof(zone_run_req_t));
