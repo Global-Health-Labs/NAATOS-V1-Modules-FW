@@ -57,7 +57,7 @@ void heater_task(void * pvParameters) {
         }
         printf("HEATER: Suspending for 15 seconds.\n");
         // Delay Task for 15 Seconds
-        vTaskDelay(pdMS_TO_TICKS(15000));
+        vTaskDelay(pdMS_TO_TICKS(USB_SUSPEND_TASKS_TIME));
         // Send Suspend Over
         xReturned = xQueueSend(usb_usbWaitOverQueue, &sus_over, 0); 
         if (xReturned != pdPASS) {

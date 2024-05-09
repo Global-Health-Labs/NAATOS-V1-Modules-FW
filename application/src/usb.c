@@ -69,20 +69,18 @@ void cdc_acm_user_ev_handler(app_usbd_class_inst_t const * p_inst,
             break;
         }
         case APP_USBD_CDC_ACM_USER_EVT_PORT_CLOSE:
-            //bsp_board_led_off(LED_CDC_ACM_OPEN);
             break;
         case APP_USBD_CDC_ACM_USER_EVT_TX_DONE:
-           // bsp_board_led_invert(LED_CDC_ACM_TX);
             break;
         case APP_USBD_CDC_ACM_USER_EVT_RX_DONE:
         {
             ret_code_t ret;
-            NRF_LOG_INFO("Bytes waiting: %d", app_usbd_cdc_acm_bytes_stored(p_cdc_acm));
+            printf("Bytes waiting: %d\n", app_usbd_cdc_acm_bytes_stored(p_cdc_acm));
             do
             {
                 //Get amount of data transfered
                 size_t size = app_usbd_cdc_acm_rx_size(p_cdc_acm);
-                NRF_LOG_INFO("RX: size: %lu char: %c", size, m_rx_buffer[0]);
+                printf("RX: size: %lu char: %c\n", size, m_rx_buffer[0]);
 
                 // Fetch data until internal buffer is empty 
                 ret = app_usbd_cdc_acm_read(&m_app_cdc_acm,
@@ -90,7 +88,6 @@ void cdc_acm_user_ev_handler(app_usbd_class_inst_t const * p_inst,
                                             READ_SIZE);
             } while (ret == NRF_SUCCESS);
 
-            //bsp_board_led_invert(LED_CDC_ACM_RX);
             break;
         }
         default:
@@ -323,7 +320,7 @@ void composite_usb_task(void * pvParameters) {
       }
     }
     else {
-      vTaskDelay(100);
+      vTaskDelay(50);
     }
   }
 }

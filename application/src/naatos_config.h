@@ -49,6 +49,8 @@
 #define VALV_START_MSG        "Valve Zone Heating Started."
 #define VALV_STOP_MSG         "Valve Zone Heating Stopped."
 
+#define USB_SUSPEND_TASKS_TIME    15000
+
 /* Main States */
 typedef enum {
   LOW_POWER,
