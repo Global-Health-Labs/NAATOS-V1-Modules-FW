@@ -29,6 +29,9 @@ main_state_t main_state;
 // USB Suspended Vars
 bool usb_started = false;
 bool usb_suspended_tasks = false;
+bool usb_detected = false;
+bool msc_active = false, cdc_acm_active = false;
+bool usb_done_config = false;
 
 /* ***** Instances ***** */
 
@@ -115,7 +118,7 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
             break;
         case APP_USBD_EVT_POWER_DETECTED:
             printf("USB: Power detected\n");
-
+            usb_detected = true;
             if (!nrf_drv_usbd_is_enabled())
             {
                 app_usbd_enable();
@@ -124,9 +127,13 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
         case APP_USBD_EVT_POWER_REMOVED:
             printf("USB: Power removed\n");
             app_usbd_stop();
+            usb_done_config = false;
+            usb_detected = false;
+            usb_started = false;
             break;
         case APP_USBD_EVT_POWER_READY:
             printf("USB: Ready\n");
+            m_usb_connected = true;
             app_usbd_start();
             break;
         default:
@@ -210,10 +217,6 @@ void start_usb(bool cdc_acm, bool msc) {
         .ev_state_proc = usbd_user_ev_handler
     };
     
-    if (msc) {
-      usb_suspend_conflicting_tasks();
-    }
-    
     if (sd_card_inited) {
       uninit_sd_card();
     }
@@ -224,15 +227,23 @@ void start_usb(bool cdc_acm, bool msc) {
     APP_ERROR_CHECK(ret);
     
     if (cdc_acm) {
+      cdc_acm_active = true;
       app_usbd_class_inst_t const * class_cdc_acm = app_usbd_cdc_acm_class_inst_get(&m_app_cdc_acm);
       ret = app_usbd_class_append(class_cdc_acm);
       APP_ERROR_CHECK(ret);
     }
+    else {
+      cdc_acm_active = false;
+    }
     
     if (msc) {
+      msc_active = true;
       app_usbd_class_inst_t const * class_inst_msc = app_usbd_msc_class_inst_get(&m_app_msc);
       ret = app_usbd_class_append(class_inst_msc);
       APP_ERROR_CHECK(ret);
+    }
+    else {
+      msc_active = false;
     }
 
     if (USBD_POWER_DETECTION)
@@ -246,6 +257,7 @@ void start_usb(bool cdc_acm, bool msc) {
 
         app_usbd_enable();
         app_usbd_start();
+
         m_usb_connected = true;
     }
 }
@@ -272,6 +284,10 @@ void composite_usb_task(void * pvParameters) {
     
     while (app_usbd_event_queue_process()) {
         // Nothing to do 
+    }
+
+    if (msc_active && usb_detected && !usb_suspended_tasks && !usb_done_config) {
+      usb_suspend_conflicting_tasks();
     }
     
     if (usb_suspended_tasks) {
@@ -304,6 +320,7 @@ void composite_usb_task(void * pvParameters) {
 
       if (batt_over && heater_over && pwm_over && sensor_over) {
         usb_suspended_tasks = false;
+        usb_done_config = true;
       }
     }
     else {
