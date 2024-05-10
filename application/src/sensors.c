@@ -68,8 +68,8 @@ void sensors_task(void * pvParameters) {
       if (xReturned != pdPASS) {
         printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
       }
-      // Wait for Coninute
-      //xReturned = xQueueReceive(sensor_mainStateContinueQueue, &cont, portMAX_DELAY);
+      // Wait for Continue
+      xReturned = xQueueReceive(sensor_mainStateContinueQueue, &cont, portMAX_DELAY);
       if (xReturned != pdPASS) {
         printf("USB: Unable to recevive continue to sensor_mainStateContinueQueue queue.\n");
       }

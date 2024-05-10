@@ -64,9 +64,9 @@ void logger_task(void * pvParameters) {
       printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
     }
     // Wait for Coninute
-    xReturned = xQueueReceive(sensor_mainStateContinueQueue, &cont, portMAX_DELAY);
+    xReturned = xQueueReceive(logger_mainStateContinueQueue, &cont, portMAX_DELAY);
     if (xReturned != pdPASS) {
-      printf("USB: Unable to recevive continue to sensor_mainStateContinueQueue queue.\n");
+      printf("USB: Unable to recevive continue to logger_mainStateContinueQueue queue.\n");
     }
 
     if (main_state == RUNNING) {

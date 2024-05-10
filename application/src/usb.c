@@ -112,7 +112,6 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
         case APP_USBD_EVT_STARTED:
             printf("USB: Started\n");
             usb_started = true;
-            usb_detected = true;
             break;
         case APP_USBD_EVT_STOPPED:
             printf("USB: Stopped\n");
@@ -129,7 +128,7 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
         case APP_USBD_EVT_POWER_REMOVED:
             printf("USB: Power removed\n");
             app_usbd_stop();
-            usb_done_config = false;
+            usb_done_config = false;  
             usb_detected = false;
             usb_started = false;
             break;
