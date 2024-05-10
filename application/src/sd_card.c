@@ -422,19 +422,19 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
             parameters->logging_rate = atof(val);
             break;
         case VALVE_ZONE_RUN_TIME:
-            parameters->valve_zone_run_time_m = atoi(val);
+            parameters->amplification_zone_run_time_m = atoi(val);// TODO: Figure out why this is backwards
             break;
         case AMP_ZONE_RUN_TIME:
-            parameters->amplification_zone_run_time_m = atoi(val);
+            parameters->valve_zone_run_time_m = atoi(val);// TODO: Figure out why this is backwards
             break;
         case LOW_POWER_THRESHOLD:
             parameters->low_power_threshold = atoi(val);
             break;
         case VALVE_SETPOINT_C:
-            parameters->valve_setpoint = atof(val);
+            parameters->valve_setpoint = atof(val); 
             break;
         case AMP_SETPOINT_C:
-            parameters->amplification_setpoint = atof(val);
+            parameters->amplification_setpoint = atof(val); 
             break;
         case VALVE_KP:
             parameters->valve_kp = atof(val);

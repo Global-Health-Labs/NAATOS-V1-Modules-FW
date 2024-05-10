@@ -202,12 +202,12 @@ void main_task(void * pvParameters) {
   int percent_recv;   
   bool hal_triggered = false, optical_triggered = false; 
   bool error_during_run = false;
+  uint32_t start_time = 0, end_time = 0;
 
   // Set Start up state to standby
   main_state_t main_state = STANDBY;
-
   int i = 0;
-  
+
   // Main State Loop
   for (;;) {
     switch(main_state) {
@@ -254,6 +254,14 @@ void main_task(void * pvParameters) {
         /* ***** Amplification Zone Run ***** */
         // Send start amplification message to heater queue
         begin_amplification_zone();
+        // Get the start time and end time
+        start_time = xTaskGetTickCount();
+        if (use_default_configuration_parameters) {
+          end_time = pdMS_TO_TICKS((DEFAULT_AMPLIFICATION_ZONE_ON_TIME * 60) * 1000);
+        }
+        else {
+          end_time = pdMS_TO_TICKS((config.amplification_zone_run_time_m * 60) * 1000);
+        }
         // Get sensor switch data ensuring sample is still in position
         do {
           // TODO: Get the current time
@@ -271,9 +279,7 @@ void main_task(void * pvParameters) {
             error_during_run = true;
             break;
           }
-          i++;
-        } while ( i < 50/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
-        i = 0;
+        } while ( pdTICKS_TO_MS(xTaskGetTickCount() - start_time) < end_time);
         
         // End amplification zone
         end_amplification_zone();
@@ -284,6 +290,14 @@ void main_task(void * pvParameters) {
         // Send valve zone start request
         if (!error_during_run) {
           begin_valve_zone();
+          // Get Start Time and End Time
+          start_time = xTaskGetTickCount();
+           if (use_default_configuration_parameters) {
+            end_time = pdMS_TO_TICKS((DEFAULT_VALVE_ZONE_ON_TIME * 60) * 1000);
+          }
+          else {
+            end_time = pdMS_TO_TICKS((config.valve_zone_run_time_m * 60) * 1000);
+          }
         }
         else {
           break;
@@ -306,9 +320,8 @@ void main_task(void * pvParameters) {
             error_during_run = true;
             break;
           }
-          i++;
-        } while (i < 50/*TODO: Compare current time against VALVE_ON_TIME*/);
-        i=0;
+        } while (pdTICKS_TO_MS(xTaskGetTickCount() - start_time) < end_time);
+       
         // Stop the valve zone
         end_valve_zone();
         // Check for errors
