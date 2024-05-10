@@ -246,7 +246,6 @@ void main_task(void * pvParameters) {
       case RUNNING:
         vTaskDelay(pdMS_TO_TICKS(100));
         /* ***** Start Sample Preperation ***** */
-        // TODO: Send Start Test Preperation to log 
 #if GO_STRAIGHT_TO_RUNNING
         // Allow for other tasks to get ready to receive main state change
         vTaskDelay(2000);
@@ -264,20 +263,10 @@ void main_task(void * pvParameters) {
         }
         // Get sensor switch data ensuring sample is still in position
         do {
-          // TODO: Get the current time
           xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
           if (!hal_triggered || !optical_triggered) {
-            // Send Interrupt Event to logging task
-            xReturned = xQueueSend(logger_logMessageQueue, &interrupt_log_msg, 0);
-            if (xReturned != pdPASS) {
-              printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
-            }
-            main_state = STANDBY;
-            sendUpdatedMainTaskState(main_state);
-            vTaskDelay(100);
-            error_during_run = true;
             break;
           }
         } while ( pdTICKS_TO_MS(xTaskGetTickCount() - start_time) < end_time);
@@ -301,24 +290,24 @@ void main_task(void * pvParameters) {
           }
         }
         else {
+          // Send Interrupt Event to logging task
+          xReturned = xQueueSend(logger_logMessageQueue, &interrupt_log_msg, 0);
+          if (xReturned != pdPASS) {
+            printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+          }
+          main_state = STANDBY;
+          sendUpdatedMainTaskState(main_state);
+          vTaskDelay(100);
+          error_during_run = true;
           break;
         }
 
         // Get sensor switch data ensuring sample is still in position
         do {
-          // TODO: Get the current time
           xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
           if (!hal_triggered || !optical_triggered) {
-            // Send interrupt Event to logging task
-            xReturned = xQueueSend(logger_logMessageQueue, &interrupt_log_msg, 0);
-            if (xReturned != pdPASS) {
-              printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
-            }
-            main_state = STANDBY;
-            sendUpdatedMainTaskState(main_state);
-            error_during_run = true;
             break;
           }
         } while (pdTICKS_TO_MS(xTaskGetTickCount() - start_time) < end_time);
@@ -327,6 +316,14 @@ void main_task(void * pvParameters) {
         end_valve_zone();
         // Check for errors
         if (error_during_run) {
+            // Send interrupt Event to logging task
+            xReturned = xQueueSend(logger_logMessageQueue, &interrupt_log_msg, 0);
+            if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+            }
+            main_state = STANDBY;
+            sendUpdatedMainTaskState(main_state);
+            error_during_run = true;
             break;
         }
 
@@ -497,6 +494,7 @@ void end_amplification_zone(void) {
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send stop amplification zone event to logging task.\n");
   }
+  vTaskDelay(100);
 }
 
 void end_valve_zone(void) {
