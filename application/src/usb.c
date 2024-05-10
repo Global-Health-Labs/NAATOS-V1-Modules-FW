@@ -264,7 +264,13 @@ void start_usb(bool cdc_acm, bool msc) {
 
 void restart_usb_only_cdc_acm(void) {
   printf("USB: Restarting USB to only have Virtual COM Port.\n");
-  app_usbd_suspend_req();
+  app_usbd_stop();
+  init_sd_card();
+  
+
+  usb_done_config = false;
+  usb_detected = false;
+  usb_started = false;
   m_usb_connected = false;
 }
 
@@ -273,7 +279,7 @@ void composite_usb_task(void * pvParameters) {
   usb_suspend_over_t sus_over;
   bool batt_over = false, heater_over = false, pwm_over = false, sensor_over = false;
 
-  vTaskDelay(pdMS_TO_TICKS(1000));
+  vTaskDelay(pdMS_TO_TICKS(100));
 
   // Start the USB
   if (!usb_started) {
@@ -286,7 +292,7 @@ void composite_usb_task(void * pvParameters) {
         // Nothing to do 
     }
 
-    if (msc_active && usb_detected && !usb_suspended_tasks && !usb_done_config) {
+    if (msc_active && usb_detected && !usb_suspended_tasks && !usb_done_config && main_state == STANDBY) {
       usb_suspend_conflicting_tasks();
       batt_over = false; heater_over = false; pwm_over = false; sensor_over = false;
     }
@@ -364,9 +370,15 @@ void usb_task(void * pvParameters) {
       // TODO: Mount the file system
       // TODO: Disable USB
       // TODO: Enable Logging
+      xReturned = xQueueSend(main_mainStateRespQueue, &usb_task, 0);
+      if (xReturned != pdPASS) {
+        printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
+      }
     }
     else if (main_state == RUNNING) {
-      restart_usb_only_cdc_acm();
+      if (usb_started) {
+        restart_usb_only_cdc_acm();
+      }
       xReturned = xQueueSend(main_mainStateRespQueue, &usb_task, 0);
       if (xReturned != pdPASS) {
         printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");

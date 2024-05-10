@@ -3,6 +3,7 @@
 xQueueHandle logger_recvBattPercentQueue;
 xQueueHandle logger_logMessageQueue;
 xQueueHandle logger_mainStateChangeQueue;
+xQueueHandle logger_mainStateContinueQueue;
 
 calendar_time_t time = {
     .second = 0,
@@ -41,6 +42,8 @@ void logger_task(void * pvParameters) {
   uint32_t logFileLineSize;
   FRESULT res;
   bool run_stopped = false;
+  tasks_t logger_task = LOGGER;
+  bool cont;
 
   // If logging rate is less than once a second, do UART only
   if (config.logging_rate < 1.0) {
@@ -54,6 +57,17 @@ void logger_task(void * pvParameters) {
     if (xReturned != pdPASS) {
       printf("LOG_TASK: Unable to receive state change from logger_mainStateChangeQueue.\n");
     }
+    // Respond to main state change
+    xReturned = xQueueSend(main_mainStateRespQueue, &logger_task, 0);
+    if (xReturned != pdPASS) {
+      printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
+    }
+    // Wait for Coninute
+    xReturned = xQueueReceive(sensor_mainStateContinueQueue, &cont, portMAX_DELAY);
+    if (xReturned != pdPASS) {
+      printf("USB: Unable to recevive continue to sensor_mainStateContinueQueue queue.\n");
+    }
+
     if (main_state == RUNNING) {
       // Create Log File based on the UTC Time of the Sample preperation
       getLogFileName(logFileName);
@@ -75,7 +89,7 @@ void logger_task(void * pvParameters) {
         if (xReturned != pdPASS) {
           printf("LOG_TASK: Unable to receive state change from logger_mainStateChangeQueue.\n");
         }
-        //continue;
+        continue;
       }
 
       // Request the battery percentage from the bettery task
@@ -90,6 +104,7 @@ void logger_task(void * pvParameters) {
       }
       
       while (!new_temp && !run_stopped) {
+
         // Wait for a log data message (either temperature data or event data)
         xReturned = xQueueReceive(logger_logMessageQueue, &log_message, portMAX_DELAY);
         if (xReturned != pdPASS) {
@@ -117,7 +132,7 @@ void logger_task(void * pvParameters) {
           logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n", time.hour, time.minute, time.second, last_temp_message.temperature_data.valve_zone_temp,
                                     last_temp_message.temperature_data.amp0_zone_temp, last_temp_message.temperature_data.amp1_zone_temp,
                                     last_temp_message.temperature_data.amp2_zone_temp, battery_percent, log_message.event_data.message);
-          if (log_message.event_data.event == SAMPLE_END || log_message.event_data.event == SAMPLE_INTERRUPTED) {
+          if (log_message.event_data.event == SAMPLE_VALV_ENDED || log_message.event_data.event == SAMPLE_INTERRUPTED) {
             run_stopped = true;
           }
         }

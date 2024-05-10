@@ -12,6 +12,7 @@
 xQueueHandle battery_requestPercentQueue;
 xQueueHandle battery_mainStateQueue;
 xQueueHandle battery_usbWaitQueue;
+xQueueHandle battery_mainStateContinueQueue;
 
 charge_state_t charge_state;
 int battery_percentage = 100;
@@ -21,6 +22,8 @@ void battery_task(void * pvParameters) {
   BaseType_t xReturned;
   battery_percent_req_t recv_req;
   bool inc = false; //temp
+  tasks_t batt_task = BATTERY;
+  bool cont;
 
   usb_suspend_req_t sus_req;
   usb_suspend_acpt_t sus_acpt = {
@@ -50,6 +53,16 @@ void battery_task(void * pvParameters) {
       xReturned = xQueueReceive(battery_mainStateQueue, &batt_main_state, 0);
       if (xReturned != pdPASS) {
         printf("BATT_TASK: Unable to receive state change from battery_mainStateQueue.\n");
+      }
+      // Respond to main state change
+      xReturned = xQueueSend(main_mainStateRespQueue, &batt_task, 0);
+      if (xReturned != pdPASS) {
+        printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
+      }
+      // Wait for Coninute
+      xReturned = xQueueReceive(battery_mainStateContinueQueue, &cont, portMAX_DELAY);
+      if (xReturned != pdPASS) {
+        printf("USB: Unable to recevive continue to battery_mainStateContinueQueue queue.\n");
       }
       continue;
     }

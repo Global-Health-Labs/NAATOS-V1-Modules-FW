@@ -176,6 +176,7 @@ naatos_config_parameters config = {
   .amp2_kd = 0
 };
 bool use_default_configuration_parameters;
+bool sensor_sent = false;
 
 // Function defs
 void sendUpdatedMainTaskState(main_state_t new_state);
@@ -215,6 +216,8 @@ void main_task(void * pvParameters) {
       // In Standby State
       case STANDBY:
         if (error_during_run) error_during_run = false;
+        hal_triggered = false;
+        optical_triggered = false; 
         // Check for Battery Data in Battery Queue
         if (xQueueReceive(main_batteryDataQueue, &percent_recv, 0) == pdPASS) {
           if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
@@ -271,22 +274,23 @@ void main_task(void * pvParameters) {
             break;
           }
           i++;
-        } while ( i < 500/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
+        } while ( i < 50/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
         i = 0;
         
+        // End amplification zone
+        end_amplification_zone();
+        
+        vTaskDelay(100);
+
         /* ***** Valve Zone Run **** */
         // Send valve zone start request
-        begin_valve_zone();
-        // Small delay
-        vTaskDelay(10);
-        // Send amplification zone stop request
-        end_amplification_zone();
-        // Check for errors
-        if (error_during_run) {
-            vTaskDelay(10);
-            end_valve_zone();
-            break;
+        if (!error_during_run) {
+          begin_valve_zone();
         }
+        else {
+          break;
+        }
+
         // Get sensor switch data ensuring sample is still in position
         do {
           // TODO: Get the current time
@@ -305,7 +309,7 @@ void main_task(void * pvParameters) {
             break;
           }
           i++;
-        } while (i < 500/*TODO: Compare current time against VALVE_ON_TIME*/);
+        } while (i < 50/*TODO: Compare current time against VALVE_ON_TIME*/);
         i=0;
         // Stop the valve zone
         end_valve_zone();
@@ -314,14 +318,16 @@ void main_task(void * pvParameters) {
             break;
         }
 
+        vTaskDelay(100);
+
         // TODO: might have to do small delay here for heater task to update
         /* ***** End Sample Preperation ***** */
         // Update sensor state prematuraly to stop sending of temp data
-        main_state = STANDBY;
-        xReturned = xQueueSend(sensor_mainStateQueue, &main_state, 0);
-        if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send main state change to heater_mainStateQueue.\n");
-        }
+        //main_state = STANDBY;
+       // xReturned = xQueueSend(sensor_mainStateQueue, &main_state, 0);
+        //if (xReturned != pdPASS) {
+        //  printf("MAIN_TASK: Unable to send main state change to heater_mainStateQueue.\n");
+        //}
         // Wait for the sample to be removed prior to going back to STANDBY state
         do {
           xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
@@ -329,7 +335,9 @@ void main_task(void * pvParameters) {
           optical_triggered = switch_data.optical_tiggered;
         } while(hal_triggered && optical_triggered);
         // Update current main state
+        main_state = STANDBY;
         sendUpdatedMainTaskState(main_state);
+        vTaskDelay(100);
         break;
 
       // In Low Power State
@@ -348,6 +356,7 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   usb_message_t msg;
   bool logger_resp = false, batt_resp = false, usb_resp = false, sensor_resp = false;
   tasks_t task_recv;
+  bool main_state_cont = true;
   
   // Get the update to send
   if (new_state == RUNNING)
@@ -410,6 +419,23 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
         }
     }
   }
+
+  printf("MAIN: All tasks updated... sending continue requests.\n");
+  
+  xReturned = xQueueSend(logger_mainStateContinueQueue, &main_state_cont, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send main state continue to logger_mainStateContinueQueue.\n");
+  }
+  xReturned = xQueueSend(battery_mainStateContinueQueue, &main_state_cont, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send main state continue to battery_mainStateContinueQueue.\n");
+  }
+  // Send Continues to Tasks that need it
+  xReturned = xQueueSend(sensor_mainStateContinueQueue, &main_state_cont, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send main state continue to sensor_mainStateContinueQueue.\n");
+  }
+
 }
 
 void begin_amplification_zone(void) {
@@ -571,6 +597,9 @@ void create_queues() {
   sensor_usbWaitQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_suspend_req_t));
   if (sensor_usbWaitQueue == NULL)
     printf("Unable to create sensor_usbWaitQueue queue\n");
+  sensor_mainStateContinueQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (sensor_mainStateContinueQueue == NULL)
+    printf("Unable to create sensor_mainStateContinueQueue queue\n");
 
   // Battery Management Task Queues
   battery_requestPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(battery_percent_req_t));
@@ -582,6 +611,9 @@ void create_queues() {
   battery_usbWaitQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_suspend_req_t));
   if (battery_usbWaitQueue == NULL)
     printf("Unable to create battery_usbWaitQueue queue\n");
+  battery_mainStateContinueQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (battery_mainStateContinueQueue == NULL)
+    printf("Unable to create battery_mainStateContinueQueue queue\n");
 
   // USB Management Task Queues
   usb_stateChangeQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_message_t));
@@ -604,6 +636,9 @@ void create_queues() {
   logger_mainStateChangeQueue = xQueueCreate(QUEUE_SIZE, sizeof(main_state_t));
   if (logger_mainStateChangeQueue == NULL)
     printf("Unable to create logger_mainStateChangeQueue queue\n");
+  logger_mainStateContinueQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (logger_mainStateContinueQueue == NULL)
+    printf("Unable to create logger_mainStateContinueQueue queue\n");
 
   // PWM Task Queues
   pwm_usbWaitQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_suspend_req_t));

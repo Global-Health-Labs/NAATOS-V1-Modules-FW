@@ -13,6 +13,7 @@ static long double amp2_temperature = 0.0;
 
 xQueueHandle sensor_mainStateQueue;
 xQueueHandle sensor_usbWaitQueue;
+xQueueHandle sensor_mainStateContinueQueue;
 
 main_state_t s_main_state = STANDBY;
 
@@ -26,6 +27,8 @@ void sensors_task(void * pvParameters) {
   BaseType_t xReturned;
   uint32_t sample_log_index = 0;
   uint32_t sample_log_max = 0;
+  tasks_t sensor_task = SENSORS;
+  bool cont;
 
   usb_suspend_req_t sus_req;
   usb_suspend_acpt_t sus_acpt = {
@@ -60,7 +63,16 @@ void sensors_task(void * pvParameters) {
       if (xReturned != pdPASS) {
         printf("BATT_TASK: Unable to receive state change from sensor_mainStateQueue.\n");
       }
-      continue;
+      // Respond to main state change
+      xReturned = xQueueSend(main_mainStateRespQueue, &sensor_task, 0);
+      if (xReturned != pdPASS) {
+        printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
+      }
+      // Wait for Coninute
+      //xReturned = xQueueReceive(sensor_mainStateContinueQueue, &cont, portMAX_DELAY);
+      if (xReturned != pdPASS) {
+        printf("USB: Unable to recevive continue to sensor_mainStateContinueQueue queue.\n");
+      }
     }
 
     // Check to see if we need to suspend for USB to be enabled
