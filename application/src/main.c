@@ -276,6 +276,7 @@ void main_task(void * pvParameters) {
             }
             main_state = STANDBY;
             sendUpdatedMainTaskState(main_state);
+            vTaskDelay(100);
             error_during_run = true;
             break;
           }
@@ -428,6 +429,10 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
           break;
         }
     }
+    else {
+      vTaskDelay(50);
+    }
+
   }
 
   printf("MAIN: All tasks updated... sending continue requests.\n");

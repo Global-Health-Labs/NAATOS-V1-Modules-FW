@@ -90,7 +90,6 @@ void logger_task(void * pvParameters) {
         if (xReturned != pdPASS) {
           printf("LOG_TASK: Unable to receive state change from logger_mainStateChangeQueue.\n");
         }
-        interrupted = true;
         continue;
       }
 
