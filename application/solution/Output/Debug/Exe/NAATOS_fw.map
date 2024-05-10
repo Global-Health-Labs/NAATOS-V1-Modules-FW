@@ -23536,9 +23536,8 @@ Linker script and memory map
                 0x0000000000018764        0xa Output/Debug/Obj/NAATOS_fw/adc.o
                 0x0000000000018764                saadc_callback_handler
  .text.get_optical_triggered
-                0x000000000001876e       0x28 Output/Debug/Obj/NAATOS_fw/adc.o
+                0x000000000001876e       0x2a Output/Debug/Obj/NAATOS_fw/adc.o
                 0x000000000001876e                get_optical_triggered
- *fill*         0x0000000000018796        0x2 
  .text.init_adc
                 0x0000000000018798       0x60 Output/Debug/Obj/NAATOS_fw/adc.o
                 0x0000000000018798                init_adc
