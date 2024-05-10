@@ -176,7 +176,6 @@ naatos_config_parameters config = {
   .amp2_kd = 0
 };
 bool use_default_configuration_parameters;
-bool sensor_sent = false;
 
 // Function defs
 void sendUpdatedMainTaskState(main_state_t new_state);
@@ -206,7 +205,6 @@ void main_task(void * pvParameters) {
 
   // Set Start up state to standby
   main_state_t main_state = STANDBY;
-  // TODO: Get Configuration Settings
 
   int i = 0;
   
@@ -337,7 +335,7 @@ void main_task(void * pvParameters) {
         // Update current main state
         main_state = STANDBY;
         sendUpdatedMainTaskState(main_state);
-        vTaskDelay(100);
+        vTaskDelay(250);
         break;
 
       // In Low Power State
@@ -389,7 +387,6 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send main state change to heater_mainStateQueue.\n");
   }
-
   /* Get responses from the states to ensure all configurations for the run or standby have been made */
   while(!logger_resp || !batt_resp || !usb_resp || !sensor_resp) {
     if (uxQueueMessagesWaiting(main_mainStateRespQueue) > 0) {
@@ -421,7 +418,8 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   }
 
   printf("MAIN: All tasks updated... sending continue requests.\n");
-  
+   
+  // Send Continues to Tasks that need it
   xReturned = xQueueSend(logger_mainStateContinueQueue, &main_state_cont, 0);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send main state continue to logger_mainStateContinueQueue.\n");
@@ -430,10 +428,13 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send main state continue to battery_mainStateContinueQueue.\n");
   }
-  // Send Continues to Tasks that need it
   xReturned = xQueueSend(sensor_mainStateContinueQueue, &main_state_cont, 0);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send main state continue to sensor_mainStateContinueQueue.\n");
+  }
+  xReturned = xQueueSend(usb_mainStateContinueQueue, &main_state_cont, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send main state continue to usb_mainStateContinueQueue.\n");
   }
 
 }
@@ -625,6 +626,9 @@ void create_queues() {
   usb_usbWaitOverQueue = xQueueCreate(4, sizeof(usb_suspend_over_t));
   if (usb_usbWaitOverQueue == NULL)
     printf("Unable to create usb_usbWaitOverQueue queue\n");
+  usb_mainStateContinueQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (usb_mainStateContinueQueue == NULL)
+    printf("Unable to create usb_mainStateContinueQueue queue\n");
 
   // Logger Task Queues
   logger_recvBattPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));

@@ -31,6 +31,7 @@ extern xQueueHandle battery_mainStateContinueQueue;
 extern xQueueHandle usb_stateChangeQueue;
 extern xQueueHandle usb_recvUsbWaitAcceptQueue;
 extern xQueueHandle usb_usbWaitOverQueue;
+extern xQueueHandle usb_mainStateContinueQueue;
 
 // Logger Task Queue(s)
 extern xQueueHandle logger_recvBattPercentQueue;

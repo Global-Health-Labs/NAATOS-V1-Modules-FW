@@ -20,6 +20,7 @@ static bool m_usb_connected = false;
 xQueueHandle usb_stateChangeQueue;
 xQueueHandle usb_recvUsbWaitAcceptQueue;
 xQueueHandle usb_usbWaitOverQueue;
+xQueueHandle usb_mainStateContinueQueue;
 
 // Main Loop 
 usb_message_t recv_msg;
@@ -111,6 +112,7 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
         case APP_USBD_EVT_STARTED:
             printf("USB: Started\n");
             usb_started = true;
+            usb_detected = true;
             break;
         case APP_USBD_EVT_STOPPED:
             printf("USB: Stopped\n");
@@ -269,7 +271,6 @@ void restart_usb_only_cdc_acm(void) {
   
 
   usb_done_config = false;
-  usb_detected = false;
   usb_started = false;
   m_usb_connected = false;
 }
@@ -340,6 +341,7 @@ void usb_task(void * pvParameters) {
   BaseType_t xReturned;
   bool conn_state_updated = false, main_state_updated = false;
   tasks_t usb_task = USB;
+  bool cont = false;
 
   // Set Current State to Standby
   main_state = STANDBY;
@@ -367,13 +369,23 @@ void usb_task(void * pvParameters) {
 
     // File System Update Based on the main state
     if (main_state == STANDBY) {
-      // TODO: Mount the file system
-      // TODO: Disable USB
-      // TODO: Enable Logging
+      // Uninit the SD Card
+      //uninit_sd_card();
+
       xReturned = xQueueSend(main_mainStateRespQueue, &usb_task, 0);
       if (xReturned != pdPASS) {
         printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
       }
+      // Wait for Coninute
+      xReturned = xQueueReceive(usb_mainStateContinueQueue, &cont, portMAX_DELAY);
+      if (xReturned != pdPASS) {
+        printf("USB: Unable to recevive continue to usb_mainStateContinueQueue queue.\n");
+      }
+      
+      // Start the USB
+      //app_usbd_enable();
+      //usb_done_config = false;
+
     }
     else if (main_state == RUNNING) {
       if (usb_started) {
@@ -382,6 +394,11 @@ void usb_task(void * pvParameters) {
       xReturned = xQueueSend(main_mainStateRespQueue, &usb_task, 0);
       if (xReturned != pdPASS) {
         printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
+      }
+      // Wait for Coninute
+      xReturned = xQueueReceive(usb_mainStateContinueQueue, &cont, portMAX_DELAY);
+      if (xReturned != pdPASS) {
+        printf("USB: Unable to recevive continue to usb_mainStateContinueQueue queue.\n");
       }
     }
   }

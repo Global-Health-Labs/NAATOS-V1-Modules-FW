@@ -44,6 +44,7 @@ void logger_task(void * pvParameters) {
   bool run_stopped = false;
   tasks_t logger_task = LOGGER;
   bool cont;
+  bool interrupted = true;
 
   // If logging rate is less than once a second, do UART only
   if (config.logging_rate < 1.0) {
@@ -89,6 +90,7 @@ void logger_task(void * pvParameters) {
         if (xReturned != pdPASS) {
           printf("LOG_TASK: Unable to receive state change from logger_mainStateChangeQueue.\n");
         }
+        interrupted = true;
         continue;
       }
 
