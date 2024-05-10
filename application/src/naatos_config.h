@@ -5,6 +5,10 @@
 #include "FreeRTOS.h"
 #include  "task.h"
 
+
+#define NAATOS_FW_VERSON  "v0.1.0"
+
+
 #define pdTICKS_TO_MS( xTimeInTicks )    ( ( TickType_t ) ( ( ( uint64_t ) ( xTimeInTicks ) * ( uint64_t ) 1000U ) / ( uint64_t ) configTICK_RATE_HZ ) )
 
 /* Battery Parameters */

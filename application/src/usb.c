@@ -288,6 +288,7 @@ void composite_usb_task(void * pvParameters) {
 
     if (msc_active && usb_detected && !usb_suspended_tasks && !usb_done_config) {
       usb_suspend_conflicting_tasks();
+      batt_over = false; heater_over = false; pwm_over = false; sensor_over = false;
     }
     
     if (usb_suspended_tasks) {
