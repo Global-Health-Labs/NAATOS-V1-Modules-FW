@@ -267,6 +267,7 @@ void main_task(void * pvParameters) {
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
           if (!hal_triggered || !optical_triggered) {
+          error_during_run = true;
             break;
           }
         } while ( pdTICKS_TO_MS(xTaskGetTickCount() - start_time) < end_time);
@@ -298,7 +299,6 @@ void main_task(void * pvParameters) {
           main_state = STANDBY;
           sendUpdatedMainTaskState(main_state);
           vTaskDelay(100);
-          error_during_run = true;
           break;
         }
 
@@ -308,6 +308,7 @@ void main_task(void * pvParameters) {
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
           if (!hal_triggered || !optical_triggered) {
+            error_during_run = true;
             break;
           }
         } while (pdTICKS_TO_MS(xTaskGetTickCount() - start_time) < end_time);
@@ -323,7 +324,6 @@ void main_task(void * pvParameters) {
             }
             main_state = STANDBY;
             sendUpdatedMainTaskState(main_state);
-            error_during_run = true;
             break;
         }
 
