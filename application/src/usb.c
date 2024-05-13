@@ -269,7 +269,7 @@ void restart_usb_only_cdc_acm(void) {
   init_sd_card();
   
 
-  usb_done_config = false;
+  //usb_done_config = false;
   usb_started = false;
   m_usb_connected = false;
 }
