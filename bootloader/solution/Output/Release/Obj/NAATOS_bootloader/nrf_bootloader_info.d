@@ -19,34 +19,21 @@ Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o: \
  ../sdk/modules/nrfx/mdk/nrf51_to_nrf52840.h \
  ../sdk/modules/nrfx/mdk/nrf52_to_nrf52840.h \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
- ../sdk/components/softdevice/s140/headers/nrf52/nrf_mbr.h \
- ../sdk/components/softdevice/s140/headers/nrf_svc.h \
- ../sdk/components/softdevice/s140/headers/nrf_sdm.h \
- ../sdk/components/softdevice/s140/headers/nrf_svc.h \
- ../sdk/components/softdevice/s140/headers/nrf_error.h \
- ../sdk/components/softdevice/s140/headers/nrf_error_sdm.h \
- ../sdk/components/softdevice/s140/headers/nrf_soc.h \
- ../sdk/components/softdevice/s140/headers/nrf_error_soc.h \
+ ../sdk/components/softdevice/mbr/headers/nrf_mbr.h \
+ ../sdk/components/softdevice/mbr/headers/nrf_svc.h \
  ../sdk/components/libraries/bootloader/dfu/nrf_dfu_types.h \
  ../sdk/components/libraries/util/sdk_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/string.h \
  ../config/sdk_config.h ../sdk/components/libraries/util/sdk_os.h \
  ../sdk/components/libraries/util/sdk_errors.h \
- ../sdk/components/softdevice/s140/headers/nrf_error.h \
+ ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../sdk/components/libraries/util/app_util.h \
  ../sdk/components/libraries/util/sdk_macros.h \
  ../sdk/components/libraries/util/nrf_assert.h \
  ../sdk/components/libraries/util/app_util_platform.h \
- ../sdk/components/softdevice/s140/headers/nrf_soc.h \
- ../sdk/components/softdevice/s140/headers/nrf_nvic.h \
  ../sdk/components/libraries/util/app_error.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
  ../sdk/components/libraries/util/app_error_weak.h \
- ../sdk/components/softdevice/s140/headers/ble_gap.h \
- ../sdk/components/softdevice/s140/headers/ble_hci.h \
- ../sdk/components/softdevice/s140/headers/ble_ranges.h \
- ../sdk/components/softdevice/s140/headers/ble_types.h \
- ../sdk/components/softdevice/s140/headers/ble_err.h \
  ../sdk/modules/nrfx/hal/nrf_nvmc.h ../sdk/modules/nrfx/nrfx.h \
  ../sdk/integration/nrfx/nrfx_config.h \
  ../sdk/modules/nrfx/drivers/nrfx_common.h \
@@ -62,5 +49,4 @@ Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o: \
  ../sdk/modules/nrfx/soc/nrfx_atomic.h \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/libraries/util/sdk_resources.h \
- ../sdk/components/softdevice/s140/headers/nrf_sd_def.h \
  ../sdk/modules/nrfx/drivers/nrfx_errors.h

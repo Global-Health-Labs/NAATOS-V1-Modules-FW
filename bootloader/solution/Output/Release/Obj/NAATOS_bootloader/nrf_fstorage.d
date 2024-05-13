@@ -5,7 +5,7 @@ Output/Release/Obj/NAATOS_bootloader/nrf_fstorage.o: \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
  ../sdk/components/libraries/util/sdk_errors.h \
- ../sdk/components/softdevice/s140/headers/nrf_error.h \
+ ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../sdk/components/libraries/experimental_section_vars/nrf_section.h \
  ../sdk/components/libraries/util/nordic_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stddef.h \
@@ -31,8 +31,8 @@ Output/Release/Obj/NAATOS_bootloader/nrf_fstorage.o: \
  ../sdk/components/libraries/util/sdk_os.h \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/libraries/util/app_util.h \
- ../sdk/components/softdevice/s140/headers/nrf52/nrf_mbr.h \
- ../sdk/components/softdevice/s140/headers/nrf_svc.h \
+ ../sdk/components/softdevice/mbr/headers/nrf_mbr.h \
+ ../sdk/components/softdevice/mbr/headers/nrf_svc.h \
  ../sdk/components/libraries/util/sdk_macros.h \
  ../sdk/components/libraries/log/src/nrf_log_internal.h \
  ../sdk/components/libraries/util/app_util.h \

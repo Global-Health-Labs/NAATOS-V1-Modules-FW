@@ -3,7 +3,7 @@ Output/Release/Obj/NAATOS_bootloader/nrf_crypto_ecdsa.o: \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\bootloader\sdk\components\libraries\crypto\nrf_crypto_error.h \
  ../sdk/components/libraries/util/sdk_errors.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
- ../sdk/components/softdevice/s140/headers/nrf_error.h \
+ ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\bootloader\sdk\components\libraries\crypto\nrf_crypto_ecc.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stddef.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
@@ -52,8 +52,8 @@ Output/Release/Obj/NAATOS_bootloader/nrf_crypto_ecdsa.o: \
  ../sdk/modules/nrfx/mdk/nrf51_to_nrf52840.h \
  ../sdk/modules/nrfx/mdk/nrf52_to_nrf52840.h \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
- ../sdk/components/softdevice/s140/headers/nrf52/nrf_mbr.h \
- ../sdk/components/softdevice/s140/headers/nrf_svc.h \
+ ../sdk/components/softdevice/mbr/headers/nrf_mbr.h \
+ ../sdk/components/softdevice/mbr/headers/nrf_svc.h \
  ../sdk/components/libraries/util/sdk_macros.h \
  ../sdk/components/libraries/util/nrf_assert.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\bootloader\sdk\components\libraries\crypto\nrf_crypto_types.h \

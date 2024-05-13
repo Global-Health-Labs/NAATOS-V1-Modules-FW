@@ -26,9 +26,4 @@ Output/Release/Obj/NAATOS_bootloader/nrf_section_iter.o: \
  ../sdk/components/softdevice/s140/headers/nrf52/nrf_mbr.h \
  ../sdk/components/softdevice/s140/headers/nrf_svc.h \
  ../sdk/components/libraries/util/sdk_macros.h \
- ../sdk/components/libraries/util/nrf_assert.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\bootloader\sdk\components\libraries\experimental_section_vars\nrf_section_iter.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\bootloader\sdk\components\libraries\experimental_section_vars\nrf_section.h \
- ../sdk/components/libraries/util/nordic_common.h \
- ../sdk/components/libraries/util/nrf_assert.h \
- ../sdk/components/libraries/util/app_util.h
+ ../sdk/components/libraries/util/nrf_assert.h

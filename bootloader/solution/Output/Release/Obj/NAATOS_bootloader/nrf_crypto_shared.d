@@ -25,11 +25,11 @@ Output/Release/Obj/NAATOS_bootloader/nrf_crypto_shared.o: \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
  ../sdk/components/libraries/util/sdk_os.h \
  ../sdk/components/libraries/util/sdk_errors.h \
- ../sdk/components/softdevice/s140/headers/nrf_error.h \
+ ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../sdk/components/libraries/util/app_util.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stddef.h \
- ../sdk/components/softdevice/s140/headers/nrf52/nrf_mbr.h \
- ../sdk/components/softdevice/s140/headers/nrf_svc.h \
+ ../sdk/components/softdevice/mbr/headers/nrf_mbr.h \
+ ../sdk/components/softdevice/mbr/headers/nrf_svc.h \
  ../sdk/components/libraries/util/sdk_macros.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\bootloader\sdk\components\libraries\crypto\nrf_crypto_types.h \
  ../sdk/components/libraries/util/sdk_alloca.h \

@@ -19,13 +19,13 @@ Output/Release/Obj/NAATOS_bootloader/nrf_atfifo.o: \
  ../sdk/modules/nrfx/mdk/nrf51_to_nrf52840.h \
  ../sdk/modules/nrfx/mdk/nrf52_to_nrf52840.h \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
- ../sdk/components/softdevice/s140/headers/nrf52/nrf_mbr.h \
- ../sdk/components/softdevice/s140/headers/nrf_svc.h \
+ ../sdk/components/softdevice/mbr/headers/nrf_mbr.h \
+ ../sdk/components/softdevice/mbr/headers/nrf_svc.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\bootloader\sdk\components\libraries\atomic_fifo\nrf_atfifo.h \
  ../config/sdk_config.h ../sdk/components/libraries/util/nordic_common.h \
  ../sdk/components/libraries/util/nrf_assert.h \
  ../sdk/components/libraries/util/sdk_errors.h \
- ../sdk/components/softdevice/s140/headers/nrf_error.h \
+ ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../sdk/components/libraries/log/nrf_log_instance.h \
  ../sdk/components/libraries/experimental_section_vars/nrf_section.h \
  ../sdk/components/libraries/log/nrf_log_types.h \

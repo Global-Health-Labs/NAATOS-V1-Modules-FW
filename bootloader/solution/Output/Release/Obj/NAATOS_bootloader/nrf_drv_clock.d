@@ -30,40 +30,29 @@ Output/Release/Obj/NAATOS_bootloader/nrf_drv_clock.o: \
  ../sdk/components/libraries/util/app_util.h \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
  ../sdk/components/libraries/util/nordic_common.h \
- ../sdk/components/softdevice/s140/headers/nrf52/nrf_mbr.h \
- ../sdk/components/softdevice/s140/headers/nrf_svc.h \
+ ../sdk/components/softdevice/mbr/headers/nrf_mbr.h \
+ ../sdk/components/softdevice/mbr/headers/nrf_svc.h \
  ../sdk/components/libraries/util/app_util_platform.h \
- ../sdk/components/softdevice/s140/headers/nrf_soc.h \
- ../sdk/components/softdevice/s140/headers/nrf_svc.h \
- ../sdk/components/softdevice/s140/headers/nrf_error.h \
- ../sdk/components/softdevice/s140/headers/nrf_error_soc.h \
- ../sdk/components/softdevice/s140/headers/nrf_nvic.h \
  ../sdk/components/libraries/util/nrf_assert.h \
  ../sdk/components/libraries/util/app_error.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
  ../sdk/components/libraries/util/sdk_errors.h \
- ../sdk/components/softdevice/s140/headers/nrf_error.h \
+ ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../sdk/components/libraries/util/app_error_weak.h \
  ../sdk/modules/nrfx/soc/nrfx_coredep.h \
  ../sdk/modules/nrfx/soc/nrfx_atomic.h \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/libraries/util/sdk_resources.h \
- ../sdk/components/softdevice/s140/headers/nrf_sd_def.h \
- ../sdk/components/softdevice/s140/headers/nrf_soc.h \
  ../sdk/modules/nrfx/drivers/nrfx_errors.h \
  ../sdk/modules/nrfx/hal/nrf_clock.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_power_clock.h \
- ../sdk/components/softdevice/common/nrf_sdh.h \
- ../sdk/components/libraries/experimental_section_vars/nrf_section_iter.h \
- ../sdk/components/libraries/experimental_section_vars/nrf_section.h \
- ../sdk/components/softdevice/common/nrf_sdh_soc.h \
+ ../sdk/modules/nrfx/hal/nrf_wdt.h \
+ ../sdk/components/libraries/log/nrf_log.h \
  ../sdk/components/libraries/util/sdk_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/string.h \
  ../sdk/components/libraries/util/sdk_os.h \
  ../sdk/components/libraries/util/app_util.h \
  ../sdk/components/libraries/util/sdk_macros.h \
- ../sdk/modules/nrfx/hal/nrf_wdt.h \
- ../sdk/components/libraries/log/nrf_log.h \
  ../sdk/components/libraries/experimental_section_vars/nrf_section.h \
  ../sdk/components/libraries/log/src/nrf_log_internal.h \
  ../sdk/components/libraries/log/nrf_log_instance.h \

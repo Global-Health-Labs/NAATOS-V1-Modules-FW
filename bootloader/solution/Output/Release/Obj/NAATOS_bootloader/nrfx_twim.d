@@ -48,20 +48,4 @@ Output/Release/Obj/NAATOS_bootloader/nrfx_twim.o: \
  ../sdk/components/libraries/util/sdk_resources.h \
  ../sdk/components/softdevice/s140/headers/nrf_sd_def.h \
  ../sdk/components/softdevice/s140/headers/nrf_soc.h \
- ../sdk/modules/nrfx/drivers/nrfx_errors.h \
- ../sdk/modules/nrfx/drivers/include/nrfx_twim.h \
- ../sdk/modules/nrfx/drivers/include/nrfx_twi_twim.h \
- ../sdk/modules/nrfx/hal/nrf_twim.h ../sdk/modules/nrfx/hal/nrf_gpio.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\bootloader\sdk\modules\nrfx\drivers\src\prs/nrfx_prs.h \
- ../sdk/integration/nrfx/nrfx_log.h \
- ../sdk/components/libraries/log/nrf_log.h \
- ../sdk/components/libraries/util/sdk_common.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/string.h \
- ../sdk/components/libraries/util/sdk_os.h \
- ../sdk/components/libraries/util/app_util.h \
- ../sdk/components/libraries/util/sdk_macros.h \
- ../sdk/components/libraries/experimental_section_vars/nrf_section.h \
- ../sdk/components/libraries/log/src/nrf_log_internal.h \
- ../sdk/components/libraries/log/nrf_log_instance.h \
- ../sdk/components/libraries/log/nrf_log_types.h \
- ../sdk/components/libraries/log/nrf_log_types.h
+ ../sdk/modules/nrfx/drivers/nrfx_errors.h

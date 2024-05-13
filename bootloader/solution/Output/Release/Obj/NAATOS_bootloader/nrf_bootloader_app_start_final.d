@@ -5,7 +5,7 @@ Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o: \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
  ../sdk/components/libraries/util/sdk_errors.h \
- ../sdk/components/softdevice/s140/headers/nrf_error.h \
+ ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../sdk/modules/nrfx/mdk/nrf.h ../sdk/modules/nrfx/mdk/nrf52840.h \
  ../sdk/components/toolchain/cmsis/include/core_cm4.h \
  ../sdk/components/toolchain/cmsis/include/cmsis_version.h \
@@ -25,14 +25,8 @@ Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o: \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
  ../sdk/components/libraries/util/nordic_common.h \
- ../sdk/components/softdevice/s140/headers/nrf52/nrf_mbr.h \
- ../sdk/components/softdevice/s140/headers/nrf_svc.h \
- ../sdk/components/softdevice/s140/headers/nrf_sdm.h \
- ../sdk/components/softdevice/s140/headers/nrf_svc.h \
- ../sdk/components/softdevice/s140/headers/nrf_error.h \
- ../sdk/components/softdevice/s140/headers/nrf_error_sdm.h \
- ../sdk/components/softdevice/s140/headers/nrf_soc.h \
- ../sdk/components/softdevice/s140/headers/nrf_error_soc.h \
+ ../sdk/components/softdevice/mbr/headers/nrf_mbr.h \
+ ../sdk/components/softdevice/mbr/headers/nrf_svc.h \
  ../sdk/components/libraries/bootloader/dfu/nrf_dfu_types.h \
  ../sdk/components/libraries/util/sdk_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/string.h \
@@ -42,16 +36,9 @@ Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o: \
  ../sdk/components/libraries/util/sdk_macros.h \
  ../sdk/components/libraries/util/nrf_assert.h \
  ../sdk/components/libraries/util/app_util_platform.h \
- ../sdk/components/softdevice/s140/headers/nrf_soc.h \
- ../sdk/components/softdevice/s140/headers/nrf_nvic.h \
  ../sdk/components/libraries/util/app_error.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
  ../sdk/components/libraries/util/app_error_weak.h \
- ../sdk/components/softdevice/s140/headers/ble_gap.h \
- ../sdk/components/softdevice/s140/headers/ble_hci.h \
- ../sdk/components/softdevice/s140/headers/ble_ranges.h \
- ../sdk/components/softdevice/s140/headers/ble_types.h \
- ../sdk/components/softdevice/s140/headers/ble_err.h \
  ../sdk/components/libraries/bootloader/dfu/nrf_dfu_utils.h \
  ../sdk/components/libraries/bootloader/dfu/nrf_dfu_types.h \
  ../sdk/components/libraries/bootloader/dfu/nrf_dfu_settings.h \

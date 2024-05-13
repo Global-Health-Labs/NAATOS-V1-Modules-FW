@@ -28,27 +28,20 @@ Output/Release/Obj/NAATOS_bootloader/main.o: \
  ../sdk/components/libraries/util/app_util.h \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
  ../sdk/components/libraries/util/nordic_common.h \
- ../sdk/components/softdevice/s140/headers/nrf52/nrf_mbr.h \
- ../sdk/components/softdevice/s140/headers/nrf_svc.h \
+ ../sdk/components/softdevice/mbr/headers/nrf_mbr.h \
+ ../sdk/components/softdevice/mbr/headers/nrf_svc.h \
  ../sdk/components/libraries/util/nordic_common.h \
  ../sdk/components/libraries/util/app_util_platform.h \
- ../sdk/components/softdevice/s140/headers/nrf_soc.h \
- ../sdk/components/softdevice/s140/headers/nrf_svc.h \
- ../sdk/components/softdevice/s140/headers/nrf_error.h \
- ../sdk/components/softdevice/s140/headers/nrf_error_soc.h \
- ../sdk/components/softdevice/s140/headers/nrf_nvic.h \
  ../sdk/components/libraries/util/nrf_assert.h \
  ../sdk/components/libraries/util/app_error.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
  ../sdk/components/libraries/util/sdk_errors.h \
- ../sdk/components/softdevice/s140/headers/nrf_error.h \
+ ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../sdk/components/libraries/util/app_error_weak.h \
  ../sdk/modules/nrfx/soc/nrfx_coredep.h \
  ../sdk/modules/nrfx/soc/nrfx_atomic.h \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/libraries/util/sdk_resources.h \
- ../sdk/components/softdevice/s140/headers/nrf_sd_def.h \
- ../sdk/components/softdevice/s140/headers/nrf_soc.h \
  ../sdk/modules/nrfx/drivers/nrfx_errors.h \
  ../sdk/components/boards/custom_board.h \
  ../sdk/components/libraries/bootloader/nrf_bootloader.h \
@@ -59,11 +52,6 @@ Output/Release/Obj/NAATOS_bootloader/main.o: \
  ../sdk/components/libraries/util/sdk_os.h \
  ../sdk/components/libraries/util/app_util.h \
  ../sdk/components/libraries/util/sdk_macros.h \
- ../sdk/components/softdevice/s140/headers/ble_gap.h \
- ../sdk/components/softdevice/s140/headers/ble_hci.h \
- ../sdk/components/softdevice/s140/headers/ble_ranges.h \
- ../sdk/components/softdevice/s140/headers/ble_types.h \
- ../sdk/components/softdevice/s140/headers/ble_err.h \
  ../sdk/components/libraries/bootloader/dfu/nrf_dfu_req_handler.h \
  ../sdk/components/libraries/bootloader/dfu/nrf_dfu_flash.h \
  ../sdk/components/libraries/bootloader/nrf_bootloader_app_start.h \
@@ -81,6 +69,4 @@ Output/Release/Obj/NAATOS_bootloader/main.o: \
  ../sdk/components/libraries/util/app_error.h \
  ../sdk/components/libraries/util/app_error_weak.h \
  ../sdk/components/libraries/bootloader/nrf_bootloader_info.h \
- ../sdk/components/softdevice/s140/headers/nrf_sdm.h \
- ../sdk/components/softdevice/s140/headers/nrf_error_sdm.h \
  ../sdk/components/libraries/delay/nrf_delay.h
