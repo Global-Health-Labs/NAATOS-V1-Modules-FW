@@ -1,12 +1,12 @@
 Output/Debug/Obj/NAATOS_fw/main.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\main.c \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdio.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdlib.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdbool.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\main.c \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdlib.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  ../sdk/external/freertos/source/include/FreeRTOS.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stddef.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stddef.h \
  ../sdk/external/freertos/config/FreeRTOSConfig.h \
  ../sdk/components/libraries/util/app_util_platform.h \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
@@ -62,14 +62,14 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/modules/nrfx/drivers/include/nrfx_clock.h \
  ../sdk/modules/nrfx/hal/nrf_clock.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_power_clock.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\states.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\battery.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_config.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_queues.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\states.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\battery.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\naatos_config.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\naatos_queues.h \
  ../sdk/external/freertos/source/include/queue.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\logger.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sd_card.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\logger.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\sd_card.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/string.h \
  ../sdk/external/fatfs/src/ff.h ../sdk/external/fatfs/src/integer.h \
  ../sdk/external/fatfs/src/ffconf.h \
  ../sdk/external/fatfs/port/diskio_blkdev.h \
@@ -100,9 +100,9 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/components/libraries/memobj/nrf_memobj.h \
  ../sdk/components/libraries/balloc/nrf_balloc.h \
  ../sdk/components/libraries/log/nrf_log_default_backends.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\heater.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pid.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pwm.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\heater.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\pid.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\pwm.h \
  ../sdk/components/libraries/pwm/app_pwm.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_timer.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_timer.h \
@@ -110,15 +110,15 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/integration/nrfx/legacy/nrf_drv_ppi.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_ppi.h \
  ../sdk/modules/nrfx/hal/nrf_ppi.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\calendar_rtc.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\i2c_hal_freertos.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sensors.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\adc.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\calendar_rtc.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\i2c_hal_freertos.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\sensors.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\adc.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_saadc.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_saadc.h \
  ../sdk/modules/nrfx/hal/nrf_saadc.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\tsys01.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\usb.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\tsys01.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\usb.h \
  ../sdk/components/libraries/usbd/app_usbd.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_usbd.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_usbd.h \
@@ -155,12 +155,12 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/components/libraries/sortlist/nrf_sortlist.h \
  ../sdk/components/libraries/cli/nrf_cli.h \
  ../sdk/components/libraries/cli/nrf_cli_types.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/inttypes.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/inttypes.h \
  ../sdk/components/libraries/log/nrf_log_backend_interface.h \
  ../sdk/components/libraries/queue/nrf_queue.h \
  ../sdk/external/fprintf/nrf_fprintf.h \
  ../sdk/external/fprintf/nrf_fprintf_format.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdarg.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdarg.h \
  ../sdk/external/fprintf/nrf_fprintf.h \
  ../sdk/components/libraries/cli/uart/nrf_cli_uart.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_uart.h \
@@ -170,7 +170,7 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/modules/nrfx/hal/nrf_uart.h \
  ../sdk/components/libraries/ringbuf/nrf_ringbuf.h \
  ../sdk/components/libraries/atomic/nrf_atomic.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\spi.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\spi.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_spi.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_spim.h \
  ../sdk/modules/nrfx/hal/nrf_spim.h \

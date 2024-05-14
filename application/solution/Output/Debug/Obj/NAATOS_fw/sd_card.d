@@ -1,11 +1,11 @@
 Output/Debug/Obj/NAATOS_fw/sd_card.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sd_card.c \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sd_card.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\sd_card.c \
+ C\:\Nordic\NAATOS_fw_src\application\src\sd_card.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/string.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
  ../sdk/modules/nrfx/mdk/nrf.h ../sdk/modules/nrfx/mdk/nrf52840.h \
  ../sdk/components/toolchain/cmsis/include/core_cm4.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  ../sdk/components/toolchain/cmsis/include/cmsis_version.h \
  ../sdk/components/toolchain/cmsis/include/cmsis_compiler.h \
  ../sdk/components/toolchain/cmsis/include/cmsis_gcc.h \
@@ -16,11 +16,11 @@ Output/Debug/Obj/NAATOS_fw/sd_card.o: \
  ../sdk/modules/nrfx/mdk/nrf52_to_nrf52840.h \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
  ../sdk/components/libraries/bsp/bsp.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdbool.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
  ../sdk/components/boards/boards.h ../sdk/modules/nrfx/hal/nrf_gpio.h \
  ../sdk/modules/nrfx/nrfx.h ../sdk/integration/nrfx/nrfx_config.h \
  ../src/config/sdk_config.h ../sdk/modules/nrfx/drivers/nrfx_common.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stddef.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stddef.h \
  ../sdk/modules/nrfx/mdk/nrf_peripherals.h \
  ../sdk/modules/nrfx/mdk/nrf52840_peripherals.h \
  ../sdk/integration/nrfx/nrfx_glue.h \
@@ -35,7 +35,7 @@ Output/Debug/Obj/NAATOS_fw/sd_card.o: \
  ../sdk/components/libraries/util/app_util_platform.h \
  ../sdk/components/libraries/util/nrf_assert.h \
  ../sdk/components/libraries/util/app_error.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdio.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../sdk/components/libraries/util/app_error_weak.h \
@@ -75,10 +75,10 @@ Output/Debug/Obj/NAATOS_fw/sd_card.o: \
  ../sdk/components/libraries/log/src/nrf_log_ctrl_internal.h \
  ../sdk/components/libraries/log/nrf_log_backend_interface.h \
  ../sdk/components/libraries/memobj/nrf_memobj.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdlib.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdlib.h \
  ../sdk/components/libraries/balloc/nrf_balloc.h \
  ../sdk/components/libraries/log/nrf_log_default_backends.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_config.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\naatos_config.h \
  ../sdk/external/freertos/source/include/FreeRTOS.h \
  ../sdk/external/freertos/config/FreeRTOSConfig.h \
  ../sdk/external/freertos/source/include/projdefs.h \
@@ -89,11 +89,11 @@ Output/Debug/Obj/NAATOS_fw/sd_card.o: \
  ../sdk/external/freertos/source/include/mpu_wrappers.h \
  ../sdk/external/freertos/source/include/task.h \
  ../sdk/external/freertos/source/include/list.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\heater.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_queues.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\heater.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\naatos_queues.h \
  ../sdk/external/freertos/source/include/queue.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pid.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pwm.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\pid.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\pwm.h \
  ../sdk/components/libraries/pwm/app_pwm.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_timer.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_timer.h \
