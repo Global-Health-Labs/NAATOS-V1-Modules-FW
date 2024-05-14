@@ -23,6 +23,20 @@ FRESULT check_for_config_file(void);
 
 // Initalize Function
 void init_sd_card(void) {
+ nrf_gpio_cfg(SPI_SCK_PIN,
+                 NRF_GPIO_PIN_DIR_OUTPUT,
+                 NRF_GPIO_PIN_INPUT_DISCONNECT,
+                 NRF_GPIO_PIN_NOPULL,
+                 NRF_GPIO_PIN_H0H1,       // Require High Drive low/high level
+                 NRF_GPIO_PIN_NOSENSE);
+
+  nrf_gpio_cfg(SPI_MOSI_PIN,
+                 NRF_GPIO_PIN_DIR_OUTPUT,
+                 NRF_GPIO_PIN_INPUT_DISCONNECT,
+                 NRF_GPIO_PIN_NOPULL,
+                 NRF_GPIO_PIN_H0H1,       // Require High Drive low/high level
+                 NRF_GPIO_PIN_NOSENSE);
+
   memset(&fs, 0, sizeof(FATFS));
 
   // Register the drives we have 
@@ -39,7 +53,7 @@ void init_sd_card(void) {
   // Get SD Card Specifications
   blocks_per_mb = (1024uL * 1024uL) / m_block_dev_sdc.block_dev.p_ops->geometry(&m_block_dev_sdc.block_dev)->blk_size;
   capacity = m_block_dev_sdc.block_dev.p_ops->geometry(&m_block_dev_sdc.block_dev)->blk_count / blocks_per_mb;
-  printf("SD Card initalized. Capactity: %d MB\n", capacity);
+  printf("Capactity: %d MB\n", capacity);
   
   // Mount SD Card
   ff_result = sd_card_mount();

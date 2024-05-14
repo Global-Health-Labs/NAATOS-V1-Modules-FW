@@ -30,12 +30,12 @@ void heater_task(void * pvParameters) {
 
   // Create PID Controllers 
   if (use_default_configuration_parameters) {
-    pid_controller_init(&valve_pid, VALVE_SETPOINT, V_KP, V_KI, V_KD);  
+    pid_controller_init(&valve_pid, AMP0_SETPOINT, V_KP, V_KI, V_KD);  //TODO: Change back to VALVE SETPOINT
     pid_controller_init(&amp0_pid, AMP0_SETPOINT, A0_KP, A0_KI, A0_KD);
     pid_controller_init(&amp1_pid, AMP1_SETPOINT, A1_KP, A1_KI, A1_KD);
     pid_controller_init(&amp2_pid, AMP1_SETPOINT, A2_KP, A2_KI, A2_KD);
   } else {
-    pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  
+    pid_controller_init(&valve_pid, config.amplification_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);   //TODO: Change back to VALVE SETPOINT
     pid_controller_init(&amp0_pid, config.amplification_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
     pid_controller_init(&amp1_pid, config.amplification_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
     pid_controller_init(&amp2_pid, config.amplification_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
@@ -84,6 +84,8 @@ void heater_task(void * pvParameters) {
           update_amp0_duty(amp0_pid.out);
           update_amp1_duty(amp1_pid.out);
           update_amp2_duty(amp2_pid.out);
+          valve_pid.out = 1;
+          update_valve_duty(valve_pid.out);
         }
       }
       else if (zone_req.zone = VALVE) {
@@ -120,6 +122,10 @@ void heater_task(void * pvParameters) {
       pid_controller_compute(&amp2_pid, temperature_data.amp2_zone_temp);
       // Update Amplification 2 PWM with PID output
       update_amp2_duty(amp2_pid.out);
+      // Update Valve PID loop with new temperatures
+      pid_controller_compute(&valve_pid, temperature_data.valve_zone_temp);
+      // Update Valve PWM with PID output
+      update_valve_duty(valve_pid.out);
     }
     if (valve_zone_running) {
       // Update Valve PID loop with new temperatures

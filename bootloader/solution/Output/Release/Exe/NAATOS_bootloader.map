@@ -9183,7 +9183,7 @@ FLASH1           0x0000000000000000 0x0000000000100000 xw
 Linker script and memory map
 
                 0x0000000000000000                __do_debug_operation = __do_debug_operation_mempoll
-                0x00000000000fbcb0                __vfprintf = __vfprintf_long
+                0x00000000000fbcb4                __vfprintf = __vfprintf_long
                 0x0000000000000000                __vfscanf = __vfscanf_long
                 0x0000000010001018                __uicr_mbr_params_page_segment_start__ = 0x10001018
                 0x000000001000101c                __uicr_mbr_params_page_segment_end__ = 0x1000101c
@@ -9370,7 +9370,7 @@ Linker script and memory map
                 0x0000000000000001                . = ASSERT (((__init_rodata_start__ == __init_rodata_end__) || ((__init_rodata_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .init_rodata is too large to fit in FLASH1 memory segment)
                 0x00000000000f43b8                __text_load_start__ = ALIGN (__init_rodata_end__, 0x4)
 
-.text           0x00000000000f43b8     0x7f30
+.text           0x00000000000f43b8     0x7f34
                 0x00000000000f43b8                __text_start__ = .
  *(.text .text.* .glue_7t .glue_7 .gnu.linkonce.t.* .gcc_except_table .ARM.extab* .gnu.linkonce.armextab.*)
  .glue_7        0x00000000000f43b8        0x0 linker stubs
@@ -10057,369 +10057,369 @@ Linker script and memory map
                 0x00000000000f89a4        0x4 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
                 0x00000000000f89a4                nrf_dfu_init_user
  .text.nrf_bootloader_init
-                0x00000000000f89a8      0x188 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
+                0x00000000000f89a8      0x18c Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
                 0x00000000000f89a8                nrf_bootloader_init
  .text.nrf_bootloader_app_start
-                0x00000000000f8b30       0x24 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start.o
-                0x00000000000f8b30                nrf_bootloader_app_start
+                0x00000000000f8b34       0x24 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start.o
+                0x00000000000f8b34                nrf_bootloader_app_start
  .text.jump_to_addr
-                0x00000000000f8b54        0x6 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
-                0x00000000000f8b54                jump_to_addr
- *fill*         0x00000000000f8b5a        0x2 
+                0x00000000000f8b58        0x6 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
+                0x00000000000f8b58                jump_to_addr
+ *fill*         0x00000000000f8b5e        0x2 
  .text.nrf_bootloader_flash_protect
-                0x00000000000f8b5c       0x44 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
-                0x00000000000f8b5c                nrf_bootloader_flash_protect
+                0x00000000000f8b60       0x44 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
+                0x00000000000f8b60                nrf_bootloader_flash_protect
  .text.nrf_bootloader_app_start_final
-                0x00000000000f8ba0       0x60 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
-                0x00000000000f8ba0                nrf_bootloader_app_start_final
+                0x00000000000f8ba4       0x60 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
+                0x00000000000f8ba4                nrf_bootloader_app_start_final
  .text.timer_init
-                0x00000000000f8c00       0x70 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
+                0x00000000000f8c04       0x70 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
  .text.timer_activate
-                0x00000000000f8c70       0x68 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
+                0x00000000000f8c74       0x68 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
  .text.RTC2_IRQHandler
-                0x00000000000f8cd8       0x88 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
-                0x00000000000f8cd8                RTC2_IRQHandler
+                0x00000000000f8cdc       0x88 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
+                0x00000000000f8cdc                RTC2_IRQHandler
  .text.nrf_bootloader_dfu_inactivity_timer_restart
-                0x00000000000f8d60       0x38 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
-                0x00000000000f8d60                nrf_bootloader_dfu_inactivity_timer_restart
+                0x00000000000f8d64       0x38 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
+                0x00000000000f8d64                nrf_bootloader_dfu_inactivity_timer_restart
  .text.nrf_bootloader_wdt_feed_timer_start
-                0x00000000000f8d98       0x24 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
-                0x00000000000f8d98                nrf_bootloader_wdt_feed_timer_start
+                0x00000000000f8d9c       0x24 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
+                0x00000000000f8d9c                nrf_bootloader_wdt_feed_timer_start
  .text.flash_write_callback
-                0x00000000000f8dbc        0xc Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
+                0x00000000000f8dc0        0xc Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
  .text.image_copy.part.0.constprop.0
-                0x00000000000f8dc8       0x90 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
+                0x00000000000f8dcc       0x90 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
  .text.sd_activate
-                0x00000000000f8e58       0x58 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
+                0x00000000000f8e5c       0x58 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
  .text.bl_activate.isra.0
-                0x00000000000f8eb0       0x48 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
+                0x00000000000f8eb4       0x48 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
  .text.nrf_bootloader_fw_activate
-                0x00000000000f8ef8       0xac Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
-                0x00000000000f8ef8                nrf_bootloader_fw_activate
+                0x00000000000f8efc       0xac Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
+                0x00000000000f8efc                nrf_bootloader_fw_activate
  .text.nrf_bootloader_mbr_addrs_populate
-                0x00000000000f8fa4       0x34 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o
-                0x00000000000f8fa4                nrf_bootloader_mbr_addrs_populate
+                0x00000000000f8fa8       0x34 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o
+                0x00000000000f8fa8                nrf_bootloader_mbr_addrs_populate
  .text.wdt_feed
-                0x00000000000f8fd8       0x34 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
+                0x00000000000f8fdc       0x34 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
  .text.wdt_feed_timer_handler
-                0x00000000000f900c        0x4 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
+                0x00000000000f9010        0x4 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
  .text.WDT_IRQHandler
-                0x00000000000f9010       0x1c Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
-                0x00000000000f9010                WDT_IRQHandler
+                0x00000000000f9014       0x1c Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
+                0x00000000000f9014                WDT_IRQHandler
  .text.nrf_bootloader_wdt_init
-                0x00000000000f902c       0x4c Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
-                0x00000000000f902c                nrf_bootloader_wdt_init
+                0x00000000000f9030       0x4c Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
+                0x00000000000f9030                nrf_bootloader_wdt_init
  .text.nrf_bootloader_wdt_feed
-                0x00000000000f9078       0x14 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
-                0x00000000000f9078                nrf_bootloader_wdt_feed
+                0x00000000000f907c       0x14 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
+                0x00000000000f907c                nrf_bootloader_wdt_feed
  .text.nrf52_errata_36
-                0x00000000000f908c       0x12 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
- *fill*         0x00000000000f909e        0x2 
+                0x00000000000f9090       0x12 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
+ *fill*         0x00000000000f90a2        0x2 
  .text.nrf52_errata_98
-                0x00000000000f90a0       0x24 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
+                0x00000000000f90a4       0x24 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
  .text.SystemInit
-                0x00000000000f90c4      0x188 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
-                0x00000000000f90c4                SystemInit
+                0x00000000000f90c8      0x188 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
+                0x00000000000f90c8                SystemInit
  .text.dfu_observer
-                0x00000000000f924c       0x24 Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
+                0x00000000000f9250       0x24 Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
  .text.nrf_dfu_init
-                0x00000000000f9270       0x28 Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
-                0x00000000000f9270                nrf_dfu_init
+                0x00000000000f9274       0x28 Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
+                0x00000000000f9274                nrf_dfu_init
  .text.dfu_fstorage_evt_handler
-                0x00000000000f9298        0xa Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
-                0x00000000000f9298                dfu_fstorage_evt_handler
- *fill*         0x00000000000f92a2        0x2 
+                0x00000000000f929c        0xa Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
+                0x00000000000f929c                dfu_fstorage_evt_handler
+ *fill*         0x00000000000f92a6        0x2 
  .text.nrf_dfu_flash_init
-                0x00000000000f92a4       0x14 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
-                0x00000000000f92a4                nrf_dfu_flash_init
+                0x00000000000f92a8       0x14 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
+                0x00000000000f92a8                nrf_dfu_flash_init
  .text.nrf_dfu_flash_store
-                0x00000000000f92b8       0x1c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
-                0x00000000000f92b8                nrf_dfu_flash_store
+                0x00000000000f92bc       0x1c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
+                0x00000000000f92bc                nrf_dfu_flash_store
  .text.nrf_dfu_flash_erase
-                0x00000000000f92d4       0x10 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
-                0x00000000000f92d4                nrf_dfu_flash_erase
+                0x00000000000f92d8       0x10 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
+                0x00000000000f92d8                nrf_dfu_flash_erase
  .text.ext_error_set
-                0x00000000000f92e4        0xc Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
-                0x00000000000f92e4                ext_error_set
+                0x00000000000f92e8        0xc Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
+                0x00000000000f92e8                ext_error_set
  .text.ext_error_get
-                0x00000000000f92f0       0x10 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
-                0x00000000000f92f0                ext_error_get
+                0x00000000000f92f4       0x10 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
+                0x00000000000f92f4                ext_error_get
  .text.sd_mbr_command
-                0x00000000000f9300        0x4 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
+                0x00000000000f9304        0x4 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
  .text.nrf_dfu_mbr_copy_bl
-                0x00000000000f9304       0x22 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
-                0x00000000000f9304                nrf_dfu_mbr_copy_bl
+                0x00000000000f9308       0x22 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
+                0x00000000000f9308                nrf_dfu_mbr_copy_bl
  .text.nrf_dfu_mbr_irq_forward_address_set
-                0x00000000000f9326       0x2a Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
-                0x00000000000f9326                nrf_dfu_mbr_irq_forward_address_set
+                0x00000000000f932a       0x2a Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
+                0x00000000000f932a                nrf_dfu_mbr_irq_forward_address_set
  .text.on_dfu_complete
-                0x00000000000f9350        0xc Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
+                0x00000000000f9354        0xc Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
  .text.ext_err_code_handle
-                0x00000000000f935c        0xe Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
- *fill*         0x00000000000f936a        0x2 
+                0x00000000000f9360        0xe Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
+ *fill*         0x00000000000f936e        0x2 
  .text.on_data_obj_execute_request_sched
-                0x00000000000f936c       0x84 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
+                0x00000000000f9370       0x84 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
  .text.nrf_dfu_req_handler_req
-                0x00000000000f93f0      0x330 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
+                0x00000000000f93f4      0x330 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
  .text.nrf_dfu_req_handler_on_req
-                0x00000000000f9720       0x14 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
-                0x00000000000f9720                nrf_dfu_req_handler_on_req
+                0x00000000000f9724       0x14 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
+                0x00000000000f9724                nrf_dfu_req_handler_on_req
  .text.nrf_dfu_req_handler_init
-                0x00000000000f9734       0x48 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
-                0x00000000000f9734                nrf_dfu_req_handler_init
+                0x00000000000f9738       0x48 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
+                0x00000000000f9738                nrf_dfu_req_handler_init
  .text.settings_write
-                0x00000000000f977c       0x50 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
+                0x00000000000f9780       0x50 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
  .text.nrf_dfu_settings_reinit
-                0x00000000000f97cc      0x114 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
-                0x00000000000f97cc                nrf_dfu_settings_reinit
+                0x00000000000f97d0      0x114 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
+                0x00000000000f97d0                nrf_dfu_settings_reinit
  .text.nrf_dfu_settings_write
-                0x00000000000f98e0       0x40 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
-                0x00000000000f98e0                nrf_dfu_settings_write
+                0x00000000000f98e4       0x40 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
+                0x00000000000f98e4                nrf_dfu_settings_write
  .text.settings_backup
-                0x00000000000f9920       0x14 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
-                0x00000000000f9920                settings_backup
+                0x00000000000f9924       0x14 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
+                0x00000000000f9924                settings_backup
  .text.nrf_dfu_settings_backup
-                0x00000000000f9934        0xc Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
-                0x00000000000f9934                nrf_dfu_settings_backup
+                0x00000000000f9938        0xc Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
+                0x00000000000f9938                nrf_dfu_settings_backup
  .text.nrf_dfu_settings_write_and_backup
-                0x00000000000f9940       0x20 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
-                0x00000000000f9940                nrf_dfu_settings_write_and_backup
+                0x00000000000f9944       0x20 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
+                0x00000000000f9944                nrf_dfu_settings_write_and_backup
  .text.nrf_dfu_settings_init
-                0x00000000000f9960       0x1a Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
-                0x00000000000f9960                nrf_dfu_settings_init
+                0x00000000000f9964       0x1a Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
+                0x00000000000f9964                nrf_dfu_settings_init
  .text.nrf_dfu_settings_additional_erase
-                0x00000000000f997a        0x4 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
-                0x00000000000f997a                nrf_dfu_settings_additional_erase
- *fill*         0x00000000000f997e        0x2 
+                0x00000000000f997e        0x4 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
+                0x00000000000f997e                nrf_dfu_settings_additional_erase
+ *fill*         0x00000000000f9982        0x2 
  .text.nrf_dfu_settings_progress_reset
-                0x00000000000f9980       0x28 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
-                0x00000000000f9980                nrf_dfu_settings_progress_reset
+                0x00000000000f9984       0x28 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
+                0x00000000000f9984                nrf_dfu_settings_progress_reset
  .text.nrf_dfu_transports_init
-                0x00000000000f99a8       0x30 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
-                0x00000000000f99a8                nrf_dfu_transports_init
+                0x00000000000f99ac       0x30 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
+                0x00000000000f99ac                nrf_dfu_transports_init
  .text.nrf_dfu_transports_close
-                0x00000000000f99d8       0x30 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
-                0x00000000000f99d8                nrf_dfu_transports_close
+                0x00000000000f99dc       0x30 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
+                0x00000000000f99dc                nrf_dfu_transports_close
  .text.nrf_dfu_bank_invalidate
-                0x00000000000f9a08       0x18 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
-                0x00000000000f9a08                nrf_dfu_bank_invalidate
+                0x00000000000f9a0c       0x18 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
+                0x00000000000f9a0c                nrf_dfu_bank_invalidate
  .text.nrf_dfu_softdevice_invalidate
-                0x00000000000f9a20       0x48 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
-                0x00000000000f9a20                nrf_dfu_softdevice_invalidate
+                0x00000000000f9a24       0x48 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
+                0x00000000000f9a24                nrf_dfu_softdevice_invalidate
  .text.nrf_dfu_bank0_start_addr
-                0x00000000000f9a68       0x28 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
-                0x00000000000f9a68                nrf_dfu_bank0_start_addr
+                0x00000000000f9a6c       0x28 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
+                0x00000000000f9a6c                nrf_dfu_bank0_start_addr
  .text.nrf_dfu_bank1_start_addr
-                0x00000000000f9a90       0x20 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
-                0x00000000000f9a90                nrf_dfu_bank1_start_addr
+                0x00000000000f9a94       0x20 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
+                0x00000000000f9a94                nrf_dfu_bank1_start_addr
  .text.nrf_dfu_app_start_address
-                0x00000000000f9ab0        0x4 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
-                0x00000000000f9ab0                nrf_dfu_app_start_address
+                0x00000000000f9ab4        0x4 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
+                0x00000000000f9ab4                nrf_dfu_app_start_address
  .text.nrf_dfu_softdevice_start_address
-                0x00000000000f9ab4        0x6 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
-                0x00000000000f9ab4                nrf_dfu_softdevice_start_address
- *fill*         0x00000000000f9aba        0x2 
+                0x00000000000f9ab8        0x6 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
+                0x00000000000f9ab8                nrf_dfu_softdevice_start_address
+ *fill*         0x00000000000f9abe        0x2 
  .text.nrf_dfu_cache_prepare
-                0x00000000000f9abc       0xb4 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
-                0x00000000000f9abc                nrf_dfu_cache_prepare
+                0x00000000000f9ac0       0xb4 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
+                0x00000000000f9ac0                nrf_dfu_cache_prepare
  .text.update_data_size_get
-                0x00000000000f9b70       0x50 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x00000000000f9b74       0x50 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
  .text.stored_init_cmd_decode
-                0x00000000000f9bc0       0xec Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x00000000000f9bc4       0xec Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
  .text.pb_decoding_callback
-                0x00000000000f9cac       0x4c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x00000000000f9cb0       0x4c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
  .text.crypto_init.part.0
-                0x00000000000f9cf8       0x3c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x00000000000f9cfc       0x3c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
  .text.nrf_dfu_validation_signature_check
-                0x00000000000f9d34       0xa8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x00000000000f9d38       0xa8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
  .text.nrf_dfu_validation_hash_ok
-                0x00000000000f9ddc       0x6c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x00000000000f9de0       0x6c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
  .text.nrf_dfu_validation_init
-                0x00000000000f9e48       0x1c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
-                0x00000000000f9e48                nrf_dfu_validation_init
+                0x00000000000f9e4c       0x1c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x00000000000f9e4c                nrf_dfu_validation_init
  .text.nrf_dfu_validation_init_cmd_create
-                0x00000000000f9e64       0x30 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
-                0x00000000000f9e64                nrf_dfu_validation_init_cmd_create
+                0x00000000000f9e68       0x30 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x00000000000f9e68                nrf_dfu_validation_init_cmd_create
  .text.nrf_dfu_validation_init_cmd_append
-                0x00000000000f9e94       0x40 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
-                0x00000000000f9e94                nrf_dfu_validation_init_cmd_append
+                0x00000000000f9e98       0x40 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x00000000000f9e98                nrf_dfu_validation_init_cmd_append
  .text.nrf_dfu_validation_init_cmd_present
-                0x00000000000f9ed4        0xc Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
-                0x00000000000f9ed4                nrf_dfu_validation_init_cmd_present
+                0x00000000000f9ed8        0xc Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x00000000000f9ed8                nrf_dfu_validation_init_cmd_present
  .text.nrf_dfu_validation_prevalidate
-                0x00000000000f9ee0       0x50 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
-                0x00000000000f9ee0                nrf_dfu_validation_prevalidate
+                0x00000000000f9ee4       0x50 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x00000000000f9ee4                nrf_dfu_validation_prevalidate
  .text.nrf_dfu_validation_init_cmd_execute
-                0x00000000000f9f30       0x9c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
-                0x00000000000f9f30                nrf_dfu_validation_init_cmd_execute
+                0x00000000000f9f34       0x9c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x00000000000f9f34                nrf_dfu_validation_init_cmd_execute
  .text.fw_hash_ok
-                0x00000000000f9fcc        0x8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
-                0x00000000000f9fcc                fw_hash_ok
+                0x00000000000f9fd0        0x8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x00000000000f9fd0                fw_hash_ok
  .text.nrf_dfu_validation_boot_validate
-                0x00000000000f9fd4       0x58 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
-                0x00000000000f9fd4                nrf_dfu_validation_boot_validate
+                0x00000000000f9fd8       0x58 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x00000000000f9fd8                nrf_dfu_validation_boot_validate
  .text.boot_validation_extract
-                0x00000000000fa02c       0xa8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x00000000000fa030       0xa8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
  .text.postvalidate
-                0x00000000000fa0d4      0x254 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
-                0x00000000000fa0d4                postvalidate
+                0x00000000000fa0d8      0x254 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x00000000000fa0d8                postvalidate
  .text.nrf_dfu_validation_activation_prepare
-                0x00000000000fa328        0x6 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
-                0x00000000000fa328                nrf_dfu_validation_activation_prepare
- *fill*         0x00000000000fa32e        0x2 
+                0x00000000000fa32c        0x6 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x00000000000fa32c                nrf_dfu_validation_activation_prepare
+ *fill*         0x00000000000fa332        0x2 
  .text.nrf_dfu_ver_validation_check
-                0x00000000000fa330       0xd8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
-                0x00000000000fa330                nrf_dfu_ver_validation_check
+                0x00000000000fa334       0xd8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
+                0x00000000000fa334                nrf_dfu_ver_validation_check
  .text.uint32_encode
-                0x00000000000fa408       0x12 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
+                0x00000000000fa40c       0x12 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
  .text.dfu_req_handler_rsp_clbk
-                0x00000000000fa41a      0x11a Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
-                0x00000000000fa41a                dfu_req_handler_rsp_clbk
+                0x00000000000fa41e      0x11a Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
+                0x00000000000fa41e                dfu_req_handler_rsp_clbk
  .text.nrf_dfu_serial_on_packet_received
-                0x00000000000fa534       0x94 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
-                0x00000000000fa534                nrf_dfu_serial_on_packet_received
+                0x00000000000fa538       0x94 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
+                0x00000000000fa538                nrf_dfu_serial_on_packet_received
  .text.verify_context_ecdsa_verify_secp256r1
-                0x00000000000fa5c8       0x20 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_ecdsa_verify_secp256r1.c.obj)
+                0x00000000000fa5cc       0x20 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_ecdsa_verify_secp256r1.c.obj)
  .text.nrf_cc310_bl_ecdsa_verify_init_secp256r1
-                0x00000000000fa5e8       0x4c ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_ecdsa_verify_secp256r1.c.obj)
-                0x00000000000fa5e8                nrf_cc310_bl_ecdsa_verify_init_secp256r1
+                0x00000000000fa5ec       0x4c ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_ecdsa_verify_secp256r1.c.obj)
+                0x00000000000fa5ec                nrf_cc310_bl_ecdsa_verify_init_secp256r1
  .text.nrf_cc310_bl_ecdsa_verify_hash_secp256r1
-                0x00000000000fa634      0x164 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_ecdsa_verify_secp256r1.c.obj)
-                0x00000000000fa634                nrf_cc310_bl_ecdsa_verify_hash_secp256r1
+                0x00000000000fa638      0x164 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_ecdsa_verify_secp256r1.c.obj)
+                0x00000000000fa638                nrf_cc310_bl_ecdsa_verify_hash_secp256r1
  .text.nrf_cc310_bl_ecdsa_verify_secp256r1
-                0x00000000000fa798       0x28 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_ecdsa_verify_secp256r1.c.obj)
-                0x00000000000fa798                nrf_cc310_bl_ecdsa_verify_secp256r1
+                0x00000000000fa79c       0x28 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_ecdsa_verify_secp256r1.c.obj)
+                0x00000000000fa79c                nrf_cc310_bl_ecdsa_verify_secp256r1
  .text.set_digest_in_hw_sha256
-                0x00000000000fa7c0       0x38 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash_sha256.c.obj)
+                0x00000000000fa7c4       0x38 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash_sha256.c.obj)
  .text.read_digest_in_hw_sha256
-                0x00000000000fa7f8       0x54 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash_sha256.c.obj)
+                0x00000000000fa7fc       0x54 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash_sha256.c.obj)
  .text.verify_context_hash_sha256
-                0x00000000000fa84c       0x20 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash_sha256.c.obj)
+                0x00000000000fa850       0x20 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash_sha256.c.obj)
  .text.nrf_cc310_bl_hash_sha256_init
-                0x00000000000fa86c       0x34 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash_sha256.c.obj)
-                0x00000000000fa86c                nrf_cc310_bl_hash_sha256_init
+                0x00000000000fa870       0x34 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash_sha256.c.obj)
+                0x00000000000fa870                nrf_cc310_bl_hash_sha256_init
  .text.nrf_cc310_bl_hash_sha256_update
-                0x00000000000fa8a0       0xa4 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash_sha256.c.obj)
-                0x00000000000fa8a0                nrf_cc310_bl_hash_sha256_update
+                0x00000000000fa8a4       0xa4 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash_sha256.c.obj)
+                0x00000000000fa8a4                nrf_cc310_bl_hash_sha256_update
  .text.nrf_cc310_bl_hash_sha256_finalize
-                0x00000000000fa944       0x60 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash_sha256.c.obj)
-                0x00000000000fa944                nrf_cc310_bl_hash_sha256_finalize
+                0x00000000000fa948       0x60 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash_sha256.c.obj)
+                0x00000000000fa948                nrf_cc310_bl_hash_sha256_finalize
  .text.nrf_cc310_bl_init
-                0x00000000000fa9a4       0x34 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_init.c.obj)
-                0x00000000000fa9a4                nrf_cc310_bl_init
+                0x00000000000fa9a8       0x34 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_init.c.obj)
+                0x00000000000fa9a8                nrf_cc310_bl_init
  .text.PkaSetRegsMapTab
-                0x00000000000fa9d8       0x48 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
-                0x00000000000fa9d8                PkaSetRegsMapTab
+                0x00000000000fa9dc       0x48 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
+                0x00000000000fa9dc                PkaSetRegsMapTab
  .text.PkaGetRegEffectiveSizeInBits
-                0x00000000000faa20       0x90 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
-                0x00000000000faa20                PkaGetRegEffectiveSizeInBits
+                0x00000000000faa24       0x90 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
+                0x00000000000faa24                PkaGetRegEffectiveSizeInBits
  .text.PkaGetNextMsBit
-                0x00000000000faab0       0x74 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
-                0x00000000000faab0                PkaGetNextMsBit
+                0x00000000000faab4       0x74 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
+                0x00000000000faab4                PkaGetNextMsBit
  .text.PkaSetRegsSizesTab
-                0x00000000000fab24       0x3c ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
-                0x00000000000fab24                PkaSetRegsSizesTab
+                0x00000000000fab28       0x3c ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
+                0x00000000000fab28                PkaSetRegsSizesTab
  .text.PkaInitPka
-                0x00000000000fab60       0x74 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
-                0x00000000000fab60                PkaInitPka
+                0x00000000000fab64       0x74 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
+                0x00000000000fab64                PkaInitPka
  .text.PkaInitAndMutexLock
-                0x00000000000fabd4        0x8 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
-                0x00000000000fabd4                PkaInitAndMutexLock
+                0x00000000000fabd8        0x8 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
+                0x00000000000fabd8                PkaInitAndMutexLock
  .text.PkaClearBlockOfRegs
-                0x00000000000fabdc      0x140 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
-                0x00000000000fabdc                PkaClearBlockOfRegs
+                0x00000000000fabe0      0x140 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
+                0x00000000000fabe0                PkaClearBlockOfRegs
  .text.PkaFinishAndMutexUnlock
-                0x00000000000fad1c       0x24 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
-                0x00000000000fad1c                PkaFinishAndMutexUnlock
+                0x00000000000fad20       0x24 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
+                0x00000000000fad20                PkaFinishAndMutexUnlock
  .text.PkaCopyDataIntoPkaReg
-                0x00000000000fad40       0xbc ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
-                0x00000000000fad40                PkaCopyDataIntoPkaReg
+                0x00000000000fad44       0xbc ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka.c.obj)
+                0x00000000000fad44                PkaCopyDataIntoPkaReg
  .text.PkaEcdsaVerify
-                0x00000000000fadfc      0x28c ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka_ec_wrst_dsa_verify.c.obj)
-                0x00000000000fadfc                PkaEcdsaVerify
+                0x00000000000fae00      0x28c ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka_ec_wrst_dsa_verify.c.obj)
+                0x00000000000fae00                PkaEcdsaVerify
  .text.SaSi_PalMemCopy
-                0x00000000000fb088        0x4 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(ssi_pal_mem.c.obj)
-                0x00000000000fb088                SaSi_PalMemCopy
- .text.SaSi_PalMemSet
                 0x00000000000fb08c        0x4 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(ssi_pal_mem.c.obj)
-                0x00000000000fb08c                SaSi_PalMemSet
+                0x00000000000fb08c                SaSi_PalMemCopy
+ .text.SaSi_PalMemSet
+                0x00000000000fb090        0x4 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(ssi_pal_mem.c.obj)
+                0x00000000000fb090                SaSi_PalMemSet
  .text.SaSi_PalMemSetZero
-                0x00000000000fb090        0x8 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(ssi_pal_mem.c.obj)
-                0x00000000000fb090                SaSi_PalMemSetZero
+                0x00000000000fb094        0x8 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(ssi_pal_mem.c.obj)
+                0x00000000000fb094                SaSi_PalMemSetZero
  .text.CRYS_COMMON_ReverseMemcpy32
-                0x00000000000fb098       0x1a ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(crys_common_conv_endian.c.obj)
-                0x00000000000fb098                CRYS_COMMON_ReverseMemcpy32
- *fill*         0x00000000000fb0b2        0x2 
+                0x00000000000fb09c       0x1a ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(crys_common_conv_endian.c.obj)
+                0x00000000000fb09c                CRYS_COMMON_ReverseMemcpy32
+ *fill*         0x00000000000fb0b6        0x2 
  .text.nrf_cc310_bl_hash_update_internal
-                0x00000000000fb0b4       0xf0 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash.c.obj)
-                0x00000000000fb0b4                nrf_cc310_bl_hash_update_internal
+                0x00000000000fb0b8       0xf0 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash.c.obj)
+                0x00000000000fb0b8                nrf_cc310_bl_hash_update_internal
  .text.PkaDoubleMdf2Mdf
-                0x00000000000fb1a4      0x1ac ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka_ec_wrst.c.obj)
-                0x00000000000fb1a4                PkaDoubleMdf2Mdf
+                0x00000000000fb1a8      0x1ac ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka_ec_wrst.c.obj)
+                0x00000000000fb1a8                PkaDoubleMdf2Mdf
  .text.PkaDoubleMdf2Jcb
-                0x00000000000fb350      0x178 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka_ec_wrst.c.obj)
-                0x00000000000fb350                PkaDoubleMdf2Jcb
+                0x00000000000fb354      0x178 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka_ec_wrst.c.obj)
+                0x00000000000fb354                PkaDoubleMdf2Jcb
  .text.PkaAddJcbAfn2Mdf
-                0x00000000000fb4c8      0x194 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka_ec_wrst.c.obj)
-                0x00000000000fb4c8                PkaAddJcbAfn2Mdf
+                0x00000000000fb4cc      0x194 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka_ec_wrst.c.obj)
+                0x00000000000fb4cc                PkaAddJcbAfn2Mdf
  .text.PkaJcb2Afn
-                0x00000000000fb65c       0xb0 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka_ec_wrst.c.obj)
-                0x00000000000fb65c                PkaJcb2Afn
+                0x00000000000fb660       0xb0 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka_ec_wrst.c.obj)
+                0x00000000000fb660                PkaJcb2Afn
  .text.PkaAddAff
-                0x00000000000fb70c      0x114 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka_ec_wrst.c.obj)
-                0x00000000000fb70c                PkaAddAff
+                0x00000000000fb710      0x114 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka_ec_wrst.c.obj)
+                0x00000000000fb710                PkaAddAff
  .text.PkaSum2ScalarMullt
-                0x00000000000fb820      0x1e4 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka_ec_wrst.c.obj)
-                0x00000000000fb820                PkaSum2ScalarMullt
+                0x00000000000fb824      0x1e4 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(pka_ec_wrst.c.obj)
+                0x00000000000fb824                PkaSum2ScalarMullt
  .text.SaSi_HalClearInterruptBit
-                0x00000000000fba04        0xc ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(ssi_hal.c.obj)
-                0x00000000000fba04                SaSi_HalClearInterruptBit
+                0x00000000000fba08        0xc ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(ssi_hal.c.obj)
+                0x00000000000fba08                SaSi_HalClearInterruptBit
  .text.SaSi_HalMaskInterrupt
-                0x00000000000fba10        0xc ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(ssi_hal.c.obj)
-                0x00000000000fba10                SaSi_HalMaskInterrupt
+                0x00000000000fba14        0xc ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(ssi_hal.c.obj)
+                0x00000000000fba14                SaSi_HalMaskInterrupt
  .text.SaSi_HalWaitInterrupt
-                0x00000000000fba1c       0x34 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(ssi_hal.c.obj)
-                0x00000000000fba1c                SaSi_HalWaitInterrupt
+                0x00000000000fba20       0x34 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(ssi_hal.c.obj)
+                0x00000000000fba20                SaSi_HalWaitInterrupt
  .text.CRYPTOCELL_IRQHandler
-                0x00000000000fba50       0x24 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(ssi_hal.c.obj)
-                0x00000000000fba50                CRYPTOCELL_IRQHandler
+                0x00000000000fba54       0x24 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(ssi_hal.c.obj)
+                0x00000000000fba54                CRYPTOCELL_IRQHandler
  .text.libc.__putc
-                0x00000000000fba74       0x36 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x00000000000fba74                __putc
+                0x00000000000fba78       0x36 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x00000000000fba78                __putc
  .text.libc.__RAL_print_padding
-                0x00000000000fbaaa       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x00000000000fbaaa                __RAL_print_padding
+                0x00000000000fbaae       0x1c C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x00000000000fbaae                __RAL_print_padding
  .text.libc.__RAL_pre_padding
-                0x00000000000fbac6       0x1a C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x00000000000fbac6                __RAL_pre_padding
+                0x00000000000fbaca       0x1a C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x00000000000fbaca                __RAL_pre_padding
  .text.libc.memcmp
-                0x00000000000fbae0       0x6e C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x00000000000fbae0                memcmp
+                0x00000000000fbae4       0x6e C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x00000000000fbae4                memcmp
  .text.libc.snprintf
-                0x00000000000fbb4e       0x28 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x00000000000fbb4e                snprintf
+                0x00000000000fbb52       0x28 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x00000000000fbb52                snprintf
  .text.libc.strnlen
-                0x00000000000fbb76       0x22 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x00000000000fbb76                strnlen
+                0x00000000000fbb7a       0x22 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x00000000000fbb7a                strnlen
  .text.libc.memcpy
-                0x00000000000fbb98       0x52 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2_asm.o)
-                0x00000000000fbb98                __aeabi_memcpy
-                0x00000000000fbb98                memcpy
-                0x00000000000fbba4                __aeabi_memcpy8
-                0x00000000000fbba4                __aeabi_memcpy4
+                0x00000000000fbb9c       0x52 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2_asm.o)
+                0x00000000000fbb9c                __aeabi_memcpy
+                0x00000000000fbb9c                memcpy
+                0x00000000000fbba8                __aeabi_memcpy8
+                0x00000000000fbba8                __aeabi_memcpy4
  .text.libc.memset
-                0x00000000000fbbea       0x66 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2_asm.o)
-                0x00000000000fbbea                memset
+                0x00000000000fbbee       0x66 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2_asm.o)
+                0x00000000000fbbee                memset
  .text.libc.strlen
-                0x00000000000fbc50       0x60 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2_asm.o)
-                0x00000000000fbc50                strlen
+                0x00000000000fbc54       0x60 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2_asm.o)
+                0x00000000000fbc54                strlen
  .text.libc.__vfprintf_long
-                0x00000000000fbcb0      0x638 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libvfprintf.o)
-                0x00000000000fbcb0                __vfprintf_long
-                0x00000000000fc2e8                . = ALIGN (MAX ((__text_start__ + 0x4), .), 0x4)
-                0x00000000000fc2e8                __text_end__ = (__text_start__ + SIZEOF (.text))
-                0x0000000000007f30                __text_size__ = SIZEOF (.text)
-                0x00000000000fc2e8                __text_load_end__ = __text_end__
+                0x00000000000fbcb4      0x638 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libvfprintf.o)
+                0x00000000000fbcb4                __vfprintf_long
+                0x00000000000fc2ec                . = ALIGN (MAX ((__text_start__ + 0x4), .), 0x4)
+                0x00000000000fc2ec                __text_end__ = (__text_start__ + SIZEOF (.text))
+                0x0000000000007f34                __text_size__ = SIZEOF (.text)
+                0x00000000000fc2ec                __text_load_end__ = __text_end__
 
 .vfp11_veneer   0x0000000100000000        0x0
  .vfp11_veneer  0x0000000100000000        0x0 linker stubs
@@ -10430,169 +10430,169 @@ Linker script and memory map
 .iplt           0x0000000100000000        0x0
  .iplt          0x0000000100000000        0x0 Output/Release/Obj/NAATOS_bootloader/thumb_crt0.o
                 0x0000000000000001                . = ASSERT (((__text_start__ == __text_end__) || ((__text_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .text is too large to fit in FLASH1 memory segment)
-                0x00000000000fc2e8                __crypto_data_load_start__ = ALIGN (__text_end__, 0x4)
+                0x00000000000fc2ec                __crypto_data_load_start__ = ALIGN (__text_end__, 0x4)
 
-.crypto_data    0x00000000000fc2e8        0x8
-                0x00000000000fc2e8                __crypto_data_start__ = .
-                0x00000000000fc2e8                __start_crypto_data = __crypto_data_start__
+.crypto_data    0x00000000000fc2ec        0x8
+                0x00000000000fc2ec                __crypto_data_start__ = .
+                0x00000000000fc2ec                __start_crypto_data = __crypto_data_start__
  *(SORT_BY_NAME(.crypto_data*))
- .crypto_data   0x00000000000fc2e8        0x8 Output/Release/Obj/NAATOS_bootloader/cc310_bl_backend_init.o
-                0x00000000000fc2e8                cc310_bl_backend
-                0x00000000000fc2f0                __crypto_data_end__ = (__crypto_data_start__ + SIZEOF (.crypto_data))
+ .crypto_data   0x00000000000fc2ec        0x8 Output/Release/Obj/NAATOS_bootloader/cc310_bl_backend_init.o
+                0x00000000000fc2ec                cc310_bl_backend
+                0x00000000000fc2f4                __crypto_data_end__ = (__crypto_data_start__ + SIZEOF (.crypto_data))
                 0x0000000000000008                __crypto_data_size__ = SIZEOF (.crypto_data)
-                0x00000000000fc2f0                __stop_crypto_data = __crypto_data_end__
-                0x00000000000fc2f0                __crypto_data_load_end__ = __crypto_data_end__
+                0x00000000000fc2f4                __stop_crypto_data = __crypto_data_end__
+                0x00000000000fc2f4                __crypto_data_load_end__ = __crypto_data_end__
                 0x0000000000000001                . = ASSERT (((__crypto_data_start__ == __crypto_data_end__) || ((__crypto_data_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .crypto_data is too large to fit in FLASH1 memory segment)
-                0x00000000000fc2f0                __nrf_queue_load_start__ = ALIGN (__crypto_data_end__, 0x4)
+                0x00000000000fc2f4                __nrf_queue_load_start__ = ALIGN (__crypto_data_end__, 0x4)
 
-.nrf_queue      0x00000000000fc2f0        0x0
-                0x00000000000fc2f0                __nrf_queue_start__ = .
-                0x00000000000fc2f0                __start_nrf_queue = __nrf_queue_start__
+.nrf_queue      0x00000000000fc2f4        0x0
+                0x00000000000fc2f4                __nrf_queue_start__ = .
+                0x00000000000fc2f4                __start_nrf_queue = __nrf_queue_start__
  *(.nrf_queue*)
-                0x00000000000fc2f0                __nrf_queue_end__ = (__nrf_queue_start__ + SIZEOF (.nrf_queue))
+                0x00000000000fc2f4                __nrf_queue_end__ = (__nrf_queue_start__ + SIZEOF (.nrf_queue))
                 0x0000000000000000                __nrf_queue_size__ = SIZEOF (.nrf_queue)
-                0x00000000000fc2f0                __stop_nrf_queue = __nrf_queue_end__
-                0x00000000000fc2f0                __nrf_queue_load_end__ = __nrf_queue_end__
+                0x00000000000fc2f4                __stop_nrf_queue = __nrf_queue_end__
+                0x00000000000fc2f4                __nrf_queue_load_end__ = __nrf_queue_end__
                 0x0000000000000001                . = ASSERT (((__nrf_queue_start__ == __nrf_queue_end__) || ((__nrf_queue_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .nrf_queue is too large to fit in FLASH1 memory segment)
-                0x00000000000fc2f0                __dfu_trans_load_start__ = ALIGN (__nrf_queue_end__, 0x4)
+                0x00000000000fc2f4                __dfu_trans_load_start__ = ALIGN (__nrf_queue_end__, 0x4)
 
-.dfu_trans      0x00000000000fc2f0        0x8
-                0x00000000000fc2f0                __dfu_trans_start__ = .
-                0x00000000000fc2f0                __start_dfu_trans = __dfu_trans_start__
+.dfu_trans      0x00000000000fc2f4        0x8
+                0x00000000000fc2f4                __dfu_trans_start__ = .
+                0x00000000000fc2f4                __start_dfu_trans = __dfu_trans_start__
  *(SORT_BY_NAME(.dfu_trans*))
- .dfu_trans     0x00000000000fc2f0        0x8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o
-                0x00000000000fc2f0                usb_dfu_transport
-                0x00000000000fc2f8                __dfu_trans_end__ = (__dfu_trans_start__ + SIZEOF (.dfu_trans))
+ .dfu_trans     0x00000000000fc2f4        0x8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o
+                0x00000000000fc2f4                usb_dfu_transport
+                0x00000000000fc2fc                __dfu_trans_end__ = (__dfu_trans_start__ + SIZEOF (.dfu_trans))
                 0x0000000000000008                __dfu_trans_size__ = SIZEOF (.dfu_trans)
-                0x00000000000fc2f8                __stop_dfu_trans = __dfu_trans_end__
-                0x00000000000fc2f8                __dfu_trans_load_end__ = __dfu_trans_end__
+                0x00000000000fc2fc                __stop_dfu_trans = __dfu_trans_end__
+                0x00000000000fc2fc                __dfu_trans_load_end__ = __dfu_trans_end__
                 0x0000000000000001                . = ASSERT (((__dfu_trans_start__ == __dfu_trans_end__) || ((__dfu_trans_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .dfu_trans is too large to fit in FLASH1 memory segment)
-                0x00000000000fc2f8                __svc_data_load_start__ = ALIGN (__dfu_trans_end__, 0x4)
+                0x00000000000fc2fc                __svc_data_load_start__ = ALIGN (__dfu_trans_end__, 0x4)
 
-.svc_data       0x00000000000fc2f8        0x0
-                0x00000000000fc2f8                __svc_data_start__ = .
-                0x00000000000fc2f8                __start_svc_data = __svc_data_start__
+.svc_data       0x00000000000fc2fc        0x0
+                0x00000000000fc2fc                __svc_data_start__ = .
+                0x00000000000fc2fc                __start_svc_data = __svc_data_start__
  *(.svc_data*)
-                0x00000000000fc2f8                __svc_data_end__ = (__svc_data_start__ + SIZEOF (.svc_data))
+                0x00000000000fc2fc                __svc_data_end__ = (__svc_data_start__ + SIZEOF (.svc_data))
                 0x0000000000000000                __svc_data_size__ = SIZEOF (.svc_data)
-                0x00000000000fc2f8                __stop_svc_data = __svc_data_end__
-                0x00000000000fc2f8                __svc_data_load_end__ = __svc_data_end__
+                0x00000000000fc2fc                __stop_svc_data = __svc_data_end__
+                0x00000000000fc2fc                __svc_data_load_end__ = __svc_data_end__
                 0x0000000000000001                . = ASSERT (((__svc_data_start__ == __svc_data_end__) || ((__svc_data_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .svc_data is too large to fit in FLASH1 memory segment)
-                0x00000000000fc2f8                __log_const_data_load_start__ = ALIGN (__svc_data_end__, 0x4)
+                0x00000000000fc2fc                __log_const_data_load_start__ = ALIGN (__svc_data_end__, 0x4)
 
 .log_const_data
-                0x00000000000fc2f8        0x0
-                0x00000000000fc2f8                __log_const_data_start__ = .
-                0x00000000000fc2f8                __start_log_const_data = __log_const_data_start__
+                0x00000000000fc2fc        0x0
+                0x00000000000fc2fc                __log_const_data_start__ = .
+                0x00000000000fc2fc                __start_log_const_data = __log_const_data_start__
  *(SORT_BY_NAME(.log_const_data*))
-                0x00000000000fc2f8                __log_const_data_end__ = (__log_const_data_start__ + SIZEOF (.log_const_data))
+                0x00000000000fc2fc                __log_const_data_end__ = (__log_const_data_start__ + SIZEOF (.log_const_data))
                 0x0000000000000000                __log_const_data_size__ = SIZEOF (.log_const_data)
-                0x00000000000fc2f8                __stop_log_const_data = __log_const_data_end__
-                0x00000000000fc2f8                __log_const_data_load_end__ = __log_const_data_end__
+                0x00000000000fc2fc                __stop_log_const_data = __log_const_data_end__
+                0x00000000000fc2fc                __log_const_data_load_end__ = __log_const_data_end__
                 0x0000000000000001                . = ASSERT (((__log_const_data_start__ == __log_const_data_end__) || ((__log_const_data_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .log_const_data is too large to fit in FLASH1 memory segment)
-                0x00000000000fc2f8                __nrf_balloc_load_start__ = ALIGN (__log_const_data_end__, 0x4)
+                0x00000000000fc2fc                __nrf_balloc_load_start__ = ALIGN (__log_const_data_end__, 0x4)
 
-.nrf_balloc     0x00000000000fc2f8       0x14
-                0x00000000000fc2f8                __nrf_balloc_start__ = .
-                0x00000000000fc2f8                __start_nrf_balloc = __nrf_balloc_start__
+.nrf_balloc     0x00000000000fc2fc       0x14
+                0x00000000000fc2fc                __nrf_balloc_start__ = .
+                0x00000000000fc2fc                __start_nrf_balloc = __nrf_balloc_start__
  *(.nrf_balloc*)
- .nrf_balloc    0x00000000000fc2f8       0x14 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o
-                0x00000000000fc2f8                m_payload_pool
-                0x00000000000fc30c                __nrf_balloc_end__ = (__nrf_balloc_start__ + SIZEOF (.nrf_balloc))
+ .nrf_balloc    0x00000000000fc2fc       0x14 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o
+                0x00000000000fc2fc                m_payload_pool
+                0x00000000000fc310                __nrf_balloc_end__ = (__nrf_balloc_start__ + SIZEOF (.nrf_balloc))
                 0x0000000000000014                __nrf_balloc_size__ = SIZEOF (.nrf_balloc)
-                0x00000000000fc30c                __stop_nrf_balloc = __nrf_balloc_end__
-                0x00000000000fc30c                __nrf_balloc_load_end__ = __nrf_balloc_end__
+                0x00000000000fc310                __stop_nrf_balloc = __nrf_balloc_end__
+                0x00000000000fc310                __nrf_balloc_load_end__ = __nrf_balloc_end__
                 0x0000000000000001                . = ASSERT (((__nrf_balloc_start__ == __nrf_balloc_end__) || ((__nrf_balloc_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .nrf_balloc is too large to fit in FLASH1 memory segment)
-                0x00000000000fc30c                __sdh_ble_observers_load_start__ = ALIGN (__nrf_balloc_end__, 0x4)
+                0x00000000000fc310                __sdh_ble_observers_load_start__ = ALIGN (__nrf_balloc_end__, 0x4)
 
 .sdh_ble_observers
-                0x00000000000fc30c        0x0
-                0x00000000000fc30c                __sdh_ble_observers_start__ = .
-                0x00000000000fc30c                __start_sdh_ble_observers = __sdh_ble_observers_start__
+                0x00000000000fc310        0x0
+                0x00000000000fc310                __sdh_ble_observers_start__ = .
+                0x00000000000fc310                __start_sdh_ble_observers = __sdh_ble_observers_start__
  *(SORT_BY_NAME(.sdh_ble_observers*))
-                0x00000000000fc30c                __sdh_ble_observers_end__ = (__sdh_ble_observers_start__ + SIZEOF (.sdh_ble_observers))
+                0x00000000000fc310                __sdh_ble_observers_end__ = (__sdh_ble_observers_start__ + SIZEOF (.sdh_ble_observers))
                 0x0000000000000000                __sdh_ble_observers_size__ = SIZEOF (.sdh_ble_observers)
-                0x00000000000fc30c                __stop_sdh_ble_observers = __sdh_ble_observers_end__
-                0x00000000000fc30c                __sdh_ble_observers_load_end__ = __sdh_ble_observers_end__
+                0x00000000000fc310                __stop_sdh_ble_observers = __sdh_ble_observers_end__
+                0x00000000000fc310                __sdh_ble_observers_load_end__ = __sdh_ble_observers_end__
                 0x0000000000000001                . = ASSERT (((__sdh_ble_observers_start__ == __sdh_ble_observers_end__) || ((__sdh_ble_observers_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .sdh_ble_observers is too large to fit in FLASH1 memory segment)
-                0x00000000000fc30c                __log_backends_load_start__ = ALIGN (__sdh_ble_observers_end__, 0x4)
+                0x00000000000fc310                __log_backends_load_start__ = ALIGN (__sdh_ble_observers_end__, 0x4)
 
-.log_backends   0x00000000000fc30c        0x0
-                0x00000000000fc30c                __log_backends_start__ = .
-                0x00000000000fc30c                __start_log_backends = __log_backends_start__
+.log_backends   0x00000000000fc310        0x0
+                0x00000000000fc310                __log_backends_start__ = .
+                0x00000000000fc310                __start_log_backends = __log_backends_start__
  *(SORT_BY_NAME(.log_backends*))
-                0x00000000000fc30c                __log_backends_end__ = (__log_backends_start__ + SIZEOF (.log_backends))
+                0x00000000000fc310                __log_backends_end__ = (__log_backends_start__ + SIZEOF (.log_backends))
                 0x0000000000000000                __log_backends_size__ = SIZEOF (.log_backends)
-                0x00000000000fc30c                __stop_log_backends = __log_backends_end__
-                0x00000000000fc30c                __log_backends_load_end__ = __log_backends_end__
+                0x00000000000fc310                __stop_log_backends = __log_backends_end__
+                0x00000000000fc310                __log_backends_load_end__ = __log_backends_end__
                 0x0000000000000001                . = ASSERT (((__log_backends_start__ == __log_backends_end__) || ((__log_backends_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .log_backends is too large to fit in FLASH1 memory segment)
-                0x00000000000fc30c                __sdh_req_observers_load_start__ = ALIGN (__log_backends_end__, 0x4)
+                0x00000000000fc310                __sdh_req_observers_load_start__ = ALIGN (__log_backends_end__, 0x4)
 
 .sdh_req_observers
-                0x00000000000fc30c        0x0
-                0x00000000000fc30c                __sdh_req_observers_start__ = .
-                0x00000000000fc30c                __start_sdh_req_observers = __sdh_req_observers_start__
+                0x00000000000fc310        0x0
+                0x00000000000fc310                __sdh_req_observers_start__ = .
+                0x00000000000fc310                __start_sdh_req_observers = __sdh_req_observers_start__
  *(SORT_BY_NAME(.sdh_req_observers*))
-                0x00000000000fc30c                __sdh_req_observers_end__ = (__sdh_req_observers_start__ + SIZEOF (.sdh_req_observers))
+                0x00000000000fc310                __sdh_req_observers_end__ = (__sdh_req_observers_start__ + SIZEOF (.sdh_req_observers))
                 0x0000000000000000                __sdh_req_observers_size__ = SIZEOF (.sdh_req_observers)
-                0x00000000000fc30c                __stop_sdh_req_observers = __sdh_req_observers_end__
-                0x00000000000fc30c                __sdh_req_observers_load_end__ = __sdh_req_observers_end__
+                0x00000000000fc310                __stop_sdh_req_observers = __sdh_req_observers_end__
+                0x00000000000fc310                __sdh_req_observers_load_end__ = __sdh_req_observers_end__
                 0x0000000000000001                . = ASSERT (((__sdh_req_observers_start__ == __sdh_req_observers_end__) || ((__sdh_req_observers_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .sdh_req_observers is too large to fit in FLASH1 memory segment)
-                0x00000000000fc30c                __sdh_state_observers_load_start__ = ALIGN (__sdh_req_observers_end__, 0x4)
+                0x00000000000fc310                __sdh_state_observers_load_start__ = ALIGN (__sdh_req_observers_end__, 0x4)
 
 .sdh_state_observers
-                0x00000000000fc30c        0x0
-                0x00000000000fc30c                __sdh_state_observers_start__ = .
-                0x00000000000fc30c                __start_sdh_state_observers = __sdh_state_observers_start__
+                0x00000000000fc310        0x0
+                0x00000000000fc310                __sdh_state_observers_start__ = .
+                0x00000000000fc310                __start_sdh_state_observers = __sdh_state_observers_start__
  *(SORT_BY_NAME(.sdh_state_observers*))
-                0x00000000000fc30c                __sdh_state_observers_end__ = (__sdh_state_observers_start__ + SIZEOF (.sdh_state_observers))
+                0x00000000000fc310                __sdh_state_observers_end__ = (__sdh_state_observers_start__ + SIZEOF (.sdh_state_observers))
                 0x0000000000000000                __sdh_state_observers_size__ = SIZEOF (.sdh_state_observers)
-                0x00000000000fc30c                __stop_sdh_state_observers = __sdh_state_observers_end__
-                0x00000000000fc30c                __sdh_state_observers_load_end__ = __sdh_state_observers_end__
+                0x00000000000fc310                __stop_sdh_state_observers = __sdh_state_observers_end__
+                0x00000000000fc310                __sdh_state_observers_load_end__ = __sdh_state_observers_end__
                 0x0000000000000001                . = ASSERT (((__sdh_state_observers_start__ == __sdh_state_observers_end__) || ((__sdh_state_observers_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .sdh_state_observers is too large to fit in FLASH1 memory segment)
-                0x00000000000fc30c                __sdh_stack_observers_load_start__ = ALIGN (__sdh_state_observers_end__, 0x4)
+                0x00000000000fc310                __sdh_stack_observers_load_start__ = ALIGN (__sdh_state_observers_end__, 0x4)
 
 .sdh_stack_observers
-                0x00000000000fc30c        0x0
-                0x00000000000fc30c                __sdh_stack_observers_start__ = .
-                0x00000000000fc30c                __start_sdh_stack_observers = __sdh_stack_observers_start__
+                0x00000000000fc310        0x0
+                0x00000000000fc310                __sdh_stack_observers_start__ = .
+                0x00000000000fc310                __start_sdh_stack_observers = __sdh_stack_observers_start__
  *(SORT_BY_NAME(.sdh_stack_observers*))
-                0x00000000000fc30c                __sdh_stack_observers_end__ = (__sdh_stack_observers_start__ + SIZEOF (.sdh_stack_observers))
+                0x00000000000fc310                __sdh_stack_observers_end__ = (__sdh_stack_observers_start__ + SIZEOF (.sdh_stack_observers))
                 0x0000000000000000                __sdh_stack_observers_size__ = SIZEOF (.sdh_stack_observers)
-                0x00000000000fc30c                __stop_sdh_stack_observers = __sdh_stack_observers_end__
-                0x00000000000fc30c                __sdh_stack_observers_load_end__ = __sdh_stack_observers_end__
+                0x00000000000fc310                __stop_sdh_stack_observers = __sdh_stack_observers_end__
+                0x00000000000fc310                __sdh_stack_observers_load_end__ = __sdh_stack_observers_end__
                 0x0000000000000001                . = ASSERT (((__sdh_stack_observers_start__ == __sdh_stack_observers_end__) || ((__sdh_stack_observers_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .sdh_stack_observers is too large to fit in FLASH1 memory segment)
-                0x00000000000fc30c                __sdh_soc_observers_load_start__ = ALIGN (__sdh_stack_observers_end__, 0x4)
+                0x00000000000fc310                __sdh_soc_observers_load_start__ = ALIGN (__sdh_stack_observers_end__, 0x4)
 
 .sdh_soc_observers
-                0x00000000000fc30c        0x0
-                0x00000000000fc30c                __sdh_soc_observers_start__ = .
-                0x00000000000fc30c                __start_sdh_soc_observers = __sdh_soc_observers_start__
+                0x00000000000fc310        0x0
+                0x00000000000fc310                __sdh_soc_observers_start__ = .
+                0x00000000000fc310                __start_sdh_soc_observers = __sdh_soc_observers_start__
  *(SORT_BY_NAME(.sdh_soc_observers*))
-                0x00000000000fc30c                __sdh_soc_observers_end__ = (__sdh_soc_observers_start__ + SIZEOF (.sdh_soc_observers))
+                0x00000000000fc310                __sdh_soc_observers_end__ = (__sdh_soc_observers_start__ + SIZEOF (.sdh_soc_observers))
                 0x0000000000000000                __sdh_soc_observers_size__ = SIZEOF (.sdh_soc_observers)
-                0x00000000000fc30c                __stop_sdh_soc_observers = __sdh_soc_observers_end__
-                0x00000000000fc30c                __sdh_soc_observers_load_end__ = __sdh_soc_observers_end__
+                0x00000000000fc310                __stop_sdh_soc_observers = __sdh_soc_observers_end__
+                0x00000000000fc310                __sdh_soc_observers_load_end__ = __sdh_soc_observers_end__
                 0x0000000000000001                . = ASSERT (((__sdh_soc_observers_start__ == __sdh_soc_observers_end__) || ((__sdh_soc_observers_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .sdh_soc_observers is too large to fit in FLASH1 memory segment)
-                0x00000000000fc30c                __nrf_sections_load_start__ = ALIGN (__sdh_soc_observers_end__, 0x4)
+                0x00000000000fc310                __nrf_sections_load_start__ = ALIGN (__sdh_soc_observers_end__, 0x4)
 
-.nrf_sections   0x00000000000fc30c        0x0
-                0x00000000000fc30c                __nrf_sections_start__ = .
-                0x00000000000fc30c                __start_nrf_sections = __nrf_sections_start__
+.nrf_sections   0x00000000000fc310        0x0
+                0x00000000000fc310                __nrf_sections_start__ = .
+                0x00000000000fc310                __start_nrf_sections = __nrf_sections_start__
  *(.nrf_sections .nrf_sections.*)
-                0x00000000000fc30c                __nrf_sections_end__ = (__nrf_sections_start__ + SIZEOF (.nrf_sections))
+                0x00000000000fc310                __nrf_sections_end__ = (__nrf_sections_start__ + SIZEOF (.nrf_sections))
                 0x0000000000000000                __nrf_sections_size__ = SIZEOF (.nrf_sections)
-                0x00000000000fc30c                __nrf_sections_load_end__ = __nrf_sections_end__
+                0x00000000000fc310                __nrf_sections_load_end__ = __nrf_sections_end__
                 0x0000000000000001                . = ASSERT (((__nrf_sections_start__ == __nrf_sections_end__) || ((__nrf_sections_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .nrf_sections is too large to fit in FLASH1 memory segment)
-                0x00000000000fc30c                __log_dynamic_data_load_start__ = ALIGN (__nrf_sections_end__, 0x4)
+                0x00000000000fc310                __log_dynamic_data_load_start__ = ALIGN (__nrf_sections_end__, 0x4)
 
 .log_dynamic_data
-                0x0000000020000008        0x0 load address 0x00000000000fc30c
+                0x0000000020000008        0x0 load address 0x00000000000fc310
                 0x0000000020000008                __log_dynamic_data_start__ = .
  *(SORT_BY_NAME(.log_dynamic_data*))
                 0x0000000020000008                __log_dynamic_data_end__ = (__log_dynamic_data_start__ + SIZEOF (.log_dynamic_data))
                 0x0000000000000000                __log_dynamic_data_size__ = SIZEOF (.log_dynamic_data)
-                0x00000000000fc30c                __log_dynamic_data_load_end__ = (__log_dynamic_data_load_start__ + SIZEOF (.log_dynamic_data))
+                0x00000000000fc310                __log_dynamic_data_load_end__ = (__log_dynamic_data_load_start__ + SIZEOF (.log_dynamic_data))
                 0x0000000000000001                . = ASSERT (((__log_dynamic_data_load_start__ == __log_dynamic_data_load_end__) || ((__log_dynamic_data_load_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .log_dynamic_data is too large to fit in FLASH1 memory segment)
 
 .log_dynamic_data_run
@@ -10605,15 +10605,15 @@ Linker script and memory map
                 0x0000000020000008                __stop_log_dynamic_data = __log_dynamic_data_run_end__
                 0x0000000020000008                __log_dynamic_data_run_load_end__ = __log_dynamic_data_run_end__
                 0x0000000000000001                . = ASSERT (((__log_dynamic_data_run_start__ == __log_dynamic_data_run_end__) || ((__log_dynamic_data_run_end__ - __RAM1_segment_start__) <= __RAM1_segment_size__)), error: .log_dynamic_data_run is too large to fit in RAM1 memory segment)
-                0x00000000000fc30c                __log_filter_data_load_start__ = ALIGN ((__log_dynamic_data_load_start__ + SIZEOF (.log_dynamic_data)), 0x4)
+                0x00000000000fc310                __log_filter_data_load_start__ = ALIGN ((__log_dynamic_data_load_start__ + SIZEOF (.log_dynamic_data)), 0x4)
 
 .log_filter_data
-                0x0000000020000008        0x0 load address 0x00000000000fc30c
+                0x0000000020000008        0x0 load address 0x00000000000fc310
                 0x0000000020000008                __log_filter_data_start__ = .
  *(SORT_BY_NAME(.log_filter_data*))
                 0x0000000020000008                __log_filter_data_end__ = (__log_filter_data_start__ + SIZEOF (.log_filter_data))
                 0x0000000000000000                __log_filter_data_size__ = SIZEOF (.log_filter_data)
-                0x00000000000fc30c                __log_filter_data_load_end__ = (__log_filter_data_load_start__ + SIZEOF (.log_filter_data))
+                0x00000000000fc310                __log_filter_data_load_end__ = (__log_filter_data_load_start__ + SIZEOF (.log_filter_data))
                 0x0000000000000001                . = ASSERT (((__log_filter_data_load_start__ == __log_filter_data_load_end__) || ((__log_filter_data_load_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .log_filter_data is too large to fit in FLASH1 memory segment)
 
 .log_filter_data_run
@@ -10626,19 +10626,19 @@ Linker script and memory map
                 0x0000000020000008                __stop_log_filter_data = __log_filter_data_run_end__
                 0x0000000020000008                __log_filter_data_run_load_end__ = __log_filter_data_run_end__
                 0x0000000000000001                . = ASSERT (((__log_filter_data_run_start__ == __log_filter_data_run_end__) || ((__log_filter_data_run_end__ - __RAM1_segment_start__) <= __RAM1_segment_size__)), error: .log_filter_data_run is too large to fit in RAM1 memory segment)
-                0x00000000000fc30c                __fs_data_load_start__ = ALIGN ((__log_filter_data_load_start__ + SIZEOF (.log_filter_data)), 0x4)
+                0x00000000000fc310                __fs_data_load_start__ = ALIGN ((__log_filter_data_load_start__ + SIZEOF (.log_filter_data)), 0x4)
 
-.fs_data        0x0000000020000008       0x14 load address 0x00000000000fc30c
+.fs_data        0x0000000020000008       0x14 load address 0x00000000000fc310
                 0x0000000020000008                __fs_data_start__ = .
  *(.fs_data*)
  .fs_data       0x0000000020000008       0x14 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
                 0x0000000020000008                m_fs
                 0x000000002000001c                __fs_data_end__ = (__fs_data_start__ + SIZEOF (.fs_data))
                 0x0000000000000014                __fs_data_size__ = SIZEOF (.fs_data)
-                0x00000000000fc320                __fs_data_load_end__ = (__fs_data_load_start__ + SIZEOF (.fs_data))
+                0x00000000000fc324                __fs_data_load_end__ = (__fs_data_load_start__ + SIZEOF (.fs_data))
                 0x0000000000000001                . = ASSERT (((__fs_data_load_start__ == __fs_data_load_end__) || ((__fs_data_load_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .fs_data is too large to fit in FLASH1 memory segment)
 
-.fs_data_run    0x0000000020000008       0x14 load address 0x00000000000fc30c
+.fs_data_run    0x0000000020000008       0x14 load address 0x00000000000fc310
                 0x0000000020000008                __fs_data_run_start__ = .
                 0x0000000020000008                __start_fs_data = __fs_data_run_start__
                 0x000000002000001c                . = MAX ((__fs_data_run_start__ + SIZEOF (.fs_data)), .)
@@ -10659,204 +10659,205 @@ Linker script and memory map
                 0x0000000000000000                __nrf_sections_run_end_size__ = SIZEOF (.nrf_sections_run_end)
                 0x000000002000001c                __nrf_sections_run_end_load_end__ = __nrf_sections_run_end_end__
                 0x0000000000000001                . = ASSERT (((__nrf_sections_run_end_start__ == __nrf_sections_run_end_end__) || ((__nrf_sections_run_end_end__ - __RAM1_segment_start__) <= __RAM1_segment_size__)), error: .nrf_sections_run_end is too large to fit in RAM1 memory segment)
-                0x00000000000fc320                __dtors_load_start__ = ALIGN ((__fs_data_load_start__ + SIZEOF (.fs_data)), 0x4)
+                0x00000000000fc324                __dtors_load_start__ = ALIGN ((__fs_data_load_start__ + SIZEOF (.fs_data)), 0x4)
 
-.dtors          0x00000000000fc320        0x0
-                0x00000000000fc320                __dtors_start__ = .
+.dtors          0x00000000000fc324        0x0
+                0x00000000000fc324                __dtors_start__ = .
  *(SORT_BY_NAME(.dtors.*))
  *(.dtors)
  *(.fini_array)
  *(SORT_BY_NAME(.fini_array.*))
-                0x00000000000fc320                __dtors_end__ = (__dtors_start__ + SIZEOF (.dtors))
+                0x00000000000fc324                __dtors_end__ = (__dtors_start__ + SIZEOF (.dtors))
                 0x0000000000000000                __dtors_size__ = SIZEOF (.dtors)
-                0x00000000000fc320                __dtors_load_end__ = __dtors_end__
+                0x00000000000fc324                __dtors_load_end__ = __dtors_end__
                 0x0000000000000001                . = ASSERT (((__dtors_start__ == __dtors_end__) || ((__dtors_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .dtors is too large to fit in FLASH1 memory segment)
-                0x00000000000fc320                __ctors_load_start__ = ALIGN (__dtors_end__, 0x4)
+                0x00000000000fc324                __ctors_load_start__ = ALIGN (__dtors_end__, 0x4)
 
-.ctors          0x00000000000fc320        0x0
-                0x00000000000fc320                __ctors_start__ = .
+.ctors          0x00000000000fc324        0x0
+                0x00000000000fc324                __ctors_start__ = .
  *(SORT_BY_NAME(.ctors.*))
  *(.ctors)
  *(.init_array)
  *(SORT_BY_NAME(.init_array.*))
-                0x00000000000fc320                __ctors_end__ = (__ctors_start__ + SIZEOF (.ctors))
+                0x00000000000fc324                __ctors_end__ = (__ctors_start__ + SIZEOF (.ctors))
                 0x0000000000000000                __ctors_size__ = SIZEOF (.ctors)
-                0x00000000000fc320                __ctors_load_end__ = __ctors_end__
+                0x00000000000fc324                __ctors_load_end__ = __ctors_end__
                 0x0000000000000001                . = ASSERT (((__ctors_start__ == __ctors_end__) || ((__ctors_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .ctors is too large to fit in FLASH1 memory segment)
-                0x00000000000fc320                __rodata_load_start__ = ALIGN (__ctors_end__, 0x4)
+                0x00000000000fc324                __rodata_load_start__ = ALIGN (__ctors_end__, 0x4)
 
-.rodata         0x00000000000fc320      0x580
-                0x00000000000fc320                __rodata_start__ = .
+.rodata         0x00000000000fc324      0x58c
+                0x00000000000fc324                __rodata_start__ = .
  *(.rodata .rodata.* .gnu.linkonce.r.*)
  .rodata.m_app_cdc_acm
-                0x00000000000fc320       0x24 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o
-                0x00000000000fc320                m_app_cdc_acm
+                0x00000000000fc324       0x24 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o
+                0x00000000000fc324                m_app_cdc_acm
  .rodata.usbd_config.0
-                0x00000000000fc344        0xc Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o
+                0x00000000000fc348        0xc Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o
  .rodata.PB_DECODERS
-                0x00000000000fc350       0x24 Output/Release/Obj/NAATOS_bootloader/pb_decode.o
+                0x00000000000fc354       0x24 Output/Release/Obj/NAATOS_bootloader/pb_decode.o
  .rodata.g_nrf_crypto_ecc_secp256r1_curve_info
-                0x00000000000fc374        0xc Output/Release/Obj/NAATOS_bootloader/cc310_bl_backend_ecc.o
-                0x00000000000fc374                g_nrf_crypto_ecc_secp256r1_curve_info
+                0x00000000000fc378        0xc Output/Release/Obj/NAATOS_bootloader/cc310_bl_backend_ecc.o
+                0x00000000000fc378                g_nrf_crypto_ecc_secp256r1_curve_info
  .rodata.g_nrf_crypto_hash_sha256_info
-                0x00000000000fc380       0x18 Output/Release/Obj/NAATOS_bootloader/cc310_bl_backend_hash.o
-                0x00000000000fc380                g_nrf_crypto_hash_sha256_info
+                0x00000000000fc384       0x18 Output/Release/Obj/NAATOS_bootloader/cc310_bl_backend_hash.o
+                0x00000000000fc384                g_nrf_crypto_hash_sha256_info
  .rodata.CSWTCH.58
-                0x00000000000fc398        0x7 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
- *fill*         0x00000000000fc39f        0x1 
+                0x00000000000fc39c        0x7 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
+ *fill*         0x00000000000fc3a3        0x1 
  .rodata.config.10
-                0x00000000000fc3a0        0x4 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
- .rodata.ev.7   0x00000000000fc3a4        0x4 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
- .rodata.ev.8   0x00000000000fc3a8        0x4 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
- .rodata.ev.9   0x00000000000fc3ac        0x4 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
+                0x00000000000fc3a4        0x4 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
+ .rodata.ev.7   0x00000000000fc3a8        0x4 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
+ .rodata.ev.8   0x00000000000fc3ac        0x4 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
+ .rodata.ev.9   0x00000000000fc3b0        0x4 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
  .rodata.event_setaddress.11
-                0x00000000000fc3b0        0x4 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
+                0x00000000000fc3b4        0x4 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
  .rodata.evt_data.0
-                0x00000000000fc3b4        0x1 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
- .rodata.evt_data.2
-                0x00000000000fc3b5        0x1 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
- .rodata.evt_data.3
-                0x00000000000fc3b6        0x1 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
- .rodata.evt_data.4
-                0x00000000000fc3b7        0x1 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
- .rodata.evt_data.5
                 0x00000000000fc3b8        0x1 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
- .rodata.evt_data.6
+ .rodata.evt_data.2
                 0x00000000000fc3b9        0x1 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
- *fill*         0x00000000000fc3ba        0x2 
+ .rodata.evt_data.3
+                0x00000000000fc3ba        0x1 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
+ .rodata.evt_data.4
+                0x00000000000fc3bb        0x1 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
+ .rodata.evt_data.5
+                0x00000000000fc3bc        0x1 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
+ .rodata.evt_data.6
+                0x00000000000fc3bd        0x1 Output/Release/Obj/NAATOS_bootloader/app_usbd.o
+ *fill*         0x00000000000fc3be        0x2 
  .rodata.app_usbd_cdc_acm_class_methods
-                0x00000000000fc3bc       0x14 Output/Release/Obj/NAATOS_bootloader/app_usbd_cdc_acm.o
-                0x00000000000fc3bc                app_usbd_cdc_acm_class_methods
+                0x00000000000fc3c0       0x14 Output/Release/Obj/NAATOS_bootloader/app_usbd_cdc_acm.o
+                0x00000000000fc3c0                app_usbd_cdc_acm_class_methods
  .rodata.app_usbd_core_inst
-                0x00000000000fc3d0       0x10 Output/Release/Obj/NAATOS_bootloader/app_usbd_core.o
-                0x00000000000fc3d0                app_usbd_core_inst
+                0x00000000000fc3d4       0x10 Output/Release/Obj/NAATOS_bootloader/app_usbd_core.o
+                0x00000000000fc3d4                app_usbd_core_inst
  .rodata.evt_data.0
-                0x00000000000fc3e0        0x1 Output/Release/Obj/NAATOS_bootloader/app_usbd_core.o
+                0x00000000000fc3e4        0x1 Output/Release/Obj/NAATOS_bootloader/app_usbd_core.o
  .rodata.m_configuration_dsc
-                0x00000000000fc3e1        0x9 Output/Release/Obj/NAATOS_bootloader/app_usbd_core.o
- *fill*         0x00000000000fc3ea        0x2 
+                0x00000000000fc3e5        0x9 Output/Release/Obj/NAATOS_bootloader/app_usbd_core.o
+ *fill*         0x00000000000fc3ee        0x2 
  .rodata.m_core_methods
-                0x00000000000fc3ec       0x14 Output/Release/Obj/NAATOS_bootloader/app_usbd_core.o
+                0x00000000000fc3f0       0x14 Output/Release/Obj/NAATOS_bootloader/app_usbd_core.o
  .rodata.m_device_dsc
-                0x00000000000fc400       0x12 Output/Release/Obj/NAATOS_bootloader/app_usbd_core.o
- *fill*         0x00000000000fc412        0x2 
+                0x00000000000fc404       0x12 Output/Release/Obj/NAATOS_bootloader/app_usbd_core.o
+ *fill*         0x00000000000fc416        0x2 
  .rodata.m_setup_data_handler_empty_desc
-                0x00000000000fc414        0x8 Output/Release/Obj/NAATOS_bootloader/app_usbd_core.o
+                0x00000000000fc418        0x8 Output/Release/Obj/NAATOS_bootloader/app_usbd_core.o
  .rodata.usbd_descriptor_feeder_desc
-                0x00000000000fc41c        0x8 Output/Release/Obj/NAATOS_bootloader/app_usbd_core.o
+                0x00000000000fc420        0x8 Output/Release/Obj/NAATOS_bootloader/app_usbd_core.o
  .rodata.app_usbd_serial_num_generate.str1.1
-                0x00000000000fc424        0x9 Output/Release/Obj/NAATOS_bootloader/app_usbd_serial_num.o
- *fill*         0x00000000000fc42d        0x1 
+                0x00000000000fc428        0x9 Output/Release/Obj/NAATOS_bootloader/app_usbd_serial_num.o
+ *fill*         0x00000000000fc431        0x1 
  .rodata.__compound_literal.1
-                0x00000000000fc42e        0x6 Output/Release/Obj/NAATOS_bootloader/app_usbd_string_desc.o
+                0x00000000000fc432        0x6 Output/Release/Obj/NAATOS_bootloader/app_usbd_string_desc.o
  .rodata.__compound_literal.2
-                0x00000000000fc434       0x15 Output/Release/Obj/NAATOS_bootloader/app_usbd_string_desc.o
+                0x00000000000fc438       0x15 Output/Release/Obj/NAATOS_bootloader/app_usbd_string_desc.o
  .rodata.__compound_literal.3
-                0x00000000000fc449       0x16 Output/Release/Obj/NAATOS_bootloader/app_usbd_string_desc.o
+                0x00000000000fc44d       0x16 Output/Release/Obj/NAATOS_bootloader/app_usbd_string_desc.o
  .rodata.__compound_literal.4
-                0x00000000000fc45f       0x16 Output/Release/Obj/NAATOS_bootloader/app_usbd_string_desc.o
+                0x00000000000fc463       0x16 Output/Release/Obj/NAATOS_bootloader/app_usbd_string_desc.o
  .rodata.__compound_literal.5
-                0x00000000000fc475        0x7 Output/Release/Obj/NAATOS_bootloader/app_usbd_string_desc.o
+                0x00000000000fc479        0x7 Output/Release/Obj/NAATOS_bootloader/app_usbd_string_desc.o
  .rodata.m_string_dsc
-                0x00000000000fc47c       0x18 Output/Release/Obj/NAATOS_bootloader/app_usbd_string_desc.o
+                0x00000000000fc480       0x18 Output/Release/Obj/NAATOS_bootloader/app_usbd_string_desc.o
  .rodata.m_string_translation
-                0x00000000000fc494        0xc Output/Release/Obj/NAATOS_bootloader/app_usbd_string_desc.o
+                0x00000000000fc498        0xc Output/Release/Obj/NAATOS_bootloader/app_usbd_string_desc.o
  .rodata.m_flash_info
-                0x00000000000fc4a0        0xc Output/Release/Obj/NAATOS_bootloader/nrf_fstorage_nvmc.o
+                0x00000000000fc4a4        0xc Output/Release/Obj/NAATOS_bootloader/nrf_fstorage_nvmc.o
  .rodata.nrf_fstorage_nvmc
-                0x00000000000fc4ac       0x20 Output/Release/Obj/NAATOS_bootloader/nrf_fstorage_nvmc.o
-                0x00000000000fc4ac                nrf_fstorage_nvmc
+                0x00000000000fc4b0       0x20 Output/Release/Obj/NAATOS_bootloader/nrf_fstorage_nvmc.o
+                0x00000000000fc4b0                nrf_fstorage_nvmc
  .rodata.m_drv_power_config_default
-                0x00000000000fc4cc        0x1 Output/Release/Obj/NAATOS_bootloader/nrf_drv_power.o
+                0x00000000000fc4d0        0x1 Output/Release/Obj/NAATOS_bootloader/nrf_drv_power.o
  .rodata.CSWTCH.174
-                0x00000000000fc4cd        0x6 Output/Release/Obj/NAATOS_bootloader/nrfx_usbd.o
+                0x00000000000fc4d1        0x6 Output/Release/Obj/NAATOS_bootloader/nrfx_usbd.o
  .rodata.epin_bitpos.1
-                0x00000000000fc4d3        0x9 Output/Release/Obj/NAATOS_bootloader/nrfx_usbd.o
+                0x00000000000fc4d7        0x9 Output/Release/Obj/NAATOS_bootloader/nrfx_usbd.o
  .rodata.epin_endev.3
-                0x00000000000fc4dc       0x12 Output/Release/Obj/NAATOS_bootloader/nrfx_usbd.o
+                0x00000000000fc4e0       0x12 Output/Release/Obj/NAATOS_bootloader/nrfx_usbd.o
  .rodata.epout_bitpos.0
-                0x00000000000fc4ee        0x9 Output/Release/Obj/NAATOS_bootloader/nrfx_usbd.o
- *fill*         0x00000000000fc4f7        0x1 
+                0x00000000000fc4f2        0x9 Output/Release/Obj/NAATOS_bootloader/nrfx_usbd.o
+ *fill*         0x00000000000fc4fb        0x1 
  .rodata.epout_endev.2
-                0x00000000000fc4f8       0x12 Output/Release/Obj/NAATOS_bootloader/nrfx_usbd.o
- *fill*         0x00000000000fc50a        0x2 
- .rodata.m_isr  0x00000000000fc50c       0x64 Output/Release/Obj/NAATOS_bootloader/nrfx_usbd.o
- .rodata.pk     0x00000000000fc570       0x40 Output/Release/Obj/NAATOS_bootloader/dfu_public_key.o
-                0x00000000000fc570                pk
+                0x00000000000fc4fc       0x12 Output/Release/Obj/NAATOS_bootloader/nrfx_usbd.o
+ *fill*         0x00000000000fc50e        0x2 
+ .rodata.m_isr  0x00000000000fc510       0x64 Output/Release/Obj/NAATOS_bootloader/nrfx_usbd.o
+ .rodata.pk     0x00000000000fc574       0x40 Output/Release/Obj/NAATOS_bootloader/dfu_public_key.o
+                0x00000000000fc574                pk
+ *fill*         0x00000000000fc5b4        0xc 
  .rodata.delay_machine_code.1
-                0x00000000000fc5b0        0x6 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
+                0x00000000000fc5c0        0x6 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
  .rodata.CSWTCH.14
-                0x00000000000fc5b6        0x6 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
+                0x00000000000fc5c6        0x6 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
  .rodata.CSWTCH.5
-                0x00000000000fc5bc        0x6 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
- *fill*         0x00000000000fc5c2        0x2 
+                0x00000000000fc5cc        0x6 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
+ *fill*         0x00000000000fc5d2        0x2 
  .rodata.dfu_boot_validation_fields
-                0x00000000000fc5c4       0x30 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
-                0x00000000000fc5c4                dfu_boot_validation_fields
+                0x00000000000fc5d4       0x30 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
+                0x00000000000fc5d4                dfu_boot_validation_fields
  .rodata.dfu_command_fields
-                0x00000000000fc5f4       0x30 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
-                0x00000000000fc5f4                dfu_command_fields
+                0x00000000000fc604       0x30 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
+                0x00000000000fc604                dfu_command_fields
  .rodata.dfu_hash_fields
-                0x00000000000fc624       0x30 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
-                0x00000000000fc624                dfu_hash_fields
+                0x00000000000fc634       0x30 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
+                0x00000000000fc634                dfu_hash_fields
  .rodata.dfu_init_command_fields
-                0x00000000000fc654       0xb0 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
-                0x00000000000fc654                dfu_init_command_fields
+                0x00000000000fc664       0xb0 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
+                0x00000000000fc664                dfu_init_command_fields
  .rodata.dfu_init_command_is_debug_default
-                0x00000000000fc704        0x1 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
-                0x00000000000fc704                dfu_init_command_is_debug_default
- *fill*         0x00000000000fc705        0x3 
+                0x00000000000fc714        0x1 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
+                0x00000000000fc714                dfu_init_command_is_debug_default
+ *fill*         0x00000000000fc715        0x3 
  .rodata.dfu_packet_fields
-                0x00000000000fc708       0x30 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
-                0x00000000000fc708                dfu_packet_fields
+                0x00000000000fc718       0x30 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
+                0x00000000000fc718                dfu_packet_fields
  .rodata.dfu_signed_command_fields
-                0x00000000000fc738       0x40 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
-                0x00000000000fc738                dfu_signed_command_fields
+                0x00000000000fc748       0x40 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
+                0x00000000000fc748                dfu_signed_command_fields
  .rodata.all_zero.0
-                0x00000000000fc778        0x4 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
+                0x00000000000fc788        0x4 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
  .rodata.domain_secp256r1
-                0x00000000000fc77c       0xcc ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_ecdsa_verify_secp256r1.c.obj)
-                0x00000000000fc77c                domain_secp256r1
- .rodata        0x00000000000fc848       0x10 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash_sha256.c.obj)
+                0x00000000000fc78c       0xcc ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_ecdsa_verify_secp256r1.c.obj)
+                0x00000000000fc78c                domain_secp256r1
+ .rodata        0x00000000000fc858       0x10 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash_sha256.c.obj)
  .rodata.NRF_CC310_BL_HASH_LARVAL_SHA256
-                0x00000000000fc858       0x20 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash_sha256.c.obj)
-                0x00000000000fc858                NRF_CC310_BL_HASH_LARVAL_SHA256
+                0x00000000000fc868       0x20 ../sdk/external/nrf_cc310_bl/lib/cortex-m4/hard-float/libnrf_cc310_bl_0.9.13.a(nrf_cc310_bl_hash_sha256.c.obj)
+                0x00000000000fc868                NRF_CC310_BL_HASH_LARVAL_SHA256
  .rodata.libc.__RAL_hex_lc
-                0x00000000000fc878       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x00000000000fc878                __RAL_hex_lc
- .rodata.libc.__RAL_hex_uc
                 0x00000000000fc888       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
-                0x00000000000fc888                __RAL_hex_uc
+                0x00000000000fc888                __RAL_hex_lc
+ .rodata.libc.__RAL_hex_uc
+                0x00000000000fc898       0x10 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
+                0x00000000000fc898                __RAL_hex_uc
  .rodata.libc.__vfprintf_int.str1.4
-                0x00000000000fc898        0x7 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libvfprintf.o)
-                0x00000000000fc8a0                . = ALIGN (MAX ((__rodata_start__ + 0x4), .), 0x4)
- *fill*         0x00000000000fc89f        0x1 
-                0x00000000000fc8a0                __rodata_end__ = (__rodata_start__ + SIZEOF (.rodata))
-                0x0000000000000580                __rodata_size__ = SIZEOF (.rodata)
-                0x00000000000fc8a0                __rodata_load_end__ = __rodata_end__
+                0x00000000000fc8a8        0x7 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libvfprintf.o)
+                0x00000000000fc8b0                . = ALIGN (MAX ((__rodata_start__ + 0x4), .), 0x4)
+ *fill*         0x00000000000fc8af        0x1 
+                0x00000000000fc8b0                __rodata_end__ = (__rodata_start__ + SIZEOF (.rodata))
+                0x000000000000058c                __rodata_size__ = SIZEOF (.rodata)
+                0x00000000000fc8b0                __rodata_load_end__ = __rodata_end__
 
-.rel.dyn        0x00000000000fc8a0        0x0
- .rel.iplt      0x00000000000fc8a0        0x0 Output/Release/Obj/NAATOS_bootloader/thumb_crt0.o
+.rel.dyn        0x00000000000fc8b0        0x0
+ .rel.iplt      0x00000000000fc8b0        0x0 Output/Release/Obj/NAATOS_bootloader/thumb_crt0.o
                 0x0000000000000001                . = ASSERT (((__rodata_start__ == __rodata_end__) || ((__rodata_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .rodata is too large to fit in FLASH1 memory segment)
-                0x00000000000fc8a0                __ARM.exidx_load_start__ = ALIGN (__rodata_end__, 0x4)
+                0x00000000000fc8b0                __ARM.exidx_load_start__ = ALIGN (__rodata_end__, 0x4)
 
-.ARM.exidx      0x00000000000fc8a0        0x0
-                0x00000000000fc8a0                __ARM.exidx_start__ = .
-                0x00000000000fc8a0                __exidx_start = __ARM.exidx_start__
+.ARM.exidx      0x00000000000fc8b0        0x0
+                0x00000000000fc8b0                __ARM.exidx_start__ = .
+                0x00000000000fc8b0                __exidx_start = __ARM.exidx_start__
  *(.ARM.exidx .ARM.exidx.*)
-                0x00000000000fc8a0                __ARM.exidx_end__ = (__ARM.exidx_start__ + SIZEOF (.ARM.exidx))
+                0x00000000000fc8b0                __ARM.exidx_end__ = (__ARM.exidx_start__ + SIZEOF (.ARM.exidx))
                 0x0000000000000000                __ARM.exidx_size__ = SIZEOF (.ARM.exidx)
-                0x00000000000fc8a0                __exidx_end = __ARM.exidx_end__
-                0x00000000000fc8a0                __ARM.exidx_load_end__ = __ARM.exidx_end__
+                0x00000000000fc8b0                __exidx_end = __ARM.exidx_end__
+                0x00000000000fc8b0                __ARM.exidx_load_end__ = __ARM.exidx_end__
                 0x0000000000000001                . = ASSERT (((__ARM.exidx_start__ == __ARM.exidx_end__) || ((__ARM.exidx_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .ARM.exidx is too large to fit in FLASH1 memory segment)
-                0x00000000000fc8a0                __fast_load_start__ = ALIGN (__ARM.exidx_end__, 0x4)
+                0x00000000000fc8b0                __fast_load_start__ = ALIGN (__ARM.exidx_end__, 0x4)
 
-.fast           0x000000002000001c        0x0 load address 0x00000000000fc8a0
+.fast           0x000000002000001c        0x0 load address 0x00000000000fc8b0
                 0x000000002000001c                __fast_start__ = .
  *(.fast .fast.*)
                 0x000000002000001c                __fast_end__ = (__fast_start__ + SIZEOF (.fast))
                 0x0000000000000000                __fast_size__ = SIZEOF (.fast)
-                0x00000000000fc8a0                __fast_load_end__ = (__fast_load_start__ + SIZEOF (.fast))
+                0x00000000000fc8b0                __fast_load_end__ = (__fast_load_start__ + SIZEOF (.fast))
                 0x0000000000000001                . = ASSERT (((__fast_load_start__ == __fast_load_end__) || ((__fast_load_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .fast is too large to fit in FLASH1 memory segment)
 
 .fast_run       0x000000002000001c        0x0
@@ -10866,9 +10867,9 @@ Linker script and memory map
                 0x0000000000000000                __fast_run_size__ = SIZEOF (.fast_run)
                 0x000000002000001c                __fast_run_load_end__ = __fast_run_end__
                 0x0000000000000001                . = ASSERT (((__fast_run_start__ == __fast_run_end__) || ((__fast_run_end__ - __RAM1_segment_start__) <= __RAM1_segment_size__)), error: .fast_run is too large to fit in RAM1 memory segment)
-                0x00000000000fc8a0                __data_load_start__ = ALIGN ((__fast_load_start__ + SIZEOF (.fast)), 0x4)
+                0x00000000000fc8b0                __data_load_start__ = ALIGN ((__fast_load_start__ + SIZEOF (.fast)), 0x4)
 
-.data           0x000000002000001c       0x40 load address 0x00000000000fc8a0
+.data           0x000000002000001c       0x40 load address 0x00000000000fc8b0
                 0x000000002000001c                __data_start__ = .
  *(.data .data.* .gnu.linkonce.d.*)
  .data.m_app_cdc_acm_ep
@@ -10896,13 +10897,13 @@ Linker script and memory map
                 0x0000000020000058                mp_dfu_settings_backup_buffer
                 0x000000002000005c                __data_end__ = (__data_start__ + SIZEOF (.data))
                 0x0000000000000040                __data_size__ = SIZEOF (.data)
-                0x00000000000fc8e0                __data_load_end__ = (__data_load_start__ + SIZEOF (.data))
+                0x00000000000fc8f0                __data_load_end__ = (__data_load_start__ + SIZEOF (.data))
 
 .igot.plt       0x0000000100000000        0x0
  .igot.plt      0x0000000100000000        0x0 Output/Release/Obj/NAATOS_bootloader/thumb_crt0.o
                 0x0000000000000001                . = ASSERT (((__data_load_start__ == __data_load_end__) || ((__data_load_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .data is too large to fit in FLASH1 memory segment)
 
-.data_run       0x000000002000001c       0x40 load address 0x00000000000fc8a0
+.data_run       0x000000002000001c       0x40 load address 0x00000000000fc8b0
                 0x000000002000001c                __data_run_start__ = .
                 0x000000002000005c                . = MAX ((__data_run_start__ + SIZEOF (.data)), .)
  *fill*         0x000000002000001c       0x40 
@@ -10910,14 +10911,14 @@ Linker script and memory map
                 0x0000000000000040                __data_run_size__ = SIZEOF (.data_run)
                 0x000000002000005c                __data_run_load_end__ = __data_run_end__
                 0x0000000000000001                . = ASSERT (((__data_run_start__ == __data_run_end__) || ((__data_run_end__ - __RAM1_segment_start__) <= __RAM1_segment_size__)), error: .data_run is too large to fit in RAM1 memory segment)
-                0x00000000000fc8e0                __tdata_load_start__ = ALIGN ((__data_load_start__ + SIZEOF (.data)), 0x4)
+                0x00000000000fc8f0                __tdata_load_start__ = ALIGN ((__data_load_start__ + SIZEOF (.data)), 0x4)
 
-.tdata          0x000000002000005c        0x0 load address 0x00000000000fc8e0
+.tdata          0x000000002000005c        0x0 load address 0x00000000000fc8f0
                 0x000000002000005c                __tdata_start__ = .
  *(.tdata .tdata.*)
                 0x000000002000005c                __tdata_end__ = (__tdata_start__ + SIZEOF (.tdata))
                 0x0000000000000000                __tdata_size__ = SIZEOF (.tdata)
-                0x00000000000fc8e0                __tdata_load_end__ = (__tdata_load_start__ + SIZEOF (.tdata))
+                0x00000000000fc8f0                __tdata_load_end__ = (__tdata_load_start__ + SIZEOF (.tdata))
                 0x0000000000000001                . = ASSERT (((__tdata_load_start__ == __tdata_load_end__) || ((__tdata_load_end__ - __FLASH1_segment_start__) <= __FLASH1_segment_size__)), error: .tdata is too large to fit in FLASH1 memory segment)
 
 .tdata_run      0x000000002000005c        0x0
@@ -11529,7 +11530,7 @@ LOAD linker stubs
  .comment       0x000000000000009e       0x26 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc2.o)
  .comment       0x000000000000009e       0x26 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.34/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libvfprintf.o)
 
-.debug_line     0x0000000000000000    0x24ea6
+.debug_line     0x0000000000000000    0x24e4e
  .debug_line    0x0000000000000000      0x212 Output/Release/Obj/NAATOS_bootloader/thumb_crt0.o
  .debug_line    0x0000000000000212      0xda0 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o
  .debug_line    0x0000000000000fb2      0x288 Output/Release/Obj/NAATOS_bootloader/pb_common.o
@@ -11566,30 +11567,30 @@ LOAD linker stubs
  .debug_line    0x0000000000017a69      0x4a1 Output/Release/Obj/NAATOS_bootloader/nrf_crypto_shared.o
  .debug_line    0x0000000000017f0a      0x9a1 Output/Release/Obj/NAATOS_bootloader/main.o
  .debug_line    0x00000000000188ab       0xe3 Output/Release/Obj/NAATOS_bootloader/dfu_public_key.o
- .debug_line    0x000000000001898e      0xd5a Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
- .debug_line    0x00000000000196e8      0x546 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start.o
- .debug_line    0x0000000000019c2e      0x7d5 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
- .debug_line    0x000000000001a403      0xbb6 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
- .debug_line    0x000000000001afb9      0x9c8 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
- .debug_line    0x000000000001b981      0x657 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o
- .debug_line    0x000000000001bfd8      0x86e Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
- .debug_line    0x000000000001c846       0x96 Output/Release/Obj/NAATOS_bootloader/ses_startup_nrf52840.o
- .debug_line    0x000000000001c8dc       0xb5 Output/Release/Obj/NAATOS_bootloader/ses_startup_nrf_common.o
- .debug_line    0x000000000001c991      0x59d Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
- .debug_line    0x000000000001cf2e      0x136 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
- .debug_line    0x000000000001d064      0x561 Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
- .debug_line    0x000000000001d5c5      0x5c6 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
- .debug_line    0x000000000001db8b      0x520 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
- .debug_line    0x000000000001e0ab      0x5c3 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
- .debug_line    0x000000000001e66e     0x18b1 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
- .debug_line    0x000000000001ff1f      0xac5 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
- .debug_line    0x00000000000209e4      0x590 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
- .debug_line    0x0000000000020f74      0x8b9 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
- .debug_line    0x000000000002182d     0x1c02 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
- .debug_line    0x000000000002342f     0x1195 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
- .debug_line    0x00000000000245c4      0x8e2 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
+ .debug_line    0x000000000001898e      0xd07 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
+ .debug_line    0x0000000000019695      0x546 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start.o
+ .debug_line    0x0000000000019bdb      0x7d0 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
+ .debug_line    0x000000000001a3ab      0xbb6 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
+ .debug_line    0x000000000001af61      0x9c8 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
+ .debug_line    0x000000000001b929      0x657 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o
+ .debug_line    0x000000000001bf80      0x86e Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
+ .debug_line    0x000000000001c7ee       0x96 Output/Release/Obj/NAATOS_bootloader/ses_startup_nrf52840.o
+ .debug_line    0x000000000001c884       0xb5 Output/Release/Obj/NAATOS_bootloader/ses_startup_nrf_common.o
+ .debug_line    0x000000000001c939      0x59d Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
+ .debug_line    0x000000000001ced6      0x136 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
+ .debug_line    0x000000000001d00c      0x561 Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
+ .debug_line    0x000000000001d56d      0x5c6 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
+ .debug_line    0x000000000001db33      0x520 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
+ .debug_line    0x000000000001e053      0x5c3 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
+ .debug_line    0x000000000001e616     0x18b1 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
+ .debug_line    0x000000000001fec7      0xac5 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
+ .debug_line    0x000000000002098c      0x590 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
+ .debug_line    0x0000000000020f1c      0x8b9 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
+ .debug_line    0x00000000000217d5     0x1c02 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+ .debug_line    0x00000000000233d7     0x1195 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
+ .debug_line    0x000000000002456c      0x8e2 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
 
-.debug_info     0x0000000000000000    0x30ea2
+.debug_info     0x0000000000000000    0x30a99
  .debug_info    0x0000000000000000       0x22 Output/Release/Obj/NAATOS_bootloader/thumb_crt0.o
  .debug_info    0x0000000000000022     0x18b0 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o
  .debug_info    0x00000000000018d2      0x329 Output/Release/Obj/NAATOS_bootloader/pb_common.o
@@ -11626,30 +11627,30 @@ LOAD linker stubs
  .debug_info    0x0000000000021152      0x2a2 Output/Release/Obj/NAATOS_bootloader/nrf_crypto_shared.o
  .debug_info    0x00000000000213f4      0x5c4 Output/Release/Obj/NAATOS_bootloader/main.o
  .debug_info    0x00000000000219b8       0x92 Output/Release/Obj/NAATOS_bootloader/dfu_public_key.o
- .debug_info    0x0000000000021a4a     0x1928 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
- .debug_info    0x0000000000023372      0x268 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start.o
- .debug_info    0x00000000000235da      0x8bc Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
- .debug_info    0x0000000000023e96     0x165e Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
- .debug_info    0x00000000000254f4      0xa1b Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
- .debug_info    0x0000000000025f0f      0x495 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o
- .debug_info    0x00000000000263a4      0x813 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
- .debug_info    0x0000000000026bb7       0x23 Output/Release/Obj/NAATOS_bootloader/ses_startup_nrf52840.o
- .debug_info    0x0000000000026bda       0x23 Output/Release/Obj/NAATOS_bootloader/ses_startup_nrf_common.o
- .debug_info    0x0000000000026bfd     0x1683 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
- .debug_info    0x0000000000028280      0x685 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
- .debug_info    0x0000000000028905      0x20f Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
- .debug_info    0x0000000000028b14      0x5e9 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
- .debug_info    0x00000000000290fd      0x1a9 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
- .debug_info    0x00000000000292a6      0x3de Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
- .debug_info    0x0000000000029684     0x1e18 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
- .debug_info    0x000000000002b49c      0xd6f Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
- .debug_info    0x000000000002c20b      0x2ef Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
- .debug_info    0x000000000002c4fa      0x70c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
- .debug_info    0x000000000002cc06     0x2ad5 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
- .debug_info    0x000000000002f6db      0xaac Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
- .debug_info    0x0000000000030187      0xd1b Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
+ .debug_info    0x0000000000021a4a     0x151f Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
+ .debug_info    0x0000000000022f69      0x268 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start.o
+ .debug_info    0x00000000000231d1      0x8bc Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
+ .debug_info    0x0000000000023a8d     0x165e Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
+ .debug_info    0x00000000000250eb      0xa1b Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
+ .debug_info    0x0000000000025b06      0x495 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o
+ .debug_info    0x0000000000025f9b      0x813 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
+ .debug_info    0x00000000000267ae       0x23 Output/Release/Obj/NAATOS_bootloader/ses_startup_nrf52840.o
+ .debug_info    0x00000000000267d1       0x23 Output/Release/Obj/NAATOS_bootloader/ses_startup_nrf_common.o
+ .debug_info    0x00000000000267f4     0x1683 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
+ .debug_info    0x0000000000027e77      0x685 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
+ .debug_info    0x00000000000284fc      0x20f Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
+ .debug_info    0x000000000002870b      0x5e9 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
+ .debug_info    0x0000000000028cf4      0x1a9 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
+ .debug_info    0x0000000000028e9d      0x3de Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
+ .debug_info    0x000000000002927b     0x1e18 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
+ .debug_info    0x000000000002b093      0xd6f Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
+ .debug_info    0x000000000002be02      0x2ef Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
+ .debug_info    0x000000000002c0f1      0x70c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
+ .debug_info    0x000000000002c7fd     0x2ad5 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+ .debug_info    0x000000000002f2d2      0xaac Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
+ .debug_info    0x000000000002fd7e      0xd1b Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
 
-.debug_abbrev   0x0000000000000000     0x95d3
+.debug_abbrev   0x0000000000000000     0x959c
  .debug_abbrev  0x0000000000000000       0x12 Output/Release/Obj/NAATOS_bootloader/thumb_crt0.o
  .debug_abbrev  0x0000000000000012      0x48d Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o
  .debug_abbrev  0x000000000000049f      0x137 Output/Release/Obj/NAATOS_bootloader/pb_common.o
@@ -11686,28 +11687,28 @@ LOAD linker stubs
  .debug_abbrev  0x0000000000005ad8       0xe5 Output/Release/Obj/NAATOS_bootloader/nrf_crypto_shared.o
  .debug_abbrev  0x0000000000005bbd      0x2ba Output/Release/Obj/NAATOS_bootloader/main.o
  .debug_abbrev  0x0000000000005e77       0x6a Output/Release/Obj/NAATOS_bootloader/dfu_public_key.o
- .debug_abbrev  0x0000000000005ee1      0x51a Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
- .debug_abbrev  0x00000000000063fb      0x142 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start.o
- .debug_abbrev  0x000000000000653d      0x326 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
- .debug_abbrev  0x0000000000006863      0x3fb Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
- .debug_abbrev  0x0000000000006c5e      0x391 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
- .debug_abbrev  0x0000000000006fef      0x193 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o
- .debug_abbrev  0x0000000000007182      0x2d0 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
- .debug_abbrev  0x0000000000007452       0x14 Output/Release/Obj/NAATOS_bootloader/ses_startup_nrf52840.o
- .debug_abbrev  0x0000000000007466       0x14 Output/Release/Obj/NAATOS_bootloader/ses_startup_nrf_common.o
- .debug_abbrev  0x000000000000747a      0x2af Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
- .debug_abbrev  0x0000000000007729      0x102 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
- .debug_abbrev  0x000000000000782b      0x13a Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
- .debug_abbrev  0x0000000000007965      0x1d6 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
- .debug_abbrev  0x0000000000007b3b       0xce Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
- .debug_abbrev  0x0000000000007c09      0x19d Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
- .debug_abbrev  0x0000000000007da6      0x4d2 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
- .debug_abbrev  0x0000000000008278      0x3f7 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
- .debug_abbrev  0x000000000000866f      0x16c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
- .debug_abbrev  0x00000000000087db      0x2c1 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
- .debug_abbrev  0x0000000000008a9c      0x543 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
- .debug_abbrev  0x0000000000008fdf      0x288 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
- .debug_abbrev  0x0000000000009267      0x36c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
+ .debug_abbrev  0x0000000000005ee1      0x4e3 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
+ .debug_abbrev  0x00000000000063c4      0x142 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start.o
+ .debug_abbrev  0x0000000000006506      0x326 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
+ .debug_abbrev  0x000000000000682c      0x3fb Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
+ .debug_abbrev  0x0000000000006c27      0x391 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
+ .debug_abbrev  0x0000000000006fb8      0x193 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o
+ .debug_abbrev  0x000000000000714b      0x2d0 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
+ .debug_abbrev  0x000000000000741b       0x14 Output/Release/Obj/NAATOS_bootloader/ses_startup_nrf52840.o
+ .debug_abbrev  0x000000000000742f       0x14 Output/Release/Obj/NAATOS_bootloader/ses_startup_nrf_common.o
+ .debug_abbrev  0x0000000000007443      0x2af Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
+ .debug_abbrev  0x00000000000076f2      0x102 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
+ .debug_abbrev  0x00000000000077f4      0x13a Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
+ .debug_abbrev  0x000000000000792e      0x1d6 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
+ .debug_abbrev  0x0000000000007b04       0xce Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
+ .debug_abbrev  0x0000000000007bd2      0x19d Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
+ .debug_abbrev  0x0000000000007d6f      0x4d2 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
+ .debug_abbrev  0x0000000000008241      0x3f7 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
+ .debug_abbrev  0x0000000000008638      0x16c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
+ .debug_abbrev  0x00000000000087a4      0x2c1 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
+ .debug_abbrev  0x0000000000008a65      0x543 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+ .debug_abbrev  0x0000000000008fa8      0x288 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
+ .debug_abbrev  0x0000000000009230      0x36c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
 
 .debug_aranges  0x0000000000000000     0x14f0
  .debug_aranges
@@ -11827,7 +11828,7 @@ LOAD linker stubs
  .debug_aranges
                 0x00000000000014c0       0x30 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
 
-.debug_str      0x0000000000000000    0xb65a5
+.debug_str      0x0000000000000000    0xb62ca
  .debug_str     0x0000000000000000       0x93 Output/Release/Obj/NAATOS_bootloader/thumb_crt0.o
  .debug_str     0x0000000000000093    0x96570 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o
                                       0x97ba8 (size before relaxing)
@@ -11899,52 +11900,52 @@ LOAD linker stubs
                                       0x89a22 (size before relaxing)
  .debug_str     0x00000000000b0952       0x41 Output/Release/Obj/NAATOS_bootloader/dfu_public_key.o
                                        0x3597 (size before relaxing)
- .debug_str     0x00000000000b0993     0x17a0 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
-                                      0x8cf8b (size before relaxing)
- .debug_str     0x00000000000b2133       0xbf Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start.o
+ .debug_str     0x00000000000b0993     0x14dc Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
+                                      0x8ccbb (size before relaxing)
+ .debug_str     0x00000000000b1e6f       0xbf Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start.o
                                       0x8535e (size before relaxing)
- .debug_str     0x00000000000b21f2      0x185 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
+ .debug_str     0x00000000000b1f2e      0x185 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
                                       0x86c16 (size before relaxing)
- .debug_str     0x00000000000b2377      0x6ae Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
+ .debug_str     0x00000000000b20b3      0x6ae Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
                                       0x887b9 (size before relaxing)
- .debug_str     0x00000000000b2a25      0x1c6 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
+ .debug_str     0x00000000000b2761      0x1c6 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
                                       0x86460 (size before relaxing)
- .debug_str     0x00000000000b2beb      0x10f Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o
+ .debug_str     0x00000000000b2927      0x10f Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o
                                       0x85f85 (size before relaxing)
- .debug_str     0x00000000000b2cfa      0x1f2 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
+ .debug_str     0x00000000000b2a36      0x1f2 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
                                       0x883b8 (size before relaxing)
- .debug_str     0x00000000000b2eec       0x58 Output/Release/Obj/NAATOS_bootloader/ses_startup_nrf52840.o
+ .debug_str     0x00000000000b2c28       0x58 Output/Release/Obj/NAATOS_bootloader/ses_startup_nrf52840.o
                                          0x9b (size before relaxing)
- .debug_str     0x00000000000b2f44       0x5a Output/Release/Obj/NAATOS_bootloader/ses_startup_nrf_common.o
+ .debug_str     0x00000000000b2c80       0x5a Output/Release/Obj/NAATOS_bootloader/ses_startup_nrf_common.o
                                          0x9d (size before relaxing)
- .debug_str     0x00000000000b2f9e      0x266 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
+ .debug_str     0x00000000000b2cda      0x266 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
                                       0x7e031 (size before relaxing)
- .debug_str     0x00000000000b3204      0x3b7 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
+ .debug_str     0x00000000000b2f40      0x3b7 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
                                        0x5cd4 (size before relaxing)
- .debug_str     0x00000000000b35bb       0xa8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
+ .debug_str     0x00000000000b32f7       0xa8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
                                       0x85555 (size before relaxing)
- .debug_str     0x00000000000b3663      0x128 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
+ .debug_str     0x00000000000b339f      0x128 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
                                       0x8568f (size before relaxing)
- .debug_str     0x00000000000b378b      0x401 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
+ .debug_str     0x00000000000b34c7      0x401 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
                                       0x8560b (size before relaxing)
- .debug_str     0x00000000000b3b8c      0x29e Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
+ .debug_str     0x00000000000b38c8      0x29e Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
                                       0x85c22 (size before relaxing)
- .debug_str     0x00000000000b3e2a     0x16e3 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
+ .debug_str     0x00000000000b3b66     0x16e3 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
                                       0x8e399 (size before relaxing)
- .debug_str     0x00000000000b550d      0x559 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
+ .debug_str     0x00000000000b5249      0x542 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
                                       0x88687 (size before relaxing)
- .debug_str     0x00000000000b5a66      0x146 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
+ .debug_str     0x00000000000b578b      0x146 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
                                       0x855b3 (size before relaxing)
- .debug_str     0x00000000000b5bac      0x16a Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
+ .debug_str     0x00000000000b58d1      0x16a Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
                                       0x880f0 (size before relaxing)
- .debug_str     0x00000000000b5d16      0x5d6 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+ .debug_str     0x00000000000b5a3b      0x5d6 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
                                       0x8f9ea (size before relaxing)
- .debug_str     0x00000000000b62ec      0x159 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
+ .debug_str     0x00000000000b6011      0x159 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
                                       0x8d7fb (size before relaxing)
- .debug_str     0x00000000000b6445      0x160 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
+ .debug_str     0x00000000000b616a      0x160 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
                                       0x85ffa (size before relaxing)
 
-.debug_ranges   0x0000000000000000     0x42f0
+.debug_ranges   0x0000000000000000     0x4290
  .debug_ranges  0x0000000000000000       0x90 Output/Release/Obj/NAATOS_bootloader/thumb_crt0.o
  .debug_ranges  0x0000000000000090       0x60 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o
  .debug_ranges  0x00000000000000f0       0x20 Output/Release/Obj/NAATOS_bootloader/pb_common.o
@@ -11980,25 +11981,25 @@ LOAD linker stubs
  .debug_ranges  0x00000000000035e8       0x70 Output/Release/Obj/NAATOS_bootloader/nrf_crypto_init.o
  .debug_ranges  0x0000000000003658       0x28 Output/Release/Obj/NAATOS_bootloader/nrf_crypto_shared.o
  .debug_ranges  0x0000000000003680       0xb0 Output/Release/Obj/NAATOS_bootloader/main.o
- .debug_ranges  0x0000000000003730      0x118 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
- .debug_ranges  0x0000000000003848       0x10 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start.o
- .debug_ranges  0x0000000000003858       0x68 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
- .debug_ranges  0x00000000000038c0      0x228 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
- .debug_ranges  0x0000000000003ae8       0x78 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
- .debug_ranges  0x0000000000003b60       0x20 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o
- .debug_ranges  0x0000000000003b80       0x80 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
- .debug_ranges  0x0000000000003c00       0x38 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
- .debug_ranges  0x0000000000003c38       0x18 Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
- .debug_ranges  0x0000000000003c50       0x28 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
- .debug_ranges  0x0000000000003c78       0x18 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
- .debug_ranges  0x0000000000003c90       0x28 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
- .debug_ranges  0x0000000000003cb8      0x1a8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
- .debug_ranges  0x0000000000003e60       0xc8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
- .debug_ranges  0x0000000000003f28       0x60 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
- .debug_ranges  0x0000000000003f88       0x60 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
- .debug_ranges  0x0000000000003fe8      0x208 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
- .debug_ranges  0x00000000000041f0       0x98 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
- .debug_ranges  0x0000000000004288       0x68 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
+ .debug_ranges  0x0000000000003730       0xb8 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
+ .debug_ranges  0x00000000000037e8       0x10 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start.o
+ .debug_ranges  0x00000000000037f8       0x68 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
+ .debug_ranges  0x0000000000003860      0x228 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
+ .debug_ranges  0x0000000000003a88       0x78 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
+ .debug_ranges  0x0000000000003b00       0x20 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o
+ .debug_ranges  0x0000000000003b20       0x80 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
+ .debug_ranges  0x0000000000003ba0       0x38 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
+ .debug_ranges  0x0000000000003bd8       0x18 Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
+ .debug_ranges  0x0000000000003bf0       0x28 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
+ .debug_ranges  0x0000000000003c18       0x18 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
+ .debug_ranges  0x0000000000003c30       0x28 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
+ .debug_ranges  0x0000000000003c58      0x1a8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
+ .debug_ranges  0x0000000000003e00       0xc8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
+ .debug_ranges  0x0000000000003ec8       0x60 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
+ .debug_ranges  0x0000000000003f28       0x60 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
+ .debug_ranges  0x0000000000003f88      0x208 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+ .debug_ranges  0x0000000000004190       0x98 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
+ .debug_ranges  0x0000000000004228       0x68 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
 
 .debug_frame    0x0000000000000000     0x3b38
  .debug_frame   0x0000000000000000      0x11c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o
@@ -12055,7 +12056,7 @@ LOAD linker stubs
  .debug_frame   0x0000000000003a78       0x34 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
  .debug_frame   0x0000000000003aac       0x8c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
 
-.debug_loc      0x0000000000000000    0x13da0
+.debug_loc      0x0000000000000000    0x13ce4
  .debug_loc     0x0000000000000000      0x43d Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o
  .debug_loc     0x000000000000043d      0x1b2 Output/Release/Obj/NAATOS_bootloader/pb_common.o
  .debug_loc     0x00000000000005ef     0x1c70 Output/Release/Obj/NAATOS_bootloader/pb_decode.o
@@ -12090,26 +12091,26 @@ LOAD linker stubs
  .debug_loc     0x000000000000f1d5       0x9a Output/Release/Obj/NAATOS_bootloader/nrf_crypto_init.o
  .debug_loc     0x000000000000f26f      0x2a1 Output/Release/Obj/NAATOS_bootloader/nrf_crypto_shared.o
  .debug_loc     0x000000000000f510       0xfa Output/Release/Obj/NAATOS_bootloader/main.o
- .debug_loc     0x000000000000f60a      0x507 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
- .debug_loc     0x000000000000fb11      0x26e Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
- .debug_loc     0x000000000000fd7f      0x7e7 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
- .debug_loc     0x0000000000010566      0x478 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
- .debug_loc     0x00000000000109de       0xa9 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
- .debug_loc     0x0000000000010a87       0x96 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
- .debug_loc     0x0000000000010b1d       0x7d Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
- .debug_loc     0x0000000000010b9a      0x1cb Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
- .debug_loc     0x0000000000010d65       0x3b Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
- .debug_loc     0x0000000000010da0      0x10b Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
- .debug_loc     0x0000000000010eab      0x97a Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
- .debug_loc     0x0000000000011825      0x44a Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
- .debug_loc     0x0000000000011c6f      0x116 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
- .debug_loc     0x0000000000011d85      0x262 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
- .debug_loc     0x0000000000011fe7     0x1372 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
- .debug_loc     0x0000000000013359      0x2d8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
- .debug_loc     0x0000000000013631      0x76f Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
+ .debug_loc     0x000000000000f60a      0x44b Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
+ .debug_loc     0x000000000000fa55      0x26e Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
+ .debug_loc     0x000000000000fcc3      0x7e7 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
+ .debug_loc     0x00000000000104aa      0x478 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
+ .debug_loc     0x0000000000010922       0xa9 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
+ .debug_loc     0x00000000000109cb       0x96 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
+ .debug_loc     0x0000000000010a61       0x7d Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
+ .debug_loc     0x0000000000010ade      0x1cb Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
+ .debug_loc     0x0000000000010ca9       0x3b Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
+ .debug_loc     0x0000000000010ce4      0x10b Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
+ .debug_loc     0x0000000000010def      0x97a Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
+ .debug_loc     0x0000000000011769      0x44a Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
+ .debug_loc     0x0000000000011bb3      0x116 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
+ .debug_loc     0x0000000000011cc9      0x262 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
+ .debug_loc     0x0000000000011f2b     0x1372 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+ .debug_loc     0x000000000001329d      0x2d8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
+ .debug_loc     0x0000000000013575      0x76f Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
 
 .debug_pubnames
-                0x0000000000000000    0x137df
+                0x0000000000000000    0x135d2
  .debug_pubnames
                 0x0000000000000000     0x10dc Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o
  .debug_pubnames
@@ -12181,48 +12182,48 @@ LOAD linker stubs
  .debug_pubnames
                 0x000000000000e2be       0x19 Output/Release/Obj/NAATOS_bootloader/dfu_public_key.o
  .debug_pubnames
-                0x000000000000e2d7      0xd25 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
+                0x000000000000e2d7      0xb18 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
  .debug_pubnames
-                0x000000000000effc       0xd4 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start.o
+                0x000000000000edef       0xd4 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start.o
  .debug_pubnames
-                0x000000000000f0d0      0x181 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
+                0x000000000000eec3      0x181 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
  .debug_pubnames
-                0x000000000000f251      0x97c Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
+                0x000000000000f044      0x97c Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
  .debug_pubnames
-                0x000000000000fbcd      0x1e0 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
+                0x000000000000f9c0      0x1e0 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
  .debug_pubnames
-                0x000000000000fdad       0xa3 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o
+                0x000000000000fba0       0xa3 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o
  .debug_pubnames
-                0x000000000000fe50      0x60f Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
+                0x000000000000fc43      0x60f Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
  .debug_pubnames
-                0x000000000001045f      0x141 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
+                0x0000000000010252      0x141 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
  .debug_pubnames
-                0x00000000000105a0       0xd2 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
+                0x0000000000010393       0xd2 Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
  .debug_pubnames
-                0x0000000000010672      0x1fc Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
+                0x0000000000010465      0x1fc Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
  .debug_pubnames
-                0x000000000001086e      0x1c7 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
+                0x0000000000010661      0x1c7 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
  .debug_pubnames
-                0x0000000000010a35      0x3e8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
+                0x0000000000010828      0x3e8 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
  .debug_pubnames
-                0x0000000000010e1d      0x16c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
+                0x0000000000010c10      0x16c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
  .debug_pubnames
-                0x0000000000010f89      0xb3e Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
+                0x0000000000010d7c      0xb3e Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
  .debug_pubnames
-                0x0000000000011ac7      0x38c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
+                0x00000000000118ba      0x38c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
  .debug_pubnames
-                0x0000000000011e53       0xf0 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
+                0x0000000000011c46       0xf0 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
  .debug_pubnames
-                0x0000000000011f43      0x18c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
+                0x0000000000011d36      0x18c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
  .debug_pubnames
-                0x00000000000120cf      0xa2e Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x0000000000011ec2      0xa2e Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
  .debug_pubnames
-                0x0000000000012afd      0x5fd Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
+                0x00000000000128f0      0x5fd Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
  .debug_pubnames
-                0x00000000000130fa      0x6e5 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
+                0x0000000000012eed      0x6e5 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
 
 .debug_pubtypes
-                0x0000000000000000     0xba60
+                0x0000000000000000     0xb9d4
  .debug_pubtypes
                 0x0000000000000000      0x5fd Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o
  .debug_pubtypes
@@ -12294,45 +12295,45 @@ LOAD linker stubs
  .debug_pubtypes
                 0x000000000000817f       0xab Output/Release/Obj/NAATOS_bootloader/dfu_public_key.o
  .debug_pubtypes
-                0x000000000000822a      0x2c5 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
+                0x000000000000822a      0x239 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader.o
  .debug_pubtypes
-                0x00000000000084ef       0xf6 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start.o
+                0x0000000000008463       0xf6 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start.o
  .debug_pubtypes
-                0x00000000000085e5      0x1b9 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
+                0x0000000000008559      0x1b9 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_app_start_final.o
  .debug_pubtypes
-                0x000000000000879e      0x1c4 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
+                0x0000000000008712      0x1c4 Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_dfu_timers.o
  .debug_pubtypes
-                0x0000000000008962      0x1bc Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
+                0x00000000000088d6      0x1bc Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_fw_activation.o
  .debug_pubtypes
-                0x0000000000008b1e       0xfd Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o
+                0x0000000000008a92       0xfd Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_info.o
  .debug_pubtypes
-                0x0000000000008c1b      0x14f Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
+                0x0000000000008b8f      0x14f Output/Release/Obj/NAATOS_bootloader/nrf_bootloader_wdt.o
  .debug_pubtypes
-                0x0000000000008d6a      0x1d2 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
+                0x0000000000008cde      0x1d2 Output/Release/Obj/NAATOS_bootloader/system_nrf52840.o
  .debug_pubtypes
-                0x0000000000008f3c      0x2cd Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
+                0x0000000000008eb0      0x2cd Output/Release/Obj/NAATOS_bootloader/dfu-cc.pb.o
  .debug_pubtypes
-                0x0000000000009209      0x100 Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
+                0x000000000000917d      0x100 Output/Release/Obj/NAATOS_bootloader/nrf_dfu.o
  .debug_pubtypes
-                0x0000000000009309      0x1bd Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
+                0x000000000000927d      0x1bd Output/Release/Obj/NAATOS_bootloader/nrf_dfu_flash.o
  .debug_pubtypes
-                0x00000000000094c6       0xf7 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
+                0x000000000000943a       0xf7 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_handling_error.o
  .debug_pubtypes
-                0x00000000000095bd      0x1bc Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
+                0x0000000000009531      0x1bc Output/Release/Obj/NAATOS_bootloader/nrf_dfu_mbr.o
  .debug_pubtypes
-                0x0000000000009779      0x50f Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
+                0x00000000000096ed      0x50f Output/Release/Obj/NAATOS_bootloader/nrf_dfu_req_handler.o
  .debug_pubtypes
-                0x0000000000009c88      0x1be Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
+                0x0000000000009bfc      0x1be Output/Release/Obj/NAATOS_bootloader/nrf_dfu_settings.o
  .debug_pubtypes
-                0x0000000000009e46      0x168 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
+                0x0000000000009dba      0x168 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_transport.o
  .debug_pubtypes
-                0x0000000000009fae      0x1a1 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
+                0x0000000000009f22      0x1a1 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_utils.o
  .debug_pubtypes
-                0x000000000000a14f     0x121a Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
+                0x000000000000a0c3     0x121a Output/Release/Obj/NAATOS_bootloader/nrf_dfu_validation.o
  .debug_pubtypes
-                0x000000000000b369      0x29c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
+                0x000000000000b2dd      0x29c Output/Release/Obj/NAATOS_bootloader/nrf_dfu_ver_validation.o
  .debug_pubtypes
-                0x000000000000b605      0x45b Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
+                0x000000000000b579      0x45b Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial.o
 
 .debug_macro    0x0000000000000000    0x24be8
  .debug_macro   0x0000000000000000      0x4a6 Output/Release/Obj/NAATOS_bootloader/nrf_dfu_serial_usb.o

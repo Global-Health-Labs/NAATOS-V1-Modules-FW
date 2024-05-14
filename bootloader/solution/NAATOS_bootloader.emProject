@@ -17,8 +17,8 @@
       arm_target_interface_type="SWD"
       c_preprocessor_definitions="BOARD_PCA10056;CONFIG_GPIO_AS_PINRESET;FLOAT_ABI_HARD;INITIALIZE_USER_SECTIONS;MBR_PRESENT;NO_VTOR_CONFIG;NRF52840_XXAA;NRF_DFU_SETTINGS_VERSION=2;SVC_INTERFACE_CALL_AS_NORMAL_FUNCTION;"
       c_user_include_directories="../config;../sdk/components/boards;../sdk/components/drivers_nrf/nrf_soc_nosd;../sdk/components/libraries/atomic;../sdk/components/libraries/atomic_fifo;../sdk/components/libraries/balloc;../sdk/components/libraries/bootloader;../sdk/components/libraries/bootloader/dfu;../sdk/components/libraries/bootloader/serial_dfu;../sdk/components/libraries/crc32;../sdk/components/libraries/crypto;../sdk/components/libraries/crypto/backend/cc310;../sdk/components/libraries/crypto/backend/cc310_bl;../sdk/components/libraries/crypto/backend/cifra;../sdk/components/libraries/crypto/backend/mbedtls;../sdk/components/libraries/crypto/backend/micro_ecc;../sdk/components/libraries/crypto/backend/nrf_hw;../sdk/components/libraries/crypto/backend/nrf_sw;../sdk/components/libraries/crypto/backend/oberon;../sdk/components/libraries/crypto/backend/optiga;../sdk/components/libraries/delay;../sdk/components/libraries/experimental_section_vars;../sdk/components/libraries/fstorage;../sdk/components/libraries/log;../sdk/components/libraries/log/src;../sdk/components/libraries/mem_manager;../sdk/components/libraries/memobj;../sdk/components/libraries/mutex;../sdk/components/libraries/queue;../sdk/components/libraries/ringbuf;../sdk/components/libraries/scheduler;../sdk/components/libraries/slip;../sdk/components/libraries/stack_info;../sdk/components/libraries/strerror;../sdk/components/libraries/usbd;../sdk/components/libraries/usbd/class/cdc;../sdk/components/libraries/usbd/class/cdc/acm;../sdk/components/libraries/util;../sdk/components/softdevice/mbr/headers;../sdk/components/toolchain/cmsis/include;../src;../sdk/external/fprintf;../sdk/external/nano-pb;../sdk/external/nrf_cc310/include;../sdk/external/nrf_cc310_bl/include;../sdk/external/nrf_oberon;../sdk/external/nrf_oberon/include;../sdk/external/utf_converter;../sdk/integration/nrfx;../sdk/integration/nrfx/legacy;../sdk/modules/nrfx;../sdk/modules/nrfx/drivers/include;../sdk/modules/nrfx/hal;../sdk/modules/nrfx/mdk"
-      debug_additional_load_file="../../../../../components/softdevice/mbr/hex/mbr_nrf52_2.4.1_mbr.hex"
-      debug_register_definition_file="../../../../../modules/nrfx/mdk/nrf52840.svd"
+      debug_additional_load_file="../sdk/components/softdevice/mbr/hex/mbr_nrf52_2.4.1_mbr.hex"
+      debug_register_definition_file="../sdk/modules/nrfx/mdk/nrf52840.svd"
       debug_start_from_entry_point_symbol="No"
       debug_target_connection="J-Link"
       gcc_debugging_level="Level 3"
@@ -30,7 +30,7 @@
       linker_section_placement_file="flash_placement.xml"
       linker_section_placement_macros="FLASH_PH_START=0x0;FLASH_PH_SIZE=0x100000;RAM_PH_START=0x20000000;RAM_PH_SIZE=0x40000;FLASH_START=0xf4000;FLASH_SIZE=0xa000;RAM_START=0x20000008;RAM_SIZE=0x3fff8"
       linker_section_placements_segments="FLASH1 RX 0x0 0x100000;RAM1 RWX 0x20000000 0x40000;mbr_params_page RX 0x000FE000 0x1000;bootloader_settings_page RX 0x000FF000 0x1000;uicr_bootloader_start_address RX 0x10001014 0x4;uicr_mbr_params_page RX 0x10001018 0x4"
-      macros="CMSIS_CONFIG_TOOL=../../../../../external_tools/cmsisconfig/CMSIS_Configuration_Wizard.jar"
+      macros="CMSIS_CONFIG_TOOL=../sdk/external_tools/cmsisconfig/CMSIS_Configuration_Wizard.jar"
       project_directory=""
       project_type="Executable" />
     <folder Name="Segger Startup Files">
