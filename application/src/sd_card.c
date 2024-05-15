@@ -293,7 +293,17 @@ FRESULT check_for_config_file(void) {
     return res;
   }
   // Write Amplification Zone Setpoint
-  configBufferSize = sprintf(configBuffer, "amplification_setpoint:%0.2f\n", AMP0_SETPOINT);
+  configBufferSize = sprintf(configBuffer, "amp0_setpoint:%0.2f\n", AMP0_SETPOINT);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "amp1_setpoint:%0.2f\n", AMP1_SETPOINT);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "amp2_setpoint:%0.2f\n", AMP2_SETPOINT);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -447,8 +457,14 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
         case VALVE_SETPOINT_C:
             parameters->valve_setpoint = atof(val); 
             break;
-        case AMP_SETPOINT_C:
-            parameters->amplification_setpoint = atof(val); 
+        case AMP0_SETPOINT_C:
+            parameters->amp0_setpoint = atof(val); 
+            break;
+        case AMP1_SETPOINT_C:
+            parameters->amp1_setpoint = atof(val); 
+            break;
+        case AMP2_SETPOINT_C:
+            parameters->amp2_setpoint = atof(val); 
             break;
         case VALVE_KP:
             parameters->valve_kp = atof(val);

@@ -1,0 +1,18 @@
+Output/Release/Obj/NAATOS_fw/nrf_soc.o: \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\drivers_nrf\nrf_soc_nosd\nrf_soc.c \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdlib.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\drivers_nrf\nrf_soc_nosd\nrf_soc.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
+ ../sdk/modules/nrfx/mdk/nrf.h ../sdk/modules/nrfx/mdk/nrf52840.h \
+ ../sdk/components/toolchain/cmsis/include/core_cm4.h \
+ ../sdk/components/toolchain/cmsis/include/cmsis_version.h \
+ ../sdk/components/toolchain/cmsis/include/cmsis_compiler.h \
+ ../sdk/components/toolchain/cmsis/include/cmsis_gcc.h \
+ ../sdk/components/toolchain/cmsis/include/mpu_armv7.h \
+ ../sdk/modules/nrfx/mdk/system_nrf52840.h \
+ ../sdk/modules/nrfx/mdk/nrf52840_bitfields.h \
+ ../sdk/modules/nrfx/mdk/nrf51_to_nrf52840.h \
+ ../sdk/modules/nrfx/mdk/nrf52_to_nrf52840.h \
+ ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
+ D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\drivers_nrf\nrf_soc_nosd\nrf_error.h

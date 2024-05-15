@@ -197,7 +197,9 @@ typedef struct {
   uint16_t amplification_zone_run_time_m;
   uint16_t low_power_threshold;
   float valve_setpoint;
-  float amplification_setpoint;
+  float amp0_setpoint;
+  float amp1_setpoint;
+  float amp2_setpoint;
   float valve_kp;
   float valve_ki;
   float valve_kd;

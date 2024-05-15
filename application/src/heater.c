@@ -35,10 +35,10 @@ void heater_task(void * pvParameters) {
     pid_controller_init(&amp1_pid, AMP1_SETPOINT, A1_KP, A1_KI, A1_KD);
     pid_controller_init(&amp2_pid, AMP1_SETPOINT, A2_KP, A2_KI, A2_KD);
   } else {
-    pid_controller_init(&valve_pid, config.amplification_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);   //TODO: Change back to VALVE SETPOINT
-    pid_controller_init(&amp0_pid, config.amplification_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
-    pid_controller_init(&amp1_pid, config.amplification_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
-    pid_controller_init(&amp2_pid, config.amplification_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
+    pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);   //TODO: Change back to VALVE SETPOINT
+    pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
+    pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
+    pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
   }
 
   for (;;) {
