@@ -179,10 +179,10 @@ void sensors_task(void * pvParameters) {
     // Delay based on the given sample rate
     // Remove 48 ms delay when running for temperature read delays
     if (use_default_configuration_parameters) {
-      vTaskDelay(pdMS_TO_TICKS((DEFAULT_SAMPLE_RATE*1000) - (12 * 4) + 1)); 
+      vTaskDelay(pdMS_TO_TICKS((DEFAULT_SAMPLE_RATE*1000.0) - (12.0 * 4.0) + 1.0)); 
     }
     else {
-      vTaskDelay(pdMS_TO_TICKS((config.sample_rate*1000) - (12 * 4) + 1));
+      vTaskDelay(pdMS_TO_TICKS((config.sample_rate*1000.0) - (12.0 * 4.0) + 1.0));
     }
   }
 }
