@@ -1,12 +1,12 @@
 Output/Debug/Obj/NAATOS_fw/main.o: \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\main.c \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdio.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdlib.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdbool.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdlib.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  ../sdk/external/freertos/source/include/FreeRTOS.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stddef.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stddef.h \
  ../sdk/external/freertos/config/FreeRTOSConfig.h \
  ../sdk/components/libraries/util/app_util_platform.h \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
@@ -69,7 +69,7 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/external/freertos/source/include/queue.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\logger.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\sd_card.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/string.h \
  ../sdk/external/fatfs/src/ff.h ../sdk/external/fatfs/src/integer.h \
  ../sdk/external/fatfs/src/ffconf.h \
  ../sdk/external/fatfs/port/diskio_blkdev.h \
@@ -155,12 +155,12 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/components/libraries/sortlist/nrf_sortlist.h \
  ../sdk/components/libraries/cli/nrf_cli.h \
  ../sdk/components/libraries/cli/nrf_cli_types.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/inttypes.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/inttypes.h \
  ../sdk/components/libraries/log/nrf_log_backend_interface.h \
  ../sdk/components/libraries/queue/nrf_queue.h \
  ../sdk/external/fprintf/nrf_fprintf.h \
  ../sdk/external/fprintf/nrf_fprintf_format.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdarg.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdarg.h \
  ../sdk/external/fprintf/nrf_fprintf.h \
  ../sdk/components/libraries/cli/uart/nrf_cli_uart.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_uart.h \
