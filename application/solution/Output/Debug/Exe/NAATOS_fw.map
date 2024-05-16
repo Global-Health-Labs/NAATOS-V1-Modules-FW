@@ -13988,6 +13988,7 @@ Discarded input sections
                 0x0000000000000000        0x8 Output/Debug/Obj/NAATOS_fw/main.o
  .text.get_usb_task_handle
                 0x0000000000000000        0xc Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x0000000000000000      0xacc Output/Debug/Obj/NAATOS_fw/main.o
  .debug_macro   0x0000000000000000       0x89 Output/Debug/Obj/NAATOS_fw/main.o
  .debug_macro   0x0000000000000000       0x78 Output/Debug/Obj/NAATOS_fw/main.o
  .debug_macro   0x0000000000000000       0x22 Output/Debug/Obj/NAATOS_fw/main.o
@@ -14140,7 +14141,6 @@ Discarded input sections
  .text          0x0000000000000000        0x0 Output/Debug/Obj/NAATOS_fw/battery.o
  .data          0x0000000000000000        0x0 Output/Debug/Obj/NAATOS_fw/battery.o
  .bss           0x0000000000000000        0x0 Output/Debug/Obj/NAATOS_fw/battery.o
- .debug_macro   0x0000000000000000      0xacc Output/Debug/Obj/NAATOS_fw/battery.o
  .debug_macro   0x0000000000000000       0x22 Output/Debug/Obj/NAATOS_fw/battery.o
  .debug_macro   0x0000000000000000      0x1a3 Output/Debug/Obj/NAATOS_fw/battery.o
  .debug_macro   0x0000000000000000       0x89 Output/Debug/Obj/NAATOS_fw/battery.o
@@ -25974,7 +25974,7 @@ LOAD linker stubs
  .comment       0x0000000000000025       0x26 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libvfprintf.o)
  .comment       0x0000000000000025       0x26 C:/Program Files/SEGGER/SEGGER Embedded Studio for ARM 5.42a/lib/libc_v7em_fpv4_sp_d16_hard_t_le_eabi.a(libc.o)
 
-.debug_line     0x0000000000000000    0x58227
+.debug_line     0x0000000000000000    0x5822a
  .debug_line    0x0000000000000000      0x21f Output/Debug/Obj/NAATOS_fw/thumb_crt0.o
  .debug_line    0x000000000000021f      0x5e0 Output/Debug/Obj/NAATOS_fw/nrf_log_backend_serial.o
  .debug_line    0x00000000000007ff      0x84b Output/Debug/Obj/NAATOS_fw/nrf_log_backend_uart.o
@@ -26029,35 +26029,35 @@ LOAD linker stubs
  .debug_line    0x0000000000039343      0x82d Output/Debug/Obj/NAATOS_fw/nrf_drv_twi.o
  .debug_line    0x0000000000039b70      0xf9c Output/Debug/Obj/NAATOS_fw/nrfx_spim.o
  .debug_line    0x000000000003ab0c      0xc52 Output/Debug/Obj/NAATOS_fw/nrf_cli_uart.o
- .debug_line    0x000000000003b75e     0x4b9a Output/Debug/Obj/NAATOS_fw/main.o
- .debug_line    0x00000000000402f8      0x50d Output/Debug/Obj/NAATOS_fw/battery.o
- .debug_line    0x0000000000040805      0x8bc Output/Debug/Obj/NAATOS_fw/heater.o
- .debug_line    0x00000000000410c1      0xd7d Output/Debug/Obj/NAATOS_fw/logger.o
- .debug_line    0x0000000000041e3e      0xa2e Output/Debug/Obj/NAATOS_fw/sensors.o
- .debug_line    0x000000000004286c     0x4911 Output/Debug/Obj/NAATOS_fw/usb.o
- .debug_line    0x000000000004717d      0x107 Output/Debug/Obj/NAATOS_fw/pid.o
- .debug_line    0x0000000000047284      0x960 Output/Debug/Obj/NAATOS_fw/pwm.o
- .debug_line    0x0000000000047be4      0x563 Output/Debug/Obj/NAATOS_fw/adc.o
- .debug_line    0x0000000000048147      0x8d0 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
- .debug_line    0x0000000000048a17      0x8d8 Output/Debug/Obj/NAATOS_fw/tsys01.o
- .debug_line    0x00000000000492ef     0x1153 Output/Debug/Obj/NAATOS_fw/sd_card.o
- .debug_line    0x000000000004a442      0x572 Output/Debug/Obj/NAATOS_fw/calendar_rtc.o
- .debug_line    0x000000000004a9b4      0xb03 Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
- .debug_line    0x000000000004b4b7      0x3ec Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_Syscalls_SES.o
- .debug_line    0x000000000004b8a3      0x835 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
- .debug_line    0x000000000004c0d8     0x31bb Output/Debug/Obj/NAATOS_fw/ff.o
- .debug_line    0x000000000004f293      0x204 Output/Debug/Obj/NAATOS_fw/cc932.o
- .debug_line    0x000000000004f497       0x97 Output/Debug/Obj/NAATOS_fw/ses_startup_nrf52840.o
- .debug_line    0x000000000004f52e       0xb6 Output/Debug/Obj/NAATOS_fw/ses_startup_nrf_common.o
- .debug_line    0x000000000004f5e4     0x397c Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
- .debug_line    0x0000000000052f60     0x1831 Output/Debug/Obj/NAATOS_fw/tasks.o
- .debug_line    0x0000000000054791      0x54e Output/Debug/Obj/NAATOS_fw/list.o
- .debug_line    0x0000000000054cdf     0x1189 Output/Debug/Obj/NAATOS_fw/queue.o
- .debug_line    0x0000000000055e68      0x968 Output/Debug/Obj/NAATOS_fw/timers.o
- .debug_line    0x00000000000567d0      0x490 Output/Debug/Obj/NAATOS_fw/port.o
- .debug_line    0x0000000000056c60      0x690 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
- .debug_line    0x00000000000572f0      0x869 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
- .debug_line    0x0000000000057b59      0x6ce Output/Debug/Obj/NAATOS_fw/heap_4.o
+ .debug_line    0x000000000003b75e     0x4b9b Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_line    0x00000000000402f9      0x50d Output/Debug/Obj/NAATOS_fw/battery.o
+ .debug_line    0x0000000000040806      0x8bc Output/Debug/Obj/NAATOS_fw/heater.o
+ .debug_line    0x00000000000410c2      0xd7d Output/Debug/Obj/NAATOS_fw/logger.o
+ .debug_line    0x0000000000041e3f      0xa2e Output/Debug/Obj/NAATOS_fw/sensors.o
+ .debug_line    0x000000000004286d     0x4912 Output/Debug/Obj/NAATOS_fw/usb.o
+ .debug_line    0x000000000004717f      0x107 Output/Debug/Obj/NAATOS_fw/pid.o
+ .debug_line    0x0000000000047286      0x961 Output/Debug/Obj/NAATOS_fw/pwm.o
+ .debug_line    0x0000000000047be7      0x563 Output/Debug/Obj/NAATOS_fw/adc.o
+ .debug_line    0x000000000004814a      0x8d0 Output/Debug/Obj/NAATOS_fw/i2c_hal_freertos.o
+ .debug_line    0x0000000000048a1a      0x8d8 Output/Debug/Obj/NAATOS_fw/tsys01.o
+ .debug_line    0x00000000000492f2     0x1153 Output/Debug/Obj/NAATOS_fw/sd_card.o
+ .debug_line    0x000000000004a445      0x572 Output/Debug/Obj/NAATOS_fw/calendar_rtc.o
+ .debug_line    0x000000000004a9b7      0xb03 Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o
+ .debug_line    0x000000000004b4ba      0x3ec Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_Syscalls_SES.o
+ .debug_line    0x000000000004b8a6      0x835 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o
+ .debug_line    0x000000000004c0db     0x31bb Output/Debug/Obj/NAATOS_fw/ff.o
+ .debug_line    0x000000000004f296      0x204 Output/Debug/Obj/NAATOS_fw/cc932.o
+ .debug_line    0x000000000004f49a       0x97 Output/Debug/Obj/NAATOS_fw/ses_startup_nrf52840.o
+ .debug_line    0x000000000004f531       0xb6 Output/Debug/Obj/NAATOS_fw/ses_startup_nrf_common.o
+ .debug_line    0x000000000004f5e7     0x397c Output/Debug/Obj/NAATOS_fw/system_nrf52840.o
+ .debug_line    0x0000000000052f63     0x1831 Output/Debug/Obj/NAATOS_fw/tasks.o
+ .debug_line    0x0000000000054794      0x54e Output/Debug/Obj/NAATOS_fw/list.o
+ .debug_line    0x0000000000054ce2     0x1189 Output/Debug/Obj/NAATOS_fw/queue.o
+ .debug_line    0x0000000000055e6b      0x968 Output/Debug/Obj/NAATOS_fw/timers.o
+ .debug_line    0x00000000000567d3      0x490 Output/Debug/Obj/NAATOS_fw/port.o
+ .debug_line    0x0000000000056c63      0x690 Output/Debug/Obj/NAATOS_fw/port_cmsis.o
+ .debug_line    0x00000000000572f3      0x869 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o
+ .debug_line    0x0000000000057b5c      0x6ce Output/Debug/Obj/NAATOS_fw/heap_4.o
 
 .debug_info     0x0000000000000000    0x68738
  .debug_info    0x0000000000000000       0x22 Output/Debug/Obj/NAATOS_fw/thumb_crt0.o
@@ -26505,9 +26505,9 @@ LOAD linker stubs
                                       0x8c1e3 (size before relaxing)
  .debug_str     0x00000000000b9e36     0x2c05 Output/Debug/Obj/NAATOS_fw/nrf_cli_uart.o
                                       0x9093b (size before relaxing)
- .debug_str     0x00000000000bca3b     0x9678 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_str     0x00000000000bca3b     0x9664 Output/Debug/Obj/NAATOS_fw/main.o
                                       0xad3d4 (size before relaxing)
- .debug_str     0x00000000000c60b3       0xef Output/Debug/Obj/NAATOS_fw/battery.o
+ .debug_str     0x00000000000c609f      0x103 Output/Debug/Obj/NAATOS_fw/battery.o
                                       0x82f9b (size before relaxing)
  .debug_str     0x00000000000c61a2       0xde Output/Debug/Obj/NAATOS_fw/heater.o
                                       0x8f26c (size before relaxing)
@@ -27226,41 +27226,41 @@ LOAD linker stubs
  .debug_macro   0x000000000000e287      0x3c8 Output/Debug/Obj/NAATOS_fw/nrf_cli_uart.o
  .debug_macro   0x000000000000e64f      0x173 Output/Debug/Obj/NAATOS_fw/nrf_cli_uart.o
  .debug_macro   0x000000000000e7c2      0x884 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x000000000000f046      0xacc Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x000000000000fb12       0x28 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x000000000000fb3a      0x190 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x000000000000fcca       0x12 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x000000000000fcdc      0x15a Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x000000000000fe36       0xc1 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x000000000000fef7       0x10 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x000000000000ff07       0x1f Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x000000000000ff26      0x42c Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x0000000000010352       0xb5 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x0000000000010407       0x8c Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x0000000000010493       0x91 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x0000000000010524       0xa0 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x00000000000105c4       0x86 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x000000000001064a       0xe9 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x0000000000010733       0xe0 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x0000000000010813       0x94 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x00000000000108a7       0x16 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x00000000000108bd       0x1c Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x00000000000108d9       0x10 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x00000000000108e9       0x16 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x00000000000108ff       0x34 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x0000000000010933       0x6a Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x000000000001099d       0x28 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x00000000000109c5       0x34 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x00000000000109f9       0x34 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x0000000000010a2d       0x94 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x0000000000010ac1       0x10 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x0000000000010ad1       0x52 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x0000000000010b23       0x16 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x0000000000010b39       0x4d Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x0000000000010b86       0x16 Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x0000000000010b9c       0x4c Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x0000000000010be8       0x7e Output/Debug/Obj/NAATOS_fw/main.o
- .debug_macro   0x0000000000010c66      0x1ee Output/Debug/Obj/NAATOS_fw/battery.o
+ .debug_macro   0x000000000000f046       0x28 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000f06e      0x190 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000f1fe       0x12 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000f210      0x15a Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000f36a       0xc1 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000f42b       0x10 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000f43b       0x1f Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000f45a      0x42c Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000f886       0xb5 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000f93b       0x8c Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000f9c7       0x91 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000fa58       0xa0 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000faf8       0x86 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000fb7e       0xe9 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000fc67       0xe0 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000fd47       0x94 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000fddb       0x16 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000fdf1       0x1c Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000fe0d       0x10 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000fe1d       0x16 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000fe33       0x34 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000fe67       0x6a Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000fed1       0x28 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000fef9       0x34 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000ff2d       0x34 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000ff61       0x94 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000000fff5       0x10 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x0000000000010005       0x52 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x0000000000010057       0x16 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000001006d       0x4d Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x00000000000100ba       0x16 Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x00000000000100d0       0x4c Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000001011c       0x7e Output/Debug/Obj/NAATOS_fw/main.o
+ .debug_macro   0x000000000001019a      0x1ee Output/Debug/Obj/NAATOS_fw/battery.o
+ .debug_macro   0x0000000000010388      0xacc Output/Debug/Obj/NAATOS_fw/battery.o
  .debug_macro   0x0000000000010e54      0x374 Output/Debug/Obj/NAATOS_fw/heater.o
  .debug_macro   0x00000000000111c8      0x50e Output/Debug/Obj/NAATOS_fw/logger.o
  .debug_macro   0x00000000000116d6      0x336 Output/Debug/Obj/NAATOS_fw/sensors.o
