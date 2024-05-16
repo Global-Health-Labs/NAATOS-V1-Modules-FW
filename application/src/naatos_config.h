@@ -35,7 +35,7 @@
    naatos_config.txt file on the sd card. When a new config files is created
    these rates will be used in the system.
  * Rates are in seconds
-*/
+*/ 
 #define DEFAULT_SAMPLE_RATE   0.200  // 0.048 minimum
 #define DEFAULT_LOGGING_RATE  5.000
 
