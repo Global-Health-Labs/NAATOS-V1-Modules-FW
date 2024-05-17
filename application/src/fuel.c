@@ -165,7 +165,7 @@ static fuel_gauge_errors_t fuelGauge_writeRegister(uint8_t reg,
     writeBuffer[1] = (value >> 8); //MSB of value 
 
     current_op_type = fg_operation;
-    err_code = xUtil_TWI_Write(i2c_interface_system, MAX77658_FUELGAUGE_ADDRESS, reg, writeBuffer, 2);
+    err_code = xUtil_TWI_Write(i2c_interface_sensors, MAX77658_FUELGAUGE_ADDRESS, reg, writeBuffer, 2);
     
     if (err_code != NRF_SUCCESS) {
         fuelGaugeIsBusy = false;
@@ -200,7 +200,7 @@ static fuel_gauge_errors_t fuelGauge_readRegister(uint8_t reg, fuel_gauge_intern
     uint32_t err_code;
 
     current_op_type = fg_operation;
-    err_code = xUtil_TWI_Read(i2c_interface_system, MAX77658_FUELGAUGE_ADDRESS, reg, &readBuffer.readData[0], 2);//acquire data
+    err_code = xUtil_TWI_Read(i2c_interface_sensors, MAX77658_FUELGAUGE_ADDRESS, reg, &readBuffer.readData[0], 2);//acquire data
     
     if (err_code != NRF_SUCCESS) {
         fuelGaugeIsBusy = false;
@@ -326,7 +326,7 @@ fuel_gauge_errors_t fuelGauge_init(void)
         count = 0;
         while(rxBuf & 0x8000)
         {
-            delay_ms(10); //wait until modelCFG.Refresh = 0
+            vTaskDelay(10); //wait until modelCFG.Refresh = 0
             opError = fuelGauge_readRegisterBlocking(0xDB, &rxBuf);
             if (opError != fuel_gauge_success) {
                 return opError;

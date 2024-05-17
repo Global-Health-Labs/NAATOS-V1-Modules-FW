@@ -42,10 +42,8 @@ Output/Debug/Obj/NAATOS_fw/is31fl3196.o: \
  ../sdk/external/freertos/source/include/mpu_wrappers.h \
  ../sdk/external/freertos/source/include/task.h \
  ../sdk/external/freertos/source/include/list.h \
- ../sdk/components/libraries/scheduler/app_scheduler.h \
- ../src/config/sdk_config.h ../sdk/components/libraries/util/app_error.h \
  ../sdk/components/libraries/log/nrf_log.h \
- ../sdk/components/libraries/util/sdk_common.h \
+ ../sdk/components/libraries/util/sdk_common.h ../src/config/sdk_config.h \
  ../sdk/components/libraries/util/sdk_os.h \
  ../sdk/components/libraries/util/app_util.h \
  ../sdk/components/libraries/util/sdk_macros.h \

@@ -178,6 +178,8 @@ Output/Debug/Obj/NAATOS_fw/main.o: \
  ../sdk/modules/nrfx/hal/nrf_spi.h \
  ../sdk/external/freertos/source/include/semphr.h \
  ../sdk/external/freertos/source/include/queue.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\is31fl3196.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\fuel.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_power.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_power.h \
  ../sdk/modules/nrfx/hal/nrf_power.h

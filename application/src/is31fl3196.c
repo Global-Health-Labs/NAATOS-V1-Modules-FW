@@ -4,7 +4,6 @@
 #include <string.h>
 #include "is31fl3196.h"
 #include "i2c_hal_freertos.h"
-#include "app_scheduler.h"
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
@@ -79,97 +78,6 @@ static led_driver_errors_t led_driver_writeRegister(uint8_t* buf,
                                                    led_driver_internal_op_type_t led_operation, 
                                                    led_driver_opDoneCallback_t cb);
 
-void led_driver_scheduled_evt_handler(void * p_context, uint16_t size)
-{
-    scheduled_led_evt_data_t evt_data = *(scheduled_led_evt_data_t *) p_context;
-    led_driver_errors_t led_err;
-    switch(evt_data.op_type)
-    {
-        default:
-            // Should never reach here
-            break;
-        case enable_channel_op:
-            led_err = led_driver_enable_channel(evt_data.led_selection, evt_data.color, evt_data.cb);
-            if (led_err != led_driver_success)
-            {
-                app_sched_event_put(p_context, size, led_driver_scheduled_evt_handler);
-            }
-            break;
-
-        case disable_channel_op:
-            led_err = led_driver_disable_channel(evt_data.led_selection, evt_data.color, evt_data.cb);
-            if (led_err != led_driver_success)
-            {
-                app_sched_event_put(p_context, size, led_driver_scheduled_evt_handler);
-            }
-            break;
-        case change_pwm_op:
-            led_err = led_driver_set_rgb(evt_data.led_selection, evt_data.color, evt_data.pwm, evt_data.cb);
-            if (led_err != led_driver_success)
-            {
-                app_sched_event_put(p_context, size, led_driver_scheduled_evt_handler);
-            }
-            break;
-        case write_reg:
-        {
-            uint8_t write_buf[2] = {evt_data.reg_selection, evt_data.reg_value};
-            led_err = led_driver_writeRegister(write_buf, 2, led_driver_reg_write_op, evt_data.cb);
-            if (led_err != led_driver_success)
-            {
-                app_sched_event_put(p_context, size, led_driver_scheduled_evt_handler);
-            }
-            break;
-        }
-            
-    }
-    
-}
-
-
-void led_driveri2cDoneCallback(i2c_status_t outcome, uint8_t data_len, uint8_t * p_data_read)
-{
-    led_driver_callback_data_t userData;
-    driverIsBusy = false;
-    
-    switch (current_op_type) {
-        default:
-            // Never reached
-            break;
-        case led_driver_init_read_op:
-            initOpOutcome = outcome;
-            // Data was written directly to buffer, just record number of bytes actually transferred
-            readBuffer.readLength = data_len;
-            break;
-        case led_driver_init_write_op:
-            initOpOutcome = outcome;
-            break;
-        case led_driver_reset_op:
-            initOpOutcome = outcome;
-            break;
-        case led_driver_set_pwm_op:// Update PWM registers
-        {
-            uint8_t pwm_update_buf[2] = {LED_DRIVER_DATA_UPDATE_REG, 0x00};
-            led_driver_writeRegister(pwm_update_buf, 2, led_driver_update_pwm_op, savedUserCallback);
-            break;
-        }
-        case led_driver_update_pwm_op:
-        {
-            //savedUserCallback(led_driver_success, &userData);
-            break;
-        }
-        case led_driver_en_channel_op:
-        {
-            uint8_t pwm_update_buf[2] = {LED_DRIVER_DATA_UPDATE_REG, 0x00};
-            led_driver_writeRegister(pwm_update_buf, 2, led_driver_update_pwm_op, savedUserCallback);
-            break;
-        }
-        case led_driver_read_channels_op:
-        {
-            // Do nothing, unused
-        }
-    }
-}
-
 static led_driver_errors_t led_driver_writeRegister(uint8_t* buf, 
                                                     uint8_t len,
                                                    led_driver_internal_op_type_t led_operation, 
@@ -181,33 +89,11 @@ static led_driver_errors_t led_driver_writeRegister(uint8_t* buf,
     
     driverIsBusy = true;
     uint32_t err_code;
+    uint8_t reg = buf[0];
 
     current_op_type = led_operation;
 
-    err_code = xUtil_TWI_Write(i2c_interface_system, IS31FL3199_ADDR, buf[0], &buf[1], 1);//acquire data
-    
-    if (err_code != NRF_SUCCESS) {
-        driverIsBusy = false;
-        if (err_code == NRF_ERROR_BUSY) {
-            return led_driver_busy;
-        }
-        return led_driver_i2c_error;
-    }
-    driverIsBusy = false;
-    return led_driver_success;
-}
-
-static led_driver_errors_t led_driver_readRegister(uint8_t reg, uint8_t *p_data, led_driver_internal_op_type_t led_driver_operation, led_driver_opDoneCallback_t cb)
-{
-    if (driverIsBusy) {
-        return led_driver_busy;
-    }
-    
-    driverIsBusy = true;
-    uint32_t err_code;
-
-    current_op_type = led_driver_reg_write_op;
-    err_code = xUtil_TWI_Read(i2c_interface_system, IS31FL3199_ADDR, reg, p_data, 1);//acquire data
+    err_code = xUtil_TWI_Write_Single(i2c_interface_sensors, IS31FL3199_ADDR, reg, buf, 2);//acquire data
     
     if (err_code != NRF_SUCCESS) {
         driverIsBusy = false;
@@ -237,17 +123,17 @@ void led_driver_init(void)
     uint8_t shutdown_buf[2] = {LED_DRIVER_SHUTDOWN_REG, 0x01};
     led_driver_writeRegisterBlocking(shutdown_buf, 2);
 
-    // Set LED current to 15mA
-    uint8_t led_drv_current_buf[2] = {LED_DRIVER_CONFIG_REG_2, LED_CURRENT_15MA};
+    // Set LED current to 20mA
+    uint8_t led_drv_current_buf[2] = {LED_DRIVER_CONFIG_REG_2, LED_CURRENT_30MA};
     led_driver_writeRegisterBlocking(led_drv_current_buf, 2);
 
     // Set green power LED on
-    //uint8_t led_on_buf[3] = {LED_DRIVER_CTRL_REG_1, 0x20, 0x00};
+    //uint8_t led_on_buf[3] = {LED_DRIVER_CTRL_REG_1, 0x20};
     //led_driver_writeRegisterBlocking(led_on_buf, 3);
 
     //Set all LEDs off
-    uint8_t led_off_buf[3] = {LED_DRIVER_CTRL_REG_1, 0x00, 0x00};
-    led_driver_writeRegisterBlocking(led_off_buf, 3);
+    uint8_t led_off_buf[3] = {LED_DRIVER_CTRL_REG_1, 0x00};
+    led_driver_writeRegisterBlocking(led_off_buf, 2);
 
     // Set one shot mode
     uint8_t one_shot_buf[2] = {LED_DRIVER_CONFIG_REG_1, 0x70};
@@ -255,8 +141,8 @@ void led_driver_init(void)
    
     //PWM data
     uint8_t pwm_buf[2];
-    pwm_buf[1] = LED_MAX_BRIGHTNESS/10;
-    for(int i=0x07;i<=0x0F;i++){
+    pwm_buf[1] = 0xFF;
+    for(int i=0x07;i<=0x0C;i++){
         pwm_buf[0] = i;
         led_driver_writeRegisterBlocking(pwm_buf, 2);
     }
@@ -268,7 +154,7 @@ void led_driver_init(void)
     //T0 data
     uint8_t t0_buf[2];
     t0_buf[1] = 0x00;
-    for(int j=0x11;j<=0x19;j++){
+    for(int j=0x11;j<=0x16;j++){
         t0_buf[0] = j;
         led_driver_writeRegisterBlocking(t0_buf, 2);
         //t0_buf[1] = t0_buf[1] + 1;
@@ -277,7 +163,7 @@ void led_driver_init(void)
     //T1-T3 data
     uint8_t t13_buf[2];
     t13_buf[1] = 0xa0;
-    for(int k=0x1a;k<=0x1c;k++){
+    for(int k=0x1a;k<=0x1b;k++){
         t13_buf[0] = k;
         led_driver_writeRegisterBlocking(t13_buf, 2);
     }
@@ -285,16 +171,19 @@ void led_driver_init(void)
     //T4 data
     uint8_t t4_buf[2];
     t4_buf[1] = 0x02;
-    for(int m=0x1d;m<=0x25;m++){
+    for(int m=0x1d;m<=0x22;m++){
         t4_buf[0] = m;
         led_driver_writeRegisterBlocking(t4_buf, 2);
     }
 
     uint8_t time_update_buf[2] = {LED_DRIVER_TIME_UPDATE_REG, 0x00};
     led_driver_writeRegisterBlocking(time_update_buf, 2);
+
+    uint8_t ramp_mode_buf[2] = {LED_DRIVER_RAMP_MODE_REG, 0b00110000};
+    led_driver_writeRegisterBlocking(ramp_mode_buf, 2);
     
-    led_driver_enable_channel(LED1, green, NULL);
-    led_driver_set_channel_animation_solid(LED1, green, true, NULL);
+    led_driver_enable_channel(LED1, blue, NULL);
+    led_driver_set_channel_animation_breathing(LED1, blue, true, NULL);
 
     led_driver_writeRegisterBlocking(one_shot_buf, 2);
 

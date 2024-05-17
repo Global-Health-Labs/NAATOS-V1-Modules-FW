@@ -32,6 +32,8 @@ Purpose : NAATOS Application Start
 #include "i2c_hal_freertos.h"
 #include "spi.h"
 #include "sd_card.h"
+#include "is31fl3196.h"
+#include "fuel.h"
 
 #include "nrf_drv_power.h"
 
@@ -586,6 +588,8 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
   init_sensors_gpios();   // Sensor GPIOs
   vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_400k);   // I2C
   vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
+  led_driver_init();
+  fuelGauge_init();
   init_sd_card();
 
   // Get the configuration parameters

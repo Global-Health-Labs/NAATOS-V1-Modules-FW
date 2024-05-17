@@ -8,7 +8,8 @@ extern "C" {
 #include <stdbool.h>
 #include "i2c_hal_freertos.h"
 
-#define IS31FL3199_ADDR 0b1100100
+#define IS31FL3199_ADDR 0b1100111
+#define IS31FL3199_ADDR_low 0b1100100
 
 #define LED_DRIVER_SHUTDOWN_REG 0x00
 #define LED_DRIVER_CTRL_REG_1 0x01
@@ -29,6 +30,9 @@ extern "C" {
 #define LED_DRIVER_RESET_REG 0xFF
 
 #define LED_CURRENT_15MA 0b00010000
+#define LED_CURRENT_20MA 0b00000000
+#define LED_CURRENT_25MA 0b01110000
+#define LED_CURRENT_30MA 0b01100000
 #define LED_MAX_BRIGHTNESS 0x4D
 
 typedef enum {
