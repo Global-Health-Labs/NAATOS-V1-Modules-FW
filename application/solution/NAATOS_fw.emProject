@@ -111,6 +111,7 @@
       <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_twi.c" />
       <file file_name="../sdk/integration/nrfx/legacy/nrf_drv_twi.c" />
       <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_twim.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_wdt.c" />
     </folder>
     <folder Name="Board Support">
       <file file_name="../sdk/components/libraries/bsp/bsp.c" />

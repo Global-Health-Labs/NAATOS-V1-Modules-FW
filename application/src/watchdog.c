@@ -25,7 +25,7 @@ void watchdog_init(void) {
 }
 
 
-void wdt_feed_task(void * pvParameters) {
+void wdtFeedTask(void * pvParameters) {
 /* We can handle this a few ways. We can just kick the dog in a task on an interval. That would support general system lockup 
  * We could also have all tasks we want to track update system time variable. If the time is too old then it means we dont kick dog
  * All tasks must be updated for the dog to be reset.
@@ -37,7 +37,7 @@ void wdt_feed_task(void * pvParameters) {
 
   while (true) {
       // Feed the watchdog
-      nrfx_wdt_channel_feed(m_channel_id);
+      nrf_drv_wdt_channel_feed(m_channel_id);
 
       // Delay for a period shorter than the watchdog timeout
       vTaskDelay(1000); // Adjust the delay as necessary

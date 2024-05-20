@@ -14,6 +14,7 @@
   <ProjectSessionItem path="NAATOS_bootloader"/>
   <ProjectSessionItem path="NAATOS_bootloader;NAATOS_bootloader"/>
   <ProjectSessionItem path="NAATOS_bootloader;NAATOS_bootloader;Application"/>
+  <ProjectSessionItem path="NAATOS_bootloader;NAATOS_bootloader;nRF_Bootloader"/>
  </Project>
  <Register1/>
  <Register2/>
@@ -38,8 +39,11 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="6" y="73" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/main.c" selected="1" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="73" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../src/main.c" selected="0" top="45" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="5786" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../config/sdk_config.h" selected="0" top="5745" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="483" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../sdk/components/libraries/bootloader/nrf_bootloader.c" selected="0" top="423" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="92" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../sdk/components/libraries/bootloader/nrf_bootloader_fw_activation.c" selected="0" top="35" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="79" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../sdk/components/libraries/bootloader/nrf_bootloader_wdt.c" selected="1" top="40" codecName="Default"/>
  </Files>
  <ARMCrossStudioWindow activeProject="NAATOS_bootloader" fileDialogDefaultFilter="*.c;*.cpp;*.cxx;*.cc;*.h;*.hpp;*.hxx" autoConnectTarget="J-Link" buildConfiguration="Release" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

@@ -8,8 +8,9 @@
 #include "nrf.h"
 #include "naatos_config.h"
 #include "task.h"
+
 void wdt_event_handler(void);
 
 void watchdog_init(void);
 
-void wdt_feed_task(void * pvParameters);
+void wdtFeedTask(void * pvParameters);

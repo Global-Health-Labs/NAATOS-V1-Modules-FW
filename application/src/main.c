@@ -3,6 +3,7 @@
 **********************************************************************
 File    : main.c
 Purpose : NAATOS Application Start
+SDK Version: 17.1
 */
 
 #include <stdio.h>
@@ -30,6 +31,7 @@ Purpose : NAATOS Application Start
 #include "pid.h"
 #include "pwm.h"
 #include "adc.h"
+#include "watchdog.h"
 #include "i2c_hal_freertos.h"
 
 // Task Handles
@@ -293,6 +295,14 @@ void create_tasks() {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating PWM task. Error: %d\n", xReturned);
       vTaskDelete( pwmTaskHandle );
+  }
+
+  // WDT Task
+  xReturned = xTaskCreate(pwm_task, "WDTTask", 1000, NULL, 0, &wdtFeedTask);
+  if ( xReturned != pdPASS ) {
+      /* The task was created.  Use the task's handle to delete the task. */
+      printf("Error creating WDT task. Error: %d\n", xReturned);
+      vTaskDelete( wdtFeedTask );
   }
 }
 
