@@ -1,17 +1,17 @@
 Output/Debug/Obj/NAATOS_fw/app_usbd_serial_num.o: \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\app_usbd_serial_num.c \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\app_usbd_serial_num.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdio.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/inttypes.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/string.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/inttypes.h \
  D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\app_usbd.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_usbd.h ../sdk/modules/nrfx/nrfx.h \
  ../sdk/integration/nrfx/nrfx_config.h ../src/config/sdk_config.h \
  ../sdk/modules/nrfx/drivers/nrfx_common.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stddef.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdbool.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stddef.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
  ../sdk/modules/nrfx/mdk/nrf.h ../sdk/modules/nrfx/mdk/nrf52840.h \
  ../sdk/components/toolchain/cmsis/include/core_cm4.h \
  ../sdk/components/toolchain/cmsis/include/cmsis_version.h \
