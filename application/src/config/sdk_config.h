@@ -4415,6 +4415,37 @@
 #endif
 
 // </e>
+// <e> NRFX_WDT_ENABLED - nrfx_wdt - WDT peripheral driver
+//==========================================================
+#ifndef NRFX_WDT_ENABLED
+#define NRFX_WDT_ENABLED 1
+#endif
+// <o> NRFX_WDT_CONFIG_BEHAVIOUR  - WDT behavior in CPU SLEEP or HALT mode
+
+// <1=> Run in SLEEP, Pause in HALT
+// <8=> Pause in SLEEP, Run in HALT
+// <9=> Run in SLEEP and HALT
+// <0=> Pause in SLEEP and HALT
+
+#ifndef NRFX_WDT_CONFIG_BEHAVIOUR
+#define NRFX_WDT_CONFIG_BEHAVIOUR 1
+#endif
+
+// <o> NRFX_WDT_CONFIG_RELOAD_VALUE - Reload value  <15-4294967295>
+
+
+#ifndef NRFX_WDT_CONFIG_RELOAD_VALUE
+#define NRFX_WDT_CONFIG_RELOAD_VALUE 2000
+#endif
+
+// <o> NRFX_WDT_CONFIG_NO_IRQ  - Remove WDT IRQ handling from WDT driver
+
+// <0=> Include WDT IRQ handling
+// <1=> Remove WDT IRQ handling
+
+#ifndef NRFX_WDT_CONFIG_NO_IRQ
+#define NRFX_WDT_CONFIG_NO_IRQ 1
+#endif
 
 // <e> WDT_CONFIG_LOG_ENABLED - Enables logging in the module.
 //==========================================================
