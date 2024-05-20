@@ -1,5 +1,5 @@
 Output/Debug/Obj/NAATOS_fw/nrf_drv_power.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\integration\nrfx\legacy\nrf_drv_power.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\integration\nrfx\legacy\nrf_drv_power.c \
  ../sdk/components/libraries/util/sdk_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
@@ -26,7 +26,7 @@ Output/Debug/Obj/NAATOS_fw/nrf_drv_power.o: \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
  ../sdk/components/libraries/util/sdk_macros.h \
  ../sdk/components/libraries/util/nrf_assert.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\integration\nrfx\legacy\nrf_drv_power.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\integration\nrfx\legacy\nrf_drv_power.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_power.h \
  ../sdk/modules/nrfx/nrfx.h ../sdk/integration/nrfx/nrfx_config.h \
  ../sdk/modules/nrfx/drivers/nrfx_common.h \

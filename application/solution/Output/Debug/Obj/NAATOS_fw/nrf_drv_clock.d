@@ -1,7 +1,7 @@
 Output/Debug/Obj/NAATOS_fw/nrf_drv_clock.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\integration\nrfx\legacy\nrf_drv_clock.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\integration\nrfx\legacy\nrf_drv_clock.c \
  ../sdk/components/libraries/util/nordic_common.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\integration\nrfx\legacy\nrf_drv_clock.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\integration\nrfx\legacy\nrf_drv_clock.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_clock.h \
  ../sdk/modules/nrfx/nrfx.h ../sdk/integration/nrfx/nrfx_config.h \
  ../src/config/sdk_config.h ../sdk/modules/nrfx/drivers/nrfx_common.h \

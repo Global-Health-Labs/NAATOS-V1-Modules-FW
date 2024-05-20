@@ -1,5 +1,5 @@
 Output/Debug/Obj/NAATOS_fw/nrfx_power.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\modules\nrfx\drivers\src\nrfx_power.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\modules\nrfx\drivers\src\nrfx_power.c \
  ../sdk/modules/nrfx/nrfx.h ../sdk/integration/nrfx/nrfx_config.h \
  ../src/config/sdk_config.h ../sdk/modules/nrfx/drivers/nrfx_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \

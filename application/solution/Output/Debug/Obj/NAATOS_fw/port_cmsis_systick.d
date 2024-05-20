@@ -1,5 +1,5 @@
 Output/Debug/Obj/NAATOS_fw/port_cmsis_systick.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\external\freertos\portable\CMSIS\nrf52\port_cmsis_systick.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\external\freertos\portable\CMSIS\nrf52\port_cmsis_systick.c \
  ../sdk/external/freertos/source/include/FreeRTOS.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stddef.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \

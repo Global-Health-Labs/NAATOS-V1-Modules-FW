@@ -1,5 +1,5 @@
 Output/Debug/Obj/NAATOS_fw/nrf_log_backend_rtt.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\log\src\nrf_log_backend_rtt.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\log\src\nrf_log_backend_rtt.c \
  ../sdk/components/libraries/util/sdk_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \

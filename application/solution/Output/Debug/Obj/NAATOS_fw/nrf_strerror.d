@@ -1,5 +1,5 @@
 Output/Debug/Obj/NAATOS_fw/nrf_strerror.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\strerror\nrf_strerror.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\strerror\nrf_strerror.c \
  ../sdk/components/libraries/util/sdk_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
@@ -26,5 +26,5 @@ Output/Debug/Obj/NAATOS_fw/nrf_strerror.o: \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
  ../sdk/components/libraries/util/sdk_macros.h \
  ../sdk/components/libraries/util/nrf_assert.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\strerror\nrf_strerror.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\strerror\nrf_strerror.h \
  ../sdk/components/libraries/util/sdk_errors.h

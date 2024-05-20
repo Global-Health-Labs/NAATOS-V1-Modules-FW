@@ -1,7 +1,7 @@
 Output/Debug/Obj/NAATOS_fw/heater.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\heater.c \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\heater.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_queues.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\heater.c \
+ C\:\Nordic\NAATOS_fw_src\application\src\heater.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\naatos_queues.h \
  ../sdk/external/freertos/source/include/FreeRTOS.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stddef.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/__crossworks.h \
@@ -37,11 +37,11 @@ Output/Debug/Obj/NAATOS_fw/heater.o: \
  ../sdk/components/libraries/util/app_util.h \
  ../sdk/external/freertos/source/include/mpu_wrappers.h \
  ../sdk/external/freertos/source/include/queue.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\naatos_config.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\naatos_config.h \
  ../sdk/external/freertos/source/include/task.h \
  ../sdk/external/freertos/source/include/list.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pid.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\pwm.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\pid.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\pwm.h \
  ../sdk/components/libraries/bsp/bsp.h ../sdk/components/boards/boards.h \
  ../sdk/modules/nrfx/hal/nrf_gpio.h ../sdk/modules/nrfx/nrfx.h \
  ../sdk/integration/nrfx/nrfx_config.h ../src/config/sdk_config.h \

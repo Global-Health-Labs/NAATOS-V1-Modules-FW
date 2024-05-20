@@ -1,5 +1,5 @@
 Output/Debug/Obj/NAATOS_fw/app_usbd_core.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\app_usbd_core.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\app_usbd_core.c \
  ../sdk/components/libraries/util/sdk_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
@@ -26,7 +26,7 @@ Output/Debug/Obj/NAATOS_fw/app_usbd_core.o: \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
  ../sdk/components/libraries/util/sdk_macros.h \
  ../sdk/components/libraries/util/nrf_assert.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\app_usbd_core.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\app_usbd_core.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_usbd.h ../sdk/modules/nrfx/nrfx.h \
  ../sdk/integration/nrfx/nrfx_config.h \
  ../sdk/modules/nrfx/drivers/nrfx_common.h \
@@ -57,13 +57,13 @@ Output/Debug/Obj/NAATOS_fw/app_usbd_core.o: \
  ../sdk/modules/nrfx/mdk/nrf52_erratas.h \
  ../sdk/modules/nrfx/mdk/nrf53_erratas.h \
  ../sdk/modules/nrfx/mdk/nrf91_erratas.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\app_usbd_types.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\app_usbd_request.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\app_usbd_descriptor.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\app_usbd_langid.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\app_usbd_class_base.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\app_usbd.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\app_usbd_string_desc.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\app_usbd_types.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\app_usbd_request.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\app_usbd_descriptor.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\app_usbd_langid.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\app_usbd_class_base.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\app_usbd.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\app_usbd_string_desc.h \
  ../sdk/components/libraries/atomic/nrf_atomic.h \
  ../sdk/components/libraries/log/nrf_log.h \
  ../sdk/components/libraries/experimental_section_vars/nrf_section.h \

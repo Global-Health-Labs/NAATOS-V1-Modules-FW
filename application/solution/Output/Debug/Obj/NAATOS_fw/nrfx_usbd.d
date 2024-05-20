@@ -1,5 +1,5 @@
 Output/Debug/Obj/NAATOS_fw/nrfx_usbd.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\modules\nrfx\drivers\src\nrfx_usbd.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\modules\nrfx\drivers\src\nrfx_usbd.c \
  ../sdk/modules/nrfx/nrfx.h ../sdk/integration/nrfx/nrfx_config.h \
  ../src/config/sdk_config.h ../sdk/modules/nrfx/drivers/nrfx_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
@@ -42,7 +42,7 @@ Output/Debug/Obj/NAATOS_fw/nrfx_usbd.o: \
  ../sdk/modules/nrfx/drivers/nrfx_errors.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_usbd.h \
  ../sdk/modules/nrfx/hal/nrf_usbd.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\modules\nrfx\drivers\src\nrfx_usbd_errata.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\modules\nrfx\drivers\src\nrfx_usbd_errata.h \
  ../sdk/modules/nrfx/mdk/nrf_erratas.h ../sdk/modules/nrfx/mdk/nrf.h \
  ../sdk/modules/nrfx/mdk/nrf51_erratas.h \
  ../sdk/modules/nrfx/mdk/nrf52_erratas.h \

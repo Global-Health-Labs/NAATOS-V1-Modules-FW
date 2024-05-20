@@ -1,6 +1,6 @@
 Output/Debug/Obj/NAATOS_fw/nrf_drv_ppi.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\integration\nrfx\legacy\nrf_drv_ppi.c \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\integration\nrfx\legacy\nrf_drv_ppi.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\integration\nrfx\legacy\nrf_drv_ppi.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\integration\nrfx\legacy\nrf_drv_ppi.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_ppi.h \
  ../sdk/modules/nrfx/nrfx.h ../sdk/integration/nrfx/nrfx_config.h \
  ../src/config/sdk_config.h ../sdk/modules/nrfx/drivers/nrfx_common.h \

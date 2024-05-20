@@ -1,6 +1,6 @@
 Output/Debug/Obj/NAATOS_fw/nrfx_atomic.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\modules\nrfx\soc\nrfx_atomic.c \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\modules\nrfx\soc\nrfx_atomic.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\modules\nrfx\soc\nrfx_atomic.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\modules\nrfx\soc\nrfx_atomic.h \
  ../sdk/modules/nrfx/nrfx.h ../sdk/integration/nrfx/nrfx_config.h \
  ../src/config/sdk_config.h ../sdk/modules/nrfx/drivers/nrfx_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
@@ -41,4 +41,4 @@ Output/Debug/Obj/NAATOS_fw/nrfx_atomic.o: \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/libraries/util/sdk_resources.h \
  ../sdk/modules/nrfx/drivers/nrfx_errors.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\modules\nrfx\soc\nrfx_atomic_internal.h
+ C\:\Nordic\NAATOS_fw_src\application\sdk\modules\nrfx\soc\nrfx_atomic_internal.h

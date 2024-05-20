@@ -1,5 +1,5 @@
 Output/Debug/Obj/NAATOS_fw/nrf_log_backend_uart.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\log\src\nrf_log_backend_uart.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\log\src\nrf_log_backend_uart.c \
  ../sdk/components/libraries/util/sdk_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
@@ -41,10 +41,10 @@ Output/Debug/Obj/NAATOS_fw/nrf_log_backend_uart.o: \
  ../sdk/components/libraries/experimental_section_vars/nrf_section.h \
  ../sdk/components/libraries/util/nordic_common.h \
  ../sdk/components/libraries/log/nrf_log_types.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\log\src\nrf_log_backend_serial.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\log\src\nrf_log_backend_serial.h \
  ../sdk/components/libraries/log/nrf_log_backend_interface.h \
  ../sdk/external/fprintf/nrf_fprintf.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\log\src\nrf_log_internal.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\log\src\nrf_log_internal.h \
  ../sdk/components/libraries/log/nrf_log_types.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_uart.h ../sdk/modules/nrfx/nrfx.h \
  ../sdk/integration/nrfx/nrfx_config.h \

@@ -1,6 +1,6 @@
 Output/Debug/Obj/NAATOS_fw/nrf_block_dev_sdc.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\block_dev\sdc\nrf_block_dev_sdc.c \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\block_dev\sdc\nrf_block_dev_sdc.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\block_dev\sdc\nrf_block_dev_sdc.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\block_dev\sdc\nrf_block_dev_sdc.h \
  ../sdk/components/libraries/block_dev/nrf_block_dev.h \
  ../sdk/components/libraries/util/sdk_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \

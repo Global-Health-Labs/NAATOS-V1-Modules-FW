@@ -194,6 +194,10 @@ void init_sensors_gpios(void) {
   nrf_gpio_pin_write(NRF_GPIO_PIN_MAP(1,7), 1);
   nrf_gpio_cfg_output(SENSORS_EN);
   nrf_gpio_pin_set(SENSORS_EN);
+
+  nrf_gpio_cfg_output(NRF_GPIO_PIN_MAP(1,3));
+  //nrf_gpio_pin_write(NRF_GPIO_PIN_MAP(1,3), 1);
+  nrf_gpio_pin_set(NRF_GPIO_PIN_MAP(1,3));
 }
 
 long double readTemp(sensor_selection_t sensor) {

@@ -1,6 +1,6 @@
 Output/Debug/Obj/NAATOS_fw/boards.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\boards\boards.c \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\boards\boards.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\boards\boards.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\boards\boards.h \
  ../sdk/modules/nrfx/hal/nrf_gpio.h ../sdk/modules/nrfx/nrfx.h \
  ../sdk/integration/nrfx/nrfx_config.h ../src/config/sdk_config.h \
  ../sdk/modules/nrfx/drivers/nrfx_common.h \
@@ -42,4 +42,4 @@ Output/Debug/Obj/NAATOS_fw/boards.o: \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/libraries/util/sdk_resources.h \
  ../sdk/modules/nrfx/drivers/nrfx_errors.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\boards\pca10056.h
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\boards\pca10056.h

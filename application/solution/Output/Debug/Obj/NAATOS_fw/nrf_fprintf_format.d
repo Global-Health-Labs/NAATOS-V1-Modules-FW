@@ -1,5 +1,5 @@
 Output/Debug/Obj/NAATOS_fw/nrf_fprintf_format.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\external\fprintf\nrf_fprintf_format.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\external\fprintf\nrf_fprintf_format.c \
  ../sdk/components/libraries/util/sdk_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
@@ -28,5 +28,5 @@ Output/Debug/Obj/NAATOS_fw/nrf_fprintf_format.o: \
  ../sdk/components/libraries/util/nrf_assert.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdarg.h \
  ../sdk/components/libraries/util/nrf_assert.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\external\fprintf\nrf_fprintf.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\external\fprintf\nrf_fprintf_format.h
+ C\:\Nordic\NAATOS_fw_src\application\sdk\external\fprintf\nrf_fprintf.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\external\fprintf\nrf_fprintf_format.h

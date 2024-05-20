@@ -1,5 +1,5 @@
 Output/Debug/Obj/NAATOS_fw/hardfault_implementation.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\hardfault\hardfault_implementation.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\hardfault\hardfault_implementation.c \
  ../sdk/components/libraries/util/sdk_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
@@ -26,7 +26,7 @@ Output/Debug/Obj/NAATOS_fw/hardfault_implementation.o: \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
  ../sdk/components/libraries/util/sdk_macros.h \
  ../sdk/components/libraries/util/nrf_assert.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\hardfault\hardfault.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\hardfault\hardfault.h \
  ../sdk/components/libraries/util/app_util_platform.h \
  ../sdk/components/libraries/util/app_error.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \

@@ -1,6 +1,6 @@
 Output/Debug/Obj/NAATOS_fw/spi.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\spi.c \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\spi.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\spi.c \
+ C\:\Nordic\NAATOS_fw_src\application\src\spi.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_spi.h ../sdk/modules/nrfx/nrfx.h \
  ../sdk/integration/nrfx/nrfx_config.h ../src/config/sdk_config.h \
  ../sdk/modules/nrfx/drivers/nrfx_common.h \

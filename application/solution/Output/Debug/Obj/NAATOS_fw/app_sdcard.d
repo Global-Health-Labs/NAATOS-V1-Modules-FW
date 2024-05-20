@@ -1,7 +1,7 @@
 Output/Debug/Obj/NAATOS_fw/app_sdcard.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\sdcard\app_sdcard.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\sdcard\app_sdcard.c \
  ../src/config/sdk_config.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\sdcard\app_sdcard.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\sdcard\app_sdcard.h \
  ../sdk/components/libraries/util/app_util_platform.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \

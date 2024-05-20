@@ -1,6 +1,6 @@
 Output/Debug/Obj/NAATOS_fw/nrf_drv_uart.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\integration\nrfx\legacy\nrf_drv_uart.c \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\integration\nrfx\legacy\nrf_drv_uart.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\integration\nrfx\legacy\nrf_drv_uart.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\integration\nrfx\legacy\nrf_drv_uart.h \
  ../sdk/modules/nrfx/nrfx.h ../sdk/integration/nrfx/nrfx_config.h \
  ../src/config/sdk_config.h ../sdk/modules/nrfx/drivers/nrfx_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \

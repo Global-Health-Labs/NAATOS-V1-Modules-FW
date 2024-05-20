@@ -1,6 +1,6 @@
 Output/Debug/Obj/NAATOS_fw/adc.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\adc.c \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\src\adc.h \
+ C\:\Nordic\NAATOS_fw_src\application\src\adc.c \
+ C\:\Nordic\NAATOS_fw_src\application\src\adc.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_saadc.h \
  ../sdk/modules/nrfx/drivers/include/nrfx_saadc.h \
  ../sdk/modules/nrfx/nrfx.h ../sdk/integration/nrfx/nrfx_config.h \

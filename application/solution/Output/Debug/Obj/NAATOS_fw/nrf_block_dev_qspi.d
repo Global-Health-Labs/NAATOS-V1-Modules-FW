@@ -1,5 +1,5 @@
 Output/Debug/Obj/NAATOS_fw/nrf_block_dev_qspi.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\block_dev\qspi\nrf_block_dev_qspi.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\block_dev\qspi\nrf_block_dev_qspi.c \
  ../sdk/components/libraries/util/sdk_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
@@ -26,8 +26,8 @@ Output/Debug/Obj/NAATOS_fw/nrf_block_dev_qspi.o: \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
  ../sdk/components/libraries/util/sdk_macros.h \
  ../sdk/components/libraries/util/nrf_assert.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\block_dev\qspi\nrf_serial_flash_params.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\block_dev\qspi\nrf_block_dev_qspi.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\block_dev\qspi\nrf_serial_flash_params.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\block_dev\qspi\nrf_block_dev_qspi.h \
  ../sdk/components/libraries/block_dev/nrf_block_dev.h \
  ../sdk/components/libraries/util/nrf_assert.h \
  ../sdk/integration/nrfx/legacy/nrf_drv_qspi.h \

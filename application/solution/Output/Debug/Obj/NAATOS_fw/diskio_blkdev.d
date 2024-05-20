@@ -1,6 +1,6 @@
 Output/Debug/Obj/NAATOS_fw/diskio_blkdev.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\external\fatfs\port\diskio_blkdev.c \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\external\fatfs\port\diskio_blkdev.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\external\fatfs\port\diskio_blkdev.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\external\fatfs\port\diskio_blkdev.h \
  ../sdk/external/fatfs/src/diskio.h ../sdk/external/fatfs/src/integer.h \
  ../sdk/components/libraries/block_dev/nrf_block_dev.h \
  ../sdk/components/libraries/util/sdk_common.h \

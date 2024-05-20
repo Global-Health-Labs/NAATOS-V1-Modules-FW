@@ -1,5 +1,5 @@
 Output/Debug/Obj/NAATOS_fw/app_usbd_msc.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc.c \
  ../sdk/components/libraries/util/sdk_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
@@ -64,15 +64,15 @@ Output/Debug/Obj/NAATOS_fw/app_usbd_msc.o: \
  ../sdk/components/libraries/usbd/app_usbd_descriptor.h \
  ../sdk/components/libraries/usbd/app_usbd_langid.h \
  ../sdk/components/libraries/usbd/app_usbd_class_base.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc.h \
  ../sdk/components/libraries/block_dev/nrf_block_dev.h \
  ../sdk/components/libraries/usbd/app_usbd_class_base.h \
  ../sdk/components/libraries/usbd/app_usbd_core.h \
  ../sdk/components/libraries/usbd/app_usbd_descriptor.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc_types.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc_desc.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc_scsi.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc_internal.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc_types.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc_desc.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc_scsi.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\usbd\class\msc\app_usbd_msc_internal.h \
  ../sdk/components/libraries/usbd/app_usbd_string_desc.h \
  ../sdk/components/libraries/usbd/app_usbd.h \
  ../sdk/components/libraries/delay/nrf_delay.h \

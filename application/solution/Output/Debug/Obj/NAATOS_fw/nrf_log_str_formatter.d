@@ -1,5 +1,5 @@
 Output/Debug/Obj/NAATOS_fw/nrf_log_str_formatter.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\log\src\nrf_log_str_formatter.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\log\src\nrf_log_str_formatter.c \
  ../sdk/components/libraries/util/sdk_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
@@ -44,7 +44,7 @@ Output/Debug/Obj/NAATOS_fw/nrf_log_str_formatter.o: \
  ../sdk/components/libraries/log/nrf_log_instance.h \
  ../sdk/components/libraries/experimental_section_vars/nrf_section.h \
  ../sdk/components/libraries/util/nordic_common.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\log\src\nrf_log_internal.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\log\src\nrf_log_internal.h \
  ../sdk/components/libraries/log/nrf_log_types.h \
  ../sdk/components/libraries/log/nrf_log_ctrl.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/ctype.h \

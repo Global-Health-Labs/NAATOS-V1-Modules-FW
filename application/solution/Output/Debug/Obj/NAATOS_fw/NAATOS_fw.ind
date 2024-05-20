@@ -85,6 +85,8 @@
 "Output/Debug/Obj/NAATOS_fw/spi.o"
 "Output/Debug/Obj/NAATOS_fw/sd_card.o"
 "Output/Debug/Obj/NAATOS_fw/calendar_rtc.o"
+"Output/Debug/Obj/NAATOS_fw/is31fl3196.o"
+"Output/Debug/Obj/NAATOS_fw/fuel.o"
 "Output/Debug/Obj/NAATOS_fw/SEGGER_RTT.o"
 "Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_Syscalls_SES.o"
 "Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_printf.o"

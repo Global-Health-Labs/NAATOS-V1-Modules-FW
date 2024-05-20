@@ -1,5 +1,5 @@
 Output/Debug/Obj/NAATOS_fw/nrfx_prs.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\modules\nrfx\drivers\src\prs\nrfx_prs.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\modules\nrfx\drivers\src\prs\nrfx_prs.c \
  ../sdk/modules/nrfx/nrfx.h ../sdk/integration/nrfx/nrfx_config.h \
  ../src/config/sdk_config.h ../sdk/modules/nrfx/drivers/nrfx_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
@@ -40,7 +40,7 @@ Output/Debug/Obj/NAATOS_fw/nrfx_prs.o: \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/libraries/util/sdk_resources.h \
  ../sdk/modules/nrfx/drivers/nrfx_errors.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\modules\nrfx\drivers\src\prs\nrfx_prs.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\modules\nrfx\drivers\src\prs\nrfx_prs.h \
  ../sdk/integration/nrfx/nrfx_log.h \
  ../sdk/components/libraries/log/nrf_log.h \
  ../sdk/components/libraries/util/sdk_common.h \

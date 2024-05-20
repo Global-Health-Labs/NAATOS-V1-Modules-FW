@@ -1,6 +1,6 @@
 Output/Debug/Obj/NAATOS_fw/app_timer2.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\timer\app_timer2.c \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\timer\app_timer.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\timer\app_timer2.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\timer\app_timer.h \
  ../src/config/sdk_config.h ../sdk/components/libraries/util/app_error.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdio.h \
@@ -57,5 +57,5 @@ Output/Debug/Obj/NAATOS_fw/app_timer2.o: \
  ../sdk/components/libraries/strerror/nrf_strerror.h \
  ../sdk/components/libraries/log/src/nrf_log_internal.h \
  ../sdk/components/libraries/log/nrf_log_types.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\timer\drv_rtc.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\timer\drv_rtc.h \
  ../sdk/modules/nrfx/hal/nrf_rtc.h

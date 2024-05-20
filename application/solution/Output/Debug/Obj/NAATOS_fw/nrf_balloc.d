@@ -1,5 +1,5 @@
 Output/Debug/Obj/NAATOS_fw/nrf_balloc.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\balloc\nrf_balloc.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\balloc\nrf_balloc.c \
  ../sdk/components/libraries/util/sdk_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
@@ -28,7 +28,7 @@ Output/Debug/Obj/NAATOS_fw/nrf_balloc.o: \
  ../sdk/components/libraries/util/nrf_assert.h \
  ../sdk/components/libraries/experimental_section_vars/nrf_section.h \
  ../sdk/components/libraries/util/nordic_common.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\balloc\nrf_balloc.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\balloc\nrf_balloc.h \
  ../sdk/components/libraries/util/sdk_errors.h \
  ../sdk/components/libraries/util/app_util_platform.h \
  ../sdk/components/libraries/util/app_error.h \

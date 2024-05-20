@@ -1,5 +1,5 @@
 Output/Debug/Obj/NAATOS_fw/nrf_sortlist.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\sortlist\nrf_sortlist.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\sortlist\nrf_sortlist.c \
  ../sdk/components/libraries/util/sdk_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdbool.h \
@@ -26,7 +26,7 @@ Output/Debug/Obj/NAATOS_fw/nrf_sortlist.o: \
  ../sdk/modules/nrfx/mdk/compiler_abstraction.h \
  ../sdk/components/libraries/util/sdk_macros.h \
  ../sdk/components/libraries/util/nrf_assert.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\components\libraries\sortlist\nrf_sortlist.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\components\libraries\sortlist\nrf_sortlist.h \
  ../sdk/components/libraries/util/nrf_assert.h \
  ../sdk/components/libraries/log/nrf_log.h \
  ../sdk/components/libraries/experimental_section_vars/nrf_section.h \

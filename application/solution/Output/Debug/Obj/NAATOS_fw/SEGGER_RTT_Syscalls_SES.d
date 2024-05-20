@@ -1,8 +1,8 @@
 Output/Debug/Obj/NAATOS_fw/SEGGER_RTT_Syscalls_SES.o: \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\external\segger_rtt\SEGGER_RTT_Syscalls_SES.c \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\external\segger_rtt\SEGGER_RTT_Syscalls_SES.c \
  ../src/config/sdk_config.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\external\segger_rtt\SEGGER_RTT.h \
- D\:\NAATOS\Source\ Code\GHL-NAATOS\application\sdk\external\segger_rtt\SEGGER_RTT_Conf.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\external\segger_rtt\SEGGER_RTT.h \
+ C\:\Nordic\NAATOS_fw_src\application\sdk\external\segger_rtt\SEGGER_RTT_Conf.h \
  ../sdk/components/libraries/util/nordic_common.h \
  ../sdk/components/libraries/util/app_util_platform.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.34/include/stdint.h \
