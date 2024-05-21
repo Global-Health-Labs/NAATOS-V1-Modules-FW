@@ -418,7 +418,12 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
-
+  // Write Optical Switch
+  configBufferSize = sprintf(configBuffer, "optical_distace:%d\n", OPTICAL_TRIG_THRES);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
   // Close the file
   res = f_close(&file);
   if (res != FR_OK) {
@@ -562,6 +567,9 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
             break;
         case AMP2_KD:
             parameters->amp2_kd = atof(val);
+            break;
+        case OPTICAL_DISTANCE:
+            parameters->optical_distance = atoi(val);
             break;
         default:
             // Handle default case

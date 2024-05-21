@@ -46,6 +46,8 @@
 #define DEFAULT_MIN_RUN_ZONE_TEMP_EN  true
 #define DEFAULT_ALERT_TIMEOUT_M       0.5   // Minutes
 
+#define OPTICAL_TRIG_THRES  800
+
 /* Device Debug Parameters */
 #define I2C_CONNECTED           1
 #define GO_STRAIGHT_TO_RUNNING  0
@@ -241,6 +243,7 @@ typedef struct {
   float amp2_kp;
   float amp2_ki;
   float amp2_kd;
+  uint16_t optical_distance;
 } naatos_config_parameters;
 
 /* Configuration Parameters Variables */

@@ -85,6 +85,7 @@ typedef enum {
   AMP2_KP,
   AMP2_KI,
   AMP2_KD,
+  OPTICAL_DISTANCE,
   NUM_PARAMETERS
 } naatos_config_params_t;
 
