@@ -155,7 +155,11 @@ void logger_task(void * pvParameters) {
                                     last_temp_message.temperature_data.amp2_zone_pwm,
                                     battery_percent, 
                                     log_message.event_data.message);
-          if (log_message.event_data.event == SAMPLE_VALV_ENDED || log_message.event_data.event == SAMPLE_INTERRUPTED || log_message.event_data.event == SAMPLE_TEMPS_NOT_STABALIZED) {
+          if (log_message.event_data.event == SAMPLE_VALV_ENDED || 
+              log_message.event_data.event == SAMPLE_INTERRUPTED || 
+              log_message.event_data.event == SAMPLE_TEMPS_NOT_STABALIZED || 
+              log_message.event_data.event == SAMPLE_RECOVERY_BATT) 
+          {
             run_stopped = true;
           }
         }

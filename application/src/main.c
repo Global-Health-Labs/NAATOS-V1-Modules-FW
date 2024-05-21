@@ -116,6 +116,15 @@ const log_data_message_t temps_not_stablized_msg = {
   .temperature_data = NULL,
   .event_data = temps_not_stabalized_event
 };
+const log_event_t recovery_batt_event = {
+  .event = SAMPLE_RECOVERY_BATT,
+  .message = RECOVERY_BATT
+};
+const log_data_message_t recovery_batt_msg = {
+  .data_type = EVENT_DATA,
+  .temperature_data = NULL,
+  .event_data = recovery_batt_event
+};
 const log_event_t interrupt_opt_event = {
   .event = SAMPLE_INTERRUPTED,
   .message = INTERRUPT_OPT_EVENT_MSG
@@ -250,6 +259,10 @@ void main_task(void * pvParameters) {
           last_state = main_state;
           // Check to see if there was an error during the last run
           if (error_during_run) {
+            // Set LEDs
+            set_led1_red_fast_blink();
+            set_led2_red_fast_blink();
+            // Get current time
             a_t_start = xTaskGetTickCount();
             printf("MAIN_TASK: Alert Timeout - %dms\n", pdTICKS_TO_MS(alert_timeout_ticks));
           }
@@ -300,6 +313,23 @@ void main_task(void * pvParameters) {
         vTaskDelay(2000);
 #endif
         /* ***** Amplification Zone Run ***** */
+        // Check to make sure we are above the recovery battery percentage
+        if (config.recovery_power_thresh > percent_recv) {
+          printf("MAIN_TASK: Unable to begin sample run, battery percent is less than the recovery threshold.\n");
+          // Tell Log that temperature is not stabalized yet
+          xReturned = xQueueSend(logger_logMessageQueue, &recovery_batt_msg, 0);
+          if (xReturned != pdPASS) {
+            printf("MAIN_TASK: Unable to send recovery battery percentage event to logging task.\n");
+          }
+          // Set the new main state
+          last_state = main_state;
+          main_state = STANDBY;
+          sendUpdatedMainTaskState(main_state);
+          // Set error during run and wait alert timeout
+          error_during_run = true;
+          break;
+        }
+
         // Send start amplification message to heater queue
         if (!begin_amplification_zone()) {
           printf("MAIN_TASK: Unable to begin sample run, temperatures have not yet stabalized.\n");
@@ -333,6 +363,9 @@ void main_task(void * pvParameters) {
         }
         // Get sensor switch data ensuring sample is still in position
         do {
+          // TODO: Ensure we do not go overtemp
+
+          // Get Switch data
           xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
@@ -361,9 +394,6 @@ void main_task(void * pvParameters) {
           }
         }
         else {
-          // Set LEDs
-          set_led1_red_fast_blink();
-          set_led2_red_fast_blink();
           // Send Interrupt Event to logging task
           if (!hal_triggered) {
             xReturned = xQueueSend(logger_logMessageQueue, &interrupt_hal_log_msg, 0);
@@ -387,6 +417,9 @@ void main_task(void * pvParameters) {
 
         // Get sensor switch data ensuring sample is still in position
         do {
+          // TODO: Ensure we do not go overtemp
+          
+          // Get Switch Data
           xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
@@ -400,9 +433,6 @@ void main_task(void * pvParameters) {
         end_valve_zone();
         // Check for errors
         if (error_during_run) {
-            // Set LEDs
-            set_led1_red_fast_blink();
-            set_led2_red_fast_blink();
             // Send Interrupt Event to logging task
             if (!hal_triggered) {
               xReturned = xQueueSend(logger_logMessageQueue, &interrupt_hal_log_msg, 0);

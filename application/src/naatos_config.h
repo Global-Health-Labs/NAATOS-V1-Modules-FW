@@ -45,8 +45,8 @@
 #define DEFAULT_MIN_RUN_ZONE_TEMP     50.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP_EN  true
 #define DEFAULT_ALERT_TIMEOUT_M       0.5   // Minutes
-
-#define OPTICAL_TRIG_THRES  800
+#define DEFAULT_RECOVERY_THRES        40    // Percent
+#define OPTICAL_TRIG_THRES            800
 
 /* Device Debug Parameters */
 #define I2C_CONNECTED           1
@@ -63,6 +63,7 @@
 #define VALV_START_MSG            "Valve Zone Heating Started."
 #define VALV_STOP_MSG             "Valve Zone Heating Stopped."
 #define TEMPS_NOT_STABLE          "Zone Temperatures are no below the minimum run temperature. Aborting run."
+#define RECOVERY_BATT             "Battery Percentage lower than the recovery threshold. Charge Battery More."
 
 #define USB_SUSPEND_TASKS_TIME    15000
 
@@ -115,7 +116,8 @@ typedef enum {
   SAMPLE_AMP_ENDED,
   SAMPLE_VALV_STARTED,
   SAMPLE_VALV_ENDED,
-  SAMPLE_TEMPS_NOT_STABALIZED
+  SAMPLE_TEMPS_NOT_STABALIZED,
+  SAMPLE_RECOVERY_BATT
   // Add more events here
 } event_t;
 
@@ -220,6 +222,7 @@ typedef struct {
   uint16_t valve_zone_run_time_m;
   uint16_t amplification_zone_run_time_m;
   uint16_t low_power_threshold;
+  uint16_t recovery_power_thresh;
   float valve_setpoint;
   float amp0_setpoint;
   float amp1_setpoint;

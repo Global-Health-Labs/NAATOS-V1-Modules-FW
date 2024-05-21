@@ -286,6 +286,12 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
+  // Write Recovery Power Threshold
+  configBufferSize = sprintf(configBuffer, "recovery_power_threshold:%d\n", DEFAULT_RECOVERY_THRES);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
   // Write Valve Zone Setpoint
   configBufferSize = sprintf(configBuffer, "valve_setpoint:%0.2f\n", VALVE_SETPOINT);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
@@ -335,7 +341,7 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
-  configBufferSize = sprintf(configBuffer, "min_run_zone_temp:%s\n", DEFAULT_MIN_RUN_ZONE_TEMP_EN ? "true" : "false");
+  configBufferSize = sprintf(configBuffer, "min_run_zone_temp_en:%s\n", DEFAULT_MIN_RUN_ZONE_TEMP_EN ? "true" : "false");
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -497,6 +503,9 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
             break;
         case LOW_POWER_THRESHOLD:
             parameters->low_power_threshold = atoi(val);
+            break;
+        case RECOVERY_POWER_THRESHOLD:
+            parameters->recovery_power_thresh = atoi(val);
             break;
         case VALVE_SETPOINT_C:
             parameters->valve_setpoint = atof(val); 
