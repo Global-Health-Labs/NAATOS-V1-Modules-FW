@@ -94,10 +94,13 @@ void heater_task(void * pvParameters) {
           update_amp0_duty(amp0_pid.out);
           update_amp1_duty(amp1_pid.out);
           update_amp2_duty(amp2_pid.out);
+
+#if UNIFORMITY
           valve_pid.out = 1;
           update_valve_duty(valve_pid.out);
-          // Reinitalize PID Values
           pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  // TODO: Implement defaults
+#endif
+          // Reinitalize PID Values 
           pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
           pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
           pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
@@ -181,16 +184,17 @@ void heater_task(void * pvParameters) {
       pid_controller_compute(&amp2_pid, temperature_data.amp2_zone_temp);
       // Update Amplification 2 PWM with PID output
       update_amp2_duty(amp2_pid.out);
-      //TODO: Remove eventually
+#if UNIFORMITY
       // Update Valve PID loop with new temperatures
       pid_controller_compute(&valve_pid, temperature_data.valve_zone_temp);
       // Update Valve PWM with PID output
       update_valve_duty(valve_pid.out);
+      h_pwm_data.valve_zone_pwm = valve_pid.out;
+#endif
       // Set the PWMs for the logger
       h_pwm_data.amp0_zone_pwm = amp0_pid.out;
       h_pwm_data.amp1_zone_pwm = amp1_pid.out;
       h_pwm_data.amp2_zone_pwm = amp2_pid.out;
-      h_pwm_data.valve_zone_pwm = valve_pid.out; // TODO: Remove eventally
 
    }
    if (valve_zone_running) {
@@ -221,7 +225,9 @@ void heater_task(void * pvParameters) {
       printf("Amp0: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp0_zone_temp, amp0_pid.out);
       printf("Amp1: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp1_zone_temp, amp1_pid.out);
       printf("Amp2: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp2_zone_temp, amp2_pid.out);
+#if UNIFORMITY
       printf("Valv: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.valve_zone_temp, valve_pid.out);
+#endif
     }
     if (valve_zone_running) {
       printf("Valv: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.valve_zone_temp, valve_pid.out);

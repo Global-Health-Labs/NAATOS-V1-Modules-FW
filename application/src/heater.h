@@ -5,8 +5,6 @@
 #include "pid.h"
 #include "pwm.h"
 
-#define VERBOSE_PID       1
-
 #define VALVE_SETPOINT    85.0
 #define AMP0_SETPOINT     65.0
 #define AMP1_SETPOINT     65.0
