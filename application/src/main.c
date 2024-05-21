@@ -32,6 +32,7 @@ Purpose : NAATOS Application Start
 #include "i2c_hal_freertos.h"
 #include "spi.h"
 #include "sd_card.h"
+#include "motorDebug.h"
 
 // Task Handles
 xTaskHandle mainTaskHandle;
@@ -254,7 +255,7 @@ void main_task(void * pvParameters) {
             break;
           }
           i++;
-        } while ( i < 500/*TODO: Compare current time against AMPLIFICATION_ON_TIME*/);
+        } while (1);
         i = 0;
         
         /* ***** Valve Zone Run **** */
@@ -557,6 +558,7 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
   vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_400k);   // I2C
   vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
   init_sd_card();
+  motor_tach_init(); //TODO: Should this live here? Possibly inside the sensors.c gpio pin init function?
 
   // Create Tasks
   create_tasks();

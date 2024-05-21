@@ -34,9 +34,9 @@
 #define DEFAULT_LOGGING_RATE  5.000
 
 /* Device Debug Parameters */
-#define I2C_CONNECTED           1
+#define I2C_CONNECTED           0
 #define GO_STRAIGHT_TO_RUNNING  0
-#define USE_CALENDAR_CHIP       1 
+#define USE_CALENDAR_CHIP       0 
 
 /* Log Event Messages */
 #define START_EVENT_MSG       "Sample Preperation Started."

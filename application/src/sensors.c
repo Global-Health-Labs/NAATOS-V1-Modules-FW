@@ -104,6 +104,15 @@ void sensors_task(void * pvParameters) {
     vTaskDelay(pdMS_TO_TICKS(12 * 4)); // Simulate 12ms delay for each reading
 #endif
 
+#ifdef USE_MOTOR //TODO: Why doesn't it see that USE_MOTOR is defined?
+    //TODO: Check delta time
+    //TODO: Check the counter register
+    //TODO: Clear both the counter and timers
+
+#else
+    //TODO: Give a dummy motor speed if not using one? Or don't give anything?
+#endif
+
     // Put Switch Data into queue
     xReturned = xQueueSend(main_switchQueue, (void *)&switches, 0);
     if (xReturned != pdPASS) {
@@ -147,6 +156,9 @@ void init_sensors_gpios(void) {
   nrf_gpio_cfg_input(HAL_INPUT_PIN, NRF_GPIO_PIN_PULLDOWN);
   nrf_gpio_cfg_output(SENSORS_EN);
   nrf_gpio_pin_set(SENSORS_EN);
+
+  /* Setup Motor Speed Sensor Input*/
+
 }
 
 long double readTemp(sensor_selection_t sensor) {

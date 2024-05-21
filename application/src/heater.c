@@ -52,7 +52,7 @@ void heater_task(void * pvParameters) {
           amp1_pid.out = 1;
           amp2_pid.out = 1;
           update_amp0_duty(amp0_pid.out);
-          update_amp1_duty(amp1_pid.out);
+          //update_amp1_duty(amp1_pid.out);
           update_amp2_duty(amp2_pid.out);
         }
       }
@@ -77,18 +77,21 @@ void heater_task(void * pvParameters) {
     // Update PID and PWM
     if (amplification_zone_running) {
       // Update Amplification 0 PID loop with new temperatures
-      pid_controller_compute(&amp0_pid, temperature_data.amp0_zone_temp);
+      //pid_controller_compute(&amp0_pid, temperature_data.amp0_zone_temp);
       // Update Amplification 0 PWM with PID output
+      amp0_pid.out = 45;
       update_amp0_duty(amp0_pid.out);
 
       // Update Amplification 1 PID loop with new temperatures
-      pid_controller_compute(&amp1_pid, temperature_data.amp1_zone_temp);
+      //pid_controller_compute(&amp1_pid, temperature_data.amp1_zone_temp);
       // Update Amplification 1 PWM with PID output
+      amp1_pid.out = 45;
       update_amp1_duty(amp1_pid.out);
 
       // Update Amplification 2 PID loop with new temperatures
-      pid_controller_compute(&amp2_pid, temperature_data.amp2_zone_temp);
+     // pid_controller_compute(&amp2_pid, temperature_data.amp2_zone_temp);
       // Update Amplification 2 PWM with PID output
+      amp2_pid.out = 45;
       update_amp2_duty(amp2_pid.out);
     }
     if (valve_zone_running) {
