@@ -4,7 +4,17 @@
 const bool pwm_req = true;
 
 sensor_switches_t switches;
-temperature_data_t temperatures;
+temperature_data_t temperatures = {
+  .amp0_zone_pwm = 0,
+  .amp0_zone_temp = 0,
+  .amp1_zone_pwm = 0,
+  .amp1_zone_temp = 0,
+  .amp2_zone_pwm = 0,
+  .amp2_zone_temp = 0,
+  .valve_zone_pwm = 0,
+  .valve_zone_temp = 0
+};
+
 temperature_pwm_data_t pwm_data = {
   .valve_zone_pwm = 0,
   .amp0_zone_pwm = 0,
@@ -178,15 +188,15 @@ void sensors_task(void * pvParameters) {
       sample_log_index++;
     if (sample_log_index >= sample_log_max) {
       // Request PWM from heater
-      //xReturned = xQueueSend(heater_pwmReqQueue, &pwm_req, 0);
-      //if (xReturned != pdPASS) {
-      //  printf("SENSOR_TASK: Unable to send PWM request to heater_pwmReqQueue queue.\n");
-      //}
+      xReturned = xQueueSend(heater_pwmReqQueue, &pwm_req, 0);
+      if (xReturned != pdPASS) {
+        printf("SENSOR_TASK: Unable to send PWM request to heater_pwmReqQueue queue.\n");
+      }
       // Receive PWM from heater
-      //xReturned = xQueueReceive(sensor_pwmRecvQueue, &pwm_data, portMAX_DELAY);
-      //if (xReturned != pdPASS) {
-      //  printf("SENSOR_TASK: Unable to receive PWM data from sensor_pwmRecvQueue queue.\n");
-      //}
+      xReturned = xQueueReceive(sensor_pwmRecvQueue, &pwm_data, portMAX_DELAY);
+      if (xReturned != pdPASS) {
+        printf("SENSOR_TASK: Unable to receive PWM data from sensor_pwmRecvQueue queue.\n");
+      }
       // Update PWM in temerature data
       log_msg.temperature_data.amp0_zone_temp = temperatures.amp0_zone_temp;
       log_msg.temperature_data.amp1_zone_temp = temperatures.amp1_zone_temp;

@@ -234,18 +234,18 @@ void heater_task(void * pvParameters) {
     }
 
     // Check to see if the logger needs the pwm data
-    //if (uxQueueMessagesWaiting(heater_pwmReqQueue) > 0) {
-    //  // Retrieve the request
-    //  xReturned = xQueueReceive(heater_pwmReqQueue, &h_pwm_req, 0);
-    //  if (xReturned != pdPASS) {
-    //    printf("HEATER_TASK: unable to receive pwm request from heater_pwmReqQueue queue.\n");
-    //  }
-    //  // Send back the pwm data
-    //  xReturned = xQueueSend(sensor_pwmRecvQueue, &h_pwm_data, 0);
-    //  if (xReturned != pdPASS) {
-    //    printf("HEATER_TASK: unable to send pwm data to sensor_pwmRecvQueue queue.\n");
-    // }
-    //}
+    if (uxQueueMessagesWaiting(heater_pwmReqQueue) > 0) {
+      // Retrieve the request
+      xReturned = xQueueReceive(heater_pwmReqQueue, &h_pwm_req, 0);
+      if (xReturned != pdPASS) {
+        printf("HEATER_TASK: unable to receive pwm request from heater_pwmReqQueue queue.\n");
+      }
+      // Send back the pwm data
+      xReturned = xQueueSend(sensor_pwmRecvQueue, &h_pwm_data, 0);
+      if (xReturned != pdPASS) {
+        printf("HEATER_TASK: unable to send pwm data to sensor_pwmRecvQueue queue.\n");
+      }
+    }
 
 #if VERBOSE_PID 
     if (amplification_zone_running) {

@@ -792,7 +792,7 @@ void create_queues() {
   sensor_mainStateContinueQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (sensor_mainStateContinueQueue == NULL)
     printf("Unable to create sensor_mainStateContinueQueue queue\n");
-  sensor_pwmRecvQueue = xQueueCreate(QUEUE_SIZE, sizeof(temperature_data_t));
+  sensor_pwmRecvQueue = xQueueCreate(QUEUE_SIZE, sizeof(temperature_pwm_data_t));
   if (sensor_pwmRecvQueue == NULL)
     printf("Unable to create sensor_mainStateContinueQueue queue\n");
 
