@@ -4,13 +4,22 @@
 xQueueHandle heater_zoneRunQueue;
 xQueueHandle heater_temperatureDataQueue;
 xQueueHandle heater_usbWaitQueue;
+xQueueHandle heater_pwmReqQueue;
 
 bool amplification_zone_running = false;
 bool valve_zone_running = false;
 bool starting_run = true;
+bool h_pwm_req = false;
 
 zone_run_req_t zone_req;
 temperature_data_t temperature_data;
+
+temperature_pwm_data_t h_pwm_data = {
+  .valve_zone_pwm = 0,
+  .amp0_zone_pwm = 0,
+  .amp1_zone_pwm = 0,
+  .amp2_zone_pwm = 0
+};
 
 pid_controller_t valve_pid;
 pid_controller_t amp0_pid;
@@ -164,27 +173,48 @@ void heater_task(void * pvParameters) {
       pid_controller_compute(&amp0_pid, temperature_data.amp0_zone_temp);
       // Update Amplification 0 PWM with PID output
       update_amp0_duty(amp0_pid.out);
-
       // Update Amplification 1 PID loop with new temperatures
       pid_controller_compute(&amp1_pid, temperature_data.amp1_zone_temp);
       // Update Amplification 1 PWM with PID output
       update_amp1_duty(amp1_pid.out);
-
       // Update Amplification 2 PID loop with new temperatures
       pid_controller_compute(&amp2_pid, temperature_data.amp2_zone_temp);
       // Update Amplification 2 PWM with PID output
       update_amp2_duty(amp2_pid.out);
+      //TODO: Remove eventually
       // Update Valve PID loop with new temperatures
       pid_controller_compute(&valve_pid, temperature_data.valve_zone_temp);
       // Update Valve PWM with PID output
       update_valve_duty(valve_pid.out);
-    }
-    if (valve_zone_running) {
+      // Set the PWMs for the logger
+      h_pwm_data.amp0_zone_pwm = amp0_pid.out;
+      h_pwm_data.amp1_zone_pwm = amp1_pid.out;
+      h_pwm_data.amp2_zone_pwm = amp2_pid.out;
+      h_pwm_data.valve_zone_pwm = valve_pid.out; // TODO: Remove eventally
+
+   }
+   if (valve_zone_running) {
       // Update Valve PID loop with new temperatures
       pid_controller_compute(&valve_pid, temperature_data.valve_zone_temp);
       // Update Valve PWM with PID output
       update_valve_duty(valve_pid.out);
+      // Set the PWMs for the logger
+      h_pwm_data.valve_zone_pwm = valve_pid.out;
     }
+
+    // Check to see if the logger needs the pwm data
+    //if (uxQueueMessagesWaiting(heater_pwmReqQueue) > 0) {
+    //  // Retrieve the request
+    //  xReturned = xQueueReceive(heater_pwmReqQueue, &h_pwm_req, 0);
+    //  if (xReturned != pdPASS) {
+    //    printf("HEATER_TASK: unable to receive pwm request from heater_pwmReqQueue queue.\n");
+    //  }
+    //  // Send back the pwm data
+    //  xReturned = xQueueSend(sensor_pwmRecvQueue, &h_pwm_data, 0);
+    //  if (xReturned != pdPASS) {
+    //    printf("HEATER_TASK: unable to send pwm data to sensor_pwmRecvQueue queue.\n");
+    // }
+    //}
 
 #if VERBOSE_PID 
     if (amplification_zone_running) {
@@ -197,6 +227,5 @@ void heater_task(void * pvParameters) {
       printf("Valv: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.valve_zone_temp, valve_pid.out);
     }
 #endif
-
   }
 }

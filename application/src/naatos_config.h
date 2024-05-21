@@ -132,10 +132,22 @@ typedef struct {
 // Temperature Data Struct
 typedef struct {
   float amp0_zone_temp;
+  float valve_zone_pwm;
   float amp1_zone_temp;
+  float amp0_zone_pwm;
+  float amp1_zone_pwm;
   float amp2_zone_temp;
   float valve_zone_temp;
+  float amp2_zone_pwm;
 } temperature_data_t;
+
+// Temperature PWM Data Struct
+typedef struct {
+  float valve_zone_pwm;
+  float amp0_zone_pwm;
+  float amp1_zone_pwm;
+  float amp2_zone_pwm;
+} temperature_pwm_data_t;
 
 // Composite USB Update Message
 typedef struct {

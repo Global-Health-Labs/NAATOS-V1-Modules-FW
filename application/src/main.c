@@ -639,7 +639,7 @@ void create_tasks() {
       vTaskDelete( loggerTaskHandle );
   }
   // Sensors Task
-  xReturned = xTaskCreate(sensors_task, "SensorsTask", 1024, NULL, 0, &sensorsTaskHandle);
+  xReturned = xTaskCreate(sensors_task, "SensorsTask", 2048, NULL, 0, &sensorsTaskHandle);
   if( xReturned != pdPASS ) {
       // The task was created.  Use the task's handle to delete the task. 
       printf("Error creating sensors task. Error: %d\n", xReturned);
@@ -706,6 +706,9 @@ void create_queues() {
   heater_usbWaitQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_suspend_req_t));
   if (heater_usbWaitQueue == NULL)
     printf("Unable to create heater_usbWaitQueue queue\n");
+  heater_pwmReqQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (heater_pwmReqQueue == NULL)
+    printf("Unable to create heater_usbWaitQueue queue\n");
 
   // Sensor Task Queues
   sensor_mainStateQueue = xQueueCreate(QUEUE_SIZE, sizeof(main_state_t));
@@ -716,6 +719,9 @@ void create_queues() {
     printf("Unable to create sensor_usbWaitQueue queue\n");
   sensor_mainStateContinueQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (sensor_mainStateContinueQueue == NULL)
+    printf("Unable to create sensor_mainStateContinueQueue queue\n");
+  sensor_pwmRecvQueue = xQueueCreate(QUEUE_SIZE, sizeof(temperature_data_t));
+  if (sensor_pwmRecvQueue == NULL)
     printf("Unable to create sensor_mainStateContinueQueue queue\n");
 
   // Battery Management Task Queues
