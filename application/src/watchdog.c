@@ -1,6 +1,9 @@
 #include "watchdog.h"
 #include "boards.h"
+#include "naatos_queues.h""
 static nrfx_wdt_channel_id m_channel_id;
+
+xQueueHandle watchdog_rxTimesQueue;
 
 void wdt_event_handler(void) {
     // This function is called if the WDT event occurs (optional)
@@ -35,12 +38,32 @@ void wdtFeedTask(void * pvParameters) {
  **/
   (void) pvParameters;
 
-  while (true) {
-      // Feed the watchdog
-      nrf_drv_wdt_channel_feed(m_channel_id);
+ watchdog_time_update_t recv_req;
 
-      // Delay for a period shorter than the watchdog timeout
-      vTaskDelay(1000); // Adjust the delay as necessary
+  while (true) {
+
+    //if msg in queue
+    // Set watchdog time and or set valid flag
+    if( xQueueReceive( watchdog_rxTimesQueue,
+                         &recv_req,
+                         ( TickType_t ) 0 ) == pdPASS )
+      {
+         /* *pxRxedPointer now points to xMessage. */
+         // reset specific task counter to 0
+         // if set to invalid then we dont have to compare times
+      }
+
+    // Consider all valid tasks for timeout. This means if their  tick has been incremented past the max  value we dont kick the dog
+    // If task not valid skip and dont consider it for WDT 
+
+    // if no tasks are valid just kick the dog
+    // if one of the tasks is missed then dont allow the dog to be kicked
+
+    // Feed the watchdog
+    nrf_drv_wdt_channel_feed(m_channel_id);
+
+    // Delay for a period shorter than the watchdog timeout
+    vTaskDelay(1000); 
   }
 
 }

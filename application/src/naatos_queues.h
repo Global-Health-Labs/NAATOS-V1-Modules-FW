@@ -25,4 +25,7 @@ extern xQueueHandle logger_recvBattPercentQueue;
 extern xQueueHandle logger_logMessageQueue;
 extern xQueueHandle logger_mainStateChangeQueue;
 
+//Watchdog Task Queue
+extern xQueueHandle watchdog_rxTimesQueue;
+
 #endif

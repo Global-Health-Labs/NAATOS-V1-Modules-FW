@@ -42,6 +42,7 @@ xTaskHandle sensorsTaskHandle;
 xTaskHandle batteryTaskHandle;
 xTaskHandle usbTaskHandle;
 xTaskHandle pwmTaskHandle;
+xTaskHandle wdtTaskHandle;
 
 xQueueHandle main_batteryDataQueue;
 xQueueHandle main_switchQueue;
@@ -298,11 +299,11 @@ void create_tasks() {
   }
 
   // WDT Task
-  xReturned = xTaskCreate(pwm_task, "WDTTask", 1000, NULL, 0, &wdtFeedTask);
+  xReturned = xTaskCreate(wdtFeedTask, "WDTTask", 100, NULL, 0, &wdtTaskHandle);
   if ( xReturned != pdPASS ) {
       /* The task was created.  Use the task's handle to delete the task. */
       printf("Error creating WDT task. Error: %d\n", xReturned);
-      vTaskDelete( wdtFeedTask );
+      vTaskDelete( wdtTaskHandle );
   }
 }
 
@@ -349,6 +350,11 @@ void create_queues() {
   logger_mainStateChangeQueue = xQueueCreate(QUEUE_SIZE, sizeof(main_state_t));
   if (logger_mainStateChangeQueue == NULL)
     printf("Unable to create logger_mainStateChangeQueue queue\n");
+
+  // Watchdog Task Queues
+  watchdog_rxTimesQueue = xQueueCreate(QUEUE_SIZE, sizeof(watchdog_time_update_t));
+  if (watchdog_rxTimesQueue == NULL)
+    printf("Unable to create watchdog_rxTimesQueue queue\n");
 }
 
 /*********************************************************************
