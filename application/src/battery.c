@@ -61,10 +61,10 @@ void battery_task(void * pvParameters) {
       }
     }
 
-      xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
-      if (xReturned != pdPASS) {
-        printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
-      }
+    xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
+    if (xReturned != pdPASS) {
+      printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+    }
 
     vTaskDelay(500);
   }
