@@ -120,6 +120,7 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
         case APP_USBD_EVT_POWER_DETECTED:
             printf("USB: Power detected\n");
             usb_detected = true;
+            set_led2_blue_breathe();
             if (!nrf_drv_usbd_is_enabled())
             {
                 app_usbd_enable();
@@ -131,6 +132,7 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
             usb_done_config = false;  
             usb_detected = false;
             usb_started = false;
+            turn_off_led2();
             break;
         case APP_USBD_EVT_POWER_READY:
             printf("USB: Ready\n");
@@ -294,6 +296,7 @@ void composite_usb_task(void * pvParameters) {
 
     if (msc_active && usb_detected && !usb_suspended_tasks && !usb_done_config && main_state == STANDBY) {
       usb_suspend_conflicting_tasks();
+      set_led1_blue_slow_blink();
       batt_over = false; heater_over = false; pwm_over = false; sensor_over = false;
     }
     
@@ -328,6 +331,7 @@ void composite_usb_task(void * pvParameters) {
       if (batt_over && heater_over && pwm_over && sensor_over) {
         usb_suspended_tasks = false;
         usb_done_config = true;
+        set_led1_green_breathe();
       }
     }
     else {

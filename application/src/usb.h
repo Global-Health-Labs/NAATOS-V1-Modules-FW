@@ -7,6 +7,7 @@
 #include "FreeRTOS.h"
 #include "queue.h"
 #include "sd_card.h"
+#include "led.h"
 
 #include "app_usbd.h"
 #include "app_usbd_core.h"

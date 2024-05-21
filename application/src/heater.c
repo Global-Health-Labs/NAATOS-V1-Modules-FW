@@ -86,6 +86,11 @@ void heater_task(void * pvParameters) {
           update_amp2_duty(amp2_pid.out);
           valve_pid.out = 1;
           update_valve_duty(valve_pid.out);
+          // Reinitalize PID Values
+         pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  
+         pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
+         pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
+         pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
         }
       }
       else if (zone_req.zone = VALVE) {
@@ -93,6 +98,8 @@ void heater_task(void * pvParameters) {
         if (!valve_zone_running) {
           valve_pid.out = 1;
           update_valve_duty(valve_pid.out);
+          // Reinitalize PID Values
+          pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  
         }
       }
     }
