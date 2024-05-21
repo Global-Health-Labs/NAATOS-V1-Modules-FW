@@ -3,31 +3,87 @@
 xQueueHandle logger_recvBattPercentQueue;
 xQueueHandle logger_logMessageQueue;
 xQueueHandle logger_mainStateChangeQueue;
+xQueueHandle logger_mainStateContinueQueue;
+
+calendar_time_t time = {
+    .second = 0,
+    .minute = 0,
+    .hour = 0,
+    .day = 0,
+    .week_day = 0,
+    .month = 0,
+    .year = 0
+  };
 
 const battery_percent_req_t batt_req = {
   .task_req = LOGGER
 };
 
+// Puts log file name in char pointer
+void getLogFileName(const char * _logFileName) {
+  if (!(calendar_get_time(&time))) {
+    printf("LOG_TASK: Unable to get time for log file name!\n");
+    sprintf(_logFileName, "unknown.csv");
+  }
+  // Get current Date and Time and update vars
+  sprintf(_logFileName, "sample_%d-%d-%d_%d%d.csv", time.month, time.day, time.year, time.hour, time.minute);
+}
+
 void logger_task(void * pvParameters) {
   BaseType_t xReturned;
   main_state_t main_state = STANDBY;
   log_data_message_t log_message;
+  log_data_message_t last_temp_message;
   int battery_percent;
   bool new_temp = false;
   bool uart_only = false;
+  char logFileName[50];
+  char logFileLine[256];
+  uint32_t logFileLineSize;
+  FRESULT res;
+  bool run_stopped = false;
+  tasks_t logger_task = LOGGER;
+  bool cont;
+  bool interrupted = true;
 
-  // TODO: Get the configuration settings 
-  // TODO: Check the log rate (if its less than 1 set to UART Logging only)
+  // If logging rate is less than once a second, do UART only
+  if (config.logging_rate < 1.0) {
+    uart_only = true;
+  }
+
   for (;;) {
+    run_stopped = false;
     // Wait for running state from main task update (blocking)
     xReturned = xQueueReceive(logger_mainStateChangeQueue, &main_state, portMAX_DELAY);
     if (xReturned != pdPASS) {
       printf("LOG_TASK: Unable to receive state change from logger_mainStateChangeQueue.\n");
     }
-    // TODO: Create Log File based on the UTC Time of the Sample preperation
-    
+    // Respond to main state change
+    xReturned = xQueueSend(main_mainStateRespQueue, &logger_task, 0);
+    if (xReturned != pdPASS) {
+      printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
+    }
+    // Wait for Coninute
+    xReturned = xQueueReceive(logger_mainStateContinueQueue, &cont, portMAX_DELAY);
+    if (xReturned != pdPASS) {
+      printf("USB: Unable to recevive continue to logger_mainStateContinueQueue queue.\n");
+    }
+
+    if (main_state == RUNNING) {
+      // Create Log File based on the UTC Time of the Sample preperation
+      getLogFileName(logFileName);
+      res = sd_card_create_log_file(logFileName);
+      if (res == FR_EXIST) {
+        printf("LOG_TASK: Warning! Log file with name already exist, will be overwritting that file.\n");
+      }
+      else if (res != FR_OK) {
+        printf("LOG_TASK: Unable to create log file for current sample preperation.\n");
+      }
+    }
+
     // Log sample data while we are running
-    while (main_state == RUNNING) {
+    while (main_state == RUNNING && !run_stopped) {
+      new_temp = false;
       // Check if state has changed
       if (uxQueueMessagesWaiting(logger_mainStateChangeQueue) > 0) {
         xReturned = xQueueReceive(logger_mainStateChangeQueue, &main_state, 0);
@@ -48,27 +104,50 @@ void logger_task(void * pvParameters) {
         printf("LOG_TASK: Unable to get battery percentage from battery_requestPercentQueue.\n");
       }
       
-      while (!new_temp) {
+      while (!new_temp && !run_stopped) {
+
         // Wait for a log data message (either temperature data or event data)
         xReturned = xQueueReceive(logger_logMessageQueue, &log_message, portMAX_DELAY);
         if (xReturned != pdPASS) {
           printf("LOG_TASK: Unable to get log message from logger_logMessageQueue.\n");
         }
+         
+        // Get current time
+        if (!(calendar_get_time(&time))) {
+          printf("LOG_TASK: Unable to retreive time!");
+        }
 
-        if (log_message.data_type == TEMPERATURE_DATA) {
+        // Setup Log Message for UART and File based on log message type
+         if (log_message.data_type == TEMPERATURE_DATA) {
+          // Set new temp to true
           new_temp = true;
-          // TODO: Setup Log Message for UART and File
+          // Format: Time,ValveTemp,Amp0Temp,Amp1Temp,Amp2Temp,BattPercent,Event
+          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,NONE\n", time.hour, time.minute, time.second, log_message.temperature_data.valve_zone_temp,
+                                    log_message.temperature_data.amp0_zone_temp, log_message.temperature_data.amp1_zone_temp,
+                                    log_message.temperature_data.amp2_zone_temp, battery_percent);
+          last_temp_message = log_message;
         }
         else if (log_message.data_type == EVENT_DATA) {
-          // TODO: Setup Log Message for UART and File
+          
+          // Format: Time,ValveTemp,Amp0Temp,Amp1Temp,Amp2Temp,BattPercent,Event
+          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n", time.hour, time.minute, time.second, last_temp_message.temperature_data.valve_zone_temp,
+                                    last_temp_message.temperature_data.amp0_zone_temp, last_temp_message.temperature_data.amp1_zone_temp,
+                                    last_temp_message.temperature_data.amp2_zone_temp, battery_percent, log_message.event_data.message);
+          if (log_message.event_data.event == SAMPLE_VALV_ENDED || log_message.event_data.event == SAMPLE_INTERRUPTED) {
+            run_stopped = true;
+          }
         }
-        
-        // TODO: Get current time
-        // TODO: Format Log String to have HH-MM-SS Message
         
         // Check UART Only 
         if (!uart_only) {
-          // TODO: Write to sample log file
+          // Write to sample log file
+          FRESULT res = sd_card_write_log_line(logFileName, logFileLine, logFileLineSize);
+          if (res != FR_OK) {
+            printf("LOG_TASK: Unable to write last log line!\n");
+          }
+          else {
+            printf("LOG_TASK: Wrote line to log\n");
+          }
         }
       } 
     }

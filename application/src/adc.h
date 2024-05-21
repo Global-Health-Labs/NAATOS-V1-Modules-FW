@@ -5,7 +5,7 @@
 
 #define OPTICAL_CHANNEL   0
 
-#define OPTICAL_TRIG_THRES  500
+#define OPTICAL_TRIG_THRES  800
 
 void init_adc(void);
 bool get_optical_triggered(void);

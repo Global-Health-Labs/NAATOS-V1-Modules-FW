@@ -20,9 +20,7 @@ static const nrf_drv_twi_t m_i2c[i2c_num_interfaces] = {
     NRF_DRV_TWI_INSTANCE(I2C_SENSOR_INSTANCE_ID),
 };
 
-
 static SemaphoreHandle_t m_i2c_semaphores[i2c_num_interfaces];
-
 
 /* INIT for TWI hardware for peripheral */
 void vInit_TWI_Hardware(i2c_interface_selection_t interface, uint32_t sda_pin, uint32_t scl_pin, i2c_speed_selection_t frequency) {
@@ -114,6 +112,31 @@ ret_code_t xUtil_TWI_Write( i2c_interface_selection_t interface, uint8_t slave_a
         nrf_drv_twi_enable( &m_i2c[interface] );// enable I2C
         err_code = nrf_drv_twi_tx( &m_i2c[interface], slave_addr, &reg_addr, 1, true );
         APP_ERROR_CHECK( err_code );
+        err_code = nrf_drv_twi_tx( &m_i2c[interface], slave_addr, p_buff, length, false );
+        APP_ERROR_CHECK( err_code );
+        nrf_drv_twi_disable( &m_i2c[interface] );
+        xSemaphoreGive( m_i2c_semaphores[interface] );	// 'Give' the semaphore to unblock the blocked task.
+
+    } else { err_code = NRF_ERROR_BUSY; }
+
+    return err_code;
+}
+
+ret_code_t xUtil_TWI_Write_Single( i2c_interface_selection_t interface, uint8_t slave_addr, uint8_t start_addr, uint8_t const *p_buff, uint16_t length ) {
+    #ifdef VERB_HW_TWI
+    NRF_LOG_INFO( "xUtil_TWI_Write:\tslave = 0x%02X\taddr = 0x%02X\tlenght = %u", slave_addr, start_addr, length );
+    #endif
+    ret_code_t err_code;
+    static uint8_t reg_addr;
+    reg_addr = start_addr;
+
+    if( length == 0 ) {					
+        err_code = NRF_ERROR_INVALID_LENGTH;
+
+    } else if( xSemaphoreTake( m_i2c_semaphores[interface], portMAX_DELAY ) == pdPASS ) {	// execute operation only if resuorce is free
+        nrf_drv_twi_enable( &m_i2c[interface] );// enable I2C
+        //err_code = nrf_drv_twi_tx( &m_i2c[interface], slave_addr, &reg_addr, 1, true );
+        //APP_ERROR_CHECK( err_code );
         err_code = nrf_drv_twi_tx( &m_i2c[interface], slave_addr, p_buff, length, false );
         APP_ERROR_CHECK( err_code );
         nrf_drv_twi_disable( &m_i2c[interface] );

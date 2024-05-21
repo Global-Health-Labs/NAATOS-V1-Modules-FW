@@ -48,553 +48,6 @@
 #endif
 // <h> nRF_Bootloader 
 
-// <e> NRFX_CLOCK_ENABLED - nrfx_clock - CLOCK peripheral driver
-//==========================================================
-#ifndef NRFX_CLOCK_ENABLED
-#define NRFX_CLOCK_ENABLED 1
-#endif
-// <o> NRFX_CLOCK_CONFIG_LF_SRC  - LF Clock Source
- 
-// <0=> RC 
-// <1=> XTAL 
-// <2=> Synth 
-// <131073=> External Low Swing 
-// <196609=> External Full Swing 
-
-#ifndef NRFX_CLOCK_CONFIG_LF_SRC
-#define NRFX_CLOCK_CONFIG_LF_SRC 196609
-#endif
-
-// <o> NRFX_CLOCK_CONFIG_IRQ_PRIORITY  - Interrupt priority
- 
-// <0=> 0 (highest) 
-// <1=> 1 
-// <2=> 2 
-// <3=> 3 
-// <4=> 4 
-// <5=> 5 
-// <6=> 6 
-// <7=> 7 
-
-#ifndef NRFX_CLOCK_CONFIG_IRQ_PRIORITY
-#define NRFX_CLOCK_CONFIG_IRQ_PRIORITY 6
-#endif
-
-// <e> NRFX_CLOCK_CONFIG_LOG_ENABLED - Enables logging in the module.
-//==========================================================
-#ifndef NRFX_CLOCK_CONFIG_LOG_ENABLED
-#define NRFX_CLOCK_CONFIG_LOG_ENABLED 0
-#endif
-// <o> NRFX_CLOCK_CONFIG_LOG_LEVEL  - Default Severity level
- 
-// <0=> Off 
-// <1=> Error 
-// <2=> Warning 
-// <3=> Info 
-// <4=> Debug 
-
-#ifndef NRFX_CLOCK_CONFIG_LOG_LEVEL
-#define NRFX_CLOCK_CONFIG_LOG_LEVEL 3
-#endif
-
-// <o> NRFX_CLOCK_CONFIG_INFO_COLOR  - ANSI escape code prefix.
- 
-// <0=> Default 
-// <1=> Black 
-// <2=> Red 
-// <3=> Green 
-// <4=> Yellow 
-// <5=> Blue 
-// <6=> Magenta 
-// <7=> Cyan 
-// <8=> White 
-
-#ifndef NRFX_CLOCK_CONFIG_INFO_COLOR
-#define NRFX_CLOCK_CONFIG_INFO_COLOR 0
-#endif
-
-// <o> NRFX_CLOCK_CONFIG_DEBUG_COLOR  - ANSI escape code prefix.
- 
-// <0=> Default 
-// <1=> Black 
-// <2=> Red 
-// <3=> Green 
-// <4=> Yellow 
-// <5=> Blue 
-// <6=> Magenta 
-// <7=> Cyan 
-// <8=> White 
-
-#ifndef NRFX_CLOCK_CONFIG_DEBUG_COLOR
-#define NRFX_CLOCK_CONFIG_DEBUG_COLOR 0
-#endif
-
-// </e>
-
-// </e>
-
-// <e> NRF_CLOCK_ENABLED - nrf_drv_clock - CLOCK peripheral driver - legacy layer
-//==========================================================
-#ifndef NRF_CLOCK_ENABLED
-#define NRF_CLOCK_ENABLED 1
-#endif
-// <o> CLOCK_CONFIG_LF_SRC  - LF Clock Source
- 
-// <0=> RC 
-// <1=> XTAL 
-// <2=> Synth 
-// <131073=> External Low Swing 
-// <196609=> External Full Swing 
-
-#ifndef CLOCK_CONFIG_LF_SRC
-#define CLOCK_CONFIG_LF_SRC 196609
-#endif
-
-// <q> CLOCK_CONFIG_LF_CAL_ENABLED  - Calibration enable for LF Clock Source
- 
-
-#ifndef CLOCK_CONFIG_LF_CAL_ENABLED
-#define CLOCK_CONFIG_LF_CAL_ENABLED 0
-#endif
-
-// <o> CLOCK_CONFIG_IRQ_PRIORITY  - Interrupt priority
- 
-
-// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
-// <0=> 0 (highest) 
-// <1=> 1 
-// <2=> 2 
-// <3=> 3 
-// <4=> 4 
-// <5=> 5 
-// <6=> 6 
-// <7=> 7 
-
-#ifndef CLOCK_CONFIG_IRQ_PRIORITY
-#define CLOCK_CONFIG_IRQ_PRIORITY 6
-#endif
-
-// </e>
-
-// <e> NRFX_TWIM_ENABLED - nrfx_twim - TWIM peripheral driver
-//==========================================================
-#ifndef NRFX_TWIM_ENABLED
-#define NRFX_TWIM_ENABLED 1
-#endif
-// <q> NRFX_TWIM0_ENABLED  - Enable TWIM0 instance
- 
-
-#ifndef NRFX_TWIM0_ENABLED
-#define NRFX_TWIM0_ENABLED 0
-#endif
-
-// <q> NRFX_TWIM1_ENABLED  - Enable TWIM1 instance
- 
-
-#ifndef NRFX_TWIM1_ENABLED
-#define NRFX_TWIM1_ENABLED 0
-#endif
-
-// <o> NRFX_TWIM_DEFAULT_CONFIG_FREQUENCY  - Frequency
- 
-// <26738688=> 100k 
-// <67108864=> 250k 
-// <104857600=> 400k 
-
-#ifndef NRFX_TWIM_DEFAULT_CONFIG_FREQUENCY
-#define NRFX_TWIM_DEFAULT_CONFIG_FREQUENCY 104857600
-#endif
-
-// <q> NRFX_TWIM_DEFAULT_CONFIG_HOLD_BUS_UNINIT  - Enables bus holding after uninit
- 
-
-#ifndef NRFX_TWIM_DEFAULT_CONFIG_HOLD_BUS_UNINIT
-#define NRFX_TWIM_DEFAULT_CONFIG_HOLD_BUS_UNINIT 0
-#endif
-
-// <o> NRFX_TWIM_DEFAULT_CONFIG_IRQ_PRIORITY  - Interrupt priority
- 
-// <0=> 0 (highest) 
-// <1=> 1 
-// <2=> 2 
-// <3=> 3 
-// <4=> 4 
-// <5=> 5 
-// <6=> 6 
-// <7=> 7 
-
-#ifndef NRFX_TWIM_DEFAULT_CONFIG_IRQ_PRIORITY
-#define NRFX_TWIM_DEFAULT_CONFIG_IRQ_PRIORITY 6
-#endif
-
-// <e> NRFX_TWIM_CONFIG_LOG_ENABLED - Enables logging in the module.
-//==========================================================
-#ifndef NRFX_TWIM_CONFIG_LOG_ENABLED
-#define NRFX_TWIM_CONFIG_LOG_ENABLED 0
-#endif
-// <o> NRFX_TWIM_CONFIG_LOG_LEVEL  - Default Severity level
- 
-// <0=> Off 
-// <1=> Error 
-// <2=> Warning 
-// <3=> Info 
-// <4=> Debug 
-
-#ifndef NRFX_TWIM_CONFIG_LOG_LEVEL
-#define NRFX_TWIM_CONFIG_LOG_LEVEL 3
-#endif
-
-// <o> NRFX_TWIM_CONFIG_INFO_COLOR  - ANSI escape code prefix.
- 
-// <0=> Default 
-// <1=> Black 
-// <2=> Red 
-// <3=> Green 
-// <4=> Yellow 
-// <5=> Blue 
-// <6=> Magenta 
-// <7=> Cyan 
-// <8=> White 
-
-#ifndef NRFX_TWIM_CONFIG_INFO_COLOR
-#define NRFX_TWIM_CONFIG_INFO_COLOR 0
-#endif
-
-// <o> NRFX_TWIM_CONFIG_DEBUG_COLOR  - ANSI escape code prefix.
- 
-// <0=> Default 
-// <1=> Black 
-// <2=> Red 
-// <3=> Green 
-// <4=> Yellow 
-// <5=> Blue 
-// <6=> Magenta 
-// <7=> Cyan 
-// <8=> White 
-
-#ifndef NRFX_TWIM_CONFIG_DEBUG_COLOR
-#define NRFX_TWIM_CONFIG_DEBUG_COLOR 0
-#endif
-
-// </e>
-
-// </e>
-
-// <e> NRFX_TWIS_ENABLED - nrfx_twis - TWIS peripheral driver
-//==========================================================
-#ifndef NRFX_TWIS_ENABLED
-#define NRFX_TWIS_ENABLED 0
-#endif
-// <q> NRFX_TWIS0_ENABLED  - Enable TWIS0 instance
- 
-
-#ifndef NRFX_TWIS0_ENABLED
-#define NRFX_TWIS0_ENABLED 0
-#endif
-
-// <q> NRFX_TWIS1_ENABLED  - Enable TWIS1 instance
- 
-
-#ifndef NRFX_TWIS1_ENABLED
-#define NRFX_TWIS1_ENABLED 0
-#endif
-
-// <q> NRFX_TWIS_ASSUME_INIT_AFTER_RESET_ONLY  - Assume that any instance would be initialized only once
- 
-
-// <i> Optimization flag. Registers used by TWIS are shared by other peripherals. Normally, during initialization driver tries to clear all registers to known state before doing the initialization itself. This gives initialization safe procedure, no matter when it would be called. If you activate TWIS only once and do never uninitialize it - set this flag to 1 what gives more optimal code.
-
-#ifndef NRFX_TWIS_ASSUME_INIT_AFTER_RESET_ONLY
-#define NRFX_TWIS_ASSUME_INIT_AFTER_RESET_ONLY 0
-#endif
-
-// <q> NRFX_TWIS_NO_SYNC_MODE  - Remove support for synchronous mode
- 
-
-// <i> Synchronous mode would be used in specific situations. And it uses some additional code and data memory to safely process state machine by polling it in status functions. If this functionality is not required it may be disabled to free some resources.
-
-#ifndef NRFX_TWIS_NO_SYNC_MODE
-#define NRFX_TWIS_NO_SYNC_MODE 0
-#endif
-
-// <o> NRFX_TWIS_DEFAULT_CONFIG_ADDR0 - Address0 
-#ifndef NRFX_TWIS_DEFAULT_CONFIG_ADDR0
-#define NRFX_TWIS_DEFAULT_CONFIG_ADDR0 0
-#endif
-
-// <o> NRFX_TWIS_DEFAULT_CONFIG_ADDR1 - Address1 
-#ifndef NRFX_TWIS_DEFAULT_CONFIG_ADDR1
-#define NRFX_TWIS_DEFAULT_CONFIG_ADDR1 0
-#endif
-
-// <o> NRFX_TWIS_DEFAULT_CONFIG_SCL_PULL  - SCL pin pull configuration
- 
-// <0=> Disabled 
-// <1=> Pull down 
-// <3=> Pull up 
-
-#ifndef NRFX_TWIS_DEFAULT_CONFIG_SCL_PULL
-#define NRFX_TWIS_DEFAULT_CONFIG_SCL_PULL 0
-#endif
-
-// <o> NRFX_TWIS_DEFAULT_CONFIG_SDA_PULL  - SDA pin pull configuration
- 
-// <0=> Disabled 
-// <1=> Pull down 
-// <3=> Pull up 
-
-#ifndef NRFX_TWIS_DEFAULT_CONFIG_SDA_PULL
-#define NRFX_TWIS_DEFAULT_CONFIG_SDA_PULL 0
-#endif
-
-// <o> NRFX_TWIS_DEFAULT_CONFIG_IRQ_PRIORITY  - Interrupt priority
- 
-// <0=> 0 (highest) 
-// <1=> 1 
-// <2=> 2 
-// <3=> 3 
-// <4=> 4 
-// <5=> 5 
-// <6=> 6 
-// <7=> 7 
-
-#ifndef NRFX_TWIS_DEFAULT_CONFIG_IRQ_PRIORITY
-#define NRFX_TWIS_DEFAULT_CONFIG_IRQ_PRIORITY 6
-#endif
-
-// <e> NRFX_TWIS_CONFIG_LOG_ENABLED - Enables logging in the module.
-//==========================================================
-#ifndef NRFX_TWIS_CONFIG_LOG_ENABLED
-#define NRFX_TWIS_CONFIG_LOG_ENABLED 0
-#endif
-// <o> NRFX_TWIS_CONFIG_LOG_LEVEL  - Default Severity level
- 
-// <0=> Off 
-// <1=> Error 
-// <2=> Warning 
-// <3=> Info 
-// <4=> Debug 
-
-#ifndef NRFX_TWIS_CONFIG_LOG_LEVEL
-#define NRFX_TWIS_CONFIG_LOG_LEVEL 3
-#endif
-
-// <o> NRFX_TWIS_CONFIG_INFO_COLOR  - ANSI escape code prefix.
- 
-// <0=> Default 
-// <1=> Black 
-// <2=> Red 
-// <3=> Green 
-// <4=> Yellow 
-// <5=> Blue 
-// <6=> Magenta 
-// <7=> Cyan 
-// <8=> White 
-
-#ifndef NRFX_TWIS_CONFIG_INFO_COLOR
-#define NRFX_TWIS_CONFIG_INFO_COLOR 0
-#endif
-
-// <o> NRFX_TWIS_CONFIG_DEBUG_COLOR  - ANSI escape code prefix.
- 
-// <0=> Default 
-// <1=> Black 
-// <2=> Red 
-// <3=> Green 
-// <4=> Yellow 
-// <5=> Blue 
-// <6=> Magenta 
-// <7=> Cyan 
-// <8=> White 
-
-#ifndef NRFX_TWIS_CONFIG_DEBUG_COLOR
-#define NRFX_TWIS_CONFIG_DEBUG_COLOR 0
-#endif
-
-// </e>
-
-// </e>
-
-// <e> NRFX_TWI_ENABLED - nrfx_twi - TWI peripheral driver
-//==========================================================
-#ifndef NRFX_TWI_ENABLED
-#define NRFX_TWI_ENABLED 1
-#endif
-// <q> NRFX_TWI0_ENABLED  - Enable TWI0 instance
- 
-
-#ifndef NRFX_TWI0_ENABLED
-#define NRFX_TWI0_ENABLED 0
-#endif
-
-// <q> NRFX_TWI1_ENABLED  - Enable TWI1 instance
- 
-
-#ifndef NRFX_TWI1_ENABLED
-#define NRFX_TWI1_ENABLED 0
-#endif
-
-// <o> NRFX_TWI_DEFAULT_CONFIG_FREQUENCY  - Frequency
- 
-// <26738688=> 100k 
-// <67108864=> 250k 
-// <104857600=> 400k 
-
-#ifndef NRFX_TWI_DEFAULT_CONFIG_FREQUENCY
-#define NRFX_TWI_DEFAULT_CONFIG_FREQUENCY 104857600
-#endif
-
-// <q> NRFX_TWI_DEFAULT_CONFIG_HOLD_BUS_UNINIT  - Enables bus holding after uninit
- 
-
-#ifndef NRFX_TWI_DEFAULT_CONFIG_HOLD_BUS_UNINIT
-#define NRFX_TWI_DEFAULT_CONFIG_HOLD_BUS_UNINIT 0
-#endif
-
-// <o> NRFX_TWI_DEFAULT_CONFIG_IRQ_PRIORITY  - Interrupt priority
- 
-// <0=> 0 (highest) 
-// <1=> 1 
-// <2=> 2 
-// <3=> 3 
-// <4=> 4 
-// <5=> 5 
-// <6=> 6 
-// <7=> 7 
-
-#ifndef NRFX_TWI_DEFAULT_CONFIG_IRQ_PRIORITY
-#define NRFX_TWI_DEFAULT_CONFIG_IRQ_PRIORITY 6
-#endif
-
-// <e> NRFX_TWI_CONFIG_LOG_ENABLED - Enables logging in the module.
-//==========================================================
-#ifndef NRFX_TWI_CONFIG_LOG_ENABLED
-#define NRFX_TWI_CONFIG_LOG_ENABLED 0
-#endif
-// <o> NRFX_TWI_CONFIG_LOG_LEVEL  - Default Severity level
- 
-// <0=> Off 
-// <1=> Error 
-// <2=> Warning 
-// <3=> Info 
-// <4=> Debug 
-
-#ifndef NRFX_TWI_CONFIG_LOG_LEVEL
-#define NRFX_TWI_CONFIG_LOG_LEVEL 3
-#endif
-
-// <o> NRFX_TWI_CONFIG_INFO_COLOR  - ANSI escape code prefix.
- 
-// <0=> Default 
-// <1=> Black 
-// <2=> Red 
-// <3=> Green 
-// <4=> Yellow 
-// <5=> Blue 
-// <6=> Magenta 
-// <7=> Cyan 
-// <8=> White 
-
-#ifndef NRFX_TWI_CONFIG_INFO_COLOR
-#define NRFX_TWI_CONFIG_INFO_COLOR 0
-#endif
-
-// <o> NRFX_TWI_CONFIG_DEBUG_COLOR  - ANSI escape code prefix.
- 
-// <0=> Default 
-// <1=> Black 
-// <2=> Red 
-// <3=> Green 
-// <4=> Yellow 
-// <5=> Blue 
-// <6=> Magenta 
-// <7=> Cyan 
-// <8=> White 
-
-#ifndef NRFX_TWI_CONFIG_DEBUG_COLOR
-#define NRFX_TWI_CONFIG_DEBUG_COLOR 0
-#endif
-
-// </e>
-
-// </e>
-
-// <e> TWI_ENABLED - nrf_drv_twi - TWI/TWIM peripheral driver - legacy layer
-//==========================================================
-#ifndef TWI_ENABLED
-#define TWI_ENABLED 1
-#endif
-// <o> TWI_DEFAULT_CONFIG_FREQUENCY  - Frequency
- 
-// <26738688=> 100k 
-// <67108864=> 250k 
-// <104857600=> 400k 
-
-#ifndef TWI_DEFAULT_CONFIG_FREQUENCY
-#define TWI_DEFAULT_CONFIG_FREQUENCY 104857600
-#endif
-
-// <q> TWI_DEFAULT_CONFIG_CLR_BUS_INIT  - Enables bus clearing procedure during init
- 
-
-#ifndef TWI_DEFAULT_CONFIG_CLR_BUS_INIT
-#define TWI_DEFAULT_CONFIG_CLR_BUS_INIT 0
-#endif
-
-// <q> TWI_DEFAULT_CONFIG_HOLD_BUS_UNINIT  - Enables bus holding after uninit
- 
-
-#ifndef TWI_DEFAULT_CONFIG_HOLD_BUS_UNINIT
-#define TWI_DEFAULT_CONFIG_HOLD_BUS_UNINIT 0
-#endif
-
-// <o> TWI_DEFAULT_CONFIG_IRQ_PRIORITY  - Interrupt priority
- 
-
-// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
-// <0=> 0 (highest) 
-// <1=> 1 
-// <2=> 2 
-// <3=> 3 
-// <4=> 4 
-// <5=> 5 
-// <6=> 6 
-// <7=> 7 
-
-#ifndef TWI_DEFAULT_CONFIG_IRQ_PRIORITY
-#define TWI_DEFAULT_CONFIG_IRQ_PRIORITY 6
-#endif
-
-// <e> TWI0_ENABLED - Enable TWI0 instance
-//==========================================================
-#ifndef TWI0_ENABLED
-#define TWI0_ENABLED 0
-#endif
-// <q> TWI0_USE_EASY_DMA  - Use EasyDMA (if present)
- 
-
-#ifndef TWI0_USE_EASY_DMA
-#define TWI0_USE_EASY_DMA 0
-#endif
-
-// </e>
-
-// <e> TWI1_ENABLED - Enable TWI1 instance
-//==========================================================
-#ifndef TWI1_ENABLED
-#define TWI1_ENABLED 1
-#endif
-// <q> TWI1_USE_EASY_DMA  - Use EasyDMA (if present)
- 
-
-#ifndef TWI1_USE_EASY_DMA
-#define TWI1_USE_EASY_DMA 1
-#endif
-
-// </e>
-
-// </e>
-
 //==========================================================
 // <h> nrf_bootloader - Bootloader settings
 
@@ -1712,7 +1165,7 @@
 // <e> NRF_DFU_TRANSPORT_BLE - BLE transport settings
 //==========================================================
 #ifndef NRF_DFU_TRANSPORT_BLE
-#define NRF_DFU_TRANSPORT_BLE 1
+#define NRF_DFU_TRANSPORT_BLE 0
 #endif
 // <q> NRF_DFU_BLE_SKIP_SD_INIT  - Skip the SoftDevice and interrupt vector table initialization.
  
@@ -1822,7 +1275,7 @@
 // <i> This reduced feature set is used by the BLE transport to reduce flash usage.
 
 #ifndef NRF_DFU_PROTOCOL_REDUCED
-#define NRF_DFU_PROTOCOL_REDUCED 1
+#define NRF_DFU_PROTOCOL_REDUCED 0
 #endif
 
 // <q> NRF_DFU_PROTOCOL_VERSION_MSG  - Protocol version message support.
@@ -1897,6 +1350,358 @@
 // </h> 
 //==========================================================
 
+// <h> nRF_Drivers 
+
+//==========================================================
+// <e> NRFX_CLOCK_ENABLED - nrfx_clock - CLOCK peripheral driver
+//==========================================================
+#ifndef NRFX_CLOCK_ENABLED
+#define NRFX_CLOCK_ENABLED 1
+#endif
+// <o> NRFX_CLOCK_CONFIG_LF_SRC  - LF Clock Source
+ 
+// <0=> RC 
+// <1=> XTAL 
+// <2=> Synth 
+// <131073=> External Low Swing 
+// <196609=> External Full Swing 
+
+#ifndef NRFX_CLOCK_CONFIG_LF_SRC
+#define NRFX_CLOCK_CONFIG_LF_SRC 1
+#endif
+
+// <o> NRFX_CLOCK_CONFIG_IRQ_PRIORITY  - Interrupt priority
+ 
+// <0=> 0 (highest) 
+// <1=> 1 
+// <2=> 2 
+// <3=> 3 
+// <4=> 4 
+// <5=> 5 
+// <6=> 6 
+// <7=> 7 
+
+#ifndef NRFX_CLOCK_CONFIG_IRQ_PRIORITY
+#define NRFX_CLOCK_CONFIG_IRQ_PRIORITY 6
+#endif
+
+// <e> NRFX_CLOCK_CONFIG_LOG_ENABLED - Enables logging in the module.
+//==========================================================
+#ifndef NRFX_CLOCK_CONFIG_LOG_ENABLED
+#define NRFX_CLOCK_CONFIG_LOG_ENABLED 0
+#endif
+// <o> NRFX_CLOCK_CONFIG_LOG_LEVEL  - Default Severity level
+ 
+// <0=> Off 
+// <1=> Error 
+// <2=> Warning 
+// <3=> Info 
+// <4=> Debug 
+
+#ifndef NRFX_CLOCK_CONFIG_LOG_LEVEL
+#define NRFX_CLOCK_CONFIG_LOG_LEVEL 3
+#endif
+
+// <o> NRFX_CLOCK_CONFIG_INFO_COLOR  - ANSI escape code prefix.
+ 
+// <0=> Default 
+// <1=> Black 
+// <2=> Red 
+// <3=> Green 
+// <4=> Yellow 
+// <5=> Blue 
+// <6=> Magenta 
+// <7=> Cyan 
+// <8=> White 
+
+#ifndef NRFX_CLOCK_CONFIG_INFO_COLOR
+#define NRFX_CLOCK_CONFIG_INFO_COLOR 0
+#endif
+
+// <o> NRFX_CLOCK_CONFIG_DEBUG_COLOR  - ANSI escape code prefix.
+ 
+// <0=> Default 
+// <1=> Black 
+// <2=> Red 
+// <3=> Green 
+// <4=> Yellow 
+// <5=> Blue 
+// <6=> Magenta 
+// <7=> Cyan 
+// <8=> White 
+
+#ifndef NRFX_CLOCK_CONFIG_DEBUG_COLOR
+#define NRFX_CLOCK_CONFIG_DEBUG_COLOR 0
+#endif
+
+// </e>
+
+// </e>
+
+// <e> NRFX_POWER_ENABLED - nrfx_power - POWER peripheral driver
+//==========================================================
+#ifndef NRFX_POWER_ENABLED
+#define NRFX_POWER_ENABLED 1
+#endif
+// <o> NRFX_POWER_CONFIG_IRQ_PRIORITY  - Interrupt priority
+ 
+// <0=> 0 (highest) 
+// <1=> 1 
+// <2=> 2 
+// <3=> 3 
+// <4=> 4 
+// <5=> 5 
+// <6=> 6 
+// <7=> 7 
+
+#ifndef NRFX_POWER_CONFIG_IRQ_PRIORITY
+#define NRFX_POWER_CONFIG_IRQ_PRIORITY 6
+#endif
+
+// <q> NRFX_POWER_CONFIG_DEFAULT_DCDCEN  - The default configuration of main DCDC regulator
+ 
+
+// <i> This settings means only that components for DCDC regulator are installed and it can be enabled.
+
+#ifndef NRFX_POWER_CONFIG_DEFAULT_DCDCEN
+#define NRFX_POWER_CONFIG_DEFAULT_DCDCEN 0
+#endif
+
+// <q> NRFX_POWER_CONFIG_DEFAULT_DCDCENHV  - The default configuration of High Voltage DCDC regulator
+ 
+
+// <i> This settings means only that components for DCDC regulator are installed and it can be enabled.
+
+#ifndef NRFX_POWER_CONFIG_DEFAULT_DCDCENHV
+#define NRFX_POWER_CONFIG_DEFAULT_DCDCENHV 0
+#endif
+
+// </e>
+
+// <q> NRFX_SYSTICK_ENABLED  - nrfx_systick - ARM(R) SysTick driver
+ 
+
+#ifndef NRFX_SYSTICK_ENABLED
+#define NRFX_SYSTICK_ENABLED 1
+#endif
+
+// <e> NRFX_USBD_ENABLED - nrfx_usbd - USBD peripheral driver
+//==========================================================
+#ifndef NRFX_USBD_ENABLED
+#define NRFX_USBD_ENABLED 1
+#endif
+// <o> NRFX_USBD_CONFIG_IRQ_PRIORITY  - Interrupt priority
+ 
+// <0=> 0 (highest) 
+// <1=> 1 
+// <2=> 2 
+// <3=> 3 
+// <4=> 4 
+// <5=> 5 
+// <6=> 6 
+// <7=> 7 
+
+#ifndef NRFX_USBD_CONFIG_IRQ_PRIORITY
+#define NRFX_USBD_CONFIG_IRQ_PRIORITY 6
+#endif
+
+// <o> NRFX_USBD_CONFIG_DMASCHEDULER_MODE  - USBD DMA scheduler working scheme
+ 
+// <0=> Prioritized access 
+// <1=> Round Robin 
+
+#ifndef NRFX_USBD_CONFIG_DMASCHEDULER_MODE
+#define NRFX_USBD_CONFIG_DMASCHEDULER_MODE 0
+#endif
+
+// <q> NRFX_USBD_CONFIG_DMASCHEDULER_ISO_BOOST  - Give priority to isochronous transfers
+ 
+
+// <i> This option gives priority to isochronous transfers.
+// <i> Enabling it assures that isochronous transfers are always processed,
+// <i> even if multiple other transfers are pending.
+// <i> Isochronous endpoints are prioritized before the usbd_dma_scheduler_algorithm
+// <i> function is called, so the option is independent of the algorithm chosen.
+
+#ifndef NRFX_USBD_CONFIG_DMASCHEDULER_ISO_BOOST
+#define NRFX_USBD_CONFIG_DMASCHEDULER_ISO_BOOST 1
+#endif
+
+// <q> NRFX_USBD_CONFIG_ISO_IN_ZLP  - Respond to an IN token on ISO IN endpoint with ZLP when no data is ready
+ 
+
+// <i> If set, ISO IN endpoint will respond to an IN token with ZLP when no data is ready to be sent.
+// <i> Else, there will be no response.
+
+#ifndef NRFX_USBD_CONFIG_ISO_IN_ZLP
+#define NRFX_USBD_CONFIG_ISO_IN_ZLP 0
+#endif
+
+// <q> NRFX_USBD_USE_WORKAROUND_FOR_ANOMALY_211  - Use workaround for anomaly 211
+ 
+
+// <i> If set, workaround for anomaly 211 will be enabled.
+// <i> Anomaly 211 - Device remains in SUSPEND too long when host resumes
+// <i> bus activity (sending SOF packets) without a RESUME condition.
+
+#ifndef NRFX_USBD_USE_WORKAROUND_FOR_ANOMALY_211
+#define NRFX_USBD_USE_WORKAROUND_FOR_ANOMALY_211 0
+#endif
+
+// </e>
+
+// <e> NRF_CLOCK_ENABLED - nrf_drv_clock - CLOCK peripheral driver - legacy layer
+//==========================================================
+#ifndef NRF_CLOCK_ENABLED
+#define NRF_CLOCK_ENABLED 1
+#endif
+// <o> CLOCK_CONFIG_LF_SRC  - LF Clock Source
+ 
+// <0=> RC 
+// <1=> XTAL 
+// <2=> Synth 
+// <131073=> External Low Swing 
+// <196609=> External Full Swing 
+
+#ifndef CLOCK_CONFIG_LF_SRC
+#define CLOCK_CONFIG_LF_SRC 1
+#endif
+
+// <q> CLOCK_CONFIG_LF_CAL_ENABLED  - Calibration enable for LF Clock Source
+ 
+
+#ifndef CLOCK_CONFIG_LF_CAL_ENABLED
+#define CLOCK_CONFIG_LF_CAL_ENABLED 0
+#endif
+
+// <o> CLOCK_CONFIG_IRQ_PRIORITY  - Interrupt priority
+ 
+
+// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
+// <0=> 0 (highest) 
+// <1=> 1 
+// <2=> 2 
+// <3=> 3 
+// <4=> 4 
+// <5=> 5 
+// <6=> 6 
+// <7=> 7 
+
+#ifndef CLOCK_CONFIG_IRQ_PRIORITY
+#define CLOCK_CONFIG_IRQ_PRIORITY 6
+#endif
+
+// </e>
+
+// <e> POWER_ENABLED - nrf_drv_power - POWER peripheral driver - legacy layer
+//==========================================================
+#ifndef POWER_ENABLED
+#define POWER_ENABLED 1
+#endif
+// <o> POWER_CONFIG_IRQ_PRIORITY  - Interrupt priority
+ 
+
+// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
+// <0=> 0 (highest) 
+// <1=> 1 
+// <2=> 2 
+// <3=> 3 
+// <4=> 4 
+// <5=> 5 
+// <6=> 6 
+// <7=> 7 
+
+#ifndef POWER_CONFIG_IRQ_PRIORITY
+#define POWER_CONFIG_IRQ_PRIORITY 6
+#endif
+
+// <q> POWER_CONFIG_DEFAULT_DCDCEN  - The default configuration of main DCDC regulator
+ 
+
+// <i> This settings means only that components for DCDC regulator are installed and it can be enabled.
+
+#ifndef POWER_CONFIG_DEFAULT_DCDCEN
+#define POWER_CONFIG_DEFAULT_DCDCEN 0
+#endif
+
+// <q> POWER_CONFIG_DEFAULT_DCDCENHV  - The default configuration of High Voltage DCDC regulator
+ 
+
+// <i> This settings means only that components for DCDC regulator are installed and it can be enabled.
+
+#ifndef POWER_CONFIG_DEFAULT_DCDCENHV
+#define POWER_CONFIG_DEFAULT_DCDCENHV 0
+#endif
+
+// </e>
+
+// <q> SYSTICK_ENABLED  - nrf_drv_systick - ARM(R) SysTick driver - legacy layer
+ 
+
+#ifndef SYSTICK_ENABLED
+#define SYSTICK_ENABLED 1
+#endif
+
+// <e> USBD_ENABLED - nrf_drv_usbd - Software Component
+//==========================================================
+#ifndef USBD_ENABLED
+#define USBD_ENABLED 1
+#endif
+// <o> USBD_CONFIG_IRQ_PRIORITY  - Interrupt priority
+ 
+
+// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
+// <0=> 0 (highest) 
+// <1=> 1 
+// <2=> 2 
+// <3=> 3 
+// <4=> 4 
+// <5=> 5 
+// <6=> 6 
+// <7=> 7 
+
+#ifndef USBD_CONFIG_IRQ_PRIORITY
+#define USBD_CONFIG_IRQ_PRIORITY 6
+#endif
+
+// <o> USBD_CONFIG_DMASCHEDULER_MODE  - USBD SMA scheduler working scheme
+ 
+// <0=> Prioritized access 
+// <1=> Round Robin 
+
+#ifndef USBD_CONFIG_DMASCHEDULER_MODE
+#define USBD_CONFIG_DMASCHEDULER_MODE 0
+#endif
+
+// <q> USBD_CONFIG_DMASCHEDULER_ISO_BOOST  - Give priority to isochronous transfers
+ 
+
+// <i> This option gives priority to isochronous transfers.
+// <i> Enabling it assures that isochronous transfers are always processed,
+// <i> even if multiple other transfers are pending.
+// <i> Isochronous endpoints are prioritized before the usbd_dma_scheduler_algorithm
+// <i> function is called, so the option is independent of the algorithm chosen.
+
+#ifndef USBD_CONFIG_DMASCHEDULER_ISO_BOOST
+#define USBD_CONFIG_DMASCHEDULER_ISO_BOOST 1
+#endif
+
+// <q> USBD_CONFIG_ISO_IN_ZLP  - Respond to an IN token on ISO IN endpoint with ZLP when no data is ready
+ 
+
+// <i> If set, ISO IN endpoint will respond to an IN token with ZLP when no data is ready to be sent.
+// <i> Else, there will be no response.
+// <i> NOTE: This option does not work on Engineering A chip.
+
+#ifndef USBD_CONFIG_ISO_IN_ZLP
+#define USBD_CONFIG_ISO_IN_ZLP 0
+#endif
+
+// </e>
+
+// </h> 
+//==========================================================
+
 // <h> nRF_Libraries 
 
 //==========================================================
@@ -1917,6 +1722,276 @@
 
 #ifndef APP_SCHEDULER_WITH_PROFILER
 #define APP_SCHEDULER_WITH_PROFILER 0
+#endif
+
+// </e>
+
+// <e> APP_USBD_ENABLED - app_usbd - USB Device library
+//==========================================================
+#ifndef APP_USBD_ENABLED
+#define APP_USBD_ENABLED 1
+#endif
+// <s> APP_USBD_VID - Vendor ID.
+
+// <i> Note: This value is not editable in Configuration Wizard.
+// <i> Vendor ID ordered from USB IF: http://www.usb.org/developers/vendor/
+#ifndef APP_USBD_VID
+#define APP_USBD_VID 0x1915
+#endif
+
+// <s> APP_USBD_PID - Product ID.
+
+// <i> Note: This value is not editable in Configuration Wizard.
+// <i> Selected Product ID
+#ifndef APP_USBD_PID
+#define APP_USBD_PID 0x521F
+#endif
+
+// <o> APP_USBD_DEVICE_VER_MAJOR - Major device version  <0-99> 
+
+
+// <i> Major device version, will be converted automatically to BCD notation. Use just decimal values.
+
+#ifndef APP_USBD_DEVICE_VER_MAJOR
+#define APP_USBD_DEVICE_VER_MAJOR 1
+#endif
+
+// <o> APP_USBD_DEVICE_VER_MINOR - Minor device version  <0-9> 
+
+
+// <i> Minor device version, will be converted automatically to BCD notation. Use just decimal values.
+
+#ifndef APP_USBD_DEVICE_VER_MINOR
+#define APP_USBD_DEVICE_VER_MINOR 0
+#endif
+
+// <o> APP_USBD_DEVICE_VER_SUB - Sub-minor device version  <0-9> 
+
+
+// <i> Sub-minor device version, will be converted automatically to BCD notation. Use just decimal values.
+
+#ifndef APP_USBD_DEVICE_VER_SUB
+#define APP_USBD_DEVICE_VER_SUB 0
+#endif
+
+// <q> APP_USBD_CONFIG_SELF_POWERED  - Self-powered device, as opposed to bus-powered.
+ 
+
+#ifndef APP_USBD_CONFIG_SELF_POWERED
+#define APP_USBD_CONFIG_SELF_POWERED 1
+#endif
+
+// <o> APP_USBD_CONFIG_MAX_POWER - MaxPower field in configuration descriptor in milliamps.  <0-500> 
+
+
+#ifndef APP_USBD_CONFIG_MAX_POWER
+#define APP_USBD_CONFIG_MAX_POWER 100
+#endif
+
+// <q> APP_USBD_CONFIG_POWER_EVENTS_PROCESS  - Process power events.
+ 
+
+// <i> Enable processing power events in USB event handler.
+
+#ifndef APP_USBD_CONFIG_POWER_EVENTS_PROCESS
+#define APP_USBD_CONFIG_POWER_EVENTS_PROCESS 1
+#endif
+
+// <e> APP_USBD_CONFIG_EVENT_QUEUE_ENABLE - Enable event queue.
+
+// <i> This is the default configuration when all the events are placed into internal queue.
+// <i> Disable it when an external queue is used like app_scheduler or if you wish to process all events inside interrupts.
+// <i> Processing all events from the interrupt level adds requirement not to call any functions that modifies the USBD library state from the context higher than USB interrupt context.
+// <i> Functions that modify USBD state are functions for sleep, wakeup, start, stop, enable, and disable.
+//==========================================================
+#ifndef APP_USBD_CONFIG_EVENT_QUEUE_ENABLE
+#define APP_USBD_CONFIG_EVENT_QUEUE_ENABLE 0
+#endif
+// <o> APP_USBD_CONFIG_EVENT_QUEUE_SIZE - The size of the event queue.  <16-64> 
+
+
+// <i> The size of the queue for the events that would be processed in the main loop.
+
+#ifndef APP_USBD_CONFIG_EVENT_QUEUE_SIZE
+#define APP_USBD_CONFIG_EVENT_QUEUE_SIZE 32
+#endif
+
+// <o> APP_USBD_CONFIG_SOF_HANDLING_MODE  - Change SOF events handling mode.
+ 
+
+// <i> Normal queue   - SOF events are pushed normally into the event queue.
+// <i> Compress queue - SOF events are counted and binded with other events or executed when the queue is empty.
+// <i>                  This prevents the queue from filling up with SOF events.
+// <i> Interrupt      - SOF events are processed in interrupt.
+// <0=> Normal queue 
+// <1=> Compress queue 
+// <2=> Interrupt 
+
+#ifndef APP_USBD_CONFIG_SOF_HANDLING_MODE
+#define APP_USBD_CONFIG_SOF_HANDLING_MODE 1
+#endif
+
+// </e>
+
+// <q> APP_USBD_CONFIG_SOF_TIMESTAMP_PROVIDE  - Provide a function that generates timestamps for logs based on the current SOF.
+ 
+
+// <i> The function app_usbd_sof_timestamp_get is implemented if the logger is enabled. 
+// <i> Use it when initializing the logger. 
+// <i> SOF processing is always enabled when this configuration parameter is active. 
+// <i> Note: This option is configured outside of APP_USBD_CONFIG_LOG_ENABLED. 
+// <i> This means that it works even if the logging in this very module is disabled. 
+
+#ifndef APP_USBD_CONFIG_SOF_TIMESTAMP_PROVIDE
+#define APP_USBD_CONFIG_SOF_TIMESTAMP_PROVIDE 0
+#endif
+
+// <o> APP_USBD_CONFIG_DESC_STRING_SIZE - Maximum size of the NULL-terminated string of the string descriptor.  <31-254> 
+
+
+// <i> 31 characters can be stored in the internal USB buffer used for transfers.
+// <i> Any value higher than 31 creates an additional buffer just for descriptor strings.
+
+#ifndef APP_USBD_CONFIG_DESC_STRING_SIZE
+#define APP_USBD_CONFIG_DESC_STRING_SIZE 31
+#endif
+
+// <q> APP_USBD_CONFIG_DESC_STRING_UTF_ENABLED  - Enable UTF8 conversion.
+ 
+
+// <i> Enable UTF8-encoded characters. In normal processing, only ASCII characters are available.
+
+#ifndef APP_USBD_CONFIG_DESC_STRING_UTF_ENABLED
+#define APP_USBD_CONFIG_DESC_STRING_UTF_ENABLED 0
+#endif
+
+// <s> APP_USBD_STRINGS_LANGIDS - Supported languages identifiers.
+
+// <i> Note: This value is not editable in Configuration Wizard.
+// <i> Comma-separated list of supported languages.
+#ifndef APP_USBD_STRINGS_LANGIDS
+#define APP_USBD_STRINGS_LANGIDS APP_USBD_LANG_AND_SUBLANG(APP_USBD_LANG_ENGLISH, APP_USBD_SUBLANG_ENGLISH_US)
+#endif
+
+// <e> APP_USBD_STRING_ID_MANUFACTURER - Define manufacturer string ID.
+
+// <i> Setting ID to 0 disables the string.
+//==========================================================
+#ifndef APP_USBD_STRING_ID_MANUFACTURER
+#define APP_USBD_STRING_ID_MANUFACTURER 1
+#endif
+// <q> APP_USBD_STRINGS_MANUFACTURER_EXTERN  - Define whether @ref APP_USBD_STRINGS_MANUFACTURER is created by macro or declared as a global variable.
+ 
+
+#ifndef APP_USBD_STRINGS_MANUFACTURER_EXTERN
+#define APP_USBD_STRINGS_MANUFACTURER_EXTERN 0
+#endif
+
+// <s> APP_USBD_STRINGS_MANUFACTURER - String descriptor for the manufacturer name.
+
+// <i> Note: This value is not editable in Configuration Wizard.
+// <i> Comma-separated list of manufacturer names for each defined language.
+// <i> Use @ref APP_USBD_STRING_DESC macro to create string descriptor from a NULL-terminated string.
+// <i> Use @ref APP_USBD_STRING_RAW8_DESC macro to create string descriptor from comma-separated uint8_t values.
+// <i> Use @ref APP_USBD_STRING_RAW16_DESC macro to create string descriptor from comma-separated uint16_t values.
+// <i> Alternatively, configure the macro to point to any internal variable pointer that already contains the descriptor.
+// <i> Setting string to NULL disables that string.
+// <i> The order of manufacturer names must be the same like in @ref APP_USBD_STRINGS_LANGIDS.
+#ifndef APP_USBD_STRINGS_MANUFACTURER
+#define APP_USBD_STRINGS_MANUFACTURER APP_USBD_STRING_DESC("Nordic Semiconductor")
+#endif
+
+// </e>
+
+// <e> APP_USBD_STRING_ID_PRODUCT - Define product string ID.
+
+// <i> Setting ID to 0 disables the string.
+//==========================================================
+#ifndef APP_USBD_STRING_ID_PRODUCT
+#define APP_USBD_STRING_ID_PRODUCT 2
+#endif
+// <q> APP_USBD_STRINGS_PRODUCT_EXTERN  - Define whether @ref APP_USBD_STRINGS_PRODUCT is created by macro or declared as a global variable.
+ 
+
+#ifndef APP_USBD_STRINGS_PRODUCT_EXTERN
+#define APP_USBD_STRINGS_PRODUCT_EXTERN 0
+#endif
+
+// <s> APP_USBD_STRINGS_PRODUCT - String descriptor for the product name.
+
+// <i> Note: This value is not editable in Configuration Wizard.
+// <i> List of product names that is defined the same way like in @ref APP_USBD_STRINGS_MANUFACTURER.
+#ifndef APP_USBD_STRINGS_PRODUCT
+#define APP_USBD_STRINGS_PRODUCT APP_USBD_STRING_DESC("Secure DFU Bootloader")
+#endif
+
+// </e>
+
+// <e> APP_USBD_STRING_ID_SERIAL - Define serial number string ID.
+
+// <i> Setting ID to 0 disables the string.
+//==========================================================
+#ifndef APP_USBD_STRING_ID_SERIAL
+#define APP_USBD_STRING_ID_SERIAL 3
+#endif
+// <q> APP_USBD_STRING_SERIAL_EXTERN  - Define whether @ref APP_USBD_STRING_SERIAL is created by macro or declared as a global variable.
+ 
+
+#ifndef APP_USBD_STRING_SERIAL_EXTERN
+#define APP_USBD_STRING_SERIAL_EXTERN 1
+#endif
+
+// <s> APP_USBD_STRING_SERIAL - String descriptor for the serial number.
+
+// <i> Note: This value is not editable in Configuration Wizard.
+// <i> Serial number that is defined the same way like in @ref APP_USBD_STRINGS_MANUFACTURER.
+#ifndef APP_USBD_STRING_SERIAL
+#define APP_USBD_STRING_SERIAL g_extern_serial_number
+#endif
+
+// </e>
+
+// <e> APP_USBD_STRING_ID_CONFIGURATION - Define configuration string ID.
+
+// <i> Setting ID to 0 disables the string.
+//==========================================================
+#ifndef APP_USBD_STRING_ID_CONFIGURATION
+#define APP_USBD_STRING_ID_CONFIGURATION 4
+#endif
+// <q> APP_USBD_STRING_CONFIGURATION_EXTERN  - Define whether @ref APP_USBD_STRINGS_CONFIGURATION is created by macro or declared as global variable.
+ 
+
+#ifndef APP_USBD_STRING_CONFIGURATION_EXTERN
+#define APP_USBD_STRING_CONFIGURATION_EXTERN 0
+#endif
+
+// <s> APP_USBD_STRINGS_CONFIGURATION - String descriptor for the device configuration.
+
+// <i> Note: This value is not editable in Configuration Wizard.
+// <i> Configuration string that is defined the same way like in @ref APP_USBD_STRINGS_MANUFACTURER.
+#ifndef APP_USBD_STRINGS_CONFIGURATION
+#define APP_USBD_STRINGS_CONFIGURATION APP_USBD_STRING_DESC("Default configuration")
+#endif
+
+// </e>
+
+// <s> APP_USBD_STRINGS_USER - Default values for user strings.
+
+// <i> Note: This value is not editable in Configuration Wizard.
+// <i> This value stores all application specific user strings with the default initialization.
+// <i> The setup is done by X-macros.
+// <i> Expected macro parameters:
+// <i> @code
+// <i> X(mnemonic, [=str_idx], ...)
+// <i> @endcode
+// <i> - @c mnemonic: Mnemonic of the string descriptor that would be added to
+// <i>                @ref app_usbd_string_desc_idx_t enumerator.
+// <i> - @c str_idx : String index value, can be set or left empty.
+// <i>                For example, WinUSB driver requires descriptor to be present on 0xEE index.
+// <i>                Then use X(USBD_STRING_WINUSB, =0xEE, (APP_USBD_STRING_DESC(...)))
+// <i> - @c ...     : List of string descriptors for each defined language.
+#ifndef APP_USBD_STRINGS_USER
+#define APP_USBD_STRINGS_USER X(APP_USER_1, , APP_USBD_STRING_DESC("User 1"))
 #endif
 
 // </e>
@@ -2225,19 +2300,42 @@
 
 // </e>
 
-// <q> NRF_SECTION_ITER_ENABLED  - nrf_section_iter - Section iterator
- 
-
-#ifndef NRF_SECTION_ITER_ENABLED
-#define NRF_SECTION_ITER_ENABLED 1
-#endif
-
 // <q> NRF_STRERROR_ENABLED  - nrf_strerror - Library for converting error code to string.
  
 
 #ifndef NRF_STRERROR_ENABLED
 #define NRF_STRERROR_ENABLED 1
 #endif
+
+// <q> SLIP_ENABLED  - slip - SLIP encoding and decoding
+ 
+
+#ifndef SLIP_ENABLED
+#define SLIP_ENABLED 1
+#endif
+
+// <h> app_usbd_cdc_acm - USB CDC ACM class
+
+//==========================================================
+// <q> APP_USBD_CDC_ACM_ENABLED  - Enabling USBD CDC ACM Class library
+ 
+
+#ifndef APP_USBD_CDC_ACM_ENABLED
+#define APP_USBD_CDC_ACM_ENABLED 1
+#endif
+
+// <q> APP_USBD_CDC_ACM_ZLP_ON_EPSIZE_WRITE  - Send ZLP on write with same size as endpoint
+ 
+
+// <i> If enabled, CDC ACM class will automatically send a zero length packet after transfer which has the same size as endpoint.
+// <i> This may limit throughput if a lot of binary data is sent, but in terminal mode operation it makes sure that the data is always displayed right after it is sent.
+
+#ifndef APP_USBD_CDC_ACM_ZLP_ON_EPSIZE_WRITE
+#define APP_USBD_CDC_ACM_ZLP_ON_EPSIZE_WRITE 1
+#endif
+
+// </h> 
+//==========================================================
 
 // <h> nrf_fprintf - fprintf function.
 
@@ -4854,7 +4952,7 @@
 // <e> NRF_SDH_BLE_LOG_ENABLED - Enable logging in SoftDevice handler (BLE) module.
 //==========================================================
 #ifndef NRF_SDH_BLE_LOG_ENABLED
-#define NRF_SDH_BLE_LOG_ENABLED 1
+#define NRF_SDH_BLE_LOG_ENABLED 0
 #endif
 // <o> NRF_SDH_BLE_LOG_LEVEL  - Default Severity level
  
@@ -4905,7 +5003,7 @@
 // <e> NRF_SDH_LOG_ENABLED - Enable logging in SoftDevice handler module.
 //==========================================================
 #ifndef NRF_SDH_LOG_ENABLED
-#define NRF_SDH_LOG_ENABLED 1
+#define NRF_SDH_LOG_ENABLED 0
 #endif
 // <o> NRF_SDH_LOG_LEVEL  - Default Severity level
  
@@ -4956,7 +5054,7 @@
 // <e> NRF_SDH_SOC_LOG_ENABLED - Enable logging in SoftDevice handler (SoC) module.
 //==========================================================
 #ifndef NRF_SDH_SOC_LOG_ENABLED
-#define NRF_SDH_SOC_LOG_ENABLED 1
+#define NRF_SDH_SOC_LOG_ENABLED 0
 #endif
 // <o> NRF_SDH_SOC_LOG_LEVEL  - Default Severity level
  
@@ -5232,706 +5330,17 @@
 // </h> 
 //==========================================================
 
-// <h> nRF_SoftDevice 
+// <h> nRF_USB_DFU 
 
 //==========================================================
-// <e> NRF_SDH_BLE_ENABLED - nrf_sdh_ble - SoftDevice BLE event handler
-//==========================================================
-#ifndef NRF_SDH_BLE_ENABLED
-#define NRF_SDH_BLE_ENABLED 1
-#endif
-// <h> BLE Stack configuration - Stack configuration parameters
-
-// <i> The SoftDevice handler will configure the stack with these parameters when calling @ref nrf_sdh_ble_default_cfg_set.
-// <i> Other libraries might depend on these values; keep them up-to-date even if you are not explicitely calling @ref nrf_sdh_ble_default_cfg_set.
-//==========================================================
-// <o> NRF_SDH_BLE_GAP_DATA_LENGTH   <27-251> 
-
-
-// <i> Requested BLE GAP data length to be negotiated.
-
-#ifndef NRF_SDH_BLE_GAP_DATA_LENGTH
-#define NRF_SDH_BLE_GAP_DATA_LENGTH 27
-#endif
-
-// <o> NRF_SDH_BLE_PERIPHERAL_LINK_COUNT - Maximum number of peripheral links. 
-#ifndef NRF_SDH_BLE_PERIPHERAL_LINK_COUNT
-#define NRF_SDH_BLE_PERIPHERAL_LINK_COUNT 1
-#endif
-
-// <o> NRF_SDH_BLE_CENTRAL_LINK_COUNT - Maximum number of central links. 
-#ifndef NRF_SDH_BLE_CENTRAL_LINK_COUNT
-#define NRF_SDH_BLE_CENTRAL_LINK_COUNT 0
-#endif
-
-// <o> NRF_SDH_BLE_TOTAL_LINK_COUNT - Total link count. 
-// <i> Maximum number of total concurrent connections using the default configuration.
-
-#ifndef NRF_SDH_BLE_TOTAL_LINK_COUNT
-#define NRF_SDH_BLE_TOTAL_LINK_COUNT 1
-#endif
-
-// <o> NRF_SDH_BLE_GAP_EVENT_LENGTH - GAP event length. 
-// <i> The time set aside for this connection on every connection interval in 1.25 ms units.
-
-#ifndef NRF_SDH_BLE_GAP_EVENT_LENGTH
-#define NRF_SDH_BLE_GAP_EVENT_LENGTH 6
-#endif
-
-// <o> NRF_SDH_BLE_GATT_MAX_MTU_SIZE - Static maximum MTU size. 
-#ifndef NRF_SDH_BLE_GATT_MAX_MTU_SIZE
-#define NRF_SDH_BLE_GATT_MAX_MTU_SIZE 247
-#endif
-
-// <o> NRF_SDH_BLE_GATTS_ATTR_TAB_SIZE - Attribute Table size in bytes. The size must be a multiple of 4. 
-#ifndef NRF_SDH_BLE_GATTS_ATTR_TAB_SIZE
-#define NRF_SDH_BLE_GATTS_ATTR_TAB_SIZE 1408
-#endif
-
-// <o> NRF_SDH_BLE_VS_UUID_COUNT - The number of vendor-specific UUIDs. 
-#ifndef NRF_SDH_BLE_VS_UUID_COUNT
-#define NRF_SDH_BLE_VS_UUID_COUNT 1
-#endif
-
-// <q> NRF_SDH_BLE_SERVICE_CHANGED  - Include the Service Changed characteristic in the Attribute Table.
- 
-
-#ifndef NRF_SDH_BLE_SERVICE_CHANGED
-#define NRF_SDH_BLE_SERVICE_CHANGED 0
-#endif
-
-// </h> 
-//==========================================================
-
-// <h> BLE Observers - Observers and priority levels
-
-//==========================================================
-// <o> NRF_SDH_BLE_OBSERVER_PRIO_LEVELS - Total number of priority levels for BLE observers. 
-// <i> This setting configures the number of priority levels available for BLE event handlers.
-// <i> The priority level of a handler determines the order in which it receives events, with respect to other handlers.
-
-#ifndef NRF_SDH_BLE_OBSERVER_PRIO_LEVELS
-#define NRF_SDH_BLE_OBSERVER_PRIO_LEVELS 4
-#endif
-
-// <h> BLE Observers priorities - Invididual priorities
-
-//==========================================================
-// <o> BLE_ADV_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Advertising module.
-
-#ifndef BLE_ADV_BLE_OBSERVER_PRIO
-#define BLE_ADV_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> BLE_ANCS_C_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Apple Notification Service Client.
-
-#ifndef BLE_ANCS_C_BLE_OBSERVER_PRIO
-#define BLE_ANCS_C_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_ANS_C_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Alert Notification Service Client.
-
-#ifndef BLE_ANS_C_BLE_OBSERVER_PRIO
-#define BLE_ANS_C_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_BAS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Battery Service.
-
-#ifndef BLE_BAS_BLE_OBSERVER_PRIO
-#define BLE_BAS_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_BAS_C_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Battery Service Client.
-
-#ifndef BLE_BAS_C_BLE_OBSERVER_PRIO
-#define BLE_BAS_C_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_BPS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Blood Pressure Service.
-
-#ifndef BLE_BPS_BLE_OBSERVER_PRIO
-#define BLE_BPS_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_CONN_PARAMS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Connection parameters module.
-
-#ifndef BLE_CONN_PARAMS_BLE_OBSERVER_PRIO
-#define BLE_CONN_PARAMS_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> BLE_CONN_STATE_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Connection State module.
-
-#ifndef BLE_CONN_STATE_BLE_OBSERVER_PRIO
-#define BLE_CONN_STATE_BLE_OBSERVER_PRIO 0
-#endif
-
-// <o> BLE_CSCS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Cycling Speed and Cadence Service.
-
-#ifndef BLE_CSCS_BLE_OBSERVER_PRIO
-#define BLE_CSCS_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_CTS_C_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Current Time Service Client.
-
-#ifndef BLE_CTS_C_BLE_OBSERVER_PRIO
-#define BLE_CTS_C_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_DB_DISC_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Database Discovery module.
-
-#ifndef BLE_DB_DISC_BLE_OBSERVER_PRIO
-#define BLE_DB_DISC_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> BLE_DFU_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the DFU Service.
-
-#ifndef BLE_DFU_BLE_OBSERVER_PRIO
-#define BLE_DFU_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_DIS_C_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Device Information Client.
-
-#ifndef BLE_DIS_C_BLE_OBSERVER_PRIO
-#define BLE_DIS_C_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_GLS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Glucose Service.
-
-#ifndef BLE_GLS_BLE_OBSERVER_PRIO
-#define BLE_GLS_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_HIDS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Human Interface Device Service.
-
-#ifndef BLE_HIDS_BLE_OBSERVER_PRIO
-#define BLE_HIDS_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_HRS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Heart Rate Service.
-
-#ifndef BLE_HRS_BLE_OBSERVER_PRIO
-#define BLE_HRS_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_HRS_C_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Heart Rate Service Client.
-
-#ifndef BLE_HRS_C_BLE_OBSERVER_PRIO
-#define BLE_HRS_C_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_HTS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Health Thermometer Service.
-
-#ifndef BLE_HTS_BLE_OBSERVER_PRIO
-#define BLE_HTS_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_IAS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Immediate Alert Service.
-
-#ifndef BLE_IAS_BLE_OBSERVER_PRIO
-#define BLE_IAS_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_IAS_C_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Immediate Alert Service Client.
-
-#ifndef BLE_IAS_C_BLE_OBSERVER_PRIO
-#define BLE_IAS_C_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_LBS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the LED Button Service.
-
-#ifndef BLE_LBS_BLE_OBSERVER_PRIO
-#define BLE_LBS_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_LBS_C_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the LED Button Service Client.
-
-#ifndef BLE_LBS_C_BLE_OBSERVER_PRIO
-#define BLE_LBS_C_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_LLS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Link Loss Service.
-
-#ifndef BLE_LLS_BLE_OBSERVER_PRIO
-#define BLE_LLS_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_LNS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Location Navigation Service.
-
-#ifndef BLE_LNS_BLE_OBSERVER_PRIO
-#define BLE_LNS_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_NUS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the UART Service.
-
-#ifndef BLE_NUS_BLE_OBSERVER_PRIO
-#define BLE_NUS_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_NUS_C_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the UART Central Service.
-
-#ifndef BLE_NUS_C_BLE_OBSERVER_PRIO
-#define BLE_NUS_C_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_OTS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Object transfer service.
-
-#ifndef BLE_OTS_BLE_OBSERVER_PRIO
-#define BLE_OTS_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_OTS_C_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Object transfer service client.
-
-#ifndef BLE_OTS_C_BLE_OBSERVER_PRIO
-#define BLE_OTS_C_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_RSCS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Running Speed and Cadence Service.
-
-#ifndef BLE_RSCS_BLE_OBSERVER_PRIO
-#define BLE_RSCS_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_RSCS_C_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Running Speed and Cadence Client.
-
-#ifndef BLE_RSCS_C_BLE_OBSERVER_PRIO
-#define BLE_RSCS_C_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BLE_TPS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the TX Power Service.
-
-#ifndef BLE_TPS_BLE_OBSERVER_PRIO
-#define BLE_TPS_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> BSP_BTN_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Button Control module.
-
-#ifndef BSP_BTN_BLE_OBSERVER_PRIO
-#define BSP_BTN_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
+// <o> NRF_DFU_SERIAL_USB_RX_BUFFERS - nrf_dfu_serial_usb - USB DFU transport 
+// <i> Number of buffers depends on flash access vs.
+// <i> transport throughtput. If value is too low it may lead
+// <i> to received packets being dropped.
 
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
+#ifndef NRF_DFU_SERIAL_USB_RX_BUFFERS
+#define NRF_DFU_SERIAL_USB_RX_BUFFERS 3
 #endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NRF_BLE_BMS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Bond Management Service.
-
-#ifndef NRF_BLE_BMS_BLE_OBSERVER_PRIO
-#define NRF_BLE_BMS_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> NRF_BLE_CGMS_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Contiuon Glucose Monitoring Service.
-
-#ifndef NRF_BLE_CGMS_BLE_OBSERVER_PRIO
-#define NRF_BLE_CGMS_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> NRF_BLE_ES_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Eddystone module.
-
-#ifndef NRF_BLE_ES_BLE_OBSERVER_PRIO
-#define NRF_BLE_ES_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> NRF_BLE_GATTS_C_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the GATT Service Client.
-
-#ifndef NRF_BLE_GATTS_C_BLE_OBSERVER_PRIO
-#define NRF_BLE_GATTS_C_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> NRF_BLE_GATT_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the GATT module.
-
-#ifndef NRF_BLE_GATT_BLE_OBSERVER_PRIO
-#define NRF_BLE_GATT_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NRF_BLE_GQ_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the GATT Queue module.
-
-#ifndef NRF_BLE_GQ_BLE_OBSERVER_PRIO
-#define NRF_BLE_GQ_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NRF_BLE_QWR_BLE_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the Queued writes module.
-
-#ifndef NRF_BLE_QWR_BLE_OBSERVER_PRIO
-#define NRF_BLE_QWR_BLE_OBSERVER_PRIO 2
-#endif
-
-// <o> NRF_BLE_SCAN_OBSERVER_PRIO  
-// <i> Priority for dispatching the BLE events to the Scanning Module.
-
-#ifndef NRF_BLE_SCAN_OBSERVER_PRIO
-#define NRF_BLE_SCAN_OBSERVER_PRIO 1
-#endif
-
-// <o> PM_BLE_OBSERVER_PRIO - Priority with which BLE events are dispatched to the Peer Manager module. 
-#ifndef PM_BLE_OBSERVER_PRIO
-#define PM_BLE_OBSERVER_PRIO 1
-#endif
-
-// </h> 
-//==========================================================
-
-// </h> 
-//==========================================================
-
-
-// </e>
-
-// <e> NRF_SDH_ENABLED - nrf_sdh - SoftDevice handler
-//==========================================================
-#ifndef NRF_SDH_ENABLED
-#define NRF_SDH_ENABLED 1
-#endif
-// <h> Dispatch model 
-
-// <i> This setting configures how Stack events are dispatched to the application.
-//==========================================================
-// <o> NRF_SDH_DISPATCH_MODEL
- 
-
-// <i> NRF_SDH_DISPATCH_MODEL_INTERRUPT: SoftDevice events are passed to the application from the interrupt context.
-// <i> NRF_SDH_DISPATCH_MODEL_APPSH: SoftDevice events are scheduled using @ref app_scheduler.
-// <i> NRF_SDH_DISPATCH_MODEL_POLLING: SoftDevice events are to be fetched manually.
-// <0=> NRF_SDH_DISPATCH_MODEL_INTERRUPT 
-// <1=> NRF_SDH_DISPATCH_MODEL_APPSH 
-// <2=> NRF_SDH_DISPATCH_MODEL_POLLING 
-
-#ifndef NRF_SDH_DISPATCH_MODEL
-#define NRF_SDH_DISPATCH_MODEL 0
-#endif
-
-// </h> 
-//==========================================================
-
-// <h> Clock - SoftDevice clock configuration
-
-//==========================================================
-// <o> NRF_SDH_CLOCK_LF_SRC  - SoftDevice clock source.
- 
-// <0=> NRF_CLOCK_LF_SRC_RC 
-// <1=> NRF_CLOCK_LF_SRC_XTAL 
-// <2=> NRF_CLOCK_LF_SRC_SYNTH 
-
-#ifndef NRF_SDH_CLOCK_LF_SRC
-#define NRF_SDH_CLOCK_LF_SRC 0
-#endif
-
-// <o> NRF_SDH_CLOCK_LF_RC_CTIV - SoftDevice calibration timer interval. 
-#ifndef NRF_SDH_CLOCK_LF_RC_CTIV
-#define NRF_SDH_CLOCK_LF_RC_CTIV 16
-#endif
-
-// <o> NRF_SDH_CLOCK_LF_RC_TEMP_CTIV - SoftDevice calibration timer interval under constant temperature. 
-// <i> How often (in number of calibration intervals) the RC oscillator shall be calibrated
-// <i>  if the temperature has not changed.
-
-#ifndef NRF_SDH_CLOCK_LF_RC_TEMP_CTIV
-#define NRF_SDH_CLOCK_LF_RC_TEMP_CTIV 2
-#endif
-
-// <o> NRF_SDH_CLOCK_LF_ACCURACY  - External clock accuracy used in the LL to compute timing.
- 
-// <0=> NRF_CLOCK_LF_ACCURACY_250_PPM 
-// <1=> NRF_CLOCK_LF_ACCURACY_500_PPM 
-// <2=> NRF_CLOCK_LF_ACCURACY_150_PPM 
-// <3=> NRF_CLOCK_LF_ACCURACY_100_PPM 
-// <4=> NRF_CLOCK_LF_ACCURACY_75_PPM 
-// <5=> NRF_CLOCK_LF_ACCURACY_50_PPM 
-// <6=> NRF_CLOCK_LF_ACCURACY_30_PPM 
-// <7=> NRF_CLOCK_LF_ACCURACY_20_PPM 
-// <8=> NRF_CLOCK_LF_ACCURACY_10_PPM 
-// <9=> NRF_CLOCK_LF_ACCURACY_5_PPM 
-// <10=> NRF_CLOCK_LF_ACCURACY_2_PPM 
-// <11=> NRF_CLOCK_LF_ACCURACY_1_PPM 
-
-#ifndef NRF_SDH_CLOCK_LF_ACCURACY
-#define NRF_SDH_CLOCK_LF_ACCURACY 1
-#endif
-
-// </h> 
-//==========================================================
-
-// <h> SDH Observers - Observers and priority levels
-
-//==========================================================
-// <o> NRF_SDH_REQ_OBSERVER_PRIO_LEVELS - Total number of priority levels for request observers. 
-// <i> This setting configures the number of priority levels available for the SoftDevice request event handlers.
-// <i> The priority level of a handler determines the order in which it receives events, with respect to other handlers.
-
-#ifndef NRF_SDH_REQ_OBSERVER_PRIO_LEVELS
-#define NRF_SDH_REQ_OBSERVER_PRIO_LEVELS 2
-#endif
-
-// <o> NRF_SDH_STATE_OBSERVER_PRIO_LEVELS - Total number of priority levels for state observers. 
-// <i> This setting configures the number of priority levels available for the SoftDevice state event handlers.
-// <i> The priority level of a handler determines the order in which it receives events, with respect to other handlers.
-
-#ifndef NRF_SDH_STATE_OBSERVER_PRIO_LEVELS
-#define NRF_SDH_STATE_OBSERVER_PRIO_LEVELS 2
-#endif
-
-// <o> NRF_SDH_STACK_OBSERVER_PRIO_LEVELS - Total number of priority levels for stack event observers. 
-// <i> This setting configures the number of priority levels available for the SoftDevice stack event handlers (ANT, BLE, SoC).
-// <i> The priority level of a handler determines the order in which it receives events, with respect to other handlers.
-
-#ifndef NRF_SDH_STACK_OBSERVER_PRIO_LEVELS
-#define NRF_SDH_STACK_OBSERVER_PRIO_LEVELS 2
-#endif
-
-
-// <h> State Observers priorities - Invididual priorities
-
-//==========================================================
-// <o> CLOCK_CONFIG_STATE_OBSERVER_PRIO  
-// <i> Priority with which state events are dispatched to the Clock driver.
-
-#ifndef CLOCK_CONFIG_STATE_OBSERVER_PRIO
-#define CLOCK_CONFIG_STATE_OBSERVER_PRIO 0
-#endif
-
-// <o> POWER_CONFIG_STATE_OBSERVER_PRIO  
-// <i> Priority with which state events are dispatched to the Power driver.
-
-#ifndef POWER_CONFIG_STATE_OBSERVER_PRIO
-#define POWER_CONFIG_STATE_OBSERVER_PRIO 0
-#endif
-
-// <o> RNG_CONFIG_STATE_OBSERVER_PRIO  
-// <i> Priority with which state events are dispatched to this module.
-
-#ifndef RNG_CONFIG_STATE_OBSERVER_PRIO
-#define RNG_CONFIG_STATE_OBSERVER_PRIO 0
-#endif
-
-// </h> 
-//==========================================================
-
-// <h> Stack Event Observers priorities - Invididual priorities
-
-//==========================================================
-// <o> NRF_SDH_ANT_STACK_OBSERVER_PRIO  
-// <i> This setting configures the priority with which ANT events are processed with respect to other events coming from the stack.
-// <i> Modify this setting if you need to have ANT events dispatched before or after other stack events, such as BLE or SoC.
-// <i> Zero is the highest priority.
-
-#ifndef NRF_SDH_ANT_STACK_OBSERVER_PRIO
-#define NRF_SDH_ANT_STACK_OBSERVER_PRIO 0
-#endif
-
-// <o> NRF_SDH_BLE_STACK_OBSERVER_PRIO  
-// <i> This setting configures the priority with which BLE events are processed with respect to other events coming from the stack.
-// <i> Modify this setting if you need to have BLE events dispatched before or after other stack events, such as ANT or SoC.
-// <i> Zero is the highest priority.
-
-#ifndef NRF_SDH_BLE_STACK_OBSERVER_PRIO
-#define NRF_SDH_BLE_STACK_OBSERVER_PRIO 0
-#endif
-
-// <o> NRF_SDH_SOC_STACK_OBSERVER_PRIO  
-// <i> This setting configures the priority with which SoC events are processed with respect to other events coming from the stack.
-// <i> Modify this setting if you need to have SoC events dispatched before or after other stack events, such as ANT or BLE.
-// <i> Zero is the highest priority.
-
-#ifndef NRF_SDH_SOC_STACK_OBSERVER_PRIO
-#define NRF_SDH_SOC_STACK_OBSERVER_PRIO 0
-#endif
-
-// </h> 
-//==========================================================
-
-// </h> 
-//==========================================================
-
-
-// </e>
-
-// <e> NRF_SDH_SOC_ENABLED - nrf_sdh_soc - SoftDevice SoC event handler
-//==========================================================
-#ifndef NRF_SDH_SOC_ENABLED
-#define NRF_SDH_SOC_ENABLED 1
-#endif
-// <h> SoC Observers - Observers and priority levels
-
-//==========================================================
-// <o> NRF_SDH_SOC_OBSERVER_PRIO_LEVELS - Total number of priority levels for SoC observers. 
-// <i> This setting configures the number of priority levels available for the SoC event handlers.
-// <i> The priority level of a handler determines the order in which it receives events, with respect to other handlers.
-
-#ifndef NRF_SDH_SOC_OBSERVER_PRIO_LEVELS
-#define NRF_SDH_SOC_OBSERVER_PRIO_LEVELS 2
-#endif
-
-// <h> SoC Observers priorities - Invididual priorities
-
-//==========================================================
-// <o> BLE_DFU_SOC_OBSERVER_PRIO  
-// <i> Priority with which BLE events are dispatched to the DFU Service.
-
-#ifndef BLE_DFU_SOC_OBSERVER_PRIO
-#define BLE_DFU_SOC_OBSERVER_PRIO 1
-#endif
-
-// <o> CLOCK_CONFIG_SOC_OBSERVER_PRIO  
-// <i> Priority with which SoC events are dispatched to the Clock driver.
-
-#ifndef CLOCK_CONFIG_SOC_OBSERVER_PRIO
-#define CLOCK_CONFIG_SOC_OBSERVER_PRIO 0
-#endif
-
-// <o> POWER_CONFIG_SOC_OBSERVER_PRIO  
-// <i> Priority with which SoC events are dispatched to the Power driver.
-
-#ifndef POWER_CONFIG_SOC_OBSERVER_PRIO
-#define POWER_CONFIG_SOC_OBSERVER_PRIO 0
-#endif
-
-// </h> 
-//==========================================================
-
-// </h> 
-//==========================================================
-
-
-// </e>
 
 // </h> 
 //==========================================================

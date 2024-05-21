@@ -1,17 +1,59 @@
 #pragma once
 
 #include "stdbool.h"
+#include <stdint.h>
+#include "FreeRTOS.h"
+#include  "task.h"
+
+
+#define NAATOS_FW_VERSON  "v0.1.0"
+
+
+#define pdTICKS_TO_MS( xTimeInTicks )    ( ( TickType_t ) ( ( ( uint64_t ) ( xTimeInTicks ) * ( uint64_t ) 1000U ) / ( uint64_t ) configTICK_RATE_HZ ) )
 
 /* Battery Parameters */
-#define LOW_POWER_THRESHOLD     20
+#define DEFAULT_LOW_POWER_THRESHOLD     20
 
 /* Heater Zones' Parameters */
-#define AMPLIFICATION_ZONE_ON_TIME  30    // Minutes
-#define VALVE_ZONE_ON_TIME          3     // Minutes
+#define DEFAULT_AMPLIFICATION_ZONE_ON_TIME  30    // Minutes
+#define DEFAULT_VALVE_ZONE_ON_TIME          3     // Minutes
 
 /* I2C Pins */
-#define I2C0_SDA_PIN    25
-#define I2C0_SCL_PIN    24
+#define I2C0_SDA_PIN    17
+#define I2C0_SCL_PIN    16
+#define I2C1_SDA_PIN    24
+#define I2C1_SCL_PIN    23
+
+/* SPI Pins */
+#define SPI_SCK_PIN     15    /* P0.15 */
+#define SPI_MOSI_PIN    13    /* P0.13 */
+#define SPI_MISO_PIN    14    /* P0.14 */
+#define SPI_SD_SS_PIN   12    /* P0.12 */
+
+/* Default Rates
+ * These rates are only used when there is no configuration file seen in the 
+   naatos_config.txt file on the sd card. When a new config files is created
+   these rates will be used in the system.
+ * Rates are in seconds
+*/ 
+#define DEFAULT_SAMPLE_RATE   0.200  // 0.048 minimum
+#define DEFAULT_LOGGING_RATE  5.000
+
+/* Device Debug Parameters */
+#define I2C_CONNECTED           0
+#define GO_STRAIGHT_TO_RUNNING  0
+#define USE_CALENDAR_CHIP       0 
+
+/* Log Event Messages */
+#define START_EVENT_MSG       "Sample Preperation Started."
+#define STOP_EVENT_MSG        "Sample Preperation Completed."
+#define INTERRUPT_EVENT_MSG   "Sample Preperation Interrupted."
+#define AMP_START_MSG         "Amplification Zone Heating Started."
+#define AMP_END_MSG           "Amplification Zone Heating Stopped."
+#define VALV_START_MSG        "Valve Zone Heating Started."
+#define VALV_STOP_MSG         "Valve Zone Heating Stopped."
+
+#define USB_SUSPEND_TASKS_TIME    15000
 
 /* Main States */
 typedef enum {
@@ -26,7 +68,9 @@ typedef enum {
   HEATER,
   LOGGER,
   SENSORS, 
-  USB
+  USB,
+  PWM,
+  COMPOSITE
 } tasks_t;
 
 // Charging Enum
@@ -54,7 +98,12 @@ typedef enum {
 
 typedef enum {
   SAMPLE_START,
-  SAMPLE_END
+  SAMPLE_END,
+  SAMPLE_INTERRUPTED,
+  SAMPLE_AMP_STARTED,
+  SAMPLE_AMP_ENDED,
+  SAMPLE_VALV_STARTED,
+  SAMPLE_VALV_ENDED
   // Add more events here
 } event_t;
 
@@ -102,7 +151,75 @@ typedef struct {
   tasks_t task_req;
 } battery_percent_req_t; 
 
+
 typedef struct {
   tasks_t taskName;
   bool valid; // if the task is meant to not run anymore this should be set to false
 } watchdog_time_update_t;
+
+// Calendar time struct
+typedef struct {
+  uint8_t second;
+  uint8_t minute;
+  uint8_t hour;
+  uint8_t day;
+  uint8_t week_day;
+  uint8_t month;
+  uint8_t year;
+} calendar_time_t;
+
+// USB Wait Suspend request
+typedef struct {
+  bool suspend;
+} usb_suspend_req_t;
+
+// USB Wait Suspend Acceptance
+typedef struct {
+  tasks_t task;
+  bool suspended;
+} usb_suspend_acpt_t;
+
+// USB Wait Suspend Over
+typedef struct {
+  tasks_t task;
+  bool over;
+} usb_suspend_over_t;
+
+// Task Handles
+extern xTaskHandle mainTaskHandle;
+extern xTaskHandle heaterTaskHandle;
+extern xTaskHandle loggerTaskHandle;
+extern xTaskHandle sensorsTaskHandle;
+extern xTaskHandle batteryTaskHandle;
+extern xTaskHandle usbTaskHandle;
+extern xTaskHandle pwmTaskHandle;
+extern xTaskHandle compositeTaskHandle;
+
+// Config parameters
+typedef struct {
+  float sample_rate;
+  float logging_rate;
+  uint16_t valve_zone_run_time_m;
+  uint16_t amplification_zone_run_time_m;
+  uint16_t low_power_threshold;
+  float valve_setpoint;
+  float amp0_setpoint;
+  float amp1_setpoint;
+  float amp2_setpoint;
+  float valve_kp;
+  float valve_ki;
+  float valve_kd;
+  float amp0_kp;
+  float amp0_ki;
+  float amp0_kd;
+  float amp1_kp;
+  float amp1_ki;
+  float amp1_kd;
+  float amp2_kp;
+  float amp2_ki;
+  float amp2_kd;
+} naatos_config_parameters;
+
+/* Configuration Parameters Variables */
+extern bool use_default_configuration_parameters;
+extern naatos_config_parameters config;
