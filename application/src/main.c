@@ -32,8 +32,9 @@ Purpose : NAATOS Application Start
 #include "i2c_hal_freertos.h"
 #include "spi.h"
 #include "sd_card.h"
-#include "is31fl3196.h"
+//#include "is31fl3196.h"
 #include "fuel.h"
+#include "led.h"
 
 #include "nrf_drv_power.h"
 
@@ -210,6 +211,7 @@ void main_task(void * pvParameters) {
 
   // Set Start up state to standby
   main_state_t main_state = STANDBY;
+  main_state_t last_state = LOW_POWER;
   int i = 0;
 
   // Main State Loop
@@ -217,12 +219,17 @@ void main_task(void * pvParameters) {
     switch(main_state) {
       // In Standby State
       case STANDBY:
+        if (last_state != main_state) {
+          set_led1_green_breathe();
+          last_state = main_state;
+        } 
         if (error_during_run) error_during_run = false;
         hal_triggered = false;
         optical_triggered = false; 
         // Check for Battery Data in Battery Queue
         if (xQueueReceive(main_batteryDataQueue, &percent_recv, 0) == pdPASS) {
           if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
+             last_state = main_state;
              main_state = LOW_POWER;
              sendUpdatedMainTaskState(main_state);
              break;
@@ -239,6 +246,7 @@ void main_task(void * pvParameters) {
         // Check if we can go to RUN state
         if (hal_triggered && optical_triggered) {
           // Set the new main state
+          last_state = main_state;
           main_state = RUNNING;
           sendUpdatedMainTaskState(main_state);
           // Delay
@@ -254,6 +262,11 @@ void main_task(void * pvParameters) {
         // Allow for other tasks to get ready to receive main state change
         vTaskDelay(2000);
 #endif
+        // Set LED1 to solid green
+        if (last_state != main_state) {
+          set_led1_green_solid();
+          last_state = main_state;
+        }
         /* ***** Amplification Zone Run ***** */
         // Send start amplification message to heater queue
         begin_amplification_zone();
@@ -271,7 +284,7 @@ void main_task(void * pvParameters) {
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
           if (!hal_triggered || !optical_triggered) {
-          error_during_run = true;
+            error_during_run = true;
             break;
           }
         } while ( pdTICKS_TO_MS(xTaskGetTickCount() - start_time) < end_time);
@@ -295,11 +308,15 @@ void main_task(void * pvParameters) {
           }
         }
         else {
+          // Set LEDs
+          set_led1_red_fast_blink();
+          set_led2_red_fast_blink();
           // Send Interrupt Event to logging task
           xReturned = xQueueSend(logger_logMessageQueue, &interrupt_log_msg, 0);
           if (xReturned != pdPASS) {
             printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
           }
+          last_state = main_state;
           main_state = STANDBY;
           sendUpdatedMainTaskState(main_state);
           vTaskDelay(100);
@@ -321,11 +338,15 @@ void main_task(void * pvParameters) {
         end_valve_zone();
         // Check for errors
         if (error_during_run) {
+            // Set LEDs
+            set_led1_red_fast_blink();
+            set_led2_red_fast_blink();
             // Send interrupt Event to logging task
             xReturned = xQueueSend(logger_logMessageQueue, &interrupt_log_msg, 0);
             if (xReturned != pdPASS) {
               printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
             }
+            last_state = main_state;
             main_state = STANDBY;
             sendUpdatedMainTaskState(main_state);
             break;
@@ -333,14 +354,6 @@ void main_task(void * pvParameters) {
 
         vTaskDelay(100);
 
-        // TODO: might have to do small delay here for heater task to update
-        /* ***** End Sample Preperation ***** */
-        // Update sensor state prematuraly to stop sending of temp data
-        //main_state = STANDBY;
-       // xReturned = xQueueSend(sensor_mainStateQueue, &main_state, 0);
-        //if (xReturned != pdPASS) {
-        //  printf("MAIN_TASK: Unable to send main state change to heater_mainStateQueue.\n");
-        //}
         // Wait for the sample to be removed prior to going back to STANDBY state
         do {
           xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
@@ -348,6 +361,7 @@ void main_task(void * pvParameters) {
           optical_triggered = switch_data.optical_tiggered;
         } while(hal_triggered && optical_triggered);
         // Update current main state
+        last_state = main_state;
         main_state = STANDBY;
         sendUpdatedMainTaskState(main_state);
         vTaskDelay(250);

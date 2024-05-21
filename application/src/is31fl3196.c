@@ -183,7 +183,7 @@ void led_driver_init(void)
     led_driver_writeRegisterBlocking(ramp_mode_buf, 2);
     
     led_driver_enable_channel(LED1, blue, NULL);
-    led_driver_set_channel_animation_breathing(LED1, blue, true, NULL);
+    led_driver_set_channel_animation_flashing(LED1, blue, true, NULL);
 
     led_driver_writeRegisterBlocking(one_shot_buf, 2);
 
