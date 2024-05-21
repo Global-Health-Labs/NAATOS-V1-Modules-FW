@@ -158,7 +158,8 @@ void logger_task(void * pvParameters) {
           if (log_message.event_data.event == SAMPLE_VALV_ENDED || 
               log_message.event_data.event == SAMPLE_INTERRUPTED || 
               log_message.event_data.event == SAMPLE_TEMPS_NOT_STABALIZED || 
-              log_message.event_data.event == SAMPLE_RECOVERY_BATT) 
+              log_message.event_data.event == SAMPLE_RECOVERY_BATT ||
+              log_message.event_data.event == SAMPLE_OVER_TEMP) 
           {
             run_stopped = true;
           }

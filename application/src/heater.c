@@ -10,6 +10,7 @@ bool amplification_zone_running = false;
 bool valve_zone_running = false;
 bool starting_run = true;
 bool h_pwm_req = false;
+bool greater_than_max = false;
 
 zone_run_req_t zone_req;
 temperature_data_t temperature_data;
@@ -167,8 +168,6 @@ void heater_task(void * pvParameters) {
       }
       starting_run = false;
     }
-
-    // TODO: Ensure temperatures are not above the max zone temperatures
     
     // Update PID and PWM
     if (amplification_zone_running) {
@@ -195,7 +194,21 @@ void heater_task(void * pvParameters) {
       h_pwm_data.amp0_zone_pwm = amp0_pid.out;
       h_pwm_data.amp1_zone_pwm = amp1_pid.out;
       h_pwm_data.amp2_zone_pwm = amp2_pid.out;
-
+      // Ensure that the temperatures are not greater than the max temperatures allowed
+      if (config.amp0_max_temp < temperature_data.amp0_zone_temp) {
+        greater_than_max = true;
+      }
+      if (config.amp1_max_temp < temperature_data.amp1_zone_temp) {
+        greater_than_max = true;
+      }
+      if (config.amp2_max_temp < temperature_data.amp2_zone_temp) {
+        greater_than_max = true;
+      }
+#if UNIFORMITY
+      if (config.valve_max_temp < temperature_data.valve_zone_temp) {
+        greater_than_max = true;
+      }
+#endif
    }
    if (valve_zone_running) {
       // Update Valve PID loop with new temperatures
@@ -204,6 +217,20 @@ void heater_task(void * pvParameters) {
       update_valve_duty(valve_pid.out);
       // Set the PWMs for the logger
       h_pwm_data.valve_zone_pwm = valve_pid.out;
+      // Ensure that the temperatures are not greater than the max temperatures allowed
+      if (config.valve_max_temp < temperature_data.valve_zone_temp) {
+        greater_than_max = true;
+      }
+    }
+
+    // Handle being greater than the maximum temperature
+    if (greater_than_max) {
+      // Send alert message to main task
+      xReturned = xQueueSend(main_runErrorQueue, &greater_than_max, 0);
+      if (xReturned != pdPASS) {
+        printf("HEATER_TASK: Unable to send run error for greater than max temp to main_runErrorQueue.\n");
+      }
+      greater_than_max = false;
     }
 
     // Check to see if the logger needs the pwm data

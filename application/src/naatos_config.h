@@ -8,7 +8,6 @@
 
 #define NAATOS_FW_VERSON  "v0.1.0"
 
-
 #define pdTICKS_TO_MS( xTimeInTicks )    ( ( TickType_t ) ( ( ( uint64_t ) ( xTimeInTicks ) * ( uint64_t ) 1000U ) / ( uint64_t ) configTICK_RATE_HZ ) )
 
 /* Battery Parameters */
@@ -66,6 +65,7 @@
 #define VALV_STOP_MSG             "Valve Zone Heating Stopped."
 #define TEMPS_NOT_STABLE          "Zone Temperatures are no below the minimum run temperature. Aborting run."
 #define RECOVERY_BATT             "Battery Percentage lower than the recovery threshold. Charge Battery More."
+#define OVER_TEMP_MSG             "A Zone went over its maximum temperature. Run stopped."
 
 #define USB_SUSPEND_TASKS_TIME    15000
 
@@ -119,7 +119,8 @@ typedef enum {
   SAMPLE_VALV_STARTED,
   SAMPLE_VALV_ENDED,
   SAMPLE_TEMPS_NOT_STABALIZED,
-  SAMPLE_RECOVERY_BATT
+  SAMPLE_RECOVERY_BATT,
+  SAMPLE_OVER_TEMP
   // Add more events here
 } event_t;
 

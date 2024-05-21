@@ -60,6 +60,7 @@ xQueueHandle main_batteryDataQueue;
 xQueueHandle main_switchQueue;
 xQueueHandle main_mainStateRespQueue;
 xQueueHandle main_startRunRespQueue;
+xQueueHandle main_runErrorQueue;
 
 // Zone Request Constants
 const zone_run_req_t run_amplification_zone = {
@@ -124,6 +125,15 @@ const log_data_message_t recovery_batt_msg = {
   .data_type = EVENT_DATA,
   .temperature_data = NULL,
   .event_data = recovery_batt_event
+};
+const log_event_t over_temp_event = {
+  .event = SAMPLE_OVER_TEMP,
+  .message = OVER_TEMP_MSG
+};
+const log_data_message_t over_temp_msg = {
+  .data_type = EVENT_DATA,
+  .temperature_data = NULL,
+  .event_data = over_temp_event
 };
 const log_event_t interrupt_opt_event = {
   .event = SAMPLE_INTERRUPTED,
@@ -235,6 +245,7 @@ void main_task(void * pvParameters) {
   int percent_recv;   
   bool hal_triggered = false, optical_triggered = false; 
   bool error_during_run = false;
+  bool over_temp;
   uint32_t start_time = 0, end_time = 0, a_t_start = 0;
   uint32_t alert_timeout_ticks;
 
@@ -363,8 +374,16 @@ void main_task(void * pvParameters) {
         }
         // Get sensor switch data ensuring sample is still in position
         do {
-          // TODO: Ensure we do not go overtemp
-
+          // Ensure we do not go overtemp
+          if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
+            xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
+            if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
+            }
+            error_during_run = true;
+            over_temp = true;
+            break;
+          }
           // Get Switch data
           xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
           hal_triggered = switch_data.hal_triggered;
@@ -401,10 +420,16 @@ void main_task(void * pvParameters) {
               printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
             }
           }
-          else {
+          else if (!optical_triggered) {
             xReturned = xQueueSend(logger_logMessageQueue, &interrupt_opt_log_msg, 0);
             if (xReturned != pdPASS) {
               printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+            }
+          }
+          else if (over_temp) {
+            xReturned = xQueueSend(logger_logMessageQueue, &over_temp_msg, 0);
+            if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to send sample over temp event to logging task.\n");
             }
           }
           // Update main state
@@ -417,8 +442,16 @@ void main_task(void * pvParameters) {
 
         // Get sensor switch data ensuring sample is still in position
         do {
-          // TODO: Ensure we do not go overtemp
-          
+          // Ensure we do not go overtemp
+          if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
+            xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
+            if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
+            }
+            error_during_run = true;
+            over_temp = true;
+            break;
+          }
           // Get Switch Data
           xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
           hal_triggered = switch_data.hal_triggered;
@@ -440,10 +473,16 @@ void main_task(void * pvParameters) {
                 printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
               }
             }
-            else {
+            else if (!optical_triggered) {
               xReturned = xQueueSend(logger_logMessageQueue, &interrupt_opt_log_msg, 0);
               if (xReturned != pdPASS) {
                 printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+              }
+            }
+            else if (over_temp) {
+              xReturned = xQueueSend(logger_logMessageQueue, &over_temp_msg, 0);
+              if (xReturned != pdPASS) {
+                printf("MAIN_TASK: Unable to send sample over temp event to logging task.\n");
               }
             }
             // Update main state
@@ -724,6 +763,9 @@ void create_queues() {
     printf("Unable to create main_mainStateRespQueue queue\n");
   main_startRunRespQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (main_startRunRespQueue == NULL)
+    printf("Unable to create main_mainStateRespQueue queue\n");
+  main_runErrorQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (main_runErrorQueue == NULL)
     printf("Unable to create main_mainStateRespQueue queue\n");
 
   // Heater Task Queues
