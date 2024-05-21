@@ -16,6 +16,9 @@ int battery_percentage = 100;
 void battery_task(void * pvParameters) {
   BaseType_t xReturned;
   battery_percent_req_t recv_req;
+  watchdog_time_update_t wdtUpdate = {};
+  wdtUpdate.taskName = BATTERY;
+  wdtUpdate.valid = true;
   bool inc = false; //temp
 
   // Set the charge state
@@ -57,6 +60,11 @@ void battery_task(void * pvParameters) {
         printf("BATT_TASK: Was unable to send battery information to logger queue\n");
       }
     }
+
+      xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
+      if (xReturned != pdPASS) {
+        printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+      }
 
     vTaskDelay(500);
   }
