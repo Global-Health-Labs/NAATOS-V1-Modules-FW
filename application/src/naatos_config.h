@@ -36,8 +36,15 @@
    these rates will be used in the system.
  * Rates are in seconds
 */ 
-#define DEFAULT_SAMPLE_RATE   0.200  // 0.048 minimum
-#define DEFAULT_LOGGING_RATE  5.000
+#define DEFAULT_SAMPLE_RATE           0.200  // 0.048 minimum
+#define DEFAULT_LOGGING_RATE          5.000
+#define DEFAULT_VALVE_MAX_TEMP        95.0
+#define DEFAULT_AMP0_MAX_TEMP         80.0
+#define DEFAULT_AMP1_MAX_TEMP         80.0
+#define DEFAULT_AMP2_MAX_TEMP         80.0
+#define DEFAULT_MIN_RUN_ZONE_TEMP     50.0
+#define DEFAULT_MIN_RUN_ZONE_TEMP_EN  true
+#define DEFAULT_ALERT_TIMEOUT_M       0.5   // Minutes
 
 /* Device Debug Parameters */
 #define I2C_CONNECTED           1
@@ -45,13 +52,15 @@
 #define USE_CALENDAR_CHIP       1 
 
 /* Log Event Messages */
-#define START_EVENT_MSG       "Sample Preperation Started."
-#define STOP_EVENT_MSG        "Sample Preperation Completed."
-#define INTERRUPT_EVENT_MSG   "Sample Preperation Interrupted."
-#define AMP_START_MSG         "Amplification Zone Heating Started."
-#define AMP_END_MSG           "Amplification Zone Heating Stopped."
-#define VALV_START_MSG        "Valve Zone Heating Started."
-#define VALV_STOP_MSG         "Valve Zone Heating Stopped."
+#define START_EVENT_MSG           "Sample Preperation Started."
+#define STOP_EVENT_MSG            "Sample Preperation Completed."
+#define INTERRUPT_HAL_EVENT_MSG   "Sample Preperation Interrupted. Cover Removed."
+#define INTERRUPT_OPT_EVENT_MSG   "Sample Preperation Interrupted. Sample Removed."
+#define AMP_START_MSG             "Amplification Zone Heating Started."
+#define AMP_END_MSG               "Amplification Zone Heating Stopped."
+#define VALV_START_MSG            "Valve Zone Heating Started."
+#define VALV_STOP_MSG             "Valve Zone Heating Stopped."
+#define TEMPS_NOT_STABLE          "Zone Temperatures are no below the minimum run temperature. Aborting run."
 
 #define USB_SUSPEND_TASKS_TIME    15000
 
@@ -103,7 +112,8 @@ typedef enum {
   SAMPLE_AMP_STARTED,
   SAMPLE_AMP_ENDED,
   SAMPLE_VALV_STARTED,
-  SAMPLE_VALV_ENDED
+  SAMPLE_VALV_ENDED,
+  SAMPLE_TEMPS_NOT_STABALIZED
   // Add more events here
 } event_t;
 
@@ -200,6 +210,13 @@ typedef struct {
   float amp0_setpoint;
   float amp1_setpoint;
   float amp2_setpoint;
+  float valve_max_temp;
+  float amp0_max_temp;
+  float amp1_max_temp;
+  float amp2_max_temp;
+  float min_run_zone_temp;
+  bool  min_run_zone_temp_en;
+  float alert_timeout_time_m;
   float valve_kp;
   float valve_ki;
   float valve_kd;

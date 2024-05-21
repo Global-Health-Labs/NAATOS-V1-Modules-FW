@@ -7,6 +7,7 @@ xQueueHandle heater_usbWaitQueue;
 
 bool amplification_zone_running = false;
 bool valve_zone_running = false;
+bool starting_run = true;
 
 zone_run_req_t zone_req;
 temperature_data_t temperature_data;
@@ -87,10 +88,13 @@ void heater_task(void * pvParameters) {
           valve_pid.out = 1;
           update_valve_duty(valve_pid.out);
           // Reinitalize PID Values
-         pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  
-         pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
-         pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
-         pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
+          pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  
+          pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
+          pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
+          pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
+        }
+        else {
+          starting_run = true;
         }
       }
       else if (zone_req.zone = VALVE) {
@@ -112,6 +116,47 @@ void heater_task(void * pvParameters) {
     if (xReturned != pdPASS) {
       printf("HEATER_TASK: unable to receive temperature data from heater_temperatureDataQueue\n");
     }
+    
+    // Ensure temperatures are below the minimum run zone temperature
+    if (config.min_run_zone_temp_en) {
+      if (starting_run && 
+         (temperature_data.valve_zone_temp > config.min_run_zone_temp ||
+          temperature_data.amp0_zone_temp > config.min_run_zone_temp ||
+          temperature_data.amp1_zone_temp > config.min_run_zone_temp || 
+          temperature_data.amp2_zone_temp > config.min_run_zone_temp)) 
+      {
+        starting_run = false;
+        // Send cannot start
+        xReturned = xQueueSend(main_startRunRespQueue, &starting_run, 0);
+        if (xReturned != pdPASS) {
+          printf("HEATER_TASK: Unable to send cannot start run response.\n");
+        }
+        continue;
+      }
+      else if (starting_run && 
+          (temperature_data.valve_zone_temp <= config.min_run_zone_temp &&
+           temperature_data.amp0_zone_temp <= config.min_run_zone_temp &&
+           temperature_data.amp1_zone_temp <= config.min_run_zone_temp && 
+           temperature_data.amp2_zone_temp <= config.min_run_zone_temp)) 
+      {
+        // Send can start
+        xReturned = xQueueSend(main_startRunRespQueue, &starting_run, 0);
+        if (xReturned != pdPASS) {
+          printf("HEATER_TASK: Unable to send cannot start run response.\n");
+        }
+        starting_run = false;
+      }
+    }
+    else if (!config.min_run_zone_temp_en && starting_run) {
+      // Send can start
+      xReturned = xQueueSend(main_startRunRespQueue, &starting_run, 0);
+      if (xReturned != pdPASS) {
+        printf("HEATER_TASK: Unable to send cannot start run response.\n");
+      }
+      starting_run = false;
+    }
+
+    // TODO: Ensure temperatures are not above the max zone temperatures
     
     // Update PID and PWM
     if (amplification_zone_running) {

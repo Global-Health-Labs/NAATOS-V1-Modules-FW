@@ -59,6 +59,7 @@ xTaskHandle compositeTaskHandle;
 xQueueHandle main_batteryDataQueue;
 xQueueHandle main_switchQueue;
 xQueueHandle main_mainStateRespQueue;
+xQueueHandle main_startRunRespQueue;
 
 // Zone Request Constants
 const zone_run_req_t run_amplification_zone = {
@@ -97,14 +98,32 @@ const log_data_message_t stop_log_msg = {
   .temperature_data = NULL,
   .event_data = stop_event
 };
-const log_event_t interrupt_event = {
+const log_event_t interrupt_hal_event = {
   .event = SAMPLE_INTERRUPTED,
-  .message = INTERRUPT_EVENT_MSG
+  .message = INTERRUPT_HAL_EVENT_MSG
 }; 
-const log_data_message_t interrupt_log_msg = {
+const log_data_message_t interrupt_hal_log_msg = {
   .data_type = EVENT_DATA,
   .temperature_data = NULL,
-  .event_data = interrupt_event
+  .event_data = interrupt_hal_event
+};
+const log_event_t temps_not_stabalized_event = {
+  .event = SAMPLE_TEMPS_NOT_STABALIZED,
+  .message = TEMPS_NOT_STABLE
+};
+const log_data_message_t temps_not_stablized_msg = {
+  .data_type = EVENT_DATA,
+  .temperature_data = NULL,
+  .event_data = temps_not_stabalized_event
+};
+const log_event_t interrupt_opt_event = {
+  .event = SAMPLE_INTERRUPTED,
+  .message = INTERRUPT_OPT_EVENT_MSG
+}; 
+const log_data_message_t interrupt_opt_log_msg = {
+  .data_type = EVENT_DATA,
+  .temperature_data = NULL,
+  .event_data = interrupt_opt_event
 };
 const log_event_t valve_start_event = {
   .event = SAMPLE_VALV_STARTED,
@@ -184,7 +203,7 @@ bool use_default_configuration_parameters;
 
 // Function defs
 void sendUpdatedMainTaskState(main_state_t new_state);
-void begin_amplification_zone(void);
+bool begin_amplification_zone(void);
 void end_amplification_zone(void);
 void begin_valve_zone(void);
 void end_valve_zone(void);
@@ -262,14 +281,28 @@ void main_task(void * pvParameters) {
         // Allow for other tasks to get ready to receive main state change
         vTaskDelay(2000);
 #endif
+        /* ***** Amplification Zone Run ***** */
+        // Send start amplification message to heater queue
+        if (!begin_amplification_zone()) {
+          printf("MAIN_TASK: Unable to begin sample run, temperatures have not yet stabalized.\n");
+          // Tell Log that temperature is not stabalized yet
+          xReturned = xQueueSend(logger_logMessageQueue, &temps_not_stablized_msg, 0);
+          if (xReturned != pdPASS) {
+            printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+          }
+          // Stop amplification zone
+          end_amplification_zone();
+          // Set the new main state
+          last_state = main_state;
+          main_state = STANDBY;
+          sendUpdatedMainTaskState(main_state);
+          break;
+        }
         // Set LED1 to solid green
         if (last_state != main_state) {
           set_led1_green_solid();
           last_state = main_state;
         }
-        /* ***** Amplification Zone Run ***** */
-        // Send start amplification message to heater queue
-        begin_amplification_zone();
         // Get the start time and end time
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
@@ -312,10 +345,19 @@ void main_task(void * pvParameters) {
           set_led1_red_fast_blink();
           set_led2_red_fast_blink();
           // Send Interrupt Event to logging task
-          xReturned = xQueueSend(logger_logMessageQueue, &interrupt_log_msg, 0);
-          if (xReturned != pdPASS) {
-            printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+          if (!hal_triggered) {
+            xReturned = xQueueSend(logger_logMessageQueue, &interrupt_hal_log_msg, 0);
+            if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+            }
           }
+          else {
+            xReturned = xQueueSend(logger_logMessageQueue, &interrupt_opt_log_msg, 0);
+            if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+            }
+          }
+          // Update main state
           last_state = main_state;
           main_state = STANDBY;
           sendUpdatedMainTaskState(main_state);
@@ -341,11 +383,20 @@ void main_task(void * pvParameters) {
             // Set LEDs
             set_led1_red_fast_blink();
             set_led2_red_fast_blink();
-            // Send interrupt Event to logging task
-            xReturned = xQueueSend(logger_logMessageQueue, &interrupt_log_msg, 0);
-            if (xReturned != pdPASS) {
-              printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+            // Send Interrupt Event to logging task
+            if (!hal_triggered) {
+              xReturned = xQueueSend(logger_logMessageQueue, &interrupt_hal_log_msg, 0);
+              if (xReturned != pdPASS) {
+                printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+              }
             }
+            else {
+              xReturned = xQueueSend(logger_logMessageQueue, &interrupt_opt_log_msg, 0);
+              if (xReturned != pdPASS) {
+                printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+              }
+            }
+            // Update main state
             last_state = main_state;
             main_state = STANDBY;
             sendUpdatedMainTaskState(main_state);
@@ -472,8 +523,9 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
 
 }
 
-void begin_amplification_zone(void) {
+bool begin_amplification_zone(void) {
   BaseType_t xReturned;
+  bool start_run = false;
   // Send start zone request
   xReturned = xQueueSend(heater_zoneRunQueue, &run_amplification_zone, 0);
   if (xReturned != pdPASS) {
@@ -484,6 +536,13 @@ void begin_amplification_zone(void) {
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
   }
+  // Wait for response
+  xReturned = xQueueReceive(main_startRunRespQueue, &start_run, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
+  }
+
+  return start_run;
 }
 
 void begin_valve_zone(void) {
@@ -611,7 +670,10 @@ void create_queues() {
   if (main_switchQueue == NULL)
     printf("Unable to create main_switchQueue queue\n");
   main_mainStateRespQueue = xQueueCreate(4, sizeof(tasks_t));
-  if (main_switchQueue == NULL)
+  if (main_mainStateRespQueue == NULL)
+    printf("Unable to create main_mainStateRespQueue queue\n");
+  main_startRunRespQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (main_startRunRespQueue == NULL)
     printf("Unable to create main_mainStateRespQueue queue\n");
 
   // Heater Task Queues
