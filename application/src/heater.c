@@ -88,7 +88,7 @@ void heater_task(void * pvParameters) {
           valve_pid.out = 1;
           update_valve_duty(valve_pid.out);
           // Reinitalize PID Values
-          pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  
+          pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  // TODO: Implement defaults
           pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
           pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
           pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
@@ -120,7 +120,7 @@ void heater_task(void * pvParameters) {
     // Ensure temperatures are below the minimum run zone temperature
     if (config.min_run_zone_temp_en) {
       if (starting_run && 
-         (temperature_data.valve_zone_temp > config.min_run_zone_temp ||
+         (temperature_data.valve_zone_temp > config.min_run_zone_temp ||  // TODO: Implement defaults
           temperature_data.amp0_zone_temp > config.min_run_zone_temp ||
           temperature_data.amp1_zone_temp > config.min_run_zone_temp || 
           temperature_data.amp2_zone_temp > config.min_run_zone_temp)) 
@@ -134,7 +134,7 @@ void heater_task(void * pvParameters) {
         continue;
       }
       else if (starting_run && 
-          (temperature_data.valve_zone_temp <= config.min_run_zone_temp &&
+          (temperature_data.valve_zone_temp <= config.min_run_zone_temp &&  // TODO: Implement defaults
            temperature_data.amp0_zone_temp <= config.min_run_zone_temp &&
            temperature_data.amp1_zone_temp <= config.min_run_zone_temp && 
            temperature_data.amp2_zone_temp <= config.min_run_zone_temp)) 

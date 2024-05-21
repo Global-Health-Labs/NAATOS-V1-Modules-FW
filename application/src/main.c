@@ -226,12 +226,20 @@ void main_task(void * pvParameters) {
   int percent_recv;   
   bool hal_triggered = false, optical_triggered = false; 
   bool error_during_run = false;
-  uint32_t start_time = 0, end_time = 0;
+  uint32_t start_time = 0, end_time = 0, a_t_start = 0;
+  uint32_t alert_timeout_ticks;
 
   // Set Start up state to standby
   main_state_t main_state = STANDBY;
   main_state_t last_state = LOW_POWER;
   int i = 0;
+
+  // Get the alert timeout
+  if (!use_default_configuration_parameters) {
+    alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((config.alert_timeout_time_m * 60.0) * 1000.0));
+  } else {
+     alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((DEFAULT_ALERT_TIMEOUT_M * 60.0) * 1000.0));
+  }
 
   // Main State Loop
   for (;;) {
@@ -239,10 +247,20 @@ void main_task(void * pvParameters) {
       // In Standby State
       case STANDBY:
         if (last_state != main_state) {
-          set_led1_green_breathe();
           last_state = main_state;
+          // Check to see if there was an error during the last run
+          if (error_during_run) {
+            a_t_start = xTaskGetTickCount();
+            printf("MAIN_TASK: Alert Timeout - %dms\n", pdTICKS_TO_MS(alert_timeout_ticks));
+          }
         } 
-        if (error_during_run) error_during_run = false;
+        
+        // Check to see if alert timeout is over
+        if (error_during_run && xTaskGetTickCount() >= (a_t_start + alert_timeout_ticks)) {
+          set_led1_green_breathe();
+          error_during_run = false;
+        }
+        
         hal_triggered = false;
         optical_triggered = false; 
         // Check for Battery Data in Battery Queue
@@ -263,7 +281,7 @@ void main_task(void * pvParameters) {
         hal_triggered = switch_data.hal_triggered;
         optical_triggered = switch_data.optical_tiggered;
         // Check if we can go to RUN state
-        if (hal_triggered && optical_triggered) {
+        if (hal_triggered && optical_triggered && !error_during_run) {
           // Set the new main state
           last_state = main_state;
           main_state = RUNNING;
@@ -296,6 +314,8 @@ void main_task(void * pvParameters) {
           last_state = main_state;
           main_state = STANDBY;
           sendUpdatedMainTaskState(main_state);
+          // Set error during run and wait alert timeout
+          error_during_run = true;
           break;
         }
         // Set LED1 to solid green
