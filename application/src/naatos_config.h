@@ -51,7 +51,6 @@
 #define I2C_CONNECTED           1
 #define GO_STRAIGHT_TO_RUNNING  0
 #define USE_CALENDAR_CHIP       1 
-#define UNIFORMITY              1
 #define VERBOSE_PID             1
 
 /* Log Event Messages */

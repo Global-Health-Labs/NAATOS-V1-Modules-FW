@@ -27,6 +27,11 @@ pid_controller_t amp0_pid;
 pid_controller_t amp1_pid;
 pid_controller_t amp2_pid;
 
+pid_controller_t valve_pid_2;
+pid_controller_t amp0_pid_2;
+pid_controller_t amp1_pid_2;
+pid_controller_t amp2_pid_2;
+
 void heater_task(void * pvParameters) {
   BaseType_t xReturned;
   usb_suspend_req_t sus_req;
@@ -41,15 +46,29 @@ void heater_task(void * pvParameters) {
 
   // Create PID Controllers 
   if (use_default_configuration_parameters) {
-    pid_controller_init(&valve_pid, AMP0_SETPOINT, V_KP, V_KI, V_KD);  //TODO: Change back to VALVE SETPOINT
+    pid_controller_init(&valve_pid, VALVE_SETPOINT, V_KP, V_KI, V_KD);  
     pid_controller_init(&amp0_pid, AMP0_SETPOINT, A0_KP, A0_KI, A0_KD);
     pid_controller_init(&amp1_pid, AMP1_SETPOINT, A1_KP, A1_KI, A1_KD);
     pid_controller_init(&amp2_pid, AMP1_SETPOINT, A2_KP, A2_KI, A2_KD);
   } else {
-    pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);   //TODO: Change back to VALVE SETPOINT
+    pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);   
     pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
     pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
     pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
+  }
+
+  
+  // Create PID Controllers 
+  if (use_default_configuration_parameters) {
+    pid_controller_init(&valve_pid_2, VALVE_SETPOINT_2, V_KP_2, V_KI_2, V_KD_2);  
+    pid_controller_init(&amp0_pid_2, AMP0_SETPOINT_2, A0_KP_2, A0_KI_2, A0_KD_2);
+    pid_controller_init(&amp1_pid_2, AMP1_SETPOINT_2, A1_KP_2, A1_KI_2, A1_KD_2);
+    pid_controller_init(&amp2_pid_2, AMP1_SETPOINT_2, A2_KP_2, A2_KI_2, A2_KD_2);
+  } else {
+    pid_controller_init(&valve_pid_2, config.valve_setpoint_2, config.valve_kp_2, config.valve_ki_2, config.valve_kd_2);  
+    pid_controller_init(&amp0_pid_2, config.amp0_setpoint_2, config.amp0_kp_2, config.amp0_ki_2, config.amp0_kd_2);
+    pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2);
+    pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2);
   }
 
   for (;;) {
@@ -96,11 +115,9 @@ void heater_task(void * pvParameters) {
           update_amp1_duty(amp1_pid.out);
           update_amp2_duty(amp2_pid.out);
 
-#if UNIFORMITY
           valve_pid.out = 0;
           update_valve_duty(valve_pid.out);
           pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  // TODO: Implement defaults
-#endif
           // Reinitalize PID Values 
           pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
           pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
@@ -113,10 +130,19 @@ void heater_task(void * pvParameters) {
       else if (zone_req.zone = VALVE) {
         valve_zone_running = zone_req.on;
         if (!valve_zone_running) {
-          valve_pid.out = 1;
+          valve_pid.out = 0;
+          amp0_pid.out = 0;
+          amp1_pid.out = 0;
+          amp2_pid.out = 0;
           update_valve_duty(valve_pid.out);
+          update_amp0_duty(amp0_pid.out);
+          update_amp1_duty(amp1_pid.out);
+          update_amp2_duty(amp2_pid.out);
           // Reinitalize PID Values
-          pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  
+          pid_controller_init(&valve_pid_2, config.valve_setpoint_2, config.valve_kp_2, config.valve_ki_2, config.valve_kd_2);  
+          pid_controller_init(&amp0_pid_2, config.amp0_setpoint_2, config.amp0_kp_2, config.amp0_ki_2, config.amp0_kd_2);
+          pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2);
+          pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2);
         }
       }
     }
@@ -183,13 +209,11 @@ void heater_task(void * pvParameters) {
       pid_controller_compute(&amp2_pid, temperature_data.amp2_zone_temp);
       // Update Amplification 2 PWM with PID output
       update_amp2_duty(amp2_pid.out);
-#if UNIFORMITY
       // Update Valve PID loop with new temperatures
       pid_controller_compute(&valve_pid, temperature_data.valve_zone_temp);
       // Update Valve PWM with PID output
       update_valve_duty(valve_pid.out);
       h_pwm_data.valve_zone_pwm = valve_pid.out;
-#endif
       // Set the PWMs for the logger
       h_pwm_data.amp0_zone_pwm = amp0_pid.out;
       h_pwm_data.amp1_zone_pwm = amp1_pid.out;
@@ -204,20 +228,31 @@ void heater_task(void * pvParameters) {
       if (config.amp2_max_temp < temperature_data.amp2_zone_temp) {
         greater_than_max = true;
       }
-#if UNIFORMITY
       if (config.valve_max_temp < temperature_data.valve_zone_temp) {
         greater_than_max = true;
       }
-#endif
    }
    if (valve_zone_running) {
-      // Update Valve PID loop with new temperatures
-      pid_controller_compute(&valve_pid, temperature_data.valve_zone_temp);
-      // Update Valve PWM with PID output
-      update_valve_duty(valve_pid.out);
+      pid_controller_compute(&amp0_pid_2, temperature_data.amp0_zone_temp);
+      update_amp0_duty(amp0_pid_2.out);
+      pid_controller_compute(&amp1_pid_2, temperature_data.amp1_zone_temp);
+      update_amp1_duty(amp1_pid_2.out);
+      pid_controller_compute(&amp2_pid_2, temperature_data.amp2_zone_temp);
+      update_amp2_duty(amp2_pid_2.out);
+      pid_controller_compute(&valve_pid_2, temperature_data.valve_zone_temp);
+      update_valve_duty(valve_pid_2.out);
       // Set the PWMs for the logger
       h_pwm_data.valve_zone_pwm = valve_pid.out;
       // Ensure that the temperatures are not greater than the max temperatures allowed
+      if (config.valve_max_temp < temperature_data.valve_zone_temp) {
+        greater_than_max = true;
+      }
+      if (config.amp1_max_temp < temperature_data.amp1_zone_temp) {
+        greater_than_max = true;
+      }
+      if (config.amp2_max_temp < temperature_data.amp2_zone_temp) {
+        greater_than_max = true;
+      }
       if (config.valve_max_temp < temperature_data.valve_zone_temp) {
         greater_than_max = true;
       }
@@ -252,12 +287,13 @@ void heater_task(void * pvParameters) {
       printf("Amp0: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp0_zone_temp, amp0_pid.out);
       printf("Amp1: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp1_zone_temp, amp1_pid.out);
       printf("Amp2: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp2_zone_temp, amp2_pid.out);
-#if UNIFORMITY
-      printf("Valv: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.valve_zone_temp, valve_pid.out);
-#endif
+      printf("Valve: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.valve_zone_temp, valve_pid.out);
     }
     if (valve_zone_running) {
-      printf("Valv: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.valve_zone_temp, valve_pid.out);
+      printf("Amp0_2: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp0_zone_temp, amp0_pid_2.out);
+      printf("Amp1_2: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp1_zone_temp, amp1_pid_2.out);
+      printf("Amp2_2: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp2_zone_temp, amp2_pid_2.out);
+      printf("Valve_2: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.valve_zone_temp, valve_pid_2.out);
     }
 #endif
   }

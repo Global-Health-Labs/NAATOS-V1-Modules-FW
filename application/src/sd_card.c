@@ -688,6 +688,42 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
         case AMP2_SETPOINT_C_2:
             parameters->amp2_setpoint_2 = atof(val); 
             break;
+        case VALVE_KP_2:
+            parameters->valve_kp_2 = atof(val);
+            break;
+        case VALVE_KI_2:
+            parameters->valve_ki_2 = atof(val);
+            break;
+        case VALVE_KD_2:
+            parameters->valve_kd_2 = atof(val);
+            break;
+        case AMP0_KP_2:
+            parameters->amp0_kp_2 = atof(val);
+            break;
+        case AMP0_KI_2:
+            parameters->amp0_ki_2 = atof(val);
+            break;
+        case AMP0_KD_2:
+            parameters->amp0_kd_2 = atof(val);
+            break;
+        case AMP1_KP_2:
+            parameters->amp1_kp_2 = atof(val);
+            break;
+        case AMP1_KI_2:
+            parameters->amp1_ki_2 = atof(val);
+            break;
+        case AMP1_KD_2:
+            parameters->amp1_kd_2 = atof(val);
+            break;
+        case AMP2_KP_2:
+            parameters->amp2_kp_2 = atof(val);
+            break;
+        case AMP2_KI_2:
+            parameters->amp2_ki_2 = atof(val);
+            break;
+        case AMP2_KD_2:
+            parameters->amp2_kd_2 = atof(val);
+            break;
         default:
             // Handle default case
             break;

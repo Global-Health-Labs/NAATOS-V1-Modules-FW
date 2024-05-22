@@ -216,7 +216,23 @@ naatos_config_parameters config = {
   .amp1_kd = 0,
   .amp2_kp = 0,
   .amp2_ki = 0,
-  .amp2_kd = 0
+  .amp2_kd = 0,
+  .valve_setpoint_2 = 0,
+  .amp0_setpoint_2 = 0,
+  .amp1_setpoint_2 = 0,
+  .amp2_setpoint_2 = 0,
+  .valve_kp_2 = 0,
+  .valve_ki_2 = 0, 
+  .valve_kp_2 = 0,
+  .amp0_kp_2 = 0,
+  .amp0_ki_2 = 0,
+  .amp0_kd_2 = 0,
+  .amp1_kp_2 = 0,
+  .amp1_ki_2 = 0,
+  .amp1_kd_2 = 0,
+  .amp2_kp_2 = 0,
+  .amp2_ki_2 = 0,
+  .amp2_kd_2 = 0
 };
 bool use_default_configuration_parameters;
 
