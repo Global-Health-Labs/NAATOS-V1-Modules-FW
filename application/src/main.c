@@ -225,6 +225,7 @@ bool use_default_configuration_parameters;
 
 // Function defs
 void sendUpdatedMainTaskState(main_state_t new_state);
+void sendWdtHeaterInvalid();
 bool begin_amplification_zone(void);
 void end_amplification_zone(void);
 void begin_valve_zone(void);
@@ -270,6 +271,7 @@ void main_task(void * pvParameters) {
       // In Standby State
       case STANDBY:
         if (last_state != main_state) {
+          sendWdtHeaterInvalid(); // Invalidate the heater to stop WDT from watching it
           last_state = main_state;
           // Check to see if there was an error during the last run
           if (error_during_run) {
@@ -916,6 +918,17 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
 
   // Start Tasks
   vTaskStartScheduler();
+}
+
+void sendWdtHeaterInvalid(){
+  watchdog_time_update_t wdtUpdate = {};
+  wdtUpdate.taskName = HEATER;
+  wdtUpdate.valid = false;
+
+    xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
+    if (xReturned != pdPASS) {
+      printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+    }
 }
 
 
