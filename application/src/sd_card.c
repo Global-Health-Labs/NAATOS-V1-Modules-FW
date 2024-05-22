@@ -430,6 +430,102 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
+  // Write Valve Zone Setpoint
+  configBufferSize = sprintf(configBuffer, "valve_setpoint_2:%0.2f\n", VALVE_SETPOINT_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amplification Zone Setpoint
+  configBufferSize = sprintf(configBuffer, "amp0_setpoint_2:%0.2f\n", AMP0_SETPOINT_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "amp1_setpoint_2:%0.2f\n", AMP1_SETPOINT_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "amp2_setpoint_2:%0.2f\n", AMP2_SETPOINT_2);
+
+  // Write Valve Kp
+  configBufferSize = sprintf(configBuffer, "valve_kp_2:%0.3f\n", V_KP_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Valve Ki
+  configBufferSize = sprintf(configBuffer, "valve_ki_2:%0.3f\n", V_KI_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Valve Kd
+  configBufferSize = sprintf(configBuffer, "valve_kd_2:%0.3f\n", V_KD_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp0 Kp
+  configBufferSize = sprintf(configBuffer, "amp0_kp_2:%0.3f\n", A0_KP_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp0 Ki
+  configBufferSize = sprintf(configBuffer, "amp0_ki_2:%0.3f\n", A0_KI_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp0 Kd
+  configBufferSize = sprintf(configBuffer, "amp0_kd_2:%0.3f\n", A0_KD_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp1 Kp
+  configBufferSize = sprintf(configBuffer, "amp1_kp_2:%0.3f\n", A1_KP_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp1 Ki
+  configBufferSize = sprintf(configBuffer, "amp1_ki_2:%0.3f\n", A1_KI_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp1 Kd
+  configBufferSize = sprintf(configBuffer, "amp1_kd_2:%0.3f\n", A1_KD_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp2 Kp
+  configBufferSize = sprintf(configBuffer, "amp2_kp_2:%0.3f\n", A2_KP_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp2 Ki
+  configBufferSize = sprintf(configBuffer, "amp2_ki_2:%0.3f\n", A2_KI_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp2 Kd
+  configBufferSize = sprintf(configBuffer, "amp2_kd_2:%0.3f\n", A2_KD_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
   // Close the file
   res = f_close(&file);
   if (res != FR_OK) {
@@ -579,6 +675,18 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
             break;
         case OPTICAL_DISTANCE:
             parameters->optical_distance = atoi(val);
+            break;
+        case VALVE_SETPOINT_C_2:
+            parameters->valve_setpoint_2 = atof(val); 
+            break;
+        case AMP0_SETPOINT_C_2:
+            parameters->amp0_setpoint_2 = atof(val); 
+            break;
+        case AMP1_SETPOINT_C_2:
+            parameters->amp1_setpoint_2 = atof(val); 
+            break;
+        case AMP2_SETPOINT_C_2:
+            parameters->amp2_setpoint_2 = atof(val); 
             break;
         default:
             // Handle default case

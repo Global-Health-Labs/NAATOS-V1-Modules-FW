@@ -250,6 +250,22 @@ typedef struct {
   float amp2_ki;
   float amp2_kd;
   uint16_t optical_distance;
+  float valve_setpoint_2;
+  float amp0_setpoint_2;
+  float amp1_setpoint_2;
+  float amp2_setpoint_2;
+  float valve_kp_2;
+  float valve_ki_2;
+  float valve_kd_2;
+  float amp0_kp_2;
+  float amp0_ki_2;
+  float amp0_kd_2;
+  float amp1_kp_2;
+  float amp1_ki_2;
+  float amp1_kd_2;
+  float amp2_kp_2;
+  float amp2_ki_2;
+  float amp2_kd_2;
 } naatos_config_parameters;
 
 /* Configuration Parameters Variables */

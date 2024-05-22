@@ -87,6 +87,22 @@ typedef enum {
   AMP2_KI,
   AMP2_KD,
   OPTICAL_DISTANCE,
+  VALVE_SETPOINT_C_2,
+  AMP0_SETPOINT_C_2,
+  AMP1_SETPOINT_C_2,
+  AMP2_SETPOINT_C_2,
+  VALVE_KP_2,
+  VALVE_KI_2,
+  VALVE_KD_2,
+  AMP0_KP_2,
+  AMP0_KI_2,
+  AMP0_KD_2,
+  AMP1_KP_2,
+  AMP1_KI_2,
+  AMP1_KD_2,
+  AMP2_KP_2,
+  AMP2_KI_2,
+  AMP2_KD_2,
   NUM_PARAMETERS
 } naatos_config_params_t;
 
