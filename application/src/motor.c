@@ -1,153 +1,95 @@
-#include "motor.h"
-#include "timers.h"
 #include "nrf_drv_ppi.h"
 #include "nrf_drv_timer.h"
+#include "nrf_drv_gpiote.h"
 
-#define USE_MOTOR //TODO: Where should this live?
+#include "motor.h"
 
+//Use one hardware timer (which is set up as a counter)
+static const nrf_drv_timer_t m_counter1 = NRF_DRV_TIMER_INSTANCE(1);
 
+static nrf_ppi_channel_t ppi_channel_1;
 
-//xQueueHandle heater_zoneRunQueue;
-//xQueueHandle heater_temperatureDataQueue;
+/* Empty event handler. Not used since tasks/events are handled in hardware (PPI), but needs to be defined for semantical reasons. */
+static void empty_gpiote_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
+{
+    //uint32_t count = nrf_drv_timer_capture(&m_counter1, NRF_TIMER_CC_CHANNEL0);
+    //printf("Value on MOTOR_INPUT_PIN changed. Counter value = %d\r\n", count);
+}
 
-////bool motor_running = false;
-//bool motor_running = true;
+/* Empty event handler. Not used since tasks/events are handled in hardware (PPI), but needs to be defined for semantical reasons. */
+static void empty_timer_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
+{
+    //printf("Timer event triggered\r\n");
 
-////zone_run_req_t zone_req;
-////temperature_data_t temperature_data;
+}
 
-//pid_controller_t motor_pid;
+/** @brief Function GPIOTE initialization
+ *  @details GPIOTE event triggered by pulses from motor speed sensor output
+ */
+static void gpiote_init(void)
+{
+    ret_code_t err_code;
 
+    err_code = nrf_drv_gpiote_init();
+    APP_ERROR_CHECK(err_code);
 
+    nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(false);
+    in_config.pull = NRF_GPIO_PIN_NOPULL;
 
-
-//const nrf_drv_timer_t TIMER_MOTOR = NRF_DRV_TIMER_INSTANCE(0);
-//static nrf_ppi_channel_t m_ppi_channel1;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//// Initialize the timer driver
-//static void timer_init(void)
-//{
-//    // Configure Timer 1
-//    nrf_drv_timer_config_t timer_cfg = NRF_DRV_TIMER_DEFAULT_CONFIG;
-//    nrf_drv_timer_init(&TIMER_INSTANCE, &timer_cfg, NULL);
-//}
-
-//// Function to start timer
-//static void timer_start(void)
-//{
-//    nrf_drv_timer_enable(&TIMER_INSTANCE);
-//    nrf_drv_timer_clear(&TIMER_INSTANCE);
-//}
-
-//// Function to stop timer and get elapsed time
-//static uint32_t timer_stop(void)
-//{
-//    nrf_drv_timer_disable(&TIMER_INSTANCE);
+    err_code = nrf_drv_gpiote_in_init(MOTOR_INPUT_PIN, &in_config, empty_gpiote_event_handler);
+    APP_ERROR_CHECK(err_code);
     
-//    //Elapses time in microseconds
-//    return (nrf_drv_timer_capture(&TIMER_INSTANCE, NRF_TIMER_CC_CHANNEL0) / (SystemCoreClock / 1000000);)
-  
-//}
+    nrf_drv_gpiote_in_event_enable(MOTOR_INPUT_PIN, true); 
+}
 
 
-//void motor_init(input_pin){
-////Configure a pin to be an input, read the motor speed output on this pin
-////Set up a timer or something so that you can determine the time between pulses
+/** @brief Function for Counter 1 initialization.
+ *  @details Counter 1 will be incremented by toggling state on GPIO pin via PPI.
+ */
+static void counter1_init(void)
+{
+    ret_code_t err_code;
+
+    nrf_drv_timer_config_t timer_cfg = NRF_DRV_TIMER_DEFAULT_CONFIG;
+    timer_cfg.bit_width = NRF_TIMER_BIT_WIDTH_32; //Do I need to specify a width? Example did
+    timer_cfg.mode = NRF_TIMER_MODE_COUNTER;
+    err_code = nrf_drv_timer_init(&m_counter1, &timer_cfg, empty_timer_event_handler);
+    APP_ERROR_CHECK(err_code);
+
+    nrf_drv_timer_enable(&m_counter1);
+    nrf_drv_timer_clear(&m_counter1);
+}
+
+/** @brief Function for initializing the PPI peripheral.
+*/
+static void ppi_init(void)
+{
+    ret_code_t err_code;
+
+    err_code = nrf_drv_ppi_init();
+    APP_ERROR_CHECK(err_code);
+
+    err_code = nrf_drv_ppi_channel_alloc(&ppi_channel_1);
+    APP_ERROR_CHECK(err_code);
+
+    uint32_t gpiote_evt_addr_1 = nrf_drv_gpiote_in_event_addr_get(MOTOR_INPUT_PIN);
+    uint32_t timer_count_task_addr = nrf_drv_timer_task_address_get(&m_counter1, NRF_TIMER_TASK_COUNT);
+
+    err_code = nrf_drv_ppi_channel_assign(ppi_channel_1, gpiote_evt_addr_1, timer_count_task_addr); // Trigger timer count task when GPIOTE pin detects edge
+    APP_ERROR_CHECK(err_code);
     
-//    //Initializes pin as input
-//    nrf_gpio_cfg_input(input_pin, NRF_GPIO_PIN_NOPULL);
+    err_code = nrf_drv_ppi_channel_enable(ppi_channel_1);
+    APP_ERROR_CHECK(err_code);
 
+}
 
-
-//}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//void motor_task(void * pvParameters) {
-//  BaseType_t xReturned;
-
-//  // Create PID Controllers 
-//  if (use_default_configuration_parameters) {
-//    pid_controller_init(&motor_pid, MOTOR_SETPOINT, MOTOR_P, MOTOR_I, MOTOR_D);
-//  } else {
-//      pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  
-//  }
-
-//  for (;;) {
-//    // Check for run motor message
-//    if (uxQueueMessagesWaiting(heater_zoneRunQueue) == 0) { //TODO: Replace the heat_zoneRunQueue reference
-//      vTaskDelay(100);
-//      if (true)
-//        continue; // Go back to top of loop if motor is not running
-//    }
-//    // Take message from queue
-//    else {
-//      xReturned = xQueueReceive(heater_zoneRunQueue, &zone_req, 0); //TODO: Replace reference to heater_zoneRunQueue and zone_req
-//      if (xReturned != pdPASS) {
-//        printf("HEATER_TASK: unable to receive zone run request from heater_zoneRunQueue\n");//TODO: Replace this error message
-//      }
-//      //TODO: Most of the code below needs to be replaced
-//      // Set zones enabled
-//      if (zone_req.zone == AMPLIFICATION) {
-//        amplification_zone_running = zone_req.on;
-//        if (!amplification_zone_running)  {
-//          amp0_pid.out = 1;
-//          update_amp0_duty(amp0_pid.out);
-//          update_amp1_duty(amp1_pid.out);
-//          update_amp2_duty(amp2_pid.out);
-//        }
-//      }
-//      else if (zone_req.zone = VALVE) {
-//        valve_zone_running = zone_req.on;
-//        if (!valve_zone_running) {
-//          valve_pid.out = 1;
-//          update_valve_duty(valve_pid.out);
-//        }
-//      }
-//    }
-
-//    if (!amplification_zone_running & !valve_zone_running)
-//        continue; // Go back to top of loop if no zones running
+/** @brief Initializes motor speed reading
+ */
+nrf_drv_timer_t* motor_tach_init(void)
+{
+    counter1_init();
+    gpiote_init();
+    ppi_init();
     
-//    //TODO: Here is where you should read the speed data
-//    // Receive temperature data (blocking till data comes in)
-//    xReturned = xQueueReceive(heater_temperatureDataQueue, &temperature_data, portMAX_DELAY);
-//    if (xReturned != pdPASS) {
-//      printf("HEATER_TASK: unable to receive temperature data from heater_temperatureDataQueue\n");
-//    }
-    
-//    // Update PID and PWM
-//    if (motor_running) {
-//      //TODO: Update parameters in below function calls
-//      // Update Amplification 0 PID loop with new temperatures
-//      pid_controller_compute(&amp0_pid, temperature_data.amp0_zone_temp);
-//      // Update Amplification 0 PWM with PID output
-//      update_amp0_duty(amp0_pid.out);
-//  }
-//}
+    return &m_counter1;
+}

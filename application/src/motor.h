@@ -1,15 +1,14 @@
-#pragma once
+#include "nrf_drv_ppi.h"
+#include "nrf_drv_timer.h"
 
-#include "naatos_queues.h"
-#include "naatos_config.h"
-#include "pid.h"
-#include "pwm.h"
+#include "nrf_drv_gpiote.h"
 
-#define MOTOR_SETPOINT    1000 //RP
+#define MOTOR_INPUT_PIN 38
 
-//TODO: Figure out what these values should actually be
-#define MOTOR_P    2.250
-#define MOTOR_I    0.021
-#define MOTOR_D    2.255
+static const nrf_drv_timer_t m_counter0;
+static nrf_ppi_channel_t m_ppi_channel1;
 
-//void motor_task(void * pvParameters);
+static void gpiote_init(void);
+static void empty_gpiote_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action);
+static void ppi_init(void);
+nrf_drv_timer_t* motor_tach_init(void);

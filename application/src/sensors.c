@@ -1,8 +1,17 @@
 #include "sensors.h"
 #include "timers.h"
+#include "nrf_drv_timer.h"
+
+#define USE_MOTOR
 
 sensor_switches_t switches;
 temperature_data_t temperatures;
+
+static const nrf_drv_timer_t *p_counter1;
+static uint32_t motor_speed_read_t1 = 0;
+static uint32_t motor_speed_read_t2;
+static bool skipped_last_call = false;
+static long double motor_speed = 0.0; //RPM
 
 static tsys01_errors_t tsys01_err;
 
@@ -104,11 +113,8 @@ void sensors_task(void * pvParameters) {
     vTaskDelay(pdMS_TO_TICKS(12 * 4)); // Simulate 12ms delay for each reading
 #endif
 
-#ifdef USE_MOTOR //TODO: Why doesn't it see that USE_MOTOR is defined?
-    //TODO: Check delta time
-    //TODO: Check the counter register
-    //TODO: Clear both the counter and timers
-
+#ifdef USE_MOTOR
+    readMotorSpeed();
 #else
     //TODO: Give a dummy motor speed if not using one? Or don't give anything?
 #endif
@@ -158,6 +164,7 @@ void init_sensors_gpios(void) {
   nrf_gpio_pin_set(SENSORS_EN);
 
   /* Setup Motor Speed Sensor Input*/
+  p_counter1 = motor_tach_init();
 
 }
 
@@ -172,4 +179,26 @@ long double readTemp(sensor_selection_t sensor) {
     printf("HEATER_TASK: Unable to read temperature!\n");
   }
   return temperature;
+}
+
+int readMotorSpeed(void){
+  //Only computes speed on every second run through this function
+  if(skipped_last_call){
+    //Check how many pulses have been captured in elapsed time since last call
+    motor_speed_read_t2 = xTaskGetTickCount();
+    uint32_t delta_t = pdTICKS_TO_MS(motor_speed_read_t2 - motor_speed_read_t1);
+    uint32_t pulse_count = (nrf_drv_timer_capture(p_counter1, NRF_TIMER_CC_CHANNEL0)) / 2; //Divide by two because counter increments for every rising AND falling edge
+   
+    //Convert pulse count to rotational speed
+    double motor_speed_rpm = (1000 * 60 * ((double) pulse_count / (double) delta_t)) / 9; 
+    printf("Motor speed: %f\r\n", motor_speed_rpm);
+  
+    //Clear the counter, update variable for tracking elapsed time
+    nrf_drv_timer_clear(p_counter1);
+    motor_speed_read_t1 = xTaskGetTickCount();
+    skipped_last_call = false;
+  }
+  else{
+    skipped_last_call = true;
+  }
 }
