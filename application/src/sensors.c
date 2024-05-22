@@ -1,8 +1,26 @@
 #include "sensors.h"
 #include "timers.h"
 
+const bool pwm_req = true;
+
 sensor_switches_t switches;
-temperature_data_t temperatures;
+temperature_data_t temperatures = {
+  .amp0_zone_pwm = 0,
+  .amp0_zone_temp = 0,
+  .amp1_zone_pwm = 0,
+  .amp1_zone_temp = 0,
+  .amp2_zone_pwm = 0,
+  .amp2_zone_temp = 0,
+  .valve_zone_pwm = 0,
+  .valve_zone_temp = 0
+};
+
+temperature_pwm_data_t pwm_data = {
+  .valve_zone_pwm = 0,
+  .amp0_zone_pwm = 0,
+  .amp1_zone_pwm = 0,
+  .amp2_zone_pwm = 0
+};
 
 static tsys01_errors_t tsys01_err;
 
@@ -14,6 +32,7 @@ static long double amp2_temperature = 0.0;
 xQueueHandle sensor_mainStateQueue;
 xQueueHandle sensor_usbWaitQueue;
 xQueueHandle sensor_mainStateContinueQueue;
+xQueueHandle sensor_pwmRecvQueue;
 
 main_state_t s_main_state = STANDBY;
 
@@ -168,7 +187,26 @@ void sensors_task(void * pvParameters) {
     if (s_main_state == RUNNING) 
       sample_log_index++;
     if (sample_log_index >= sample_log_max) {
-      log_msg.temperature_data = temperatures;
+      // Request PWM from heater
+      xReturned = xQueueSend(heater_pwmReqQueue, &pwm_req, 0);
+      if (xReturned != pdPASS) {
+        printf("SENSOR_TASK: Unable to send PWM request to heater_pwmReqQueue queue.\n");
+      }
+      // Receive PWM from heater
+      xReturned = xQueueReceive(sensor_pwmRecvQueue, &pwm_data, portMAX_DELAY);
+      if (xReturned != pdPASS) {
+        printf("SENSOR_TASK: Unable to receive PWM data from sensor_pwmRecvQueue queue.\n");
+      }
+      // Update PWM in temerature data
+      log_msg.temperature_data.amp0_zone_temp = temperatures.amp0_zone_temp;
+      log_msg.temperature_data.amp1_zone_temp = temperatures.amp1_zone_temp;
+      log_msg.temperature_data.amp2_zone_temp = temperatures.amp2_zone_temp;
+      log_msg.temperature_data.valve_zone_temp = temperatures.valve_zone_temp;
+      log_msg.temperature_data.amp0_zone_pwm = pwm_data.amp0_zone_pwm;
+      log_msg.temperature_data.amp1_zone_pwm = pwm_data.amp1_zone_pwm;
+      log_msg.temperature_data.amp2_zone_pwm = pwm_data.amp1_zone_pwm;
+      log_msg.temperature_data.valve_zone_pwm = pwm_data.valve_zone_pwm;
+      // Send the Log message
       xReturned = xQueueSend(logger_logMessageQueue, (void *)&log_msg, 0);
       if (xReturned != pdPASS) {
         printf("SENSORS_TASK: Unable to send log message to logger_logMessageQueue.\n");

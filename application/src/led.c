@@ -64,12 +64,7 @@ void set_led2_blue_breathe(void) {
 }
 
 void turn_off_led2(void) {
-  led_driver_disable_channel(LED2, red, NULL);
-  led_driver_disable_channel(LED2, green, NULL);
-  led_driver_disable_channel(LED2, blue, NULL);
-  led_driver_enable_channel(LED2, red, NULL);
-  led_driver_enable_channel(LED2, green, NULL);
-  led_driver_enable_channel(LED2, blue, NULL);
+  led_driver_set_channel_animation_solid(LED2, led2_current_color, true, NULL);
   led_driver_disable_channel(LED2, red, NULL);
   led_driver_disable_channel(LED2, green, NULL);
   led_driver_disable_channel(LED2, blue, NULL);

@@ -286,6 +286,12 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
+  // Write Recovery Power Threshold
+  configBufferSize = sprintf(configBuffer, "recovery_power_threshold:%d\n", DEFAULT_RECOVERY_THRES);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
   // Write Valve Zone Setpoint
   configBufferSize = sprintf(configBuffer, "valve_setpoint:%0.2f\n", VALVE_SETPOINT);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
@@ -304,6 +310,44 @@ FRESULT check_for_config_file(void) {
     return res;
   }
   configBufferSize = sprintf(configBuffer, "amp2_setpoint:%0.2f\n", AMP2_SETPOINT);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Max Temperatures
+  configBufferSize = sprintf(configBuffer, "valve_max_temp:%0.2f\n", DEFAULT_VALVE_MAX_TEMP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "amp0_max_temp:%0.2f\n", DEFAULT_AMP0_MAX_TEMP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "amp1_max_temp:%0.2f\n", DEFAULT_AMP1_MAX_TEMP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "amp2_max_temp:%0.2f\n", DEFAULT_AMP2_MAX_TEMP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Minimum Run Zone Temperature and Enable
+  configBufferSize = sprintf(configBuffer, "min_run_zone_temp:%0.2f\n", DEFAULT_MIN_RUN_ZONE_TEMP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "min_run_zone_temp_en:%s\n", DEFAULT_MIN_RUN_ZONE_TEMP_EN ? "true" : "false");
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Alert Timeout (minutes)
+  configBufferSize = sprintf(configBuffer, "alert_timeout_time_m:%0.2f\n", DEFAULT_ALERT_TIMEOUT_M);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -380,7 +424,12 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
-
+  // Write Optical Switch
+  configBufferSize = sprintf(configBuffer, "optical_distace:%d\n", OPTICAL_TRIG_THRES);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
   // Close the file
   res = f_close(&file);
   if (res != FR_OK) {
@@ -401,6 +450,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
   FRESULT res;
   char * pch;
   char * val = (char *)malloc(50 * sizeof(char));
+  int num;
 
   // Re-Mount SD Card
   res = sd_card_mount();
@@ -454,6 +504,9 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
         case LOW_POWER_THRESHOLD:
             parameters->low_power_threshold = atoi(val);
             break;
+        case RECOVERY_POWER_THRESHOLD:
+            parameters->recovery_power_thresh = atoi(val);
+            break;
         case VALVE_SETPOINT_C:
             parameters->valve_setpoint = atof(val); 
             break;
@@ -465,6 +518,28 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
             break;
         case AMP2_SETPOINT_C:
             parameters->amp2_setpoint = atof(val); 
+            break;
+        case VALVE_MAX_TEMP_C:
+            parameters->valve_max_temp = atof(val); 
+            break;
+        case AMP0_MAX_TEMP_C:
+            parameters->amp0_max_temp = atof(val);
+            break;
+        case AMP1_MAX_TEMP_C:
+            parameters->amp1_max_temp = atof(val);
+            break;
+        case AMP2_MAX_TEMP_C:
+            parameters->amp2_max_temp = atof(val);
+            break;
+        case MIN_RUN_ZONE_TEMP_C:
+            parameters->min_run_zone_temp = atof(val);
+            break;
+        case MIN_RUN_ZONE_TEMP_EN:
+            num = strcmp(val, "true\n");
+            parameters->min_run_zone_temp_en = num ? false : true;
+            break;
+        case ALERT_TIMEOUT_TIME:
+            parameters->alert_timeout_time_m = atof(val);
             break;
         case VALVE_KP:
             parameters->valve_kp = atof(val);
@@ -501,6 +576,9 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
             break;
         case AMP2_KD:
             parameters->amp2_kd = atof(val);
+            break;
+        case OPTICAL_DISTANCE:
+            parameters->optical_distance = atoi(val);
             break;
         default:
             // Handle default case
