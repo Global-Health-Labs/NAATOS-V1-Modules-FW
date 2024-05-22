@@ -89,15 +89,15 @@ void heater_task(void * pvParameters) {
       if (zone_req.zone == AMPLIFICATION) {
         amplification_zone_running = zone_req.on;
         if (!amplification_zone_running)  {
-          amp0_pid.out = 1;
-          amp1_pid.out = 1;
-          amp2_pid.out = 1;
+          amp0_pid.out = 0;
+          amp1_pid.out = 0;
+          amp2_pid.out = 0;
           update_amp0_duty(amp0_pid.out);
           update_amp1_duty(amp1_pid.out);
           update_amp2_duty(amp2_pid.out);
 
 #if UNIFORMITY
-          valve_pid.out = 1;
+          valve_pid.out = 0;
           update_valve_duty(valve_pid.out);
           pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  // TODO: Implement defaults
 #endif
