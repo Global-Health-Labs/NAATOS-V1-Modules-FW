@@ -4,8 +4,26 @@
 
 #define USE_MOTOR
 
+const bool pwm_req = true;
+
 sensor_switches_t switches;
-temperature_data_t temperatures;
+temperature_data_t temperatures = {
+  .amp0_zone_pwm = 0,
+  .amp0_zone_temp = 0,
+  .amp1_zone_pwm = 0,
+  .amp1_zone_temp = 0,
+  .amp2_zone_pwm = 0,
+  .amp2_zone_temp = 0,
+  .valve_zone_pwm = 0,
+  .valve_zone_temp = 0
+};
+
+temperature_pwm_data_t pwm_data = {
+  .valve_zone_pwm = 0,
+  .amp0_zone_pwm = 0,
+  .amp1_zone_pwm = 0,
+  .amp2_zone_pwm = 0
+};
 
 static const nrf_drv_timer_t *p_counter1;
 static uint32_t motor_speed_read_t1 = 0;
@@ -21,6 +39,10 @@ static long double amp1_temperature = 0.0;
 static long double amp2_temperature = 0.0;
 
 xQueueHandle sensor_mainStateQueue;
+xQueueHandle sensor_usbWaitQueue;
+xQueueHandle sensor_mainStateContinueQueue;
+xQueueHandle sensor_pwmRecvQueue;
+
 main_state_t s_main_state = STANDBY;
 
 static log_data_message_t log_msg = {
@@ -33,7 +55,19 @@ void sensors_task(void * pvParameters) {
   BaseType_t xReturned;
   uint32_t sample_log_index = 0;
   uint32_t sample_log_max = 0;
-  
+  tasks_t sensor_task = SENSORS;
+  bool cont;
+
+  usb_suspend_req_t sus_req;
+  usb_suspend_acpt_t sus_acpt = {
+    .task = SENSORS,
+    .suspended = true
+  };
+  usb_suspend_over_t sus_over = {
+    .task = SENSORS,
+    .over = true
+  };
+
   // Set the last sample based on config
   if (use_default_configuration_parameters) {
     sample_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE); 
@@ -57,7 +91,37 @@ void sensors_task(void * pvParameters) {
       if (xReturned != pdPASS) {
         printf("BATT_TASK: Unable to receive state change from sensor_mainStateQueue.\n");
       }
-      continue;
+      // Respond to main state change
+      xReturned = xQueueSend(main_mainStateRespQueue, &sensor_task, 0);
+      if (xReturned != pdPASS) {
+        printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
+      }
+      // Wait for Continue
+      xReturned = xQueueReceive(sensor_mainStateContinueQueue, &cont, portMAX_DELAY);
+      if (xReturned != pdPASS) {
+        printf("USB: Unable to recevive continue to sensor_mainStateContinueQueue queue.\n");
+      }
+    }
+
+    // Check to see if we need to suspend for USB to be enabled
+    if (uxQueueMessagesWaiting(sensor_usbWaitQueue) > 0) {
+      xReturned = xQueueReceive(sensor_usbWaitQueue, &sus_req, 0) ;
+      if (xReturned != pdPASS) {
+        printf("SENSORS: Unable to receive usb suspend request from sensor_usbWaitQueue\n");
+      }
+      // Send Suspend Accepted
+      xReturned = xQueueSend(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0); 
+      if (xReturned != pdPASS) {
+        printf("SENSORS: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\n");
+      }
+      printf("SENSORS: Suspending for 15 seconds.\n");
+      // Delay Task for 15 Seconds
+      vTaskDelay(pdMS_TO_TICKS(USB_SUSPEND_TASKS_TIME));
+      // Send Suspend Over
+      xReturned = xQueueSend(usb_usbWaitOverQueue, &sus_over, 0); 
+      if (xReturned != pdPASS) {
+        printf("SENSORS: Unable to send usb suspend over to usb_usbWaitOverQueue\n");
+      }
     }
    
  #if (GO_STRAIGHT_TO_RUNNING)
@@ -138,7 +202,26 @@ void sensors_task(void * pvParameters) {
     if (s_main_state == RUNNING) 
       sample_log_index++;
     if (sample_log_index >= sample_log_max) {
-      log_msg.temperature_data = temperatures;
+      // Request PWM from heater
+      xReturned = xQueueSend(heater_pwmReqQueue, &pwm_req, 0);
+      if (xReturned != pdPASS) {
+        printf("SENSOR_TASK: Unable to send PWM request to heater_pwmReqQueue queue.\n");
+      }
+      // Receive PWM from heater
+      xReturned = xQueueReceive(sensor_pwmRecvQueue, &pwm_data, portMAX_DELAY);
+      if (xReturned != pdPASS) {
+        printf("SENSOR_TASK: Unable to receive PWM data from sensor_pwmRecvQueue queue.\n");
+      }
+      // Update PWM in temerature data
+      log_msg.temperature_data.amp0_zone_temp = temperatures.amp0_zone_temp;
+      log_msg.temperature_data.amp1_zone_temp = temperatures.amp1_zone_temp;
+      log_msg.temperature_data.amp2_zone_temp = temperatures.amp2_zone_temp;
+      log_msg.temperature_data.valve_zone_temp = temperatures.valve_zone_temp;
+      log_msg.temperature_data.amp0_zone_pwm = pwm_data.amp0_zone_pwm;
+      log_msg.temperature_data.amp1_zone_pwm = pwm_data.amp1_zone_pwm;
+      log_msg.temperature_data.amp2_zone_pwm = pwm_data.amp1_zone_pwm;
+      log_msg.temperature_data.valve_zone_pwm = pwm_data.valve_zone_pwm;
+      // Send the Log message
       xReturned = xQueueSend(logger_logMessageQueue, (void *)&log_msg, 0);
       if (xReturned != pdPASS) {
         printf("SENSORS_TASK: Unable to send log message to logger_logMessageQueue.\n");
@@ -149,10 +232,10 @@ void sensors_task(void * pvParameters) {
     // Delay based on the given sample rate
     // Remove 48 ms delay when running for temperature read delays
     if (use_default_configuration_parameters) {
-      vTaskDelay(pdMS_TO_TICKS((DEFAULT_SAMPLE_RATE*1000) - (12 * 4) + 1)); 
+      vTaskDelay(pdMS_TO_TICKS((DEFAULT_SAMPLE_RATE*1000.0) - (12.0 * 4.0) + 1.0)); 
     }
     else {
-      vTaskDelay(pdMS_TO_TICKS((config.sample_rate*1000) - (12 * 4) + 1));
+      vTaskDelay(pdMS_TO_TICKS((config.sample_rate*1000.0) - (12.0 * 4.0) + 1.0));
     }
   }
 }
@@ -160,12 +243,17 @@ void sensors_task(void * pvParameters) {
 void init_sensors_gpios(void) {
   /* Setup Hal Sensor */
   nrf_gpio_cfg_input(HAL_INPUT_PIN, NRF_GPIO_PIN_PULLDOWN);
+  nrf_gpio_cfg_output(NRF_GPIO_PIN_MAP(1,7));
+  nrf_gpio_pin_write(NRF_GPIO_PIN_MAP(1,7), 1);
   nrf_gpio_cfg_output(SENSORS_EN);
   nrf_gpio_pin_set(SENSORS_EN);
 
   /* Setup Motor Speed Sensor Input*/
   p_counter1 = motor_tach_init();
 
+  nrf_gpio_cfg_output(NRF_GPIO_PIN_MAP(1,3));
+  //nrf_gpio_pin_write(NRF_GPIO_PIN_MAP(1,3), 1);
+  nrf_gpio_pin_set(NRF_GPIO_PIN_MAP(1,3));
 }
 
 long double readTemp(sensor_selection_t sensor) {

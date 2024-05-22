@@ -1,14 +1,5 @@
 <!DOCTYPE CrossStudio_Project_File>
 <solution Name="NAATOS_fw" target="8" version="2">
-  <configuration
-    Name="Debug"
-    c_preprocessor_definitions="DEBUG; DEBUG_NRF"
-    gcc_optimization_level="None" />
-  <configuration
-    Name="Release"
-    c_preprocessor_definitions="NDEBUG"
-    gcc_optimization_level="Optimize For Size"
-    link_time_optimization="No" />
   <project Name="NAATOS_fw">
     <configuration
       Name="Common"
@@ -36,160 +27,24 @@
       linker_printf_width_precision_supported="Yes"
       linker_scanf_fmt_level="long"
       linker_section_placement_file="flash_placement.xml"
-      linker_section_placement_macros="FLASH_PH_START=0x0;FLASH_PH_SIZE=0x100000;RAM_PH_START=0x20000000;RAM_PH_SIZE=0x40000;FLASH_START=0x0;FLASH_SIZE=0x100000;RAM_START=0x20000000;RAM_SIZE=0x40000"
+      linker_section_placement_macros="FLASH_PH_START=0x0;FLASH_PH_SIZE=0x100000;RAM_PH_START=0x20000000;RAM_PH_SIZE=0x40000;FLASH_START=0x0;FLASH_SIZE=0xF3000;RAM_START=0x20000000;RAM_SIZE=0x40000"
       linker_section_placements_segments="FLASH1 RX 0x0 0x100000;RAM1 RWX 0x20000000 0x40000"
       macros="CMSIS_CONFIG_TOOL=../sdk/external_tools/cmsisconfig/CMSIS_Configuration_Wizard.jar"
       project_directory=""
       project_type="Executable" />
-    <configuration
-      Name="Debug"
-      c_user_include_directories="../sdk/external/freertos/source"
-      linker_printf_fp_enabled="Double" />
-    <folder Name="Application">
-      <file file_name="../src/adc.c" />
-      <file file_name="../src/adc.h" />
-      <file file_name="../src/battery.c" />
-      <file file_name="../src/battery.h" />
-      <file file_name="../src/calendar_rtc.c" />
-      <file file_name="../src/calendar_rtc.h" />
-      <file file_name="../src/composite_usb.h" />
-      <file file_name="../src/heater.c" />
-      <file file_name="../src/heater.h" />
-      <file file_name="../src/i2c_hal_freertos.c" />
-      <file file_name="../src/i2c_hal_freertos.h" />
-      <file file_name="../src/logger.c" />
-      <file file_name="../src/logger.h" />
-      <file file_name="../src/main.c" />
-      <file file_name="../src/naatos_config.h" />
-      <file file_name="../src/naatos_queues.h" />
-      <file file_name="../src/pid.c" />
-      <file file_name="../src/pid.h" />
-      <file file_name="../src/pwm.c" />
-      <file file_name="../src/pwm.h" />
-      <file file_name="../src/sd_card.c" />
-      <file file_name="../src/sd_card.h" />
-      <file file_name="../src/config/sdk_config.h" />
-      <file file_name="../src/sensors.c" />
-      <file file_name="../src/sensors.h" />
-      <file file_name="../src/spi.c" />
-      <file file_name="../src/spi.h" />
-      <file file_name="../src/states.h" />
-      <file file_name="../src/tsys01.c" />
-      <file file_name="../src/tsys01.h" />
-      <file file_name="../src/usb.c" />
-      <file file_name="../src/usb.h" />
-      <file file_name="pid_motor.c">
-        <configuration Name="Debug" build_exclude_from_build="Yes" />
-      </file>
-      <file file_name="pid_motor.h">
-        <configuration Name="Debug" build_exclude_from_build="Yes" />
-      </file>
-      <file file_name="../src/motorDebug.c">
-        <configuration Name="Debug" build_exclude_from_build="Yes" />
-      </file>
-      <file file_name="../src/motorDebug.h">
-        <configuration Name="Debug" build_exclude_from_build="Yes" />
-      </file>
-      <file file_name="../src/motor.c" />
-      <file file_name="../src/motor.h" />
+    <folder Name="Segger Startup Files">
+      <file file_name="$(StudioDir)/source/thumb_crt0.s" />
+    </folder>
+    <folder Name="nRF_Log">
+      <file file_name="../sdk/components/libraries/log/src/nrf_log_backend_rtt.c" />
+      <file file_name="../sdk/components/libraries/log/src/nrf_log_backend_serial.c" />
+      <file file_name="../sdk/components/libraries/log/src/nrf_log_backend_uart.c" />
+      <file file_name="../sdk/components/libraries/log/src/nrf_log_default_backends.c" />
+      <file file_name="../sdk/components/libraries/log/src/nrf_log_frontend.c" />
+      <file file_name="../sdk/components/libraries/log/src/nrf_log_str_formatter.c" />
     </folder>
     <folder Name="Board Definition">
       <file file_name="../sdk/components/boards/boards.c" />
-    </folder>
-    <folder Name="Board Support">
-      <file file_name="../sdk/components/libraries/bsp/bsp.c" />
-    </folder>
-    <folder Name="FATFS">
-      <file file_name="../sdk/external/fatfs/src/option/cc932.c" />
-      <file file_name="../sdk/external/fatfs/port/diskio_blkdev.c" />
-      <file file_name="../sdk/external/fatfs/src/ff.c" />
-      <file file_name="../sdk/external/fatfs/src/ffconf.h" />
-      <file file_name="../sdk/external/fatfs/src/option/syscall.c" />
-    </folder>
-    <folder Name="FreeRTOS">
-      <configuration
-        Name="Debug"
-        build_exclude_from_build="No"
-        c_preprocessor_undefinitions="APP_TIMER_V2_RTC1_ENABLED" />
-      <file file_name="../sdk/external/freertos/source/croutine.c" />
-      <file file_name="../sdk/external/freertos/source/include/croutine.h" />
-      <file file_name="../sdk/external/freertos/source/include/deprecated_definitions.h" />
-      <file file_name="../sdk/external/freertos/source/event_groups.c" />
-      <file file_name="../sdk/external/freertos/source/include/event_groups.h" />
-      <file file_name="../sdk/external/freertos/source/include/FreeRTOS.h" />
-      <file file_name="../sdk/external/freertos/config/FreeRTOSConfig.h" />
-      <file file_name="../sdk/external/freertos/source/portable/MemMang/heap_1.c">
-        <configuration Name="Debug" build_exclude_from_build="Yes" />
-      </file>
-      <file file_name="../sdk/external/freertos/source/portable/MemMang/heap_2.c">
-        <configuration Name="Debug" build_exclude_from_build="Yes" />
-      </file>
-      <file file_name="../sdk/external/freertos/source/portable/MemMang/heap_3.c">
-        <configuration Name="Debug" build_exclude_from_build="Yes" />
-      </file>
-      <file file_name="../sdk/external/freertos/source/portable/MemMang/heap_4.c">
-        <configuration Name="Debug" build_exclude_from_build="No" />
-      </file>
-      <file file_name="heap_5.c">
-        <configuration Name="Debug" build_exclude_from_build="Yes" />
-      </file>
-      <file file_name="../sdk/external/freertos/source/list.c" />
-      <file file_name="../sdk/external/freertos/source/include/list.h" />
-      <file file_name="../sdk/external/freertos/source/include/message_buffer.h" />
-      <file file_name="../sdk/external/freertos/source/include/mpu_prototypes.h" />
-      <file file_name="../sdk/external/freertos/source/portable/Common/mpu_wrappers.c" />
-      <file file_name="../sdk/external/freertos/source/include/mpu_wrappers.h" />
-      <file file_name="../sdk/external/freertos/portable/GCC/nrf52/port.c" />
-      <file file_name="../sdk/external/freertos/portable/CMSIS/nrf52/port_cmsis.c" />
-      <file file_name="../sdk/external/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c" />
-      <file file_name="../sdk/external/freertos/source/include/portable.h" />
-      <file file_name="../sdk/external/freertos/portable/GCC/nrf52/portmacro.h" />
-      <file file_name="../sdk/external/freertos/portable/CMSIS/nrf52/portmacro_cmsis.h" />
-      <file file_name="../sdk/external/freertos/source/include/projdefs.h" />
-      <file file_name="../sdk/external/freertos/source/queue.c" />
-      <file file_name="../sdk/external/freertos/source/include/queue.h" />
-      <file file_name="../sdk/external/freertos/source/include/semphr.h" />
-      <file file_name="../sdk/external/freertos/source/include/stack_macros.h" />
-      <file file_name="../sdk/external/freertos/source/include/StackMacros.h" />
-      <file file_name="../sdk/external/freertos/source/stream_buffer.c" />
-      <file file_name="../sdk/external/freertos/source/include/stream_buffer.h" />
-      <file file_name="../sdk/external/freertos/source/include/task.h" />
-      <file file_name="../sdk/external/freertos/source/tasks.c" />
-      <file file_name="../sdk/external/freertos/source/timers.c" />
-      <file file_name="../sdk/external/freertos/source/include/timers.h" />
-    </folder>
-    <folder Name="None">
-      <file file_name="../sdk/modules/nrfx/mdk/ses_startup_nrf52840.s" />
-      <file file_name="../sdk/modules/nrfx/mdk/ses_startup_nrf_common.s" />
-      <file file_name="../sdk/modules/nrfx/mdk/system_nrf52840.c" />
-    </folder>
-    <folder Name="nRF_Drivers">
-      <file file_name="../sdk/integration/nrfx/legacy/nrf_drv_clock.c" />
-      <file file_name="../sdk/integration/nrfx/legacy/nrf_drv_power.c" />
-      <file file_name="../sdk/integration/nrfx/legacy/nrf_drv_ppi.c" />
-      <file file_name="../sdk/integration/nrfx/legacy/nrf_drv_spi.c" />
-      <file file_name="../sdk/integration/nrfx/legacy/nrf_drv_twi.c" />
-      <file file_name="../sdk/integration/nrfx/legacy/nrf_drv_uart.c" />
-      <file file_name="../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_nvic.c" />
-      <file file_name="../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_soc.c" />
-      <file file_name="../sdk/modules/nrfx/soc/nrfx_atomic.c" />
-      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_clock.c" />
-      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_gpiote.c" />
-      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_power.c" />
-      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_ppi.c" />
-      <file file_name="../sdk/modules/nrfx/drivers/src/prs/nrfx_prs.c" />
-      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_pwm.c" />
-      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_qspi.c" />
-      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_saadc.c" />
-      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_spi.c" />
-      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_spim.c" />
-      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_systick.c" />
-      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_timer.c" />
-      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_twi.c" />
-      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_twim.c" />
-      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_uart.c" />
-      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_uarte.c" />
-      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_usbd.c" />
     </folder>
     <folder Name="nRF_Libraries">
       <file file_name="../sdk/components/libraries/button/app_button.c" />
@@ -197,7 +52,6 @@
       <file file_name="../sdk/components/libraries/util/app_error_handler_gcc.c" />
       <file file_name="../sdk/components/libraries/util/app_error_weak.c" />
       <file file_name="../sdk/components/libraries/fifo/app_fifo.c" />
-      <file file_name="../sdk/components/libraries/pwm/app_pwm.c" />
       <file file_name="../sdk/components/libraries/scheduler/app_scheduler.c" />
       <file file_name="../sdk/components/libraries/sdcard/app_sdcard.c">
         <configuration Name="Debug" build_exclude_from_build="No" />
@@ -220,15 +74,9 @@
       <file file_name="../sdk/components/libraries/atomic_fifo/nrf_atfifo.c" />
       <file file_name="../sdk/components/libraries/atomic/nrf_atomic.c" />
       <file file_name="../sdk/components/libraries/balloc/nrf_balloc.c" />
-      <file file_name="../sdk/components/libraries/block_dev/empty/nrf_block_dev_empty.c">
-        <configuration Name="Debug" build_exclude_from_build="Yes" />
-      </file>
-      <file file_name="../sdk/components/libraries/block_dev/qspi/nrf_block_dev_qspi.c">
-        <configuration Name="Debug" build_exclude_from_build="Yes" />
-      </file>
-      <file file_name="../sdk/components/libraries/block_dev/ram/nrf_block_dev_ram.c">
-        <configuration Name="Debug" build_exclude_from_build="Yes" />
-      </file>
+      <file file_name="../sdk/components/libraries/block_dev/empty/nrf_block_dev_empty.c" />
+      <file file_name="../sdk/components/libraries/block_dev/qspi/nrf_block_dev_qspi.c" />
+      <file file_name="../sdk/components/libraries/block_dev/ram/nrf_block_dev_ram.c" />
       <file file_name="../sdk/components/libraries/block_dev/sdc/nrf_block_dev_sdc.c" />
       <file file_name="../sdk/external/fprintf/nrf_fprintf.c" />
       <file file_name="../sdk/external/fprintf/nrf_fprintf_format.c" />
@@ -237,27 +85,177 @@
       <file file_name="../sdk/components/libraries/block_dev/qspi/nrf_serial_flash_params.c" />
       <file file_name="../sdk/components/libraries/sortlist/nrf_sortlist.c" />
       <file file_name="../sdk/components/libraries/strerror/nrf_strerror.c" />
+      <file file_name="../sdk/components/libraries/pwm/app_pwm.c" />
+      <file file_name="../sdk/components/libraries/usbd/class/cdc/acm/app_usbd_cdc_acm.c" />
+      <file file_name="../sdk/components/libraries/usbd/app_usbd_serial_num.c" />
+      <file file_name="../sdk/components/libraries/cli/nrf_cli.c" />
+      <file file_name="../sdk/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c" />
     </folder>
-    <folder Name="nRF_Log">
-      <file file_name="../sdk/components/libraries/log/src/nrf_log_backend_rtt.c" />
-      <file file_name="../sdk/components/libraries/log/src/nrf_log_backend_serial.c" />
-      <file file_name="../sdk/components/libraries/log/src/nrf_log_backend_uart.c" />
-      <file file_name="../sdk/components/libraries/log/src/nrf_log_default_backends.c" />
-      <file file_name="../sdk/components/libraries/log/src/nrf_log_frontend.c" />
-      <file file_name="../sdk/components/libraries/log/src/nrf_log_str_formatter.c" />
+    <folder Name="nRF_Drivers">
+      <file file_name="../sdk/integration/nrfx/legacy/nrf_drv_clock.c" />
+      <file file_name="../sdk/integration/nrfx/legacy/nrf_drv_power.c" />
+      <file file_name="../sdk/integration/nrfx/legacy/nrf_drv_spi.c" />
+      <file file_name="../sdk/integration/nrfx/legacy/nrf_drv_uart.c" />
+      <file file_name="../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_nvic.c" />
+      <file file_name="../sdk/components/drivers_nrf/nrf_soc_nosd/nrf_soc.c" />
+      <file file_name="../sdk/modules/nrfx/soc/nrfx_atomic.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_clock.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_gpiote.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_power.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/prs/nrfx_prs.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_qspi.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_spi.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_systick.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_uart.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_uarte.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_usbd.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_ppi.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_pwm.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_timer.c" />
+      <file file_name="../sdk/integration/nrfx/legacy/nrf_drv_ppi.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_saadc.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_twi.c" />
+      <file file_name="../sdk/integration/nrfx/legacy/nrf_drv_twi.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_twim.c" />
+      <file file_name="../sdk/modules/nrfx/drivers/src/nrfx_spim.c" />
+      <file file_name="../sdk/components/libraries/cli/uart/nrf_cli_uart.c" />
+    </folder>
+    <folder Name="Board Support">
+      <file file_name="../sdk/components/libraries/bsp/bsp.c" />
+    </folder>
+    <folder Name="Application">
+      <file file_name="../src/main.c" />
+      <file file_name="../src/config/sdk_config.h" />
+      <file file_name="../src/battery.c" />
+      <file file_name="../src/battery.h" />
+      <file file_name="../src/composite_usb.h" />
+      <file file_name="../src/heater.c" />
+      <file file_name="../src/heater.h" />
+      <file file_name="../src/logger.c" />
+      <file file_name="../src/logger.h" />
+      <file file_name="../src/sensors.c" />
+      <file file_name="../src/sensors.h" />
+      <file file_name="../src/states.h" />
+      <file file_name="../src/usb.c">
+        <configuration Name="Debug" build_exclude_from_build="No" />
+      </file>
+      <file file_name="../src/usb.h" />
+      <file file_name="../src/naatos_queues.h" />
+      <file file_name="../src/naatos_config.h" />
+      <file file_name="../src/pid.c" />
+      <file file_name="../src/pid.h" />
+      <file file_name="../src/pwm.c" />
+      <file file_name="../src/pwm.h" />
+      <file file_name="../src/adc.c" />
+      <file file_name="../src/adc.h" />
+      <file file_name="../src/i2c_hal_freertos.c" />
+      <file file_name="../src/i2c_hal_freertos.h" />
+      <file file_name="../src/tsys01.c" />
+      <file file_name="../src/tsys01.h" />
+      <file file_name="../src/spi.c" />
+      <file file_name="../src/spi.h" />
+      <file file_name="../src/sd_card.c" />
+      <file file_name="../src/sd_card.h" />
+      <file file_name="../src/calendar_rtc.c" />
+      <file file_name="../src/calendar_rtc.h" />
+      <file file_name="../src/is31fl3196.c" />
+      <file file_name="../src/is31fl3196.h" />
+      <file file_name="../src/fuel.c" />
+      <file file_name="../src/fuel.h" />
+      <file file_name="../src/led.c" />
+      <file file_name="../src/led.h" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../sdk/external/segger_rtt/SEGGER_RTT.c" />
+      <file file_name="../sdk/external/segger_rtt/SEGGER_RTT_Syscalls_SES.c" />
       <file file_name="../sdk/external/segger_rtt/SEGGER_RTT_printf.c" />
-      <file file_name="../sdk/external/segger_rtt/SEGGER_RTT_Syscalls_SES.c">
-        <configuration Name="Debug" build_exclude_from_build="No" />
-      </file>
     </folder>
-    <folder Name="Segger Startup Files">
-      <file file_name="$(StudioDir)/source/thumb_crt0.s" />
+    <folder Name="FATFS">
+      <file file_name="../sdk/external/fatfs/port/diskio_blkdev.c" />
+      <file file_name="../sdk/external/fatfs/src/ff.c" />
+      <file file_name="../sdk/external/fatfs/src/ffconf.h" />
+      <file file_name="../sdk/external/fatfs/src/option/cc932.c" />
+      <file file_name="../sdk/external/fatfs/src/option/syscall.c" />
+    </folder>
+    <folder Name="None">
+      <file file_name="../sdk/modules/nrfx/mdk/ses_startup_nrf52840.s" />
+      <file file_name="../sdk/modules/nrfx/mdk/ses_startup_nrf_common.s" />
+      <file file_name="../sdk/modules/nrfx/mdk/system_nrf52840.c" />
     </folder>
     <folder Name="UTF8/UTF16 converter">
       <file file_name="../sdk/external/utf_converter/utf.c" />
     </folder>
+    <folder Name="FreeRTOS">
+      <file file_name="../sdk/external/freertos/source/tasks.c" />
+      <file file_name="../sdk/external/freertos/source/croutine.c" />
+      <file file_name="../sdk/external/freertos/source/event_groups.c" />
+      <file file_name="../sdk/external/freertos/source/list.c" />
+      <file file_name="../sdk/external/freertos/source/queue.c" />
+      <file file_name="../sdk/external/freertos/source/stream_buffer.c" />
+      <file file_name="../sdk/external/freertos/source/timers.c" />
+      <file file_name="../sdk/external/freertos/config/FreeRTOSConfig.h" />
+      <file file_name="../sdk/external/freertos/source/include/croutine.h" />
+      <file file_name="../sdk/external/freertos/source/include/deprecated_definitions.h" />
+      <file file_name="../sdk/external/freertos/source/include/event_groups.h" />
+      <file file_name="../sdk/external/freertos/source/include/FreeRTOS.h" />
+      <file file_name="../sdk/external/freertos/source/include/list.h" />
+      <file file_name="../sdk/external/freertos/source/include/message_buffer.h" />
+      <file file_name="../sdk/external/freertos/source/include/mpu_prototypes.h" />
+      <file file_name="../sdk/external/freertos/source/include/mpu_wrappers.h" />
+      <file file_name="../sdk/external/freertos/source/include/portable.h" />
+      <file file_name="../sdk/external/freertos/source/include/projdefs.h" />
+      <file file_name="../sdk/external/freertos/source/include/queue.h" />
+      <file file_name="../sdk/external/freertos/source/include/semphr.h" />
+      <file file_name="../sdk/external/freertos/source/include/stack_macros.h" />
+      <file file_name="../sdk/external/freertos/source/include/StackMacros.h" />
+      <file file_name="../sdk/external/freertos/source/include/stream_buffer.h" />
+      <file file_name="../sdk/external/freertos/source/include/task.h" />
+      <file file_name="../sdk/external/freertos/source/include/timers.h" />
+      <file file_name="../sdk/external/freertos/portable/GCC/nrf52/port.c" />
+      <file file_name="../sdk/external/freertos/portable/GCC/nrf52/portmacro.h" />
+      <file file_name="../sdk/external/freertos/portable/CMSIS/nrf52/port_cmsis.c" />
+      <file file_name="../sdk/external/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c" />
+      <file file_name="../sdk/external/freertos/portable/CMSIS/nrf52/portmacro_cmsis.h" />
+      <file file_name="../sdk/external/freertos/source/portable/MemMang/heap_1.c">
+        <configuration Name="Debug" build_exclude_from_build="Yes" />
+        <configuration Name="Release" build_exclude_from_build="Yes" />
+      </file>
+      <file file_name="../sdk/external/freertos/source/portable/MemMang/heap_2.c">
+        <configuration Name="Debug" build_exclude_from_build="Yes" />
+        <configuration Name="Release" build_exclude_from_build="Yes" />
+      </file>
+      <file file_name="../sdk/external/freertos/source/portable/MemMang/heap_3.c">
+        <configuration Name="Debug" build_exclude_from_build="Yes" />
+        <configuration Name="Release" build_exclude_from_build="Yes" />
+      </file>
+      <file file_name="../sdk/external/freertos/source/portable/MemMang/heap_4.c">
+        <configuration Name="Debug" build_exclude_from_build="No" />
+      </file>
+      <file file_name="heap_5.c">
+        <configuration Name="Debug" build_exclude_from_build="Yes" />
+        <configuration Name="Release" build_exclude_from_build="Yes" />
+      </file>
+      <file file_name="../sdk/external/freertos/source/portable/Common/mpu_wrappers.c" />
+      <configuration
+        Name="Debug"
+        build_exclude_from_build="No"
+        c_preprocessor_undefinitions="APP_TIMER_V2_RTC1_ENABLED" />
+    </folder>
+    <configuration
+      Name="Debug"
+      c_user_include_directories="../sdk/external/freertos/source"
+      linker_printf_fp_enabled="Double" />
+    <configuration
+      Name="Release"
+      linker_section_placement_macros="FLASH_PH_START=0x0;FLASH_PH_SIZE=0x100000;RAM_PH_START=0x20000000;RAM_PH_SIZE=0x40000;FLASH_START=0x1000;FLASH_SIZE=0xF2000;RAM_START=0x20000000;RAM_SIZE=0x40000" />
   </project>
+  <configuration
+    Name="Release"
+    c_preprocessor_definitions="NDEBUG"
+    gcc_optimization_level="Optimize For Size"
+    link_time_optimization="No" />
+  <configuration
+    Name="Debug"
+    c_preprocessor_definitions="DEBUG; DEBUG_NRF"
+    gcc_optimization_level="None" />
 </solution>

@@ -7,16 +7,19 @@
 #include "app_pwm.h"
 #include "nrf_gpio.h"
 #include "FreeRTOS.h"
+#include "queue.h"
+#include "naatos_config.h"
+#include "naatos_queues.h"
 
-//#define VALVE_ZONE_PIN  20  // P0.20
-//#define AMP0_ZONE_PIN   19  // P0.19
-//#define AMP1_ZONE_PIN   34  // P1.03
-//#define AMP2_ZONE_PIN   33  // P1.04
+#define VALVE_ZONE_PIN  20  // P0.20
+#define AMP0_ZONE_PIN   19  // P0.19
+#define AMP1_ZONE_PIN   34  // P1.03
+#define AMP2_ZONE_PIN   33  // P1.04
 
-#define VALVE_ZONE_PIN  19
-#define AMP0_ZONE_PIN   20
-#define AMP1_ZONE_PIN   33
-#define AMP2_ZONE_PIN   34
+//#define VALVE_ZONE_PIN  19
+//#define AMP0_ZONE_PIN   20
+//#define AMP1_ZONE_PIN   33
+//#define AMP2_ZONE_PIN   34
 
 #define VALVE_CHANNEL   0
 #define AMP0_CHANNEL    1
