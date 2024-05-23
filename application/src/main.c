@@ -552,11 +552,6 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
     printf("MAIN_TASK: Unable to send main state change to usb_stateChangeQueue.\n");
   }
 
-  // Send the state to the sensor task
-  //xReturned = xQueueSend(sensor_mainStateQueue, &new_state, 0);
-  //if (xReturned != pdPASS) {
-  //  printf("MAIN_TASK: Unable to send main state change to heater_mainStateQueue.\n");
-  //}
   /* Get responses from the states to ensure all configurations for the run or standby have been made */
   while(!logger_resp || !batt_resp || !usb_resp /*|| !sensor_resp*/) {
     if (uxQueueMessagesWaiting(main_mainStateRespQueue) > 0) {
@@ -577,10 +572,6 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
           usb_resp = true;
           printf("MAIN: USB Task has updated its main state.\n");
           break;
-        //case SENSORS:
-        //  sensor_resp = true;
-        //  printf("MAIN: Sensor Task has updated its main state.\n");
-        //  break;
         default:
           break;
         }
@@ -602,10 +593,6 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send main state continue to battery_mainStateContinueQueue.\n");
   }
-  //xReturned = xQueueSend(sensor_mainStateContinueQueue, &main_state_cont, 0);
-  //if (xReturned != pdPASS) {
-  //  printf("MAIN_TASK: Unable to send main state continue to sensor_mainStateContinueQueue.\n");
-  //}
   xReturned = xQueueSend(usb_mainStateContinueQueue, &main_state_cont, 0);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send main state continue to usb_mainStateContinueQueue.\n");
