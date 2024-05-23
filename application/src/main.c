@@ -59,8 +59,9 @@ xTaskHandle compositeTaskHandle;
 xQueueHandle main_batteryDataQueue;
 xQueueHandle main_switchQueue;
 xQueueHandle main_mainStateRespQueue;
-xQueueHandle main_startRunRespQueue;
+xQueueHandle main_runRespQueue;
 xQueueHandle main_runErrorQueue;
+xQueueHandle main_runConfRespQueue;
 
 // Zone Request Constants
 const zone_run_req_t run_amplification_zone = {
@@ -552,12 +553,12 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   }
 
   // Send the state to the sensor task
-  xReturned = xQueueSend(sensor_mainStateQueue, &new_state, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send main state change to heater_mainStateQueue.\n");
-  }
+  //xReturned = xQueueSend(sensor_mainStateQueue, &new_state, 0);
+  //if (xReturned != pdPASS) {
+  //  printf("MAIN_TASK: Unable to send main state change to heater_mainStateQueue.\n");
+  //}
   /* Get responses from the states to ensure all configurations for the run or standby have been made */
-  while(!logger_resp || !batt_resp || !usb_resp || !sensor_resp) {
+  while(!logger_resp || !batt_resp || !usb_resp /*|| !sensor_resp*/) {
     if (uxQueueMessagesWaiting(main_mainStateRespQueue) > 0) {
         xReturned = xQueueReceive(main_mainStateRespQueue, &task_recv, 0);
         if (xReturned != pdPASS) {
@@ -576,10 +577,10 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
           usb_resp = true;
           printf("MAIN: USB Task has updated its main state.\n");
           break;
-        case SENSORS:
-          sensor_resp = true;
-          printf("MAIN: Sensor Task has updated its main state.\n");
-          break;
+        //case SENSORS:
+        //  sensor_resp = true;
+        //  printf("MAIN: Sensor Task has updated its main state.\n");
+        //  break;
         default:
           break;
         }
@@ -601,10 +602,10 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send main state continue to battery_mainStateContinueQueue.\n");
   }
-  xReturned = xQueueSend(sensor_mainStateContinueQueue, &main_state_cont, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send main state continue to sensor_mainStateContinueQueue.\n");
-  }
+  //xReturned = xQueueSend(sensor_mainStateContinueQueue, &main_state_cont, 0);
+  //if (xReturned != pdPASS) {
+  //  printf("MAIN_TASK: Unable to send main state continue to sensor_mainStateContinueQueue.\n");
+  //}
   xReturned = xQueueSend(usb_mainStateContinueQueue, &main_state_cont, 0);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send main state continue to usb_mainStateContinueQueue.\n");
@@ -625,8 +626,13 @@ bool begin_amplification_zone(void) {
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
   }
-  // Wait for response
-  xReturned = xQueueReceive(main_startRunRespQueue, &start_run, portMAX_DELAY);
+  // Wait for run confirmation response
+  xReturned = xQueueReceive(main_runConfRespQueue, &start_run, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
+  }
+  // Wait for run ok to start response 
+  xReturned = xQueueReceive(main_runRespQueue, &start_run, portMAX_DELAY);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
   }
@@ -636,6 +642,7 @@ bool begin_amplification_zone(void) {
 
 void begin_valve_zone(void) {
   BaseType_t xReturned;
+  bool heat_conf = false;
   // Send start valve message to heater queue
   xReturned = xQueueSend(heater_zoneRunQueue, &run_valve_zone, 0);
   if (xReturned != pdPASS) {
@@ -646,10 +653,16 @@ void begin_valve_zone(void) {
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send start valve zone event to logging task.\n");
   }
+  // Wait for run confirmation response
+  xReturned = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
+  }
 }
 
 void end_amplification_zone(void) {
   BaseType_t xReturned;
+  bool heat_conf = false;
   // Send stop amplification message to heater queue
   xReturned = xQueueSend(heater_zoneRunQueue, &stop_amplification_zone, 0);
   if (xReturned != pdPASS) {
@@ -660,11 +673,16 @@ void end_amplification_zone(void) {
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send stop amplification zone event to logging task.\n");
   }
-  vTaskDelay(100);
+  // Wait for run confirmation response
+  xReturned = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
+  }
 }
 
 void end_valve_zone(void) {
   BaseType_t xReturned;
+  bool heat_conf = false;
   // Send valve zone stop request
   xReturned = xQueueSend(heater_zoneRunQueue, &stop_valve_zone, 0);
   if (xReturned != pdPASS) {
@@ -674,6 +692,11 @@ void end_valve_zone(void) {
   xReturned = xQueueSend(logger_logMessageQueue, &valve_stop_log_msg, 0);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send stop valve zone event to logging task.\n");
+  }
+  // Wait for run confirmation response
+  xReturned = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
   }
 }
 
@@ -761,13 +784,17 @@ void create_queues() {
   main_mainStateRespQueue = xQueueCreate(4, sizeof(tasks_t));
   if (main_mainStateRespQueue == NULL)
     printf("Unable to create main_mainStateRespQueue queue\n");
-  main_startRunRespQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
-  if (main_startRunRespQueue == NULL)
-    printf("Unable to create main_mainStateRespQueue queue\n");
+  main_runRespQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (main_runRespQueue == NULL)
+    printf("Unable to create main_runRespQueue queue\n");
   main_runErrorQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (main_runErrorQueue == NULL)
     printf("Unable to create main_mainStateRespQueue queue\n");
+  main_runConfRespQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (main_runConfRespQueue == NULL)
+    printf("Unable to create main_mainStateRespQueue queue\n");
 
+    
   // Heater Task Queues
   heater_zoneRunQueue = xQueueCreate(QUEUE_SIZE, sizeof(zone_run_req_t));
   if (heater_zoneRunQueue == NULL)
@@ -780,18 +807,22 @@ void create_queues() {
     printf("Unable to create heater_usbWaitQueue queue\n");
   heater_pwmReqQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (heater_pwmReqQueue == NULL)
-    printf("Unable to create heater_usbWaitQueue queue\n");
+    printf("Unable to create heater_pwmReqQueue queue\n");
+  heater_sensorConfQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (heater_sensorConfQueue == NULL)
+    printf("Unable to create heater_sensorConfQueue queue\n");
+    
 
   // Sensor Task Queues
-  sensor_mainStateQueue = xQueueCreate(QUEUE_SIZE, sizeof(main_state_t));
-  if (sensor_mainStateQueue == NULL)
-    printf("Unable to create sensor_mainStateQueue queue\n");
+  sensor_heaterStateQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (sensor_heaterStateQueue == NULL)
+    printf("Unable to create sensor_heaterStateQueue queue\n");
   sensor_usbWaitQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_suspend_req_t));
   if (sensor_usbWaitQueue == NULL)
     printf("Unable to create sensor_usbWaitQueue queue\n");
-  sensor_mainStateContinueQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
-  if (sensor_mainStateContinueQueue == NULL)
-    printf("Unable to create sensor_mainStateContinueQueue queue\n");
+  //sensor_mainStateContinueQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  //if (sensor_mainStateContinueQueue == NULL)
+  //  printf("Unable to create sensor_mainStateContinueQueue queue\n");
   sensor_pwmRecvQueue = xQueueCreate(QUEUE_SIZE, sizeof(temperature_pwm_data_t));
   if (sensor_pwmRecvQueue == NULL)
     printf("Unable to create sensor_mainStateContinueQueue queue\n");
