@@ -5,12 +5,14 @@ xQueueHandle heater_zoneRunQueue;
 xQueueHandle heater_temperatureDataQueue;
 xQueueHandle heater_usbWaitQueue;
 xQueueHandle heater_pwmReqQueue;
+xQueueHandle heater_sensorConfQueue;
 
 bool amplification_zone_running = false;
 bool valve_zone_running = false;
 bool starting_run = true;
 bool h_pwm_req = false;
 bool greater_than_max = false;
+bool heater_run = false;
 
 zone_run_req_t zone_req;
 temperature_data_t temperature_data;
@@ -32,7 +34,56 @@ pid_controller_t amp0_pid_2;
 pid_controller_t amp1_pid_2;
 pid_controller_t amp2_pid_2;
 
-void heater_task(void * pvParameters) {
+void handle_valve_stopstart_heater(bool heating) {
+  BaseType_t xReturned;
+
+  // Handle case where amplification zone is on already, dont want to send stop
+  if (amplification_zone_running && !heating)
+    return;
+
+  // Send the heater status
+  xReturned = xQueueSend(sensor_heaterStateQueue, &heating, 0);
+  if (xReturned != pdPASS) {
+    printf("HEATER_TASK: Unable to send heater state to sensor_heaterStateQueue.\n");
+  }
+  // Get the response that the sensors task has been updated
+  xReturned = xQueueReceive(heater_sensorConfQueue, &heating, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("HEATER_TASK: Unable to receive sensor confirmation from heater_sensorConfQueue.\n");
+  }
+  // Send the confirmation to the main state
+  xReturned = xQueueSend(main_runConfRespQueue, &heating, 0);
+  if (xReturned != pdPASS) {
+     printf("HEATER_TASK: Unable to send run response to main_runConfRespQueue.\n");
+  }
+}
+
+void handle_amplification_stopstart_heater(bool heating) {
+  BaseType_t xReturned;
+
+  // Handle case where valve zone is on already, dont want to send stop
+  if (valve_zone_running && !heating)
+    return;
+
+  // Send the heater status
+  xReturned = xQueueSend(sensor_heaterStateQueue, &heating, 0);
+  if (xReturned != pdPASS) {
+    printf("HEATER_TASK: Unable to send heater state to sensor_heaterStateQueue.\n");
+  }
+  // Get the response that the sensors task has been updated
+  xReturned = xQueueReceive(heater_sensorConfQueue, &heating, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("HEATER_TASK: Unable to receive sensor confirmation from heater_sensorConfQueue.\n");
+  }
+  // Send the confirmation to the main state
+  xReturned = xQueueSend(main_runConfRespQueue, &heating, 0);
+  if (xReturned != pdPASS) {
+     printf("HEATER_TASK: Unable to send run response to main_runConfRespQueue.\n");
+  }
+
+}
+
+void handle_usb_sus_req(void) {
   BaseType_t xReturned;
   usb_suspend_req_t sus_req;
   usb_suspend_acpt_t sus_acpt = {
@@ -43,6 +94,31 @@ void heater_task(void * pvParameters) {
     .task = HEATER,
     .over = true
   };
+
+  // Check to see if we need to suspend for USB to be enabled
+  if (uxQueueMessagesWaiting(heater_usbWaitQueue) > 0) {
+    xReturned = xQueueReceive(heater_usbWaitQueue, &sus_req, 0) ;
+    if (xReturned != pdPASS) {
+      printf("HEATER: Unable to receive usb suspend request from heater_usbWaitQueue\n");
+    }
+    // Send Suspend Accepted
+    xReturned = xQueueSend(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0); 
+    if (xReturned != pdPASS) {
+      printf("HEATER: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\n");
+    }
+    printf("HEATER: Suspending for 15 seconds.\n");
+    // Delay Task for 15 Seconds
+    vTaskDelay(pdMS_TO_TICKS(USB_SUSPEND_TASKS_TIME));
+    // Send Suspend Over
+    xReturned = xQueueSend(usb_usbWaitOverQueue, &sus_over, 0); 
+    if (xReturned != pdPASS) {
+      printf("HEATER: Unable to send usb suspend over to usb_usbWaitOverQueue\n");
+    }
+  }
+}
+
+void heater_task(void * pvParameters) {
+  BaseType_t xReturned;
 
   // Create PID Controllers 
   if (use_default_configuration_parameters) {
@@ -74,27 +150,11 @@ void heater_task(void * pvParameters) {
   for (;;) {
     // Check for run heater zone message
     if (uxQueueMessagesWaiting(heater_zoneRunQueue) == 0) {
-      // Check to see if we need to suspend for USB to be enabled
-      if (uxQueueMessagesWaiting(heater_usbWaitQueue) > 0) {
-        xReturned = xQueueReceive(heater_usbWaitQueue, &sus_req, 0) ;
-        if (xReturned != pdPASS) {
-          printf("HEATER: Unable to receive usb suspend request from heater_usbWaitQueue\n");
-        }
-        // Send Suspend Accepted
-        xReturned = xQueueSend(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0); 
-        if (xReturned != pdPASS) {
-          printf("HEATER: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\n");
-        }
-        printf("HEATER: Suspending for 15 seconds.\n");
-        // Delay Task for 15 Seconds
-        vTaskDelay(pdMS_TO_TICKS(USB_SUSPEND_TASKS_TIME));
-        // Send Suspend Over
-        xReturned = xQueueSend(usb_usbWaitOverQueue, &sus_over, 0); 
-        if (xReturned != pdPASS) {
-          printf("HEATER: Unable to send usb suspend over to usb_usbWaitOverQueue\n");
-        }
-      }
+      // Check to see if there is a usb suspend request
+      handle_usb_sus_req();
+      // Task Delay
       vTaskDelay(100);
+      // Continue
       if (!amplification_zone_running & !valve_zone_running)
         continue; // Go back to top of loop if no zones running
     }
@@ -122,9 +182,16 @@ void heater_task(void * pvParameters) {
           pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
           pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
           pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
+          
+          // Send stop heater to sensors task
+          heater_run = false;
+          handle_amplification_stopstart_heater(heater_run);
         }
         else {
           starting_run = true;
+          heater_run = true;
+          // Send starting heater to sensors task
+          handle_amplification_stopstart_heater(heater_run);
         }
       }
       else if (zone_req.zone = VALVE) {
@@ -143,7 +210,14 @@ void heater_task(void * pvParameters) {
           pid_controller_init(&amp0_pid_2, config.amp0_setpoint_2, config.amp0_kp_2, config.amp0_ki_2, config.amp0_kd_2);
           pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2);
           pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2);
+          // Send stop heater to sensors task
+          heater_run = false;
+          handle_valve_stopstart_heater(heater_run);
         }
+        else {
+          heater_run = true;
+          handle_valve_stopstart_heater(heater_run);
+        } 
       }
     }
 
@@ -166,7 +240,7 @@ void heater_task(void * pvParameters) {
       {
         starting_run = false;
         // Send cannot start
-        xReturned = xQueueSend(main_startRunRespQueue, &starting_run, 0);
+        xReturned = xQueueSend(main_runRespQueue, &starting_run, 0);
         if (xReturned != pdPASS) {
           printf("HEATER_TASK: Unable to send cannot start run response.\n");
         }
@@ -179,7 +253,7 @@ void heater_task(void * pvParameters) {
            temperature_data.amp2_zone_temp <= config.min_run_zone_temp)) 
       {
         // Send can start
-        xReturned = xQueueSend(main_startRunRespQueue, &starting_run, 0);
+        xReturned = xQueueSend(main_runRespQueue, &starting_run, 0);
         if (xReturned != pdPASS) {
           printf("HEATER_TASK: Unable to send cannot start run response.\n");
         }
@@ -188,7 +262,7 @@ void heater_task(void * pvParameters) {
     }
     else if (!config.min_run_zone_temp_en && starting_run) {
       // Send can start
-      xReturned = xQueueSend(main_startRunRespQueue, &starting_run, 0);
+      xReturned = xQueueSend(main_runRespQueue, &starting_run, 0);
       if (xReturned != pdPASS) {
         printf("HEATER_TASK: Unable to send cannot start run response.\n");
       }
