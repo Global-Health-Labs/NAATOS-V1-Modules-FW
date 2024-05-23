@@ -448,7 +448,10 @@ FRESULT check_for_config_file(void) {
     return res;
   }
   configBufferSize = sprintf(configBuffer, "amp2_setpoint_2:%0.2f\n", AMP2_SETPOINT_2);
-
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
   // Write Valve Kp
   configBufferSize = sprintf(configBuffer, "valve_kp_2:%0.3f\n", V_KP_2);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);

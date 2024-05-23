@@ -117,10 +117,8 @@ void handle_usb_sus_req(void) {
   }
 }
 
-void heater_task(void * pvParameters) {
-  BaseType_t xReturned;
-
-  // Create PID Controllers 
+void heater_reset_all_pids(void){
+ // Create PID Controllers 
   if (use_default_configuration_parameters) {
     pid_controller_init(&valve_pid, VALVE_SETPOINT, V_KP, V_KI, V_KD);  
     pid_controller_init(&amp0_pid, AMP0_SETPOINT, A0_KP, A0_KI, A0_KD);
@@ -146,6 +144,13 @@ void heater_task(void * pvParameters) {
     pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2);
     pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2);
   }
+
+}
+
+void heater_task(void * pvParameters) {
+  BaseType_t xReturned;
+
+  heater_reset_all_pids();
 
   for (;;) {
     // Check for run heater zone message
@@ -185,11 +190,13 @@ void heater_task(void * pvParameters) {
           
           // Send stop heater to sensors task
           heater_run = false;
+          starting_run = false;
           handle_amplification_stopstart_heater(heater_run);
         }
         else {
           starting_run = true;
           heater_run = true;
+          heater_reset_all_pids();
           // Send starting heater to sensors task
           handle_amplification_stopstart_heater(heater_run);
         }
@@ -216,6 +223,7 @@ void heater_task(void * pvParameters) {
         }
         else {
           heater_run = true;
+          heater_reset_all_pids();
           handle_valve_stopstart_heater(heater_run);
         } 
       }

@@ -329,6 +329,12 @@ void main_task(void * pvParameters) {
           sendUpdatedMainTaskState(main_state);
           // Delay
           vTaskDelay(100);
+           // Get the configuration parameters
+          FRESULT res = get_naatos_configuration_parameters(&config);
+          if (res != FR_OK) {
+            printf("Warning: configuration file was not able to be read. Using default configuration parameters.");
+            use_default_configuration_parameters = true;
+          }
         }
       break;
 
@@ -518,6 +524,7 @@ void main_task(void * pvParameters) {
           optical_triggered = switch_data.optical_tiggered;
         } while(hal_triggered && optical_triggered);
         // Update current main state
+
         last_state = main_state;
         main_state = STANDBY;
         sendUpdatedMainTaskState(main_state);
