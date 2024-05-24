@@ -7,6 +7,7 @@
 #include "FreeRTOS.h"
 #include "queue.h"
 #include "sd_card.h"
+#include "led.h"
 
 #include "app_usbd.h"
 #include "app_usbd_core.h"
@@ -50,7 +51,7 @@
 #define ENDPOINT_LIST() APP_USBD_MSC_ENDPOINT_LIST(3, 3)
 
 // Mass storage class work buffer size
-#define MSC_WORKBUFFER_SIZE (1024)
+#define MSC_WORKBUFFER_SIZE (2048)
 
 /* ***** Handlers ***** */
 void cdc_acm_user_ev_handler(app_usbd_class_inst_t const * p_inst,

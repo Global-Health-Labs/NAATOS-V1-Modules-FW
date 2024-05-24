@@ -158,6 +158,12 @@
       <file file_name="../src/sd_card.h" />
       <file file_name="../src/calendar_rtc.c" />
       <file file_name="../src/calendar_rtc.h" />
+      <file file_name="../src/is31fl3196.c" />
+      <file file_name="../src/is31fl3196.h" />
+      <file file_name="../src/fuel.c" />
+      <file file_name="../src/fuel.h" />
+      <file file_name="../src/led.c" />
+      <file file_name="../src/led.h" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../sdk/external/segger_rtt/SEGGER_RTT.c" />

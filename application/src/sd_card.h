@@ -26,8 +26,8 @@
 
 #define NAATOS_CONFIG_FILE  "config.txt"
 
-#define CSV_HEADER        "Time,ValveTemp,Amp0Temp,Amp1Temp,Amp2Temp,Batt,Event\n"
-#define CSV_HEADER_SIZE   53
+#define CSV_HEADER        "Time,ValveTemp,ValvePWM,Amp0Temp,Amp0PWM,Amp1Temp,Amp1PWM,Amp2Temp,Amp2PWM,Batt,Event\n"
+#define CSV_HEADER_SIZE   86
 
 /**
  * @brief  QSPI block device definition
@@ -62,8 +62,18 @@ typedef enum {
   VALVE_ZONE_RUN_TIME,
   AMP_ZONE_RUN_TIME,
   LOW_POWER_THRESHOLD,
+  RECOVERY_POWER_THRESHOLD,
   VALVE_SETPOINT_C,
-  AMP_SETPOINT_C,
+  AMP0_SETPOINT_C,
+  AMP1_SETPOINT_C,
+  AMP2_SETPOINT_C,
+  VALVE_MAX_TEMP_C,
+  AMP0_MAX_TEMP_C,
+  AMP1_MAX_TEMP_C,
+  AMP2_MAX_TEMP_C,
+  MIN_RUN_ZONE_TEMP_C,
+  MIN_RUN_ZONE_TEMP_EN,
+  ALERT_TIMEOUT_TIME,
   VALVE_KP,
   VALVE_KI,
   VALVE_KD,
@@ -76,6 +86,23 @@ typedef enum {
   AMP2_KP,
   AMP2_KI,
   AMP2_KD,
+  OPTICAL_DISTANCE,
+  VALVE_SETPOINT_C_2,
+  AMP0_SETPOINT_C_2,
+  AMP1_SETPOINT_C_2,
+  AMP2_SETPOINT_C_2,
+  VALVE_KP_2,
+  VALVE_KI_2,
+  VALVE_KD_2,
+  AMP0_KP_2,
+  AMP0_KI_2,
+  AMP0_KD_2,
+  AMP1_KP_2,
+  AMP1_KI_2,
+  AMP1_KD_2,
+  AMP2_KP_2,
+  AMP2_KI_2,
+  AMP2_KD_2,
   NUM_PARAMETERS
 } naatos_config_params_t;
 

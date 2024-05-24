@@ -23,6 +23,20 @@ FRESULT check_for_config_file(void);
 
 // Initalize Function
 void init_sd_card(void) {
+ nrf_gpio_cfg(SPI_SCK_PIN,
+                 NRF_GPIO_PIN_DIR_OUTPUT,
+                 NRF_GPIO_PIN_INPUT_DISCONNECT,
+                 NRF_GPIO_PIN_NOPULL,
+                 NRF_GPIO_PIN_H0H1,       // Require High Drive low/high level
+                 NRF_GPIO_PIN_NOSENSE);
+
+  nrf_gpio_cfg(SPI_MOSI_PIN,
+                 NRF_GPIO_PIN_DIR_OUTPUT,
+                 NRF_GPIO_PIN_INPUT_DISCONNECT,
+                 NRF_GPIO_PIN_NOPULL,
+                 NRF_GPIO_PIN_H0H1,       // Require High Drive low/high level
+                 NRF_GPIO_PIN_NOSENSE);
+
   memset(&fs, 0, sizeof(FATFS));
 
   // Register the drives we have 
@@ -39,7 +53,7 @@ void init_sd_card(void) {
   // Get SD Card Specifications
   blocks_per_mb = (1024uL * 1024uL) / m_block_dev_sdc.block_dev.p_ops->geometry(&m_block_dev_sdc.block_dev)->blk_size;
   capacity = m_block_dev_sdc.block_dev.p_ops->geometry(&m_block_dev_sdc.block_dev)->blk_count / blocks_per_mb;
-  printf("SD Card initalized. Capactity: %d MB\n", capacity);
+  printf("Capactity: %d MB\n", capacity);
   
   // Mount SD Card
   ff_result = sd_card_mount();
@@ -272,6 +286,12 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
+  // Write Recovery Power Threshold
+  configBufferSize = sprintf(configBuffer, "recovery_power_threshold:%d\n", DEFAULT_RECOVERY_THRES);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
   // Write Valve Zone Setpoint
   configBufferSize = sprintf(configBuffer, "valve_setpoint:%0.2f\n", VALVE_SETPOINT);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
@@ -279,7 +299,55 @@ FRESULT check_for_config_file(void) {
     return res;
   }
   // Write Amplification Zone Setpoint
-  configBufferSize = sprintf(configBuffer, "amplification_setpoint:%0.2f\n", AMP0_SETPOINT);
+  configBufferSize = sprintf(configBuffer, "amp0_setpoint:%0.2f\n", AMP0_SETPOINT);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "amp1_setpoint:%0.2f\n", AMP1_SETPOINT);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "amp2_setpoint:%0.2f\n", AMP2_SETPOINT);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Max Temperatures
+  configBufferSize = sprintf(configBuffer, "valve_max_temp:%0.2f\n", DEFAULT_VALVE_MAX_TEMP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "amp0_max_temp:%0.2f\n", DEFAULT_AMP0_MAX_TEMP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "amp1_max_temp:%0.2f\n", DEFAULT_AMP1_MAX_TEMP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "amp2_max_temp:%0.2f\n", DEFAULT_AMP2_MAX_TEMP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Minimum Run Zone Temperature and Enable
+  configBufferSize = sprintf(configBuffer, "min_run_zone_temp:%0.2f\n", DEFAULT_MIN_RUN_ZONE_TEMP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "min_run_zone_temp_en:%s\n", DEFAULT_MIN_RUN_ZONE_TEMP_EN ? "true" : "false");
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Alert Timeout (minutes)
+  configBufferSize = sprintf(configBuffer, "alert_timeout_time_m:%0.2f\n", DEFAULT_ALERT_TIMEOUT_M);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -356,7 +424,111 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
+  // Write Optical Switch
+  configBufferSize = sprintf(configBuffer, "optical_distace:%d\n", OPTICAL_TRIG_THRES);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Valve Zone Setpoint
+  configBufferSize = sprintf(configBuffer, "valve_setpoint_2:%0.2f\n", VALVE_SETPOINT_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amplification Zone Setpoint
+  configBufferSize = sprintf(configBuffer, "amp0_setpoint_2:%0.2f\n", AMP0_SETPOINT_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "amp1_setpoint_2:%0.2f\n", AMP1_SETPOINT_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "amp2_setpoint_2:%0.2f\n", AMP2_SETPOINT_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Valve Kp
+  configBufferSize = sprintf(configBuffer, "valve_kp_2:%0.3f\n", V_KP_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Valve Ki
+  configBufferSize = sprintf(configBuffer, "valve_ki_2:%0.3f\n", V_KI_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Valve Kd
+  configBufferSize = sprintf(configBuffer, "valve_kd_2:%0.3f\n", V_KD_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp0 Kp
+  configBufferSize = sprintf(configBuffer, "amp0_kp_2:%0.3f\n", A0_KP_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp0 Ki
+  configBufferSize = sprintf(configBuffer, "amp0_ki_2:%0.3f\n", A0_KI_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp0 Kd
+  configBufferSize = sprintf(configBuffer, "amp0_kd_2:%0.3f\n", A0_KD_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp1 Kp
+  configBufferSize = sprintf(configBuffer, "amp1_kp_2:%0.3f\n", A1_KP_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp1 Ki
+  configBufferSize = sprintf(configBuffer, "amp1_ki_2:%0.3f\n", A1_KI_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp1 Kd
+  configBufferSize = sprintf(configBuffer, "amp1_kd_2:%0.3f\n", A1_KD_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp2 Kp
+  configBufferSize = sprintf(configBuffer, "amp2_kp_2:%0.3f\n", A2_KP_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp2 Ki
+  configBufferSize = sprintf(configBuffer, "amp2_ki_2:%0.3f\n", A2_KI_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amp2 Kd
+  configBufferSize = sprintf(configBuffer, "amp2_kd_2:%0.3f\n", A2_KD_2);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
 
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
   // Close the file
   res = f_close(&file);
   if (res != FR_OK) {
@@ -377,6 +549,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
   FRESULT res;
   char * pch;
   char * val = (char *)malloc(50 * sizeof(char));
+  int num;
 
   // Re-Mount SD Card
   res = sd_card_mount();
@@ -430,11 +603,42 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
         case LOW_POWER_THRESHOLD:
             parameters->low_power_threshold = atoi(val);
             break;
+        case RECOVERY_POWER_THRESHOLD:
+            parameters->recovery_power_thresh = atoi(val);
+            break;
         case VALVE_SETPOINT_C:
             parameters->valve_setpoint = atof(val); 
             break;
-        case AMP_SETPOINT_C:
-            parameters->amplification_setpoint = atof(val); 
+        case AMP0_SETPOINT_C:
+            parameters->amp0_setpoint = atof(val); 
+            break;
+        case AMP1_SETPOINT_C:
+            parameters->amp1_setpoint = atof(val); 
+            break;
+        case AMP2_SETPOINT_C:
+            parameters->amp2_setpoint = atof(val); 
+            break;
+        case VALVE_MAX_TEMP_C:
+            parameters->valve_max_temp = atof(val); 
+            break;
+        case AMP0_MAX_TEMP_C:
+            parameters->amp0_max_temp = atof(val);
+            break;
+        case AMP1_MAX_TEMP_C:
+            parameters->amp1_max_temp = atof(val);
+            break;
+        case AMP2_MAX_TEMP_C:
+            parameters->amp2_max_temp = atof(val);
+            break;
+        case MIN_RUN_ZONE_TEMP_C:
+            parameters->min_run_zone_temp = atof(val);
+            break;
+        case MIN_RUN_ZONE_TEMP_EN:
+            num = strcmp(val, "true\n");
+            parameters->min_run_zone_temp_en = num ? false : true;
+            break;
+        case ALERT_TIMEOUT_TIME:
+            parameters->alert_timeout_time_m = atof(val);
             break;
         case VALVE_KP:
             parameters->valve_kp = atof(val);
@@ -471,6 +675,57 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
             break;
         case AMP2_KD:
             parameters->amp2_kd = atof(val);
+            break;
+        case OPTICAL_DISTANCE:
+            parameters->optical_distance = atoi(val);
+            break;
+        case VALVE_SETPOINT_C_2:
+            parameters->valve_setpoint_2 = atof(val); 
+            break;
+        case AMP0_SETPOINT_C_2:
+            parameters->amp0_setpoint_2 = atof(val); 
+            break;
+        case AMP1_SETPOINT_C_2:
+            parameters->amp1_setpoint_2 = atof(val); 
+            break;
+        case AMP2_SETPOINT_C_2:
+            parameters->amp2_setpoint_2 = atof(val); 
+            break;
+        case VALVE_KP_2:
+            parameters->valve_kp_2 = atof(val);
+            break;
+        case VALVE_KI_2:
+            parameters->valve_ki_2 = atof(val);
+            break;
+        case VALVE_KD_2:
+            parameters->valve_kd_2 = atof(val);
+            break;
+        case AMP0_KP_2:
+            parameters->amp0_kp_2 = atof(val);
+            break;
+        case AMP0_KI_2:
+            parameters->amp0_ki_2 = atof(val);
+            break;
+        case AMP0_KD_2:
+            parameters->amp0_kd_2 = atof(val);
+            break;
+        case AMP1_KP_2:
+            parameters->amp1_kp_2 = atof(val);
+            break;
+        case AMP1_KI_2:
+            parameters->amp1_ki_2 = atof(val);
+            break;
+        case AMP1_KD_2:
+            parameters->amp1_kd_2 = atof(val);
+            break;
+        case AMP2_KP_2:
+            parameters->amp2_kp_2 = atof(val);
+            break;
+        case AMP2_KI_2:
+            parameters->amp2_ki_2 = atof(val);
+            break;
+        case AMP2_KD_2:
+            parameters->amp2_kd_2 = atof(val);
             break;
         default:
             // Handle default case
