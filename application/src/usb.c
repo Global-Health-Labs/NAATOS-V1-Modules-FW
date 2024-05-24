@@ -128,7 +128,9 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
             break;
         case APP_USBD_EVT_POWER_REMOVED:
             printf("USB: Power removed\n");
-            app_usbd_stop();
+            if (nrf_drv_usbd_is_enabled()) {
+              app_usbd_stop();
+            }
             usb_done_config = false;  
             usb_detected = false;
             usb_started = false;
