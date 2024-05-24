@@ -229,7 +229,7 @@ NRF_BLOCK_DEV_SDC_DEFINE(
 /**
  * @brief Mass storage class work buffer size
  */
-#define MSC_WORKBUFFER_SIZE (1024)
+#define MSC_WORKBUFFER_SIZE (2048)
 
 /*lint -save -e26 -e64 -e123 -e505 -e651*/
 /**

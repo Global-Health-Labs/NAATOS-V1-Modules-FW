@@ -5,6 +5,7 @@
 #include "naatos_config.h"
 #include "FreeRTOS.h"
 #include "queue.h"
+#include "fuel.h"
 
 void battery_task(void * pvParameters);
 

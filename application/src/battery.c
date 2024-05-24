@@ -38,9 +38,6 @@ void battery_task(void * pvParameters) {
     .over = true
   };
 
-  // Set the charge state
-  charge_state = NOT_CHARGING;
-  // TODO: Get the configuration settings
 
   for (;;) {
     // TODO: Read NRF Temperature
@@ -49,7 +46,10 @@ void battery_task(void * pvParameters) {
     // TODO: GPIO Read Charger STAT pin
       // TODO: Compare pin status and update the charger status
       // TODO: if changed, put state change message in usb_stateChangeQueue
-    // TODO: I2C Fuel Gauge read (on second i2c bus to ensure no task collisions)
+
+
+    // I2C Fuel Gauge read
+    battery_percentage = fuelGauge_getSOC(NULL);
 
     // Check to see if the main task state has changed
     if (uxQueueMessagesWaiting(battery_mainStateQueue) > 0) {

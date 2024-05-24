@@ -86,11 +86,12 @@ void logger_task(void * pvParameters) {
       new_temp = false;
       // Check if state has changed
       if (uxQueueMessagesWaiting(logger_mainStateChangeQueue) > 0) {
-        xReturned = xQueueReceive(logger_mainStateChangeQueue, &main_state, 0);
-        if (xReturned != pdPASS) {
-          printf("LOG_TASK: Unable to receive state change from logger_mainStateChangeQueue.\n");
-        }
-        continue;
+        //xReturned = xQueueReceive(logger_mainStateChangeQueue, &main_state, 0);
+        //if (xReturned != pdPASS) {
+        //  printf("LOG_TASK: Unable to receive state change from logger_mainStateChangeQueue.\n");
+        //}
+        //continue;
+        break;
       }
 
       // Request the battery percentage from the bettery task
@@ -121,19 +122,45 @@ void logger_task(void * pvParameters) {
          if (log_message.data_type == TEMPERATURE_DATA) {
           // Set new temp to true
           new_temp = true;
-          // Format: Time,ValveTemp,Amp0Temp,Amp1Temp,Amp2Temp,BattPercent,Event
-          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,NONE\n", time.hour, time.minute, time.second, log_message.temperature_data.valve_zone_temp,
-                                    log_message.temperature_data.amp0_zone_temp, log_message.temperature_data.amp1_zone_temp,
-                                    log_message.temperature_data.amp2_zone_temp, battery_percent);
+          // Format: Time,ValveTemp,ValvePWM,Amp0Temp,Amp0PWM,Amp1Temp,Amp1PWM,Amp2Temp,Amp2PWM,Batt,Event
+          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%d,NONE\n", 
+                                    time.hour, 
+                                    time.minute, 
+                                    time.second, 
+                                    log_message.temperature_data.valve_zone_temp,
+                                    log_message.temperature_data.valve_zone_pwm,
+                                    log_message.temperature_data.amp0_zone_temp, 
+                                    log_message.temperature_data.amp0_zone_pwm,
+                                    log_message.temperature_data.amp1_zone_temp,
+                                    log_message.temperature_data.amp1_zone_pwm,
+                                    log_message.temperature_data.amp2_zone_temp, 
+                                    log_message.temperature_data.amp2_zone_pwm,
+                                    battery_percent);
           last_temp_message = log_message;
         }
         else if (log_message.data_type == EVENT_DATA) {
           
-          // Format: Time,ValveTemp,Amp0Temp,Amp1Temp,Amp2Temp,BattPercent,Event
-          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n", time.hour, time.minute, time.second, last_temp_message.temperature_data.valve_zone_temp,
-                                    last_temp_message.temperature_data.amp0_zone_temp, last_temp_message.temperature_data.amp1_zone_temp,
-                                    last_temp_message.temperature_data.amp2_zone_temp, battery_percent, log_message.event_data.message);
-          if (log_message.event_data.event == SAMPLE_VALV_ENDED || log_message.event_data.event == SAMPLE_INTERRUPTED) {
+          // Format: Time,ValveTemp,ValvePWM,Amp0Temp,Amp0PWM,Amp1Temp,Amp1PWM,Amp2Temp,Amp2PWM,Batt,Event
+          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n", 
+                                    time.hour, 
+                                    time.minute, 
+                                    time.second, 
+                                    last_temp_message.temperature_data.valve_zone_temp,
+                                    last_temp_message.temperature_data.valve_zone_pwm,
+                                    last_temp_message.temperature_data.amp0_zone_temp, 
+                                    last_temp_message.temperature_data.amp0_zone_pwm,
+                                    last_temp_message.temperature_data.amp1_zone_temp,
+                                    last_temp_message.temperature_data.amp1_zone_pwm,
+                                    last_temp_message.temperature_data.amp2_zone_temp, 
+                                    last_temp_message.temperature_data.amp2_zone_pwm,
+                                    battery_percent, 
+                                    log_message.event_data.message);
+          if (log_message.event_data.event == SAMPLE_VALV_ENDED || 
+              log_message.event_data.event == SAMPLE_INTERRUPTED || 
+              log_message.event_data.event == SAMPLE_TEMPS_NOT_STABALIZED || 
+              log_message.event_data.event == SAMPLE_RECOVERY_BATT ||
+              log_message.event_data.event == SAMPLE_OVER_TEMP) 
+          {
             run_stopped = true;
           }
         }

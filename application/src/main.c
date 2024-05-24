@@ -62,6 +62,9 @@ xTaskHandle compositeTaskHandle;
 xQueueHandle main_batteryDataQueue;
 xQueueHandle main_switchQueue;
 xQueueHandle main_mainStateRespQueue;
+xQueueHandle main_runRespQueue;
+xQueueHandle main_runErrorQueue;
+xQueueHandle main_runConfRespQueue;
 
 // Zone Request Constants
 const zone_run_req_t run_amplification_zone = {
@@ -100,14 +103,50 @@ const log_data_message_t stop_log_msg = {
   .temperature_data = NULL,
   .event_data = stop_event
 };
-const log_event_t interrupt_event = {
+const log_event_t interrupt_hal_event = {
   .event = SAMPLE_INTERRUPTED,
-  .message = INTERRUPT_EVENT_MSG
+  .message = INTERRUPT_HAL_EVENT_MSG
 }; 
-const log_data_message_t interrupt_log_msg = {
+const log_data_message_t interrupt_hal_log_msg = {
   .data_type = EVENT_DATA,
   .temperature_data = NULL,
-  .event_data = interrupt_event
+  .event_data = interrupt_hal_event
+};
+const log_event_t temps_not_stabalized_event = {
+  .event = SAMPLE_TEMPS_NOT_STABALIZED,
+  .message = TEMPS_NOT_STABLE
+};
+const log_data_message_t temps_not_stablized_msg = {
+  .data_type = EVENT_DATA,
+  .temperature_data = NULL,
+  .event_data = temps_not_stabalized_event
+};
+const log_event_t recovery_batt_event = {
+  .event = SAMPLE_RECOVERY_BATT,
+  .message = RECOVERY_BATT
+};
+const log_data_message_t recovery_batt_msg = {
+  .data_type = EVENT_DATA,
+  .temperature_data = NULL,
+  .event_data = recovery_batt_event
+};
+const log_event_t over_temp_event = {
+  .event = SAMPLE_OVER_TEMP,
+  .message = OVER_TEMP_MSG
+};
+const log_data_message_t over_temp_msg = {
+  .data_type = EVENT_DATA,
+  .temperature_data = NULL,
+  .event_data = over_temp_event
+};
+const log_event_t interrupt_opt_event = {
+  .event = SAMPLE_INTERRUPTED,
+  .message = INTERRUPT_OPT_EVENT_MSG
+}; 
+const log_data_message_t interrupt_opt_log_msg = {
+  .data_type = EVENT_DATA,
+  .temperature_data = NULL,
+  .event_data = interrupt_opt_event
 };
 const log_event_t valve_start_event = {
   .event = SAMPLE_VALV_STARTED,
@@ -181,13 +220,29 @@ naatos_config_parameters config = {
   .amp1_kd = 0,
   .amp2_kp = 0,
   .amp2_ki = 0,
-  .amp2_kd = 0
+  .amp2_kd = 0,
+  .valve_setpoint_2 = 0,
+  .amp0_setpoint_2 = 0,
+  .amp1_setpoint_2 = 0,
+  .amp2_setpoint_2 = 0,
+  .valve_kp_2 = 0,
+  .valve_ki_2 = 0, 
+  .valve_kp_2 = 0,
+  .amp0_kp_2 = 0,
+  .amp0_ki_2 = 0,
+  .amp0_kd_2 = 0,
+  .amp1_kp_2 = 0,
+  .amp1_ki_2 = 0,
+  .amp1_kd_2 = 0,
+  .amp2_kp_2 = 0,
+  .amp2_ki_2 = 0,
+  .amp2_kd_2 = 0
 };
 bool use_default_configuration_parameters;
 
 // Function defs
 void sendUpdatedMainTaskState(main_state_t new_state);
-void begin_amplification_zone(void);
+bool begin_amplification_zone(void);
 void end_amplification_zone(void);
 void begin_valve_zone(void);
 void end_valve_zone(void);
@@ -210,12 +265,21 @@ void main_task(void * pvParameters) {
   int percent_recv;   
   bool hal_triggered = false, optical_triggered = false; 
   bool error_during_run = false;
-  uint32_t start_time = 0, end_time = 0;
+  bool over_temp;
+  uint32_t start_time = 0, end_time = 0, a_t_start = 0;
+  uint32_t alert_timeout_ticks;
 
   // Set Start up state to standby
   main_state_t main_state = STANDBY;
   main_state_t last_state = LOW_POWER;
   int i = 0;
+
+  // Get the alert timeout
+  if (!use_default_configuration_parameters) {
+    alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((config.alert_timeout_time_m * 60.0) * 1000.0));
+  } else {
+     alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((DEFAULT_ALERT_TIMEOUT_M * 60.0) * 1000.0));
+  }
 
   // Main State Loop
   for (;;) {
@@ -223,10 +287,24 @@ void main_task(void * pvParameters) {
       // In Standby State
       case STANDBY:
         if (last_state != main_state) {
-          set_led1_green_breathe();
           last_state = main_state;
+          // Check to see if there was an error during the last run
+          if (error_during_run) {
+            // Set LEDs
+            set_led1_red_fast_blink();
+            set_led2_red_fast_blink();
+            // Get current time
+            a_t_start = xTaskGetTickCount();
+            printf("MAIN_TASK: Alert Timeout - %dms\n", pdTICKS_TO_MS(alert_timeout_ticks));
+          }
         } 
-        if (error_during_run) error_during_run = false;
+        
+        // Check to see if alert timeout is over
+        if (error_during_run && xTaskGetTickCount() >= (a_t_start + alert_timeout_ticks)) {
+          set_led1_green_breathe();
+          error_during_run = false;
+        }
+        
         hal_triggered = false;
         optical_triggered = false; 
         // Check for Battery Data in Battery Queue
@@ -247,13 +325,19 @@ void main_task(void * pvParameters) {
         hal_triggered = switch_data.hal_triggered;
         optical_triggered = switch_data.optical_tiggered;
         // Check if we can go to RUN state
-        if (hal_triggered && optical_triggered) {
+        if (hal_triggered && optical_triggered && !error_during_run) {
           // Set the new main state
           last_state = main_state;
           main_state = RUNNING;
           sendUpdatedMainTaskState(main_state);
           // Delay
           vTaskDelay(100);
+           // Get the configuration parameters
+          FRESULT res = get_naatos_configuration_parameters(&config);
+          if (res != FR_OK) {
+            printf("Warning: configuration file was not able to be read. Using default configuration parameters.");
+            use_default_configuration_parameters = true;
+          }
         }
       break;
 
@@ -265,14 +349,47 @@ void main_task(void * pvParameters) {
         // Allow for other tasks to get ready to receive main state change
         vTaskDelay(2000);
 #endif
+        /* ***** Amplification Zone Run ***** */
+        // Check to make sure we are above the recovery battery percentage
+        if (config.recovery_power_thresh > percent_recv) {
+          printf("MAIN_TASK: Unable to begin sample run, battery percent is less than the recovery threshold.\n");
+          // Tell Log that temperature is not stabalized yet
+          xReturned = xQueueSend(logger_logMessageQueue, &recovery_batt_msg, 0);
+          if (xReturned != pdPASS) {
+            printf("MAIN_TASK: Unable to send recovery battery percentage event to logging task.\n");
+          }
+          // Set the new main state
+          last_state = main_state;
+          main_state = STANDBY;
+          sendUpdatedMainTaskState(main_state);
+          // Set error during run and wait alert timeout
+          error_during_run = true;
+          break;
+        }
+
+        // Send start amplification message to heater queue
+        if (!begin_amplification_zone()) {
+          printf("MAIN_TASK: Unable to begin sample run, temperatures have not yet stabalized.\n");
+          // Tell Log that temperature is not stabalized yet
+          xReturned = xQueueSend(logger_logMessageQueue, &temps_not_stablized_msg, 0);
+          if (xReturned != pdPASS) {
+            printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+          }
+          // Stop amplification zone
+          end_amplification_zone();
+          // Set the new main state
+          last_state = main_state;
+          main_state = STANDBY;
+          sendUpdatedMainTaskState(main_state);
+          // Set error during run and wait alert timeout
+          error_during_run = true;
+          break;
+        }
         // Set LED1 to solid green
         if (last_state != main_state) {
           set_led1_green_solid();
           last_state = main_state;
         }
-        /* ***** Amplification Zone Run ***** */
-        // Send start amplification message to heater queue
-        begin_amplification_zone();
         // Get the start time and end time
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
@@ -283,6 +400,17 @@ void main_task(void * pvParameters) {
         }
         // Get sensor switch data ensuring sample is still in position
         do {
+          // Ensure we do not go overtemp
+          if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
+            xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
+            if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
+            }
+            error_during_run = true;
+            over_temp = true;
+            break;
+          }
+          // Get Switch data
           xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
@@ -311,14 +439,26 @@ void main_task(void * pvParameters) {
           }
         }
         else {
-          // Set LEDs
-          set_led1_red_fast_blink();
-          set_led2_red_fast_blink();
           // Send Interrupt Event to logging task
-          xReturned = xQueueSend(logger_logMessageQueue, &interrupt_log_msg, 0);
-          if (xReturned != pdPASS) {
-            printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+          if (!hal_triggered) {
+            xReturned = xQueueSend(logger_logMessageQueue, &interrupt_hal_log_msg, 0);
+            if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+            }
           }
+          else if (!optical_triggered) {
+            xReturned = xQueueSend(logger_logMessageQueue, &interrupt_opt_log_msg, 0);
+            if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+            }
+          }
+          else if (over_temp) {
+            xReturned = xQueueSend(logger_logMessageQueue, &over_temp_msg, 0);
+            if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to send sample over temp event to logging task.\n");
+            }
+          }
+          // Update main state
           last_state = main_state;
           main_state = STANDBY;
           sendUpdatedMainTaskState(main_state);
@@ -328,6 +468,17 @@ void main_task(void * pvParameters) {
 
         // Get sensor switch data ensuring sample is still in position
         do {
+          // Ensure we do not go overtemp
+          if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
+            xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
+            if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
+            }
+            error_during_run = true;
+            over_temp = true;
+            break;
+          }
+          // Get Switch Data
           xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
@@ -341,14 +492,26 @@ void main_task(void * pvParameters) {
         end_valve_zone();
         // Check for errors
         if (error_during_run) {
-            // Set LEDs
-            set_led1_red_fast_blink();
-            set_led2_red_fast_blink();
-            // Send interrupt Event to logging task
-            xReturned = xQueueSend(logger_logMessageQueue, &interrupt_log_msg, 0);
-            if (xReturned != pdPASS) {
-              printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+            // Send Interrupt Event to logging task
+            if (!hal_triggered) {
+              xReturned = xQueueSend(logger_logMessageQueue, &interrupt_hal_log_msg, 0);
+              if (xReturned != pdPASS) {
+                printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+              }
             }
+            else if (!optical_triggered) {
+              xReturned = xQueueSend(logger_logMessageQueue, &interrupt_opt_log_msg, 0);
+              if (xReturned != pdPASS) {
+                printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+              }
+            }
+            else if (over_temp) {
+              xReturned = xQueueSend(logger_logMessageQueue, &over_temp_msg, 0);
+              if (xReturned != pdPASS) {
+                printf("MAIN_TASK: Unable to send sample over temp event to logging task.\n");
+              }
+            }
+            // Update main state
             last_state = main_state;
             main_state = STANDBY;
             sendUpdatedMainTaskState(main_state);
@@ -364,6 +527,7 @@ void main_task(void * pvParameters) {
           optical_triggered = switch_data.optical_tiggered;
         } while(hal_triggered && optical_triggered);
         // Update current main state
+
         last_state = main_state;
         main_state = STANDBY;
         sendUpdatedMainTaskState(main_state);
@@ -414,13 +578,8 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
     printf("MAIN_TASK: Unable to send main state change to usb_stateChangeQueue.\n");
   }
 
-  // Send the state to the sensor task
-  xReturned = xQueueSend(sensor_mainStateQueue, &new_state, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send main state change to heater_mainStateQueue.\n");
-  }
   /* Get responses from the states to ensure all configurations for the run or standby have been made */
-  while(!logger_resp || !batt_resp || !usb_resp || !sensor_resp) {
+  while(!logger_resp || !batt_resp || !usb_resp /*|| !sensor_resp*/) {
     if (uxQueueMessagesWaiting(main_mainStateRespQueue) > 0) {
         xReturned = xQueueReceive(main_mainStateRespQueue, &task_recv, 0);
         if (xReturned != pdPASS) {
@@ -438,10 +597,6 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
         case USB:
           usb_resp = true;
           printf("MAIN: USB Task has updated its main state.\n");
-          break;
-        case SENSORS:
-          sensor_resp = true;
-          printf("MAIN: Sensor Task has updated its main state.\n");
           break;
         default:
           break;
@@ -464,10 +619,6 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send main state continue to battery_mainStateContinueQueue.\n");
   }
-  xReturned = xQueueSend(sensor_mainStateContinueQueue, &main_state_cont, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send main state continue to sensor_mainStateContinueQueue.\n");
-  }
   xReturned = xQueueSend(usb_mainStateContinueQueue, &main_state_cont, 0);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send main state continue to usb_mainStateContinueQueue.\n");
@@ -475,8 +626,9 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
 
 }
 
-void begin_amplification_zone(void) {
+bool begin_amplification_zone(void) {
   BaseType_t xReturned;
+  bool start_run = false;
   // Send start zone request
   xReturned = xQueueSend(heater_zoneRunQueue, &run_amplification_zone, 0);
   if (xReturned != pdPASS) {
@@ -487,10 +639,23 @@ void begin_amplification_zone(void) {
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
   }
+  // Wait for run confirmation response
+  xReturned = xQueueReceive(main_runConfRespQueue, &start_run, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
+  }
+  // Wait for run ok to start response 
+  xReturned = xQueueReceive(main_runRespQueue, &start_run, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
+  }
+
+  return start_run;
 }
 
 void begin_valve_zone(void) {
   BaseType_t xReturned;
+  bool heat_conf = false;
   // Send start valve message to heater queue
   xReturned = xQueueSend(heater_zoneRunQueue, &run_valve_zone, 0);
   if (xReturned != pdPASS) {
@@ -501,10 +666,16 @@ void begin_valve_zone(void) {
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send start valve zone event to logging task.\n");
   }
+  // Wait for run confirmation response
+  xReturned = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
+  }
 }
 
 void end_amplification_zone(void) {
   BaseType_t xReturned;
+  bool heat_conf = false;
   // Send stop amplification message to heater queue
   xReturned = xQueueSend(heater_zoneRunQueue, &stop_amplification_zone, 0);
   if (xReturned != pdPASS) {
@@ -515,11 +686,16 @@ void end_amplification_zone(void) {
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send stop amplification zone event to logging task.\n");
   }
-  vTaskDelay(100);
+  // Wait for run confirmation response
+  xReturned = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
+  }
 }
 
 void end_valve_zone(void) {
   BaseType_t xReturned;
+  bool heat_conf = false;
   // Send valve zone stop request
   xReturned = xQueueSend(heater_zoneRunQueue, &stop_valve_zone, 0);
   if (xReturned != pdPASS) {
@@ -529,6 +705,11 @@ void end_valve_zone(void) {
   xReturned = xQueueSend(logger_logMessageQueue, &valve_stop_log_msg, 0);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send stop valve zone event to logging task.\n");
+  }
+  // Wait for run confirmation response
+  xReturned = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
   }
 }
 
@@ -563,7 +744,7 @@ void create_tasks() {
       vTaskDelete( loggerTaskHandle );
   }
   // Sensors Task
-  xReturned = xTaskCreate(sensors_task, "SensorsTask", 1024, NULL, 0, &sensorsTaskHandle);
+  xReturned = xTaskCreate(sensors_task, "SensorsTask", 2048, NULL, 0, &sensorsTaskHandle);
   if( xReturned != pdPASS ) {
       // The task was created.  Use the task's handle to delete the task. 
       printf("Error creating sensors task. Error: %d\n", xReturned);
@@ -622,9 +803,19 @@ void create_queues() {
   if (main_switchQueue == NULL)
     printf("Unable to create main_switchQueue queue\n");
   main_mainStateRespQueue = xQueueCreate(4, sizeof(tasks_t));
-  if (main_switchQueue == NULL)
+  if (main_mainStateRespQueue == NULL)
+    printf("Unable to create main_mainStateRespQueue queue\n");
+  main_runRespQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (main_runRespQueue == NULL)
+    printf("Unable to create main_runRespQueue queue\n");
+  main_runErrorQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (main_runErrorQueue == NULL)
+    printf("Unable to create main_mainStateRespQueue queue\n");
+  main_runConfRespQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (main_runConfRespQueue == NULL)
     printf("Unable to create main_mainStateRespQueue queue\n");
 
+    
   // Heater Task Queues
   heater_zoneRunQueue = xQueueCreate(QUEUE_SIZE, sizeof(zone_run_req_t));
   if (heater_zoneRunQueue == NULL)
@@ -635,16 +826,26 @@ void create_queues() {
   heater_usbWaitQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_suspend_req_t));
   if (heater_usbWaitQueue == NULL)
     printf("Unable to create heater_usbWaitQueue queue\n");
+  heater_pwmReqQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (heater_pwmReqQueue == NULL)
+    printf("Unable to create heater_pwmReqQueue queue\n");
+  heater_sensorConfQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (heater_sensorConfQueue == NULL)
+    printf("Unable to create heater_sensorConfQueue queue\n");
+    
 
   // Sensor Task Queues
-  sensor_mainStateQueue = xQueueCreate(QUEUE_SIZE, sizeof(main_state_t));
-  if (sensor_mainStateQueue == NULL)
-    printf("Unable to create sensor_mainStateQueue queue\n");
+  sensor_heaterStateQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (sensor_heaterStateQueue == NULL)
+    printf("Unable to create sensor_heaterStateQueue queue\n");
   sensor_usbWaitQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_suspend_req_t));
   if (sensor_usbWaitQueue == NULL)
     printf("Unable to create sensor_usbWaitQueue queue\n");
-  sensor_mainStateContinueQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
-  if (sensor_mainStateContinueQueue == NULL)
+  //sensor_mainStateContinueQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  //if (sensor_mainStateContinueQueue == NULL)
+  //  printf("Unable to create sensor_mainStateContinueQueue queue\n");
+  sensor_pwmRecvQueue = xQueueCreate(QUEUE_SIZE, sizeof(temperature_pwm_data_t));
+  if (sensor_pwmRecvQueue == NULL)
     printf("Unable to create sensor_mainStateContinueQueue queue\n");
 
   // Battery Management Task Queues
