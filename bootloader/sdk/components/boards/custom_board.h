@@ -68,7 +68,7 @@ extern "C" {
 
 
 #define LEDS_NUMBER    0
-#define BUTTONS_NUMBER 1
+#define BUTTONS_NUMBER 0
 #define BUTTONS_ACTIVE_STATE 0
 #define BUTTON_PULL 0
 

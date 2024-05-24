@@ -901,6 +901,7 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
  int main(void) {
   ret_code_t err_code;
   FRESULT res;
+  __enable_irq();
 
   // Initialize clock driver for better time accuracy in FREERTOS
   err_code = nrf_drv_clock_init();
