@@ -13,6 +13,7 @@ bool starting_run = true;
 bool h_pwm_req = false;
 bool greater_than_max = false;
 bool heater_run = false;
+int wdtTimeout = 0;
 
 zone_run_req_t zone_req;
 temperature_data_t temperature_data;
@@ -147,6 +148,18 @@ void heater_reset_all_pids(void){
 
 }
 
+void sendWdtHeaterValid() {
+  BaseType_t xReturned;
+  watchdog_time_update_t wdtUpdate = {};
+  wdtUpdate.taskName = HEATER;
+  wdtUpdate.valid = true;
+
+    xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
+    if (xReturned != pdPASS) {
+      printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+    }
+}
+
 void heater_task(void * pvParameters) {
   BaseType_t xReturned;
 
@@ -232,6 +245,12 @@ void heater_task(void * pvParameters) {
     if (!amplification_zone_running & !valve_zone_running)
         continue; // Go back to top of loop if no zones running
     
+
+    if(wdtTimeout++ > (1/config.sample_rate)){ // send out once a second
+      wdtTimeout = 0;
+      sendWdtHeaterValid(); // update watchdog
+    }
+
     // Receive temperature data (blocking till data comes in)
     xReturned = xQueueReceive(heater_temperatureDataQueue, &temperature_data, portMAX_DELAY);
     if (xReturned != pdPASS) {

@@ -962,6 +962,7 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
 }
 
 void sendWdtHeaterInvalid(){
+  BaseType_t xReturned;
   watchdog_time_update_t wdtUpdate = {};
   wdtUpdate.taskName = HEATER;
   wdtUpdate.valid = false;
