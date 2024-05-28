@@ -55,10 +55,9 @@ void init_pwms() {
 // Updates the Valve PWM Duty Cycle
 void update_valve_duty(int duty) {
   valve_duty = duty;
-  if (valve_duty > 0)
+  if (valve_duty > 0) {
     valve_zone_active = true; 
-  else 
-    valve_zone_active = false;
+  }
 }
 
 // Updates the Amplification 0 PWM Duty Cycle
@@ -66,8 +65,6 @@ void update_amp0_duty(int duty) {
   amp0_duty = duty;
   if (amp0_duty > 0) 
     amp0_zone_active = true; 
-  else 
-    amp0_zone_active = false;
 }
 
 // Updates the Amplification 1 PWM Duty Cycle
@@ -75,8 +72,6 @@ void update_amp1_duty(int duty) {
   amp1_duty = duty;
   if (amp1_duty > 0) 
     amp1_zone_active = true; 
-  else 
-    amp1_zone_active = false;
 }
 
 // Updates the Amplification 2 PWM Duty Cycle
@@ -84,8 +79,6 @@ void update_amp2_duty(int duty) {
   amp2_duty = duty;
   if (amp2_duty > 0) 
     amp2_zone_active = true; 
-  else 
-    amp2_zone_active = false;
 }
 
 void pwm_task(void * pvParameters) {
@@ -139,12 +132,23 @@ void pwm_task(void * pvParameters) {
   
     // PWM0 Control
     if (pwm0_ready_flag) {
-      if (valve_zone_active || amp0_zone_active)
+      if (valve_zone_active || amp0_zone_active) {
         pwm0_ready_flag = false;
-      if (valve_zone_active)
+      }
+
+      if (valve_duty > 0) {
         app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty); 
-      if (amp0_zone_active) 
-         app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  amp0_duty);
+      } else if(valve_zone_active) {
+        valve_zone_active =  false;
+        app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 0);
+      }
+
+      if (amp0_duty > 0){
+        app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  amp0_duty);
+      } else if (amp0_zone_active) {
+        amp0_zone_active = false;
+        app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  0);
+      }
     }
     else if (!pwm0_ready_flag && (valve_zone_active || amp0_zone_active)) {
       vTaskDelay(15);
@@ -152,23 +156,26 @@ void pwm_task(void * pvParameters) {
     
     // PWM2 Control
     if (pwm2_ready_flag) {
-      if (amp1_zone_active || amp2_zone_active)
+      if (amp1_zone_active || amp2_zone_active) {
         pwm2_ready_flag = false;
-      if (amp1_zone_active) 
+      }
+
+      if (amp1_duty > 0){
         app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  amp1_duty);
-      if (amp2_zone_active)
+      } else if(amp1_zone_active) {
+        app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  0);
+        amp1_zone_active = false;
+      }
+        
+      if (amp2_duty > 0) {
         app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, amp2_duty);
+      } else if(amp2_zone_active)  {
+        amp2_zone_active = false;
+        app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, 0);
+      }
     }
     else if (!pwm2_ready_flag && (amp1_zone_active || amp2_zone_active)) {
       vTaskDelay(15);
     }
   }
-  /*
-  app_pwm_channel_duty_set(&PWM0, 0, 50);
-  while(1) {
-    pwm0_ready_flag = false;
-    while(!pwm0_ready_flag);
-    app_pwm_channel_duty_set(&PWM0, 0, 50);
-  }
-  */
 }

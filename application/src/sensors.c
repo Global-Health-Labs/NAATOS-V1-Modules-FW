@@ -29,12 +29,12 @@ static long double amp0_temperature = 0.0;
 static long double amp1_temperature = 0.0;
 static long double amp2_temperature = 0.0;
 
-xQueueHandle sensor_mainStateQueue;
+xQueueHandle sensor_heaterStateQueue;
 xQueueHandle sensor_usbWaitQueue;
-xQueueHandle sensor_mainStateContinueQueue;
+//xQueueHandle sensor_mainStateContinueQueue;
 xQueueHandle sensor_pwmRecvQueue;
 
-main_state_t s_main_state = STANDBY;
+bool heater_running = false;
 
 static log_data_message_t log_msg = {
   .data_type = TEMPERATURE_DATA,
@@ -76,21 +76,16 @@ void sensors_task(void * pvParameters) {
 #endif
 
   for (;;) {
-    // Check to see if the main task state has changed
-    if (uxQueueMessagesWaiting(sensor_mainStateQueue) > 0) {
-      xReturned = xQueueReceive(sensor_mainStateQueue, &s_main_state, 0);
+    // Check to see if the heater has started or stopped
+    if (uxQueueMessagesWaiting(sensor_heaterStateQueue) > 0) {
+      xReturned = xQueueReceive(sensor_heaterStateQueue, &heater_running, 0);
       if (xReturned != pdPASS) {
         printf("BATT_TASK: Unable to receive state change from sensor_mainStateQueue.\n");
       }
-      // Respond to main state change
-      xReturned = xQueueSend(main_mainStateRespQueue, &sensor_task, 0);
+      // Respond to heater change
+      xReturned = xQueueSend(heater_sensorConfQueue, &heater_running, 0);
       if (xReturned != pdPASS) {
         printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
-      }
-      // Wait for Continue
-      xReturned = xQueueReceive(sensor_mainStateContinueQueue, &cont, portMAX_DELAY);
-      if (xReturned != pdPASS) {
-        printf("USB: Unable to recevive continue to sensor_mainStateContinueQueue queue.\n");
       }
     }
 
@@ -175,7 +170,7 @@ void sensors_task(void * pvParameters) {
     }
     
     // Only send temperature data when we are running 
-    if (s_main_state == RUNNING) {
+    if (heater_running) {
       // Put Temperature Data into queue
       xReturned = xQueueSend(heater_temperatureDataQueue, (void *)&temperatures, 0);
       if (xReturned != pdPASS) {
@@ -184,7 +179,7 @@ void sensors_task(void * pvParameters) {
     }
 
     // Send temperature data to Log Data queue
-    if (s_main_state == RUNNING) 
+    if (heater_running) 
       sample_log_index++;
     if (sample_log_index >= sample_log_max) {
       // Request PWM from heater
