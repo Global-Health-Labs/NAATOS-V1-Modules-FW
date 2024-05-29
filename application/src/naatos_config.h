@@ -155,10 +155,18 @@ typedef struct {
   float amp2_zone_pwm;
 } temperature_pwm_data_t;
 
+
+typedef enum {
+  USB_TO_FILE,
+  USB_TO_COM
+} usb_requested_state;
+
+
 // Composite USB Update Message
 typedef struct {
   usb_message_type_t message_type;
   main_state_t current_state;
+  usb_requested_state request_state;
   charge_state_t charge_state;
 } usb_message_t;
 

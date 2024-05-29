@@ -138,8 +138,8 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
             break;
         case APP_USBD_EVT_POWER_READY:
             printf("USB: Ready\n");
-            m_usb_connected = true;
             app_usbd_start();
+            m_usb_connected = true;
             break;
         default:
             break;
@@ -367,6 +367,43 @@ void usb_task(void * pvParameters) {
       connection_state = recv_msg.charge_state;
     else if (recv_msg.message_type == MAIN_STATE_TYPE) 
       main_state = recv_msg.current_state;
+
+
+    // what if we dont care about main state
+    // all we cate about is if the system currently wants  usb active
+    // we will only activate usb if specific conditions like it being connected 
+    // we dont care about  button state here its not our job that is mains job
+    // enum of USB_FILE, USB_COM_PORT
+    // that way if we connect or disconnect we dont care at any given moment only that we need to be in these specific states
+    // we still sync with main when  main requests a state update
+    // if main is in the middle of a run and they plug in then the port will open and accept data
+    // if we 
+
+
+    switch(main_state){
+      case MAIN_STANDBY:
+      // check local button state along with usb state
+      // if connected to usb 
+      break;
+
+      case  MAIN_RUNNING:
+
+      break;
+
+      case MAIN_FILE:
+
+      break;
+
+      case MAIN_SLEEP:
+
+      break;
+    };
+
+
+
+
+
+
 
     // Check USB Connection Status 
     //if (connection_state != CHARGING)

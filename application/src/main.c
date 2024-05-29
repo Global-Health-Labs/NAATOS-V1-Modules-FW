@@ -306,7 +306,7 @@ void main_task(void * pvParameters) {
           set_led1_green_breathe();
           error_during_run = false;
         }
-        
+
         hal_triggered = false;
         optical_triggered = false; 
         // Check for Battery Data in Battery Queue
@@ -318,14 +318,29 @@ void main_task(void * pvParameters) {
              break;
           }
         }
+
+
+        //Check Switch task
+          // update local switch vars depending on switch state
+
+        // if button in off position and usb connected go to FILE
+          // sendUpdatedMainTask here or in  our new standard send USB file enable
+          // goto file
+        // if button on and usb connected just stay here
+
+
+
+
         // Wait for Sensor Switch Data 
         xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
         if (xReturned != pdPASS) {
           printf("MAIN_TASK: Error receiving switch data from main_switchQueue\n");
         }
+
         // Update switches triggered
         hal_triggered = switch_data.hal_triggered;
         optical_triggered = switch_data.optical_tiggered;
+
         // Check if we can go to RUN state
         if (hal_triggered && optical_triggered && !error_during_run) {
           // Set the new main state
@@ -529,6 +544,10 @@ void main_task(void * pvParameters) {
         sendUpdatedMainTaskState(main_state);
         vTaskDelay(250);
         break;
+
+      case MAIN_FILE:
+
+      break;
 
       // In Low Power State
       case MAIN_SLEEP:
