@@ -5,7 +5,6 @@
 #include "FreeRTOS.h"
 #include  "task.h"
 
-
 #define NAATOS_FW_VERSON  "v0.1.0_c"
 
 #define pdTICKS_TO_MS( xTimeInTicks )    ( ( TickType_t ) ( ( ( uint64_t ) ( xTimeInTicks ) * ( uint64_t ) 1000U ) / ( uint64_t ) configTICK_RATE_HZ ) )
@@ -178,6 +177,12 @@ typedef struct {
 typedef struct {
   tasks_t task_req;
 } battery_percent_req_t; 
+
+
+typedef struct {
+  tasks_t taskName;
+  bool valid; // if the task is meant to not run anymore this should be set to false
+} watchdog_time_update_t;
 
 // Calendar time struct
 typedef struct {
