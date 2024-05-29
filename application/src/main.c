@@ -3,6 +3,7 @@
 **********************************************************************
 File    : main.c
 Purpose : NAATOS Application Start
+SDK Version: 17.1
 */
 
 #include <stdio.h>
@@ -29,6 +30,7 @@ Purpose : NAATOS Application Start
 #include "pid.h"
 #include "pwm.h"
 #include "adc.h"
+#include "watchdog.h"
 #include "i2c_hal_freertos.h"
 #include "spi.h"
 #include "sd_card.h"
@@ -54,6 +56,7 @@ xTaskHandle sensorsTaskHandle;
 xTaskHandle batteryTaskHandle;
 xTaskHandle usbTaskHandle;
 xTaskHandle pwmTaskHandle;
+xTaskHandle wdtTaskHandle;
 xTaskHandle compositeTaskHandle;
 
 xQueueHandle main_batteryDataQueue;
@@ -768,6 +771,14 @@ void create_tasks() {
       printf("Error creating PWM task. Error: %d\n", xReturned);
       vTaskDelete( pwmTaskHandle );
   }
+
+  // WDT Task
+  xReturned = xTaskCreate(wdtFeedTask, "WDTTask", 100, NULL, 0, &wdtTaskHandle);
+  if ( xReturned != pdPASS ) {
+      /* The task was created.  Use the task's handle to delete the task. */
+      printf("Error creating WDT task. Error: %d\n", xReturned);
+      vTaskDelete( wdtTaskHandle );
+  }
   // USB Composite Task
   xReturned = xTaskCreate(composite_usb_task, "CompositeUSBTask", 1024, NULL, 0, &compositeTaskHandle);
   if ( xReturned != pdPASS ) {
@@ -875,6 +886,12 @@ void create_queues() {
   logger_mainStateChangeQueue = xQueueCreate(QUEUE_SIZE, sizeof(main_state_t));
   if (logger_mainStateChangeQueue == NULL)
     printf("Unable to create logger_mainStateChangeQueue queue\n");
+
+  // Watchdog Task Queues
+  watchdog_rxTimesQueue = xQueueCreate(QUEUE_SIZE, sizeof(watchdog_time_update_t));
+  if (watchdog_rxTimesQueue == NULL)
+    printf("Unable to create watchdog_rxTimesQueue queue\n");
+
   logger_mainStateContinueQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (logger_mainStateContinueQueue == NULL)
     printf("Unable to create logger_mainStateContinueQueue queue\n");
