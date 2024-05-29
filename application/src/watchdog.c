@@ -47,7 +47,9 @@ int heaterTicks = 0;
 bool batteryValid = false;
 int batteryTicks = 0;
 
+#if NAATOS_ENABLE_WATCHDOG
 watchdog_init();
+#endif
 
 while (true) {
 
@@ -76,7 +78,7 @@ while (true) {
 
          }
     }
-
+#if NAATOS_ENABLE_WATCHDOG
     if(heaterValid){
       heaterTicks++;
     }
@@ -89,7 +91,7 @@ while (true) {
     if(heaterTicks < MAX_WDT_TASK_TIMEOUT && batteryTicks < MAX_WDT_TASK_TIMEOUT) {
       nrf_drv_wdt_channel_feed(m_channel_id);
     }
-
+#endif
     // Delay for a period shorter than the watchdog timeout
     vTaskDelay(WDT_TASK_DELAY); 
   }
