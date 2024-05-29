@@ -15,3 +15,8 @@
 application/solution/Output/*
 bootloader/solution/Output/*
 .vscode/settings.json
+
+application/solution/*.emSession
+application/solution/*.jlink
+bootloader/solution/*.emSession
+bootloader/solution/*.jlink
