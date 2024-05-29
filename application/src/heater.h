@@ -5,47 +5,47 @@
 #include "pid.h"
 #include "pwm.h"
 
-#define VALVE_SETPOINT    65.0
-#define AMP0_SETPOINT     65.0
-#define AMP1_SETPOINT     65.0
-#define AMP2_SETPOINT     65.0
+#define VALVE_SETPOINT    67.6
+#define AMP0_SETPOINT     67.0
+#define AMP1_SETPOINT     67.2
+#define AMP2_SETPOINT     68.5
 
-#define VALVE_SETPOINT_2  85.0
-#define AMP0_SETPOINT_2   25.0
-#define AMP1_SETPOINT_2   25.0
-#define AMP2_SETPOINT_2   25.0
+#define VALVE_SETPOINT_2  83.2
+#define AMP0_SETPOINT_2   67.0
+#define AMP1_SETPOINT_2   67.0
+#define AMP2_SETPOINT_2   67.0
 
 #define V_KP    2.250
-#define V_KI    0.021
-#define V_KD    2.255
+#define V_KI    0.025
+#define V_KD    2.25
 
-#define A0_KP   2.185
-#define A0_KI   0.016
-#define A0_KD   1.258
+#define A0_KP   2.25
+#define A0_KI   0.025
+#define A0_KD   2.25
 
-#define A1_KP   2.122
-#define A1_KI   0.012
-#define A1_KD   1.277
+#define A1_KP   2.25
+#define A1_KI   0.025
+#define A1_KD   2.25
 
-#define A2_KP   2.157
-#define A2_KI   0.014
-#define A2_KD   1.262
+#define A2_KP   2.25
+#define A2_KI   0.025
+#define A2_KD   2.25
 
-#define V_KP_2  2.250
-#define V_KI_2  0.021
-#define V_KD_2  2.255
+#define V_KP_2  2.25
+#define V_KI_2  0.025
+#define V_KD_2  2.25
 
-#define A0_KP_2 2.185
-#define A0_KI_2 0.016
-#define A0_KD_2 1.258
+#define A0_KP_2 2.25
+#define A0_KI_2 0.025
+#define A0_KD_2 2.25
 
-#define A1_KP_2 2.122
-#define A1_KI_2 0.012
-#define A1_KD_2 1.277
+#define A1_KP_2 2.25
+#define A1_KI_2 0.025
+#define A1_KD_2 2.25
 
-#define A2_KP_2 2.157
-#define A2_KI_2 0.014
-#define A2_KD_2 1.262
+#define A2_KP_2 2.25
+#define A2_KI_2 0.025
+#define A2_KD_2 2.25
 
 void heater_task(void * pvParameters);
 void sendWdtHeaterValid();
