@@ -189,12 +189,12 @@ const log_data_message_t amplification_stop_log_msg = {
 // USB Main State Update Constants
 const usb_message_t standby_update = {
   .message_type = MAIN_STATE_TYPE,
-  .current_state = STANDBY,
+  .current_state = MAIN_STANDBY,
   .charge_state = NULL
 };
 const usb_message_t running_update = {
   .message_type = MAIN_STATE_TYPE,
-  .current_state = RUNNING,
+  .current_state = MAIN_RUNNING,
   .charge_state = NULL
 };
 
@@ -271,8 +271,8 @@ void main_task(void * pvParameters) {
   uint32_t alert_timeout_ticks;
 
   // Set Start up state to standby
-  main_state_t main_state = STANDBY;
-  main_state_t last_state = LOW_POWER;
+  main_state_t main_state = MAIN_STANDBY;
+  main_state_t last_state = MAIN_SLEEP;
   int i = 0;
 
   // Get the alert timeout
@@ -286,7 +286,7 @@ void main_task(void * pvParameters) {
   for (;;) {
     switch(main_state) {
       // In Standby State
-      case STANDBY:
+      case MAIN_STANDBY:
         if (last_state != main_state) {
           sendWdtHeaterInvalid(); // Invalidate the heater to stop WDT from watching it
           last_state = main_state;
@@ -313,7 +313,7 @@ void main_task(void * pvParameters) {
         if (xQueueReceive(main_batteryDataQueue, &percent_recv, 0) == pdPASS) {
           if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
              last_state = main_state;
-             main_state = LOW_POWER;
+             main_state = MAIN_SLEEP;
              sendUpdatedMainTaskState(main_state);
              break;
           }
@@ -330,7 +330,7 @@ void main_task(void * pvParameters) {
         if (hal_triggered && optical_triggered && !error_during_run) {
           // Set the new main state
           last_state = main_state;
-          main_state = RUNNING;
+          main_state = MAIN_RUNNING;
           sendUpdatedMainTaskState(main_state);
           // Delay
           vTaskDelay(100);
@@ -338,7 +338,7 @@ void main_task(void * pvParameters) {
       break;
 
       // In Running State (Will block task for the duration of the test)
-      case RUNNING:
+      case MAIN_RUNNING:
         vTaskDelay(pdMS_TO_TICKS(100));
         /* ***** Start Sample Preperation ***** */
 #if GO_STRAIGHT_TO_RUNNING
@@ -356,7 +356,7 @@ void main_task(void * pvParameters) {
           }
           // Set the new main state
           last_state = main_state;
-          main_state = STANDBY;
+          main_state = MAIN_STANDBY;
           sendUpdatedMainTaskState(main_state);
           // Set error during run and wait alert timeout
           error_during_run = true;
@@ -375,7 +375,7 @@ void main_task(void * pvParameters) {
           end_amplification_zone();
           // Set the new main state
           last_state = main_state;
-          main_state = STANDBY;
+          main_state = MAIN_STANDBY;
           sendUpdatedMainTaskState(main_state);
           // Set error during run and wait alert timeout
           error_during_run = true;
@@ -456,7 +456,7 @@ void main_task(void * pvParameters) {
           }
           // Update main state
           last_state = main_state;
-          main_state = STANDBY;
+          main_state = MAIN_STANDBY;
           sendUpdatedMainTaskState(main_state);
           vTaskDelay(100);
           break;
@@ -509,7 +509,7 @@ void main_task(void * pvParameters) {
             }
             // Update main state
             last_state = main_state;
-            main_state = STANDBY;
+            main_state = MAIN_STANDBY;
             sendUpdatedMainTaskState(main_state);
             break;
         }
@@ -525,13 +525,13 @@ void main_task(void * pvParameters) {
         // Update current main state
 
         last_state = main_state;
-        main_state = STANDBY;
+        main_state = MAIN_STANDBY;
         sendUpdatedMainTaskState(main_state);
         vTaskDelay(250);
         break;
 
       // In Low Power State
-      case LOW_POWER:
+      case MAIN_SLEEP:
 
       break;
       // Shouldnt Get here
@@ -549,9 +549,9 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   bool main_state_cont = true;
   
   // Get the update to send
-  if (new_state == RUNNING)
+  if (new_state == MAIN_RUNNING)
     msg = running_update;
-  else if (new_state == STANDBY)
+  else if (new_state == MAIN_STANDBY)
     msg = standby_update;
 
   printf("MAIN: Sending Main State Update Messages.\n");

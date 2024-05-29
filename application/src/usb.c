@@ -297,7 +297,7 @@ void composite_usb_task(void * pvParameters) {
         // Nothing to do 
     }
 
-    if (msc_active && usb_detected && !usb_suspended_tasks && !usb_done_config && main_state == STANDBY) {
+    if (msc_active && usb_detected && !usb_suspended_tasks && !usb_done_config && main_state == MAIN_STANDBY) {
       usb_suspend_conflicting_tasks();
       set_led1_blue_slow_blink();
       batt_over = false; heater_over = false; pwm_over = false; sensor_over = false;
@@ -350,7 +350,7 @@ void usb_task(void * pvParameters) {
   bool cont = false;
 
   // Set Current State to Standby
-  main_state = STANDBY;
+  main_state = MAIN_STANDBY;
   // Set connection state to not charging
   connection_state = NOT_CHARGING;
 
@@ -373,7 +373,7 @@ void usb_task(void * pvParameters) {
       //continue;
 
     // File System Update Based on the main state
-    if (main_state == STANDBY) {
+    if (main_state == MAIN_STANDBY) {
       // Uninit the SD Card
       //uninit_sd_card();
       //app_usbd_ep_enable(ENDPOINT_LIST());
@@ -393,7 +393,7 @@ void usb_task(void * pvParameters) {
       //app_usbd_ep_enable(ENDPOINT_LIST());
       //usb_done_config = false;
     }
-    else if (main_state == RUNNING) {
+    else if (main_state == MAIN_RUNNING) {
       if (usb_started) {
         restart_usb_only_cdc_acm();
       }

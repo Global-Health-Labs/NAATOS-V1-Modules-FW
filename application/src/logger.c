@@ -31,7 +31,7 @@ void getLogFileName(const char * _logFileName) {
 
 void logger_task(void * pvParameters) {
   BaseType_t xReturned;
-  main_state_t main_state = STANDBY;
+  main_state_t main_state = MAIN_STANDBY;
   log_data_message_t log_message;
   log_data_message_t last_temp_message;
   int battery_percent;
@@ -69,7 +69,7 @@ void logger_task(void * pvParameters) {
       printf("USB: Unable to recevive continue to logger_mainStateContinueQueue queue.\n");
     }
 
-    if (main_state == RUNNING) {
+    if (main_state == MAIN_RUNNING) {
       // Create Log File based on the UTC Time of the Sample preperation
       getLogFileName(logFileName);
       res = sd_card_create_log_file(logFileName);
@@ -82,7 +82,7 @@ void logger_task(void * pvParameters) {
     }
 
     // Log sample data while we are running
-    while (main_state == RUNNING && !run_stopped) {
+    while (main_state == MAIN_RUNNING && !run_stopped) {
       new_temp = false;
       // Check if state has changed
       if (uxQueueMessagesWaiting(logger_mainStateChangeQueue) > 0) {

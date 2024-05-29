@@ -16,7 +16,7 @@ xQueueHandle battery_mainStateContinueQueue;
 
 charge_state_t charge_state;
 int battery_percentage = 100;
-main_state_t batt_main_state = STANDBY;
+main_state_t batt_main_state = MAIN_STANDBY;
 
 int sendBattWDT = 0;
 
@@ -106,7 +106,7 @@ void battery_task(void * pvParameters) {
     }
 
     // Send Battery Percentage to main task if we are in standby
-    if (batt_main_state == STANDBY) {
+    if (batt_main_state == MAIN_STANDBY) {
       xReturned = xQueueSend(main_batteryDataQueue, (void *)&battery_percentage, 1000); // TODO: Probably want to send full BMS information instead
       if (xReturned != pdPASS) {
         printf("BATT_TASK: Was unable to send battery percentage to main queue. Error:%d\n", xReturned);

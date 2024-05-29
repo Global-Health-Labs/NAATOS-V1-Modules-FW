@@ -69,9 +69,10 @@
 
 /* Main States */
 typedef enum {
-  LOW_POWER,
-  STANDBY,
-  RUNNING
+  MAIN_STANDBY,
+  MAIN_RUNNING,
+  MAIN_FILE,
+  MAIN_SLEEP
 } main_state_t;
 
 typedef enum {
