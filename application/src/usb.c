@@ -128,7 +128,9 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
             break;
         case APP_USBD_EVT_POWER_REMOVED:
             printf("USB: Power removed\n");
-            app_usbd_stop();
+            if (nrf_drv_usbd_is_enabled()) {
+              app_usbd_stop();
+            }
             usb_done_config = false;  
             usb_detected = false;
             usb_started = false;
@@ -268,6 +270,7 @@ void start_usb(bool cdc_acm, bool msc) {
 void restart_usb_only_cdc_acm(void) {
   printf("USB: Restarting USB to only have Virtual COM Port.\n");
   app_usbd_stop();
+  //app_usbd_ep_disable(ENDPOINT_LIST());
   init_sd_card();
   
 
@@ -353,7 +356,6 @@ void usb_task(void * pvParameters) {
 
   // Set the first event to make sure that USB queue is processed after it is started
   for (;;) {
-    
     // Check the USB queue for an update message
     xReturned = xQueueReceive(usb_stateChangeQueue, &recv_msg, portMAX_DELAY);
     if (xReturned != pdPASS) {
@@ -374,6 +376,7 @@ void usb_task(void * pvParameters) {
     if (main_state == STANDBY) {
       // Uninit the SD Card
       //uninit_sd_card();
+      //app_usbd_ep_enable(ENDPOINT_LIST());
 
       xReturned = xQueueSend(main_mainStateRespQueue, &usb_task, 0);
       if (xReturned != pdPASS) {
@@ -387,8 +390,8 @@ void usb_task(void * pvParameters) {
       
       // Start the USB
       //app_usbd_enable();
+      //app_usbd_ep_enable(ENDPOINT_LIST());
       //usb_done_config = false;
-
     }
     else if (main_state == RUNNING) {
       if (usb_started) {

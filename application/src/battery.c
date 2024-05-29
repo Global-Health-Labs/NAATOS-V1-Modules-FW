@@ -18,9 +18,19 @@ charge_state_t charge_state;
 int battery_percentage = 100;
 main_state_t batt_main_state = STANDBY;
 
+int sendBattWDT = 0;
+
+#define BATT_TASK_DELAY 100
+#define BATT_SEND_WDT_TICKS 5 // 500 msec
+
+#
+
 void battery_task(void * pvParameters) {
   BaseType_t xReturned;
   battery_percent_req_t recv_req;
+  watchdog_time_update_t wdtUpdate = {};
+  wdtUpdate.taskName = BATTERY;
+  wdtUpdate.valid = true;
   bool inc = false; //temp
   tasks_t batt_task = BATTERY;
   bool cont;
@@ -44,6 +54,13 @@ void battery_task(void * pvParameters) {
       // TODO: Compare pin status and update the charger status
       // TODO: if changed, put state change message in usb_stateChangeQueue
 
+    if(sendBattWDT++ >= BATT_SEND_WDT_TICKS) {
+      sendBattWDT = 0;
+      xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
+      if (xReturned != pdPASS) {
+        printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+      }
+    }
 
     // I2C Fuel Gauge read
     battery_percentage = fuelGauge_getSOC(NULL);
@@ -115,7 +132,6 @@ void battery_task(void * pvParameters) {
         printf("BATT_TASK: Was unable to send battery information to logger queue\n");
       }
     }
-
-    vTaskDelay(100);
+    vTaskDelay(BATT_TASK_DELAY);
   }
 }

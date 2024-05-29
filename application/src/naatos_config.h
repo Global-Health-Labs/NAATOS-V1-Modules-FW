@@ -5,8 +5,7 @@
 #include "FreeRTOS.h"
 #include  "task.h"
 
-
-#define NAATOS_FW_VERSON  "v0.1.0"
+#define NAATOS_FW_VERSON  "v0.1.0_c"
 
 #define pdTICKS_TO_MS( xTimeInTicks )    ( ( TickType_t ) ( ( ( uint64_t ) ( xTimeInTicks ) * ( uint64_t ) 1000U ) / ( uint64_t ) configTICK_RATE_HZ ) )
 
@@ -51,7 +50,6 @@
 #define I2C_CONNECTED           0
 #define GO_STRAIGHT_TO_RUNNING  0
 #define USE_CALENDAR_CHIP       1 
-#define UNIFORMITY              1
 #define VERBOSE_PID             1
 
 /* Log Event Messages */
@@ -180,6 +178,12 @@ typedef struct {
   tasks_t task_req;
 } battery_percent_req_t; 
 
+
+typedef struct {
+  tasks_t taskName;
+  bool valid; // if the task is meant to not run anymore this should be set to false
+} watchdog_time_update_t;
+
 // Calendar time struct
 typedef struct {
   uint8_t second;
@@ -250,6 +254,22 @@ typedef struct {
   float amp2_ki;
   float amp2_kd;
   uint16_t optical_distance;
+  float valve_setpoint_2;
+  float amp0_setpoint_2;
+  float amp1_setpoint_2;
+  float amp2_setpoint_2;
+  float valve_kp_2;
+  float valve_ki_2;
+  float valve_kd_2;
+  float amp0_kp_2;
+  float amp0_ki_2;
+  float amp0_kd_2;
+  float amp1_kp_2;
+  float amp1_ki_2;
+  float amp1_kd_2;
+  float amp2_kp_2;
+  float amp2_ki_2;
+  float amp2_kd_2;
 } naatos_config_parameters;
 
 /* Configuration Parameters Variables */
