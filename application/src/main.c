@@ -918,7 +918,9 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
   init_sensors_gpios();   // Sensor GPIOs
   vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_400k);   // I2C
   vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
+#if ENABLE_LEDS
   led_driver_init();
+#endif
   fuelGauge_init();
   init_sd_card();
 
