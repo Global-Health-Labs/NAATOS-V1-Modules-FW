@@ -1,6 +1,6 @@
 #include "watchdog.h"
 #include "boards.h"
-#include "naatos_queues.h""
+#include "naatos_queues.h"
 static nrfx_wdt_channel_id m_channel_id;
 
 xQueueHandle watchdog_rxTimesQueue;
@@ -46,6 +46,8 @@ int heaterTicks = 0;
 
 bool batteryValid = false;
 int batteryTicks = 0;
+
+watchdog_init();
 
 while (true) {
 

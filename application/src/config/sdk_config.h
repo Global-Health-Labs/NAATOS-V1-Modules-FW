@@ -4578,7 +4578,7 @@
 // <1=> Remove WDT IRQ handling
 
 #ifndef NRFX_WDT_CONFIG_NO_IRQ
-#define NRFX_WDT_CONFIG_NO_IRQ 1
+#define NRFX_WDT_CONFIG_NO_IRQ 0
 #endif
 
 
