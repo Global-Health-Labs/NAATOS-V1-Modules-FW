@@ -1,6 +1,6 @@
 #include "watchdog.h"
 #include "boards.h"
-#include "naatos_queues.h""
+#include "naatos_queues.h"
 static nrfx_wdt_channel_id m_channel_id;
 
 xQueueHandle watchdog_rxTimesQueue;
@@ -15,7 +15,7 @@ void watchdog_init(void) {
 
   nrf_drv_wdt_config_t config = NRF_DRV_WDT_DEAFULT_CONFIG;
   config.behaviour = NRF_WDT_BEHAVIOUR_RUN_SLEEP_HALT; // Ensure this behaviour is supported
-  config.reload_value = 12000; // 12 seconds
+  config.reload_value = 6000; // 12 seconds
   err_code = nrf_drv_wdt_init(&config, wdt_event_handler);
   APP_ERROR_CHECK(err_code);
 
@@ -26,7 +26,9 @@ void watchdog_init(void) {
   nrf_drv_wdt_enable();
 }
 
-#define MAX_WDT_TASK_TIMEOUT_S 10 // SECONDS
+
+#define WDT_TASK_DELAY 500 // msec
+#define MAX_WDT_TASK_TIMEOUT (3 / (WDT_TASK_DELAY * 0.001))  // 3 sec
 
 void wdtFeedTask(void * pvParameters) {
 /* We can handle this a few ways. We can just kick the dog in a task on an interval. That would support general system lockup 
@@ -45,11 +47,15 @@ int heaterTicks = 0;
 bool batteryValid = false;
 int batteryTicks = 0;
 
+#if NAATOS_ENABLE_WATCHDOG
+watchdog_init();
+#endif
+
 while (true) {
 
     //if msg in queue
     // Set watchdog time and or set valid flag
-    if( xQueueReceive( watchdog_rxTimesQueue,
+    while ( xQueueReceive( watchdog_rxTimesQueue,
                          &recv_req,
                          ( TickType_t ) 0 ) == pdPASS ) {
          /* *pxRxedPointer now points to xMessage. */
@@ -72,7 +78,7 @@ while (true) {
 
          }
     }
-
+#if NAATOS_ENABLE_WATCHDOG
     if(heaterValid){
       heaterTicks++;
     }
@@ -82,12 +88,12 @@ while (true) {
     }
 
 
-    if(heaterTicks < MAX_WDT_TASK_TIMEOUT_S && batteryTicks < MAX_WDT_TASK_TIMEOUT_S) {
+    if(heaterTicks < MAX_WDT_TASK_TIMEOUT && batteryTicks < MAX_WDT_TASK_TIMEOUT) {
       nrf_drv_wdt_channel_feed(m_channel_id);
     }
-
+#endif
     // Delay for a period shorter than the watchdog timeout
-    vTaskDelay(1000); 
+    vTaskDelay(WDT_TASK_DELAY); 
   }
 
 }

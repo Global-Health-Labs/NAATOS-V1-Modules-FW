@@ -48,3 +48,4 @@
 #define A2_KD_2 1.262
 
 void heater_task(void * pvParameters);
+void sendWdtHeaterValid();
