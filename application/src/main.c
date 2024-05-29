@@ -892,6 +892,7 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
   printf("FreeRTOS Stack Overflow Has Occured.");
 }
 
+
 /*********************************************************************
 *
 *       main()
@@ -901,7 +902,6 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
  int main(void) {
   ret_code_t err_code;
   FRESULT res;
-  __enable_irq();
 
   // Initialize clock driver for better time accuracy in FREERTOS
   err_code = nrf_drv_clock_init();
@@ -922,7 +922,7 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
   led_driver_init();
   fuelGauge_init();
   init_sd_card();
-
+  
   // Get the configuration parameters
   res = get_naatos_configuration_parameters(&config);
   if (res != FR_OK) {

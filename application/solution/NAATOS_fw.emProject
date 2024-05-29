@@ -27,7 +27,7 @@
       linker_printf_width_precision_supported="Yes"
       linker_scanf_fmt_level="long"
       linker_section_placement_file="flash_placement.xml"
-      linker_section_placement_macros="FLASH_PH_START=0x0;FLASH_PH_SIZE=0x100000;RAM_PH_START=0x20000000;RAM_PH_SIZE=0x40000;FLASH_START=0x1000;FLASH_SIZE=0xF2000;RAM_START=0x20000000;RAM_SIZE=0x40000"
+      linker_section_placement_macros="FLASH_PH_START=0x0;FLASH_PH_SIZE=0x100000;RAM_PH_START=0x20000000;RAM_PH_SIZE=0x40000;FLASH_START=0x1000;FLASH_SIZE=0xF3000;RAM_START=0x20000008;RAM_SIZE=0x3FFF8"
       linker_section_placements_segments="FLASH1 RX 0x0 0x100000;RAM1 RWX 0x20000000 0x40000"
       macros="CMSIS_CONFIG_TOOL=../sdk/external_tools/cmsisconfig/CMSIS_Configuration_Wizard.jar"
       project_directory=""
