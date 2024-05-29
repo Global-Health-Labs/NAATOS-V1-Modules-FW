@@ -178,12 +178,6 @@ typedef struct {
   tasks_t task_req;
 } battery_percent_req_t; 
 
-
-typedef struct {
-  tasks_t taskName;
-  bool valid; // if the task is meant to not run anymore this should be set to false
-} watchdog_time_update_t;
-
 // Calendar time struct
 typedef struct {
   uint8_t second;

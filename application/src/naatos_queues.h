@@ -47,7 +47,4 @@ extern xQueueHandle logger_mainStateContinueQueue;
 // PWM Task Queue(s)
 extern xQueueHandle pwm_usbWaitQueue;
 
-//Watchdog Task Queue
-extern xQueueHandle watchdog_rxTimesQueue;
-
 #endif
