@@ -49,7 +49,7 @@
 #define OPTICAL_TRIG_THRES            800
 
 /* Device Debug Parameters */
-#define I2C_CONNECTED           1
+#define I2C_CONNECTED           0
 #define GO_STRAIGHT_TO_RUNNING  0
 #define USE_CALENDAR_CHIP       1 
 #define VERBOSE_PID             1

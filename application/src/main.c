@@ -238,7 +238,7 @@ naatos_config_parameters config = {
   .amp2_ki_2 = 0,
   .amp2_kd_2 = 0
 };
-bool use_default_configuration_parameters;
+bool use_default_configuration_parameters = false;
 
 // Function defs
 void sendUpdatedMainTaskState(main_state_t new_state);
@@ -334,12 +334,6 @@ void main_task(void * pvParameters) {
           sendUpdatedMainTaskState(main_state);
           // Delay
           vTaskDelay(100);
-           // Get the configuration parameters
-          FRESULT res = get_naatos_configuration_parameters(&config);
-          if (res != FR_OK) {
-            printf("Warning: configuration file was not able to be read. Using default configuration parameters.");
-            use_default_configuration_parameters = true;
-          }
         }
       break;
 
@@ -954,6 +948,8 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
   if (res != FR_OK) {
     printf("Warning: configuration file was not able to be read. Using default configuration parameters.");
     use_default_configuration_parameters = true;
+  } else {
+    use_default_configuration_parameters = false;
   }
 
   // Uninitalize the SD card
