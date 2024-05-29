@@ -37,6 +37,7 @@ SDK Version: 17.1
 //#include "is31fl3196.h"
 #include "fuel.h"
 #include "led.h"
+#include "switch.h"
 
 #include "nrf_drv_power.h"
 
@@ -58,6 +59,7 @@ xTaskHandle usbTaskHandle;
 xTaskHandle pwmTaskHandle;
 xTaskHandle wdtTaskHandle;
 xTaskHandle compositeTaskHandle;
+xTaskHandle buttonTaskHandle;
 
 xQueueHandle main_batteryDataQueue;
 xQueueHandle main_switchQueue;
@@ -65,6 +67,7 @@ xQueueHandle main_mainStateRespQueue;
 xQueueHandle main_runRespQueue;
 xQueueHandle main_runErrorQueue;
 xQueueHandle main_runConfRespQueue;
+xQueueHandle button_mainStateQueue;
 
 // Zone Request Constants
 const zone_run_req_t run_amplification_zone = {
@@ -801,6 +804,14 @@ void create_tasks() {
       printf("Error creating Composite USB task. Error: %d\n", xReturned);
       vTaskDelete( compositeTaskHandle );
   }
+
+  //Button Task
+  xReturned = xTaskCreate(buttonTask, "ButtonTask", 1024, NULL, 0, &buttonTaskHandle);
+  if ( xReturned != pdPASS ) {
+      // The task was created.  Use the task's handle to delete the task. 
+      printf("Error creating Composite USB task. Error: %d\n", xReturned);
+      vTaskDelete( buttonTaskHandle );
+  }
 }
 
 /*********************************************************************
@@ -906,6 +917,12 @@ void create_queues() {
   watchdog_rxTimesQueue = xQueueCreate(WATCH_DOG_QUEUE_SIZE, sizeof(watchdog_time_update_t));
   if (watchdog_rxTimesQueue == NULL)
     printf("Unable to create watchdog_rxTimesQueue queue\n");
+
+
+  // Button Task Queues
+  button_mainStateQueue = xQueueCreate(QUEUE_SIZE, sizeof(button_update_t));
+  if (button_mainStateQueue == NULL)
+    printf("Unable to create button_mainStateQueue queue\n");
 
   logger_mainStateContinueQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (logger_mainStateContinueQueue == NULL)

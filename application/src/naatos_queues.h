@@ -51,4 +51,6 @@ extern xQueueHandle pwm_usbWaitQueue;
 //Watchdog Task Queue
 extern xQueueHandle watchdog_rxTimesQueue;
 
+extern xQueueHandle button_mainStateQueue;
+
 #endif

@@ -193,6 +193,10 @@ typedef struct {
   bool valid; // if the task is meant to not run anymore this should be set to false
 } watchdog_time_update_t;
 
+typedef struct {
+
+} button_update_t;
+
 // Calendar time struct
 typedef struct {
   uint8_t second;
@@ -230,6 +234,7 @@ extern xTaskHandle batteryTaskHandle;
 extern xTaskHandle usbTaskHandle;
 extern xTaskHandle pwmTaskHandle;
 extern xTaskHandle compositeTaskHandle;
+extern xTaskHandle buttonTaskHandle;
 
 // Config parameters
 typedef struct {
