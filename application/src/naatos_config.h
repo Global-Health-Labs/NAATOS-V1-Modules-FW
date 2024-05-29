@@ -193,8 +193,14 @@ typedef struct {
   bool valid; // if the task is meant to not run anymore this should be set to false
 } watchdog_time_update_t;
 
-typedef struct {
+typedef enum {
+  ON_EVENT,
+  OFF_EVENT,
+  BOOTLOADER_EVENT
+} button_event_e;
 
+typedef struct {
+  button_event_e event;
 } button_update_t;
 
 // Calendar time struct

@@ -13,3 +13,5 @@
 void button_init(void);
 
 void buttonTask(void * pvParameters);
+
+void sendButtonUpdate(button_update_t msg);
