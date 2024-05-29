@@ -9,7 +9,7 @@
 #include "naatos_config.h"
 #include "task.h"
 
-#define NAATOS_ENABLE_WATCHDOG 1
+#define NAATOS_ENABLE_WATCHDOG 0
 
 void wdt_event_handler(void);
 
