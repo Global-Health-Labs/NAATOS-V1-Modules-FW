@@ -5,6 +5,7 @@
 #include "queue.h"
 
 #define QUEUE_SIZE  1
+#define WATCH_DOG_QUEUE_SIZE 30
 
 // Main Task Queue(s)
 extern xQueueHandle main_batteryDataQueue;
