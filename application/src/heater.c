@@ -298,6 +298,17 @@ void heater_task(void * pvParameters) {
     
     // Update PID and PWM
     if (amplification_zone_running) {
+      #ifdef SAMPLE_PREP_BOARD
+      // Update Amplification 2 PID loop with new temperatures
+      pid_controller_compute(&amp2_pid, temperature_data.amp2_zone_temp);
+      // Update Amplification 2 PWM with PID output
+      update_amp2_duty(amp2_pid.out);
+      h_pwm_data.amp2_zone_pwm = amp2_pid.out;
+
+      if (config.amp2_max_temp < temperature_data.amp2_zone_temp) {
+        greater_than_max = true;
+      }
+      #else
       // Update Amplification 0 PID loop with new temperatures
       pid_controller_compute(&amp0_pid, temperature_data.amp0_zone_temp);
       // Update Amplification 0 PWM with PID output
@@ -332,6 +343,7 @@ void heater_task(void * pvParameters) {
       if (config.valve_max_temp < temperature_data.valve_zone_temp) {
         greater_than_max = true;
       }
+      #endif
    }
    if (valve_zone_running) {
       pid_controller_compute(&amp0_pid_2, temperature_data.amp0_zone_temp);

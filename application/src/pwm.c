@@ -101,7 +101,6 @@ void pwm_task(void * pvParameters) {
   app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  amp0_duty);
   app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  amp1_duty);
   app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL,  amp2_duty);
-  
   // Main Task Loop
   for (;;) {
     // If not running a duty cycle do nothing

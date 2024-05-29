@@ -69,10 +69,14 @@ void sensors_task(void * pvParameters) {
 
   /* Get TSYS01 Calibration Values */
 #if I2C_CONNECTED
+#ifdef SAMPLE_PREP_BOARD
+  tsys01_err = tsys01_getCalibrationValues(amp_zone_2);
+#else
   tsys01_err = tsys01_getCalibrationValues(valve_zone);
   tsys01_err = tsys01_getCalibrationValues(amp_zone_0);
   tsys01_err = tsys01_getCalibrationValues(amp_zone_1);
   tsys01_err = tsys01_getCalibrationValues(amp_zone_2);
+#endif
 #endif
 
   for (;;) {
@@ -142,6 +146,9 @@ void sensors_task(void * pvParameters) {
  #endif
 
  #if I2C_CONNECTED
+ #ifdef SAMPLE_PREP_BOARD
+    temperatures.amp2_zone_temp = readTemp(amp_zone_2);
+ #else
     // I2C Read for Valve Zone
     temperatures.valve_zone_temp = readTemp(valve_zone);
 
@@ -153,7 +160,7 @@ void sensors_task(void * pvParameters) {
 
     // I2C Read for Amplification Zone 2 
     temperatures.amp2_zone_temp = readTemp(amp_zone_2);
-    
+#endif
 #else
     // Set temps to their setpoints if i2c is not connected
     temperatures.valve_zone_temp = 85;
@@ -228,6 +235,7 @@ void init_sensors_gpios(void) {
   nrf_gpio_cfg_output(SENSORS_EN);
   nrf_gpio_pin_set(SENSORS_EN);
 
+  // enable LED Driver
   nrf_gpio_cfg_output(NRF_GPIO_PIN_MAP(1,3));
   //nrf_gpio_pin_write(NRF_GPIO_PIN_MAP(1,3), 1);
   nrf_gpio_pin_set(NRF_GPIO_PIN_MAP(1,3));
