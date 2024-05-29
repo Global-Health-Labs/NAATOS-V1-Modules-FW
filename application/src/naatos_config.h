@@ -51,6 +51,7 @@
 #define GO_STRAIGHT_TO_RUNNING  0
 #define USE_CALENDAR_CHIP       1 
 #define VERBOSE_PID             1
+#define USE_MOTOR               1
 
 /* Log Event Messages */
 #define START_EVENT_MSG           "Sample Preperation Started."
@@ -133,6 +134,12 @@ typedef struct {
   bool on;
   zone_t zone;
 } zone_run_req_t;
+
+// Motor Speed Request Struct
+typedef struct {
+  bool on;
+  double speed;   //RPM
+} motor_run_req_t;
 
 // Temperature Data Struct
 typedef struct {
