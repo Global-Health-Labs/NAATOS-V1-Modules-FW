@@ -40,6 +40,8 @@ SDK Version: 17.1
 #include "switch.h"
 
 #include "nrf_drv_power.h"
+#include "nrf_pwr_mgmt.h"
+#include "nrf_drv_gpiote.h"
 
 #include "app_error.h"
 #include "app_util.h"
@@ -250,11 +252,20 @@ bool begin_amplification_zone(void);
 void end_amplification_zone(void);
 void begin_valve_zone(void);
 void end_valve_zone(void);
+void create_tasks(void);
 
 xTaskHandle get_usb_task_handle(void)
 {
     return usbTaskHandle;
 }
+
+void gpiote_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
+{
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR(mainTaskHandle, &xHigherPriorityTaskWoken);
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
 
 /*********************************************************************
 *
@@ -267,6 +278,7 @@ void main_task(void * pvParameters) {
   uint8_t queue_size;
   sensor_switches_t switch_data;
   int percent_recv;   
+  button_update_t buttonData;
   bool hal_triggered = false, optical_triggered = false; 
   bool error_during_run = false;
   bool over_temp;
@@ -284,6 +296,8 @@ void main_task(void * pvParameters) {
   } else {
      alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((DEFAULT_ALERT_TIMEOUT_M * 60.0) * 1000.0));
   }
+
+  create_tasks();
 
   // Main State Loop
   for (;;) {
@@ -330,8 +344,12 @@ void main_task(void * pvParameters) {
           // sendUpdatedMainTask here or in  our new standard send USB file enable
           // goto file
         // if button on and usb connected just stay here
-
-
+        if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
+          if(buttonData.event == OFF_EVENT) {
+            //main_state = MAIN_SLEEP;
+            break;
+          }
+        }
 
 
         // Wait for Sensor Switch Data 
@@ -554,6 +572,27 @@ void main_task(void * pvParameters) {
 
       // In Low Power State
       case MAIN_SLEEP:
+        if(last_state != main_state) {
+          //send out to other tasks we going to sleep
+          // wait for response
+        }
+        
+        //setup gpio event
+        /*nrf_drv_gpiote_init();
+        nrf_drv_gpiote_in_config_t config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
+        nrf_drv_gpiote_in_init(BUTTON_INPUT_PIN, &config, gpiote_event_handler);
+        nrf_drv_gpiote_in_event_enable(BUTTON_INPUT_PIN, false);
+        // go to sleep
+        nrf_pwr_mgmt_run();
+        nrf_drv_gpiote_in_event_disable(BUTTON_INPUT_PIN);
+        // Reconfigure as standard input
+        nrf_drv_gpiote_in_uninit(BUTTON_INPUT_PIN);
+        nrf_gpio_cfg_input(BUTTON_INPUT_PIN, NRF_GPIO_PIN_NOPULL);
+        // on wakeup event bring up all threads
+        // thread response
+        // go to */
+
+        //main_state = MAIN_STANDBY;
 
       break;
       // Shouldnt Get here
@@ -739,14 +778,7 @@ void end_valve_zone(void) {
 */
 void create_tasks() {
   BaseType_t xReturned;
-  
-  // Main Task
-  xReturned = xTaskCreate(main_task, "MainTask", 1024, NULL, 0, &mainTaskHandle);
-  if( xReturned != pdPASS ) {
-      // The task was created.  Use the task's handle to delete the task. 
-      printf("Error creating main task. Error: %d\n", xReturned);
-      vTaskDelete( mainTaskHandle );
-  }
+ 
   // Heater Task
   xReturned = xTaskCreate(heater_task, "HeaterTask", 1024, NULL, 0, &heaterTaskHandle);
   if( xReturned != pdPASS ) {
@@ -768,6 +800,7 @@ void create_tasks() {
       printf("Error creating sensors task. Error: %d\n", xReturned);
       vTaskDelete( sensorsTaskHandle );
   }
+
   // Battery Management Task
   xReturned = xTaskCreate(battery_task, "BatteryTask", 1024, NULL, 0, &batteryTaskHandle);
   if( xReturned != pdPASS ) {
@@ -782,21 +815,6 @@ void create_tasks() {
       printf("Error creating usb management task. Error: %d\n", xReturned);
       vTaskDelete( usbTaskHandle );
   }
-  // PWM Task
-  xReturned = xTaskCreate(pwm_task, "PWMTask", 1024, NULL, 0, &pwmTaskHandle);
-  if ( xReturned != pdPASS ) {
-      // The task was created.  Use the task's handle to delete the task. 
-      printf("Error creating PWM task. Error: %d\n", xReturned);
-      vTaskDelete( pwmTaskHandle );
-  }
-
-  // WDT Task
-  xReturned = xTaskCreate(wdtFeedTask, "WDTTask", 100, NULL, 0, &wdtTaskHandle);
-  if ( xReturned != pdPASS ) {
-      /* The task was created.  Use the task's handle to delete the task. */
-      printf("Error creating WDT task. Error: %d\n", xReturned);
-      vTaskDelete( wdtTaskHandle );
-  }
   // USB Composite Task
   xReturned = xTaskCreate(composite_usb_task, "CompositeUSBTask", 1024, NULL, 0, &compositeTaskHandle);
   if ( xReturned != pdPASS ) {
@@ -804,7 +822,20 @@ void create_tasks() {
       printf("Error creating Composite USB task. Error: %d\n", xReturned);
       vTaskDelete( compositeTaskHandle );
   }
-
+  // PWM Task
+  xReturned = xTaskCreate(pwm_task, "PWMTask", 1024, NULL, 0, &pwmTaskHandle);
+  if ( xReturned != pdPASS ) {
+      // The task was created.  Use the task's handle to delete the task. 
+      printf("Error creating PWM task. Error: %d\n", xReturned);
+      vTaskDelete( pwmTaskHandle );
+  }
+  // WDT Task
+  xReturned = xTaskCreate(wdtFeedTask, "WDTTask", 100, NULL, 0, &wdtTaskHandle);
+  if ( xReturned != pdPASS ) {
+      /* The task was created.  Use the task's handle to delete the task. */
+      printf("Error creating WDT task. Error: %d\n", xReturned);
+      vTaskDelete( wdtTaskHandle );
+  }
   //Button Task
   xReturned = xTaskCreate(buttonTask, "ButtonTask", 1024, NULL, 0, &buttonTaskHandle);
   if ( xReturned != pdPASS ) {
@@ -948,6 +979,7 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
 *   Application entry point.
 */
  int main(void) {
+ BaseType_t xReturned;
   ret_code_t err_code;
   FRESULT res;
 
@@ -973,6 +1005,10 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
   fuelGauge_init();
   init_sd_card();
   button_init();
+  //err_code = app_timer_init();
+  //APP_ERROR_CHECK(err_code);
+  //ret_code_t ret_code = nrf_pwr_mgmt_init();
+  //APP_ERROR_CHECK(ret_code);
 
   // Get the configuration parameters
   res = get_naatos_configuration_parameters(&config);
@@ -986,11 +1022,16 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
   // Uninitalize the SD card
   uninit_sd_card();
 
-  // Create Tasks
-  create_tasks();
-
   // Create Queues
   create_queues();
+
+  // Main Task
+  xReturned = xTaskCreate(main_task, "MainTask", 1024, NULL, 0, &mainTaskHandle);
+  if( xReturned != pdPASS ) {
+      // The task was created.  Use the task's handle to delete the task. 
+      printf("Error creating main task. Error: %d\n", xReturned);
+      vTaskDelete( mainTaskHandle );
+  }
 
   // Start Tasks
   vTaskStartScheduler();
