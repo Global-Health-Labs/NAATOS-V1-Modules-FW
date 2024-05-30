@@ -14,6 +14,8 @@ extern xQueueHandle main_mainStateRespQueue;
 extern xQueueHandle main_runRespQueue;
 extern xQueueHandle main_runErrorQueue;
 extern xQueueHandle main_runConfRespQueue;
+extern xQueueHandle main_usbConnRecvQueue;
+extern xQueueHandle main_usbChangedConfQueue;
 
 // Heater Task Queue(s)
 extern xQueueHandle heater_zoneRunQueue;
@@ -37,7 +39,8 @@ extern xQueueHandle battery_mainStateContinueQueue;
 extern xQueueHandle usb_stateChangeQueue;
 extern xQueueHandle usb_recvUsbWaitAcceptQueue;
 extern xQueueHandle usb_usbWaitOverQueue;
-extern xQueueHandle usb_mainStateContinueQueue;
+//extern xQueueHandle usb_mainStateContinueQueue;
+extern xQueueHandle usb_connectionReqQueue;
 
 // Logger Task Queue(s)
 extern xQueueHandle logger_recvBattPercentQueue;

@@ -16,7 +16,7 @@ void sendButtonUpdate(button_update_t msg) {
 }
 
 void buttonTask(void * pvParameters) {
-  bool previousSwitchState = nrf_gpio_pin_read(BUTTON_INPUT_PIN);
+  bool previousSwitchState = true;
   int switchCounter = 0;
   static TickType_t lastSwitchTime = 0;
 
