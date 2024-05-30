@@ -26,35 +26,35 @@ void buttonTask(void * pvParameters) {
 
   while(true) {
     vTaskDelay(BUTTON_TASK_DELAY); 
-        bool switchState = nrf_gpio_pin_read(BUTTON_INPUT_PIN);
-        
-        // Check for switch rocking back and forth
-        if (switchState != previousSwitchState) {
-            switchCounter++;
-            lastSwitchTime = xTaskGetTickCount();
+    bool switchState = nrf_gpio_pin_read(BUTTON_INPUT_PIN);
+ 
+    // Check for switch rocking back and forth
+    if (switchState != previousSwitchState) {
+        switchCounter++;
+        lastSwitchTime = xTaskGetTickCount();
+    }
+    
+    // If 5 seconds have passed since the last switch change
+    if ((xTaskGetTickCount() - lastSwitchTime) >= pdMS_TO_TICKS(2000)) {
+        if (switchCounter >= 6) {  // 3 times back and forth = 6 changes
+          currentEvent = BOOTLOADER_EVENT;
+        } else {
+          if (switchState) {
+            currentEvent = ON_EVENT;
+          } else {
+            currentEvent = OFF_EVENT;
+          }
         }
-        
-        // If 5 seconds have passed since the last switch change
-        if ((xTaskGetTickCount() - lastSwitchTime) >= pdMS_TO_TICKS(2000)) {
-            if (switchCounter >= 6) {  // 3 times back and forth = 6 changes
-              currentEvent = BOOTLOADER_EVENT;
-            } else {
-              if (switchState) {
-                currentEvent = ON_EVENT;
-              } else {
-                currentEvent = OFF_EVENT;
-              }
-            }
-            switchCounter = 0;
-        }
+        switchCounter = 0;
+    }
 
-        if(currentEvent != previousEvent) {
-          updateMsg.event = currentEvent;
-          sendButtonUpdate(updateMsg);
-          previousEvent = currentEvent;
-        }
-        
-        // Update previous state
-        previousSwitchState = switchState;
+    if(currentEvent != previousEvent) {
+      updateMsg.event = currentEvent;
+      sendButtonUpdate(updateMsg);
+      previousEvent = currentEvent;
+    }
+    
+    // Update previous state
+    previousSwitchState = switchState;
   }
 }

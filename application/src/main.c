@@ -972,6 +972,7 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
 #endif
   fuelGauge_init();
   init_sd_card();
+  button_init();
 
   // Get the configuration parameters
   res = get_naatos_configuration_parameters(&config);
