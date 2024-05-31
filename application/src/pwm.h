@@ -28,6 +28,9 @@
 #define AMP0_CHANNEL    1
 #define AMP1_CHANNEL    0
 #define AMP2_CHANNEL    1
+#if USE_MOTOR
+#define MOTOR_CHANNEL 0
+#endif
 
 void init_pwms();
 void pwm_task(void * pvParameters);
