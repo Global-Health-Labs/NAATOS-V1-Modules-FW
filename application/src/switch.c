@@ -1,6 +1,13 @@
 #include "switch.h"
 #include "naatos_queues.h"
+#include "timers.h"
+
 #define BUTTON_TASK_DELAY 150 // msec
+
+xQueueHandle buttonRxQueue;
+TimerHandle_t buttonTimer;
+
+void checkButtonState(void);
 
 void button_init(void) {
   /* Setup Hal Sensor */
@@ -15,17 +22,92 @@ void sendButtonUpdate(button_update_t msg) {
   }
 }
 
-void buttonTask(void * pvParameters) {
-  bool previousSwitchState = nrf_gpio_pin_read(BUTTON_INPUT_PIN);
-  int switchCounter = 0;
-  static TickType_t lastSwitchTime = 0;
+void vButtonTimerCallback( TimerHandle_t xTimer ) {
+  BaseType_t xReturned;
+  ButtonRxQueueMsg_t msg;
+  msg.type = BUTTON_MSG_TIMER_EVENT;
 
-  button_update_t updateMsg;
-  button_event_e currentEvent = ON_EVENT;
-  button_event_e previousEvent = ON_EVENT;
+  xReturned = xQueueSend(buttonRxQueue, &msg, 0);
+  if (xReturned != pdPASS) {
+    printf("Battery: Unable to send timer update to buttonRxQueue queue.\n");
+  }
+}
+
+void startButtonTimer(void) {
+  TickType_t sampleRateTicks = pdMS_TO_TICKS(BUTTON_TASK_DELAY); 
+
+  if(xTimerChangePeriod(buttonTimer, sampleRateTicks, 100) != pdPASS) {
+    printf("Cannot change period of button timer. \n");
+  }
+
+  if( xTimerStart( buttonTimer, 0 ) != pdPASS ){
+     printf("Failed to start button timer. \n");
+  }
+}
+
+void stopButtonTimer(void) {
+  if( xTimerStop(buttonTimer, 100) != pdPASS ){
+    printf("Failed to stop button timer. \n");
+  }
+}
+
+static bool previousSwitchState =  false;
+static int switchCounter = 0;
+static TickType_t lastSwitchTime = 0;
+button_update_t updateMsg;
+button_event_e currentEvent = ON_EVENT;
+button_event_e previousEvent = ON_EVENT;
+
+void buttonTask(void * pvParameters) {
+  BaseType_t xReturned;
+  previousSwitchState = nrf_gpio_pin_read(BUTTON_INPUT_PIN);
+
+  ButtonRxQueueMsg_t buttonRxMessage;
+
+
+
+  TickType_t sampleRateTicks = pdMS_TO_TICKS(BUTTON_TASK_DELAY); 
+
+  buttonTimer = xTimerCreate ("ButtonTimer", sampleRateTicks, pdTRUE, (void*)0, vButtonTimerCallback);
+  startButtonTimer();
 
   while(true) {
-    vTaskDelay(BUTTON_TASK_DELAY); 
+    xReturned = xQueueReceive(buttonRxQueue, &buttonRxMessage, portMAX_DELAY);
+    if (xReturned != pdPASS) {
+      printf("Unable to Rx data to button queue\n");
+    } else {
+      switch(buttonRxMessage.type) {      
+        case BUTTON_MSG_SLEEP:
+          if(xTimerIsTimerActive(buttonTimer) == pdTRUE) {
+            stopButtonTimer();
+          }
+          
+          //set button as a edge detect event and send that  event over to main queue
+
+          //if button is already true here then send event anyway
+
+
+          //send to main queue that we are asleep
+        break;
+
+        case BUTTON_MSG_WAKE:
+          if(xTimerIsTimerActive(buttonTimer) == pdFALSE) {
+            startButtonTimer();
+          }
+        break;
+
+        case BUTTON_MSG_TIMER_EVENT:
+          checkButtonState();
+        break;
+
+        default:
+        break;
+      }
+    }
+  }
+}
+
+void checkButtonState(void) {
     bool switchState = nrf_gpio_pin_read(BUTTON_INPUT_PIN);
  
     // Check for switch rocking back and forth
@@ -56,5 +138,5 @@ void buttonTask(void * pvParameters) {
     
     // Update previous state
     previousSwitchState = switchState;
-  }
+
 }

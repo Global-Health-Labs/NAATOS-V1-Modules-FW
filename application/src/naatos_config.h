@@ -231,6 +231,8 @@ typedef struct {
   bool over;
 } usb_suspend_over_t;
 
+// Sensor messages
+
 typedef enum {
   SENSOR_MSG_HEATER_STATE,
   SENSOR_MSG_USB_SUSPEND,
@@ -247,6 +249,8 @@ typedef struct {
   bool usbSuspend;
   temperature_pwm_data_t pwmData;
 } SensorRxQueueMsg_t;
+
+// Battery messages
 
 typedef enum {
   BATTERY_MSG_USB_SUSPEND,
@@ -269,6 +273,18 @@ typedef struct {
   main_state_t mainState;
   bool usbSuspend;
 } BatteryRxQueueMsg_t;
+
+
+// Button/Switch messages
+typedef enum {
+  BUTTON_MSG_SLEEP,
+  BUTTON_MSG_WAKE,
+  BUTTON_MSG_TIMER_EVENT,
+} ButtonRxQueueType_t;
+
+typedef struct {
+  ButtonRxQueueType_t type;
+} ButtonRxQueueMsg_t;
 
 // Task Handles
 extern xTaskHandle mainTaskHandle;

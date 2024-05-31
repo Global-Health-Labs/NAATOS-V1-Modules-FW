@@ -124,7 +124,7 @@ void sensors_task(void * pvParameters) {
   else {
     sampleRateTicks = pdMS_TO_TICKS((config.sample_rate*1000.0) - (12.0 * 4.0) + 1.0);
   }
-  sensorTimer = xTimerCreate ( "SensorTimer", sampleRateTicks, pdTRUE, (void*)0,vSensorTimerCallback);
+  sensorTimer = xTimerCreate ("SensorTimer", sampleRateTicks, pdTRUE, (void*)0,vSensorTimerCallback);
 
   //setup our message timer for sensor collection
   for (;;) {

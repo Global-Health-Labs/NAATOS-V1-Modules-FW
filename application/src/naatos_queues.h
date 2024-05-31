@@ -28,6 +28,9 @@ extern xQueueHandle sensorRxQueue;
 //Battery Task Queue
 extern xQueueHandle batteryRxQueue;
 
+//Button Task Queue
+extern xQueueHandle buttonRxQueue;
+
 // USB Management Task Queue(s)
 extern xQueueHandle usb_stateChangeQueue;
 extern xQueueHandle usb_recvUsbWaitAcceptQueue;

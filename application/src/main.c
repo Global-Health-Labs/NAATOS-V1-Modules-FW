@@ -909,16 +909,23 @@ void create_queues() {
   if (heater_sensorConfQueue == NULL)
     printf("Unable to create heater_sensorConfQueue queue\n");
     
-
   // Sensor Task Queues
   sensorRxQueue = xQueueCreate(10, sizeof(SensorRxQueueMsg_t));
-  if (sensorRxQueue == NULL)
+  if (sensorRxQueue == NULL){
     printf("Unable to create sensorRxQueue queue\n");
+  }
 
   // Battery Management Task Queues
   batteryRxQueue = xQueueCreate(10, sizeof(BatteryRxQueueMsg_t));
-  if (batteryRxQueue == NULL)
+  if (batteryRxQueue == NULL) {
     printf("Unable to create batteryRxQueue queue\n");
+  }
+
+  // Button Task Queue
+  buttonRxQueue = xQueueCreate(10, sizeof(ButtonRxQueueMsg_t));
+  if (buttonRxQueue == NULL) {
+    printf("Unable to create buttonRxQueue queue\n");
+  }
 
   // USB Management Task Queues
   usb_stateChangeQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_message_t));
