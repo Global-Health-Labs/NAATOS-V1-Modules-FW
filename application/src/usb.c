@@ -136,7 +136,7 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
               app_usbd_stop();
             }
             usb_done_config = false;  
-            usb_detected = false;
+            //usb_detected = false;
             turn_off_led2();
             break;
         case APP_USBD_EVT_POWER_READY:
@@ -415,6 +415,7 @@ void usb_task(void * pvParameters) {
         app_usbd_disable();
         //app_usbd_class_remove_all();
         app_usbd_uninit();
+        //usb_detected = true;
         start_usb(true, true);
         break;
       }

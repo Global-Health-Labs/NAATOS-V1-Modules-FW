@@ -974,7 +974,7 @@ void app_usbd_enable(void)
 
 void app_usbd_disable(void)
 {
-    ASSERT(!nrf_drv_usbd_is_started());
+    //ASSERT(!nrf_drv_usbd_is_started());
     nrf_drv_usbd_disable();
 }
 
