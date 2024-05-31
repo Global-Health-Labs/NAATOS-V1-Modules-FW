@@ -286,7 +286,8 @@ void main_task(void * pvParameters) {
   uint32_t alert_timeout_ticks;
 
   // Set Start up state to standby
-  main_state_t main_state = MAIN_STANDBY;
+  main_state_t main_state = MAIN_SLEEP;
+  main_state_t next_state = MAIN_STANDBY;
   main_state_t last_state = MAIN_SLEEP;
   int i = 0;
 
@@ -301,6 +302,9 @@ void main_task(void * pvParameters) {
 
   // Main State Loop
   for (;;) {
+    last_state = main_state;
+    main_state = next_state;
+
     switch(main_state) {
       // In Standby State
       case MAIN_STANDBY:
@@ -316,8 +320,6 @@ void main_task(void * pvParameters) {
             printf("MAIN: Unable to send sensor wakeup to sensorRxQueue.\n");
           }
 
-
-          last_state = main_state;
           // Check to see if there was an error during the last run
           if (error_during_run) {
             // Set LEDs
@@ -340,9 +342,8 @@ void main_task(void * pvParameters) {
         // Check for Battery Data in Battery Queue
         if (xQueueReceive(main_batteryDataQueue, &percent_recv, 0) == pdPASS) {
           if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
-             last_state = main_state;
-             main_state = MAIN_SLEEP;
-             sendUpdatedMainTaskState(main_state);
+             next_state = MAIN_SLEEP;
+             sendUpdatedMainTaskState(next_state);
              break;
           }
         }
@@ -357,7 +358,7 @@ void main_task(void * pvParameters) {
         // if button on and usb connected just stay here
         if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
           if(buttonData.event == OFF_EVENT) {
-            //main_state = MAIN_SLEEP;
+            next_state = MAIN_SLEEP;
             break;
           }
         }
@@ -375,10 +376,8 @@ void main_task(void * pvParameters) {
 
         // Check if we can go to RUN state
         if (hal_triggered && optical_triggered && !error_during_run) {
-          // Set the new main state
-          last_state = main_state;
-          main_state = MAIN_RUNNING;
-          sendUpdatedMainTaskState(main_state);
+          next_state = MAIN_RUNNING;
+          sendUpdatedMainTaskState(next_state);
           // Delay
           vTaskDelay(100);
         }
@@ -401,10 +400,8 @@ void main_task(void * pvParameters) {
           if (xReturned != pdPASS) {
             printf("MAIN_TASK: Unable to send recovery battery percentage event to logging task.\n");
           }
-          // Set the new main state
-          last_state = main_state;
-          main_state = MAIN_STANDBY;
-          sendUpdatedMainTaskState(main_state);
+          next_state = MAIN_STANDBY;
+          sendUpdatedMainTaskState(next_state);
           // Set error during run and wait alert timeout
           error_during_run = true;
           break;
@@ -420,10 +417,8 @@ void main_task(void * pvParameters) {
           }
           // Stop amplification zone
           end_amplification_zone();
-          // Set the new main state
-          last_state = main_state;
-          main_state = MAIN_STANDBY;
-          sendUpdatedMainTaskState(main_state);
+          next_state = MAIN_STANDBY;
+          sendUpdatedMainTaskState(next_state);
           // Set error during run and wait alert timeout
           error_during_run = true;
           break;
@@ -431,7 +426,6 @@ void main_task(void * pvParameters) {
         // Set LED1 to solid green
         if (last_state != main_state) {
           set_led1_green_solid();
-          last_state = main_state;
         }
         // Get the start time and end time
         start_time = xTaskGetTickCount();
@@ -501,10 +495,8 @@ void main_task(void * pvParameters) {
               printf("MAIN_TASK: Unable to send sample over temp event to logging task.\n");
             }
           }
-          // Update main state
-          last_state = main_state;
-          main_state = MAIN_STANDBY;
-          sendUpdatedMainTaskState(main_state);
+          next_state = MAIN_STANDBY;
+          sendUpdatedMainTaskState(next_state);
           vTaskDelay(100);
           break;
         }
@@ -554,10 +546,8 @@ void main_task(void * pvParameters) {
                 printf("MAIN_TASK: Unable to send sample over temp event to logging task.\n");
               }
             }
-            // Update main state
-            last_state = main_state;
-            main_state = MAIN_STANDBY;
-            sendUpdatedMainTaskState(main_state);
+            next_state = MAIN_STANDBY;
+            sendUpdatedMainTaskState(next_state);
             break;
         }
 
@@ -571,9 +561,8 @@ void main_task(void * pvParameters) {
         } while(hal_triggered && optical_triggered);
         // Update current main state
 
-        last_state = main_state;
-        main_state = MAIN_STANDBY;
-        sendUpdatedMainTaskState(main_state);
+        next_state = MAIN_STANDBY;
+        sendUpdatedMainTaskState(next_state);
         vTaskDelay(250);
         break;
 
@@ -584,6 +573,13 @@ void main_task(void * pvParameters) {
       // In Low Power State
       case MAIN_SLEEP:{
         if(last_state != main_state) {
+            SensorRxQueueMsg_t msg;
+            msg.type = SENSOR_MSG_SLEEP;
+            xReturned = xQueueSend(sensorRxQueue, &msg, 0);
+            if (xReturned != pdPASS) {
+              printf("Sensor: Unable to send timer update to sensorRxQueue queue.\n");
+            }
+        }
           //send out to other tasks we going to sleep
           // wait for response
           // now we just sit in here until we receive a button trigger
@@ -601,7 +597,7 @@ void main_task(void * pvParameters) {
     }
   }
 }
-}
+
 
 void sendUpdatedMainTaskState(main_state_t new_state) {
   BaseType_t xReturned;

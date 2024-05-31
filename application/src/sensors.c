@@ -35,7 +35,7 @@ xQueueHandle sensorRxQueue;
 
 TimerHandle_t sensorTimer;
 
-volatile bool heaterRunning = false;
+bool heaterRunning = false;
 bool usb_suspend = false;
 uint32_t sample_log_index = 0;
 uint32_t sample_log_max = 0;
@@ -198,7 +198,11 @@ void sensors_task(void * pvParameters) {
         break;
 
         case SENSOR_MSG_SLEEP:
+          if(xTimerIsTimerActive(sensorTimer) == pdTRUE) {
+            stopTimer();
+          }
 
+          //send to main queue that we are asleep
         break;
 
         case SENSOR_MSG_WAKEUP:
