@@ -70,7 +70,7 @@ void handle_amplification_stopstart_heater(bool heating) {
   if (valve_zone_running && !heating)
     return;
 
-  SensorRxQueueMsg_t msg;
+  SensorRxQueueMsg_t msg = {};
   msg.type = SENSOR_MSG_HEATER_STATE;
   msg.heaterRunning = heating;
 
@@ -385,10 +385,16 @@ void heater_task(void * pvParameters) {
       if (xReturned != pdPASS) {
         printf("HEATER_TASK: unable to receive pwm request from heater_pwmReqQueue queue.\n");
       }
+
+
+      SensorRxQueueMsg_t msg;
+      msg.type = SENSOR_MSG_PWM_RESPONSE;
+      msg.pwmData = h_pwm_data;
+
       // Send back the pwm data
-      xReturned = xQueueSend(sensor_pwmRecvQueue, &h_pwm_data, 0);
+      xReturned = xQueueSend(sensorRxQueue, &msg, 0);
       if (xReturned != pdPASS) {
-        printf("HEATER_TASK: unable to send pwm data to sensor_pwmRecvQueue queue.\n");
+        printf("HEATER_TASK: unable to send pwm data to sensorRxQueue queue.\n");
       }
     }
 

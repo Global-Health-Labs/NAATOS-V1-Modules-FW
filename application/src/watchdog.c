@@ -69,7 +69,7 @@ while (true) {
          break;
 
          case HEATER:
-          heaterValid = recv_req.valid;
+          heaterValid = recv_req.valid;\
           heaterTicks = 0;
          break;
 

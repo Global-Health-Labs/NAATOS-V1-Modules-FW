@@ -177,10 +177,16 @@ void usb_suspend_conflicting_tasks(void) {
   if (xReturned != pdPASS) {
     printf("USB: Unable to send usb suspend request to pwm_usbWaitQueue.\n");
   }
+
+  SensorRxQueueMsg_t msg;
+  msg.type = SENSOR_MSG_USB_SUSPEND;
+  msg.usbSuspend = true;
+
+
   // Send to Sensors task
-  xReturned = xQueueSend(sensor_usbWaitQueue, &sus_req, 0);
+  xReturned = xQueueSend(sensorRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
-    printf("USB: Unable to send usb suspend request to sensor_usbWaitQueue.\n");
+    printf("USB: Unable to send usb suspend request to sensorRxQueue.\n");
   }
 
   /* Receive back suspend request acceptances */
@@ -398,11 +404,6 @@ void usb_task(void * pvParameters) {
 
       break;
     };
-
-
-
-
-
 
 
     // Check USB Connection Status 

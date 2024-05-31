@@ -306,6 +306,17 @@ void main_task(void * pvParameters) {
       case MAIN_STANDBY:
         if (last_state != main_state) {
           sendWdtHeaterInvalid(); // Invalidate the heater to stop WDT from watching it
+          
+          SensorRxQueueMsg_t msg;
+          msg.type = SENSOR_MSG_WAKEUP;
+
+          // Send to Sensors task
+          xReturned = xQueueSend(sensorRxQueue, &msg, 0);
+          if (xReturned != pdPASS) {
+            printf("MAIN: Unable to send sensor wakeup to sensorRxQueue.\n");
+          }
+
+
           last_state = main_state;
           // Check to see if there was an error during the last run
           if (error_during_run) {
@@ -589,6 +600,7 @@ void main_task(void * pvParameters) {
       break;
     }
   }
+}
 }
 
 void sendUpdatedMainTaskState(main_state_t new_state) {
@@ -881,18 +893,9 @@ void create_queues() {
     
 
   // Sensor Task Queues
-  sensorRxQueue = xQueueCreate(10, sizeof(bool));
+  sensorRxQueue = xQueueCreate(10, sizeof(SensorRxQueueMsg_t));
   if (sensorRxQueue == NULL)
     printf("Unable to create sensorRxQueue queue\n");
-  sensor_usbWaitQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_suspend_req_t));
-  if (sensor_usbWaitQueue == NULL)
-    printf("Unable to create sensor_usbWaitQueue queue\n");
-  //sensor_mainStateContinueQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
-  //if (sensor_mainStateContinueQueue == NULL)
-  //  printf("Unable to create sensor_mainStateContinueQueue queue\n");
-  sensor_pwmRecvQueue = xQueueCreate(QUEUE_SIZE, sizeof(temperature_pwm_data_t));
-  if (sensor_pwmRecvQueue == NULL)
-    printf("Unable to create sensor_mainStateContinueQueue queue\n");
 
   // Battery Management Task Queues
   battery_requestPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(battery_percent_req_t));
@@ -1026,16 +1029,16 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
   vTaskStartScheduler();
 }
 
-void sendWdtHeaterInvalid(){
+void sendWdtHeaterInvalid() {
   BaseType_t xReturned;
   watchdog_time_update_t wdtUpdate = {};
   wdtUpdate.taskName = HEATER;
   wdtUpdate.valid = false;
 
-    xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
-    if (xReturned != pdPASS) {
-      printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
-    }
+  xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
+  if (xReturned != pdPASS) {
+    printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+  }
 }
 
 
