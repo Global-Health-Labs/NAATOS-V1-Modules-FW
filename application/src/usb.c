@@ -417,6 +417,7 @@ void usb_task(void * pvParameters) {
         app_usbd_uninit();
         //usb_detected = true;
         start_usb(true, true);
+        usbd_user_ev_handler(APP_USBD_EVT_POWER_DETECTED);
         break;
       }
       default:
