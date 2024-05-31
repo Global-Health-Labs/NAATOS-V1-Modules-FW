@@ -85,7 +85,7 @@ void update_amp0_duty(int duty) {
 
 // Updates the Amplification 1 PWM Duty Cycle
 void update_amp1_duty(int duty) {
-  amp1_duty = 100;
+  amp1_duty = duty;
   if (amp1_duty > 0) 
     amp1_zone_active = true; 
 }

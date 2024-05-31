@@ -1,6 +1,7 @@
 #include "sensors.h"
 #include "timers.h"
 #include "nrf_drv_timer.h"
+#include "motor.h"
 
 #define USE_MOTOR
 
@@ -50,6 +51,8 @@ static log_data_message_t log_msg = {
   .event_data = NULL,
   .temperature_data = NULL
 };
+
+int readMotorSpeed(void);
 
 void sensors_task(void * pvParameters) {
   BaseType_t xReturned;
