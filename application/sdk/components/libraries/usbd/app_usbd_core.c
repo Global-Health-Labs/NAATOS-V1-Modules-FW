@@ -256,6 +256,8 @@ static void usbd_core_state_set(app_usbd_state_t state)
  */
 static inline app_usbd_state_t usbd_core_state_get(void)
 {
+    if (m_app_usbd_state == APP_USBD_STATE_Unattached || m_app_usbd_state == APP_USBD_STATE_Configured)
+      usbd_core_state_set(APP_USBD_STATE_Disabled);
     return m_app_usbd_state;
 }
 

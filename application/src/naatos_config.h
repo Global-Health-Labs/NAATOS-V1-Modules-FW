@@ -123,6 +123,13 @@ typedef enum {
   // Add more events here
 } event_t;
 
+typedef enum {
+  USB_DISABLED = 0,
+  USB_CDC_ACM = 1,
+  USB_MSC = 2,
+  USB_MSC_CDC_ACM = 3
+} usb_command_t;
+
 // Holds data for Hal and Optical Switch
 typedef struct {
    bool hal_triggered;

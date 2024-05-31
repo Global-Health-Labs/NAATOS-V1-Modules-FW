@@ -70,6 +70,8 @@ xQueueHandle main_runRespQueue;
 xQueueHandle main_runErrorQueue;
 xQueueHandle main_runConfRespQueue;
 xQueueHandle button_mainStateQueue;
+xQueueHandle main_usbConnRecvQueue;
+xQueueHandle main_usbChangedConfQueue;
 
 // Zone Request Constants
 const zone_run_req_t run_amplification_zone = {
@@ -253,6 +255,7 @@ void end_amplification_zone(void);
 void begin_valve_zone(void);
 void end_valve_zone(void);
 void create_tasks(void);
+void send_usb_change(usb_command_t cmd);
 
 xTaskHandle get_usb_task_handle(void)
 {
@@ -284,6 +287,8 @@ void main_task(void * pvParameters) {
   bool over_temp;
   uint32_t start_time = 0, end_time = 0, a_t_start = 0;
   uint32_t alert_timeout_ticks;
+  bool usb_conn_status = false;
+  bool usb_needs_update = false;
 
   
   const BatteryRxQueueMsg_t batt_req = {
@@ -337,6 +342,10 @@ void main_task(void * pvParameters) {
           }
         } 
         
+        // Reset Run Switches
+        hal_triggered = false;
+        optical_triggered = false; 
+        
         // Check to see if alert timeout is over
         if (error_during_run && xTaskGetTickCount() >= (a_t_start + alert_timeout_ticks)) {
           set_led1_green_breathe();
@@ -361,22 +370,51 @@ void main_task(void * pvParameters) {
              break;
           }
         }
-
-
-        //Check Switch task
-          // update local switch vars depending on switch state
-
-        // if button in off position and usb connected go to FILE
-          // sendUpdatedMainTask here or in  our new standard send USB file enable
-          // goto file
-        // if button on and usb connected just stay here
+        
+        /* **** HANDLE USB AND SWITCH **** */
+        // Get switch status if it has changed
         if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
-          if(buttonData.event == OFF_EVENT) {
-            next_state = MAIN_SLEEP;
-            break;
+          // Get The USB Connection Status
+          xReturned = xQueueSend(usb_connectionReqQueue, &usb_conn_status, 0);
+          if (xReturned != pdPASS) {
+            printf("MAIN_TASK: Unable to send usb connection request to usb_connectionReqQueue. \n");
           }
-        }
 
+          // Receive the USB Connection Status
+          xReturned =xQueueReceive(main_usbConnRecvQueue, &usb_conn_status, portMAX_DELAY);
+          if (xReturned != pdPASS) {
+            printf("MAIN_TASK: Unable to receive usb connection status from main_usbConnRecvQueue. \n");
+          }
+          usb_needs_update = true;
+        }
+        // TODO: Get if USB status has changed
+        //if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
+
+        //}
+
+        if (usb_needs_update) {
+          // Switch ON and USB connected
+          if(buttonData.event == ON_EVENT && usb_conn_status) {
+            next_state = MAIN_STANDBY;
+            send_usb_change(USB_CDC_ACM);
+          }
+          // Switch ON and USB not connected
+          else if (buttonData.event == ON_EVENT && !usb_conn_status) {
+            next_state = MAIN_STANDBY;
+            send_usb_change(USB_DISABLED);
+          }
+          // Switch OFF and USB connected
+          else if (buttonData.event == OFF_EVENT && usb_conn_status) {
+            next_state = MAIN_FILE;
+            send_usb_change(USB_MSC_CDC_ACM);
+          }
+          // Switch off and USB not connected
+          else if (buttonData.event == OFF_EVENT && !usb_conn_status) {
+            next_state = MAIN_SLEEP;
+            send_usb_change(USB_DISABLED);
+          }
+          usb_needs_update = false;
+        }
 
         // Wait for Sensor Switch Data 
         xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
@@ -620,6 +658,22 @@ void main_task(void * pvParameters) {
   }
 }
 
+void send_usb_change(usb_command_t cmd) {
+  BaseType_t xReturned; 
+  usb_command_t command = cmd;
+  bool confirmed = false;
+
+  // Send command
+  xReturned = xQueueSend(usb_stateChangeQueue, &command, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send usb command to usb_stateChangeQueue. \n");
+  }
+  // Wait for response
+  xReturned = xQueueReceive(main_usbChangedConfQueue, &confirmed, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to receive usb change confirmation from main_usbChangedConfQueue. \n");
+  }
+}
 
 void sendUpdatedMainTaskState(main_state_t new_state) {
   BaseType_t xReturned;
@@ -654,13 +708,13 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   }
 
   // Send main state update to usb task
-  xReturned = xQueueSend(usb_stateChangeQueue, &msg, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send main state change to usb_stateChangeQueue.\n");
-  }
+  //xReturned = xQueueSend(usb_stateChangeQueue, &msg, 0);
+  //if (xReturned != pdPASS) {
+  //  printf("MAIN_TASK: Unable to send main state change to usb_stateChangeQueue.\n");
+  //}
 
   /* Get responses from the states to ensure all configurations for the run or standby have been made */
-  while(!logger_resp || !batt_resp || !usb_resp /*|| !sensor_resp*/) {
+  while(!logger_resp || !batt_resp /*|| !usb_resp || !sensor_resp*/) {
     if (uxQueueMessagesWaiting(main_mainStateRespQueue) > 0) {
         xReturned = xQueueReceive(main_mainStateRespQueue, &task_recv, 0);
         if (xReturned != pdPASS) {
@@ -695,11 +749,6 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send main state continue to logger_mainStateContinueQueue.\n");
   }
-  xReturned = xQueueSend(usb_mainStateContinueQueue, &main_state_cont, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send main state continue to usb_mainStateContinueQueue.\n");
-  }
-
 }
 
 bool begin_amplification_zone(void) {
@@ -890,6 +939,12 @@ void create_queues() {
   main_runConfRespQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (main_runConfRespQueue == NULL)
     printf("Unable to create main_mainStateRespQueue queue\n");
+  main_usbConnRecvQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (main_usbConnRecvQueue == NULL)
+    printf("Unable to create main_usbConnRecvQueue queue\n");
+  main_usbChangedConfQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (main_usbChangedConfQueue == NULL)
+    printf("Unable to create main_usbChangedConfQueue queue\n");
 
     
   // Heater Task Queues
@@ -937,9 +992,9 @@ void create_queues() {
   usb_usbWaitOverQueue = xQueueCreate(4, sizeof(usb_suspend_over_t));
   if (usb_usbWaitOverQueue == NULL)
     printf("Unable to create usb_usbWaitOverQueue queue\n");
-  usb_mainStateContinueQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
-  if (usb_mainStateContinueQueue == NULL)
-    printf("Unable to create usb_mainStateContinueQueue queue\n");
+  usb_connectionReqQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (usb_connectionReqQueue == NULL)
+    printf("Unable to create usb_connectionReqQueue queue\n");
 
   // Logger Task Queues
   logger_recvBattPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
@@ -986,8 +1041,7 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
 *
 *   Application entry point.
 */
-
- int main(void) {
+int main(void) {
  BaseType_t xReturned;
   ret_code_t err_code;
   FRESULT res;

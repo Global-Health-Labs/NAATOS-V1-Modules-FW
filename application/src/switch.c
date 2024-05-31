@@ -51,7 +51,7 @@ void stopButtonTimer(void) {
   }
 }
 
-static bool previousSwitchState =  false;
+static bool previousSwitchState =  true;
 static int switchCounter = 0;
 static TickType_t lastSwitchTime = 0;
 button_update_t updateMsg;
