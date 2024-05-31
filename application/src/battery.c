@@ -9,10 +9,8 @@
 #include "battery.h"
 #include "timers.h"
 
-xQueueHandle battery_requestPercentQueue;
-xQueueHandle battery_mainStateQueue;
-xQueueHandle battery_usbWaitQueue;
-xQueueHandle battery_mainStateContinueQueue;
+xQueueHandle batteryRxQueue;
+TimerHandle_t batteryTimer;
 
 charge_state_t charge_state;
 int battery_percentage = 100;
@@ -20,17 +18,47 @@ main_state_t batt_main_state = MAIN_STANDBY;
 
 int sendBattWDT = 0;
 
-#define BATT_TASK_DELAY 100
-#define BATT_SEND_WDT_TICKS 5 // 500 msec
+#define BATT_SEND_WDT_EVENT_MS 500 // 500 msec
 
-#
+void vBatteryTimerCallback( TimerHandle_t xTimer ) {
+  BaseType_t xReturned;
+  BatteryRxQueueMsg_t msg;
+  msg.type = BATTERY_MSG_TIMER_EVENT;
+
+  xReturned = xQueueSend(batteryRxQueue, &msg, 0);
+  if (xReturned != pdPASS) {
+    printf("Battery: Unable to send timer update to batteryRxQueue queue.\n");
+  }
+  
+}
+
+void startBatteryTimer(void) {
+  TickType_t sampleRateTicks = pdMS_TO_TICKS(BATT_SEND_WDT_EVENT_MS); 
+
+  if(xTimerChangePeriod(batteryTimer, sampleRateTicks, 100) != pdPASS) {
+    printf("Cannot change period of battery timer. \n");
+  }
+
+  if( xTimerStart( batteryTimer, 0 ) != pdPASS ){
+     printf("Failed to start sensor timer. \n");
+  }
+}
+
+void stopBatteryTimer(void) {
+  if( xTimerStop(batteryTimer, 100) != pdPASS ){
+    printf("Failed to stop sensor timer. \n");
+  }
+}
 
 void battery_task(void * pvParameters) {
   BaseType_t xReturned;
-  battery_percent_req_t recv_req;
-  watchdog_time_update_t wdtUpdate = {};
-  wdtUpdate.taskName = BATTERY;
-  wdtUpdate.valid = true;
+  BatteryRxQueueMsg_t batteryRxMessage;
+
+  watchdog_time_update_t wdtUpdate = {
+    .taskName = BATTERY,
+    .valid = true
+  };
+
   bool inc = false; //temp
   tasks_t batt_task = BATTERY;
   bool cont;
@@ -45,6 +73,10 @@ void battery_task(void * pvParameters) {
     .over = true
   };
 
+  TickType_t sampleRateTicks = pdMS_TO_TICKS(500); 
+
+  batteryTimer = xTimerCreate ("BatteryTimer", sampleRateTicks, pdTRUE, (void*)0, vBatteryTimerCallback);
+  startBatteryTimer();
 
   for (;;) {
     // TODO: Read NRF Temperature
@@ -54,84 +86,91 @@ void battery_task(void * pvParameters) {
       // TODO: Compare pin status and update the charger status
       // TODO: if changed, put state change message in usb_stateChangeQueue
 
-    if(sendBattWDT++ >= BATT_SEND_WDT_TICKS) {
-      sendBattWDT = 0;
-      xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
-      if (xReturned != pdPASS) {
-        printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
-      }
-    }
-
-    // I2C Fuel Gauge read
-    battery_percentage = fuelGauge_getSOC(NULL);
-
-    // Check to see if the main task state has changed
-    if (uxQueueMessagesWaiting(battery_mainStateQueue) > 0) {
-      xReturned = xQueueReceive(battery_mainStateQueue, &batt_main_state, 0);
-      if (xReturned != pdPASS) {
-        printf("BATT_TASK: Unable to receive state change from battery_mainStateQueue.\n");
-      }
-      // Respond to main state change
-      xReturned = xQueueSend(main_mainStateRespQueue, &batt_task, 0);
-      if (xReturned != pdPASS) {
-        printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
-      }
-      // Wait for Coninute
-      xReturned = xQueueReceive(battery_mainStateContinueQueue, &cont, portMAX_DELAY);
-      if (xReturned != pdPASS) {
-        printf("USB: Unable to recevive continue to battery_mainStateContinueQueue queue.\n");
-      }
-      continue;
-    }
-
-    // Check to see if we need to suspend for USB to be enabled
-    if (uxQueueMessagesWaiting(battery_usbWaitQueue) > 0) {
-      xReturned = xQueueReceive(battery_usbWaitQueue, &sus_req, 0) ;
-      if (xReturned != pdPASS) {
-        printf("BATTERY: Unable to receive usb suspend request from battery_usbWaitQueue\n");
-      }
-      // Send Suspend Accepted
-      xReturned = xQueueSend(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0); 
-      if (xReturned != pdPASS) {
-        printf("BATTERY: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\n");
-      }
-      printf("BATTERY: Suspending for 15 seconds.\n");
-      // Delay Task for 15 Seconds
-      vTaskDelay(pdMS_TO_TICKS(USB_SUSPEND_TASKS_TIME));
-      // Send Suspend Over
-      xReturned = xQueueSend(usb_usbWaitOverQueue, &sus_over, 0); 
-      if (xReturned != pdPASS) {
-        printf("BATTERY: Unable to send usb suspend over to usb_usbWaitOverQueue\n");
-      }
-    }
-
-    // Send Battery Percentage to main task if we are in standby
-    if (batt_main_state == MAIN_STANDBY) {
-      xReturned = xQueueSend(main_batteryDataQueue, (void *)&battery_percentage, 1000); // TODO: Probably want to send full BMS information instead
-      if (xReturned != pdPASS) {
-        printf("BATT_TASK: Was unable to send battery percentage to main queue. Error:%d\n", xReturned);
-      }
-    }
-
-    // Check the battery request queue (logging)
-    if (uxQueueMessagesWaiting(battery_requestPercentQueue) == 0) {
-      vTaskDelay(100);
-      continue;
-    }
-
-    // Pull off the battery request
-    xReturned = xQueueReceive(battery_requestPercentQueue, &recv_req, portMAX_DELAY);
+    
+    xReturned = xQueueReceive(batteryRxQueue, &batteryRxMessage, portMAX_DELAY);
     if (xReturned != pdPASS) {
-      printf("BATT_TASK: Was unable to pull off battery request for logger queue\n");
-    }
-    // Send to correct task
-    if (recv_req.task_req == LOGGER) {
-      // Send the Battery information to logger task
-      xReturned = xQueueSend(logger_recvBattPercentQueue, &battery_percentage, 0); // TODO: Probably want to send full BMS information instead
-      if (xReturned != pdPASS) {
-        printf("BATT_TASK: Was unable to send battery information to logger queue\n");
+      printf("Unable to Rx data to sensor queue\n");
+    } else {
+      switch(batteryRxMessage.type) {
+
+        case BATTERY_MSG_USB_SUSPEND:
+          // Send Suspend Accepted
+          xReturned = xQueueSend(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0); 
+          if (xReturned != pdPASS) {
+            printf("BATTERY: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\n");
+          }
+          printf("BATTERY: Suspending for 15 seconds.\n");
+          // Delay Task for 15 Seconds
+          vTaskDelay(pdMS_TO_TICKS(USB_SUSPEND_TASKS_TIME));
+          // Send Suspend Over
+          xReturned = xQueueSend(usb_usbWaitOverQueue, &sus_over, 0); 
+          if (xReturned != pdPASS) {
+            printf("BATTERY: Unable to send usb suspend over to usb_usbWaitOverQueue\n");
+          }
+        break;
+
+        case BATTERY_MSG_TIMER_EVENT:{
+          xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
+          if (xReturned != pdPASS) {
+            printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+          }
+          break;
+        }
+
+        case BATTERY_SOC_REQUEST:{
+          // I2C Fuel Gauge read
+          battery_percentage = fuelGauge_getSOC(NULL);
+          if(batteryRxMessage.sendTo == BATTERY_MSG_SOC_MAIN)  {
+            xReturned = xQueueSend(main_batteryDataQueue, (void *)&battery_percentage, 1000); // TODO: Probably want to send full BMS information instead
+            if (xReturned != pdPASS) {
+              printf("BATT_TASK: Was unable to send battery percentage to main queue. Error:%d\n", xReturned);
+            }
+          } else if(batteryRxMessage.sendTo == BATTERY_MSG_SOC_LOG) {
+            xReturned = xQueueSend(logger_recvBattPercentQueue, &battery_percentage, 0); // TODO: Probably want to send full BMS information instead
+            if (xReturned != pdPASS) {
+              printf("BATT_TASK: Was unable to send battery information to logger queue\n");
+            }
+          }
+
+          break;
+        }
+         
+        case BATTERY_MSG_SLEEP:
+          if(xTimerIsTimerActive(batteryTimer) == pdTRUE) {
+            stopBatteryTimer();
+          }
+
+          wdtUpdate.taskName =  BATTERY;
+          wdtUpdate.valid = false;
+          xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
+          if (xReturned != pdPASS) {
+            printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+          }
+
+          //send to main queue that we are asleep
+        break;
+
+        case BATTERY_MSG_WAKEUP:
+          if(xTimerIsTimerActive(batteryTimer) == pdFALSE) {
+            startBatteryTimer();
+          }
+        break;
+
+        case BATTERY_CONFIG_UPDATED:
+
+        break;
+
+        case BATTERY_MSG_MAIN_STATE_CHANGE:
+          // Respond to main state change
+          xReturned = xQueueSend(main_mainStateRespQueue, &batt_task, 0);
+          if (xReturned != pdPASS) {
+            printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
+          }
+        break;
+
+        default:
+        break;
       }
     }
-    vTaskDelay(BATT_TASK_DELAY);
   }
 }

@@ -15,8 +15,9 @@ calendar_time_t time = {
     .year = 0
   };
 
-const battery_percent_req_t batt_req = {
-  .task_req = LOGGER
+const BatteryRxQueueMsg_t batt_req = {
+  .type = BATTERY_SOC_REQUEST,
+  .sendTo = BATTERY_MSG_SOC_LOG
 };
 
 // Puts log file name in char pointer
@@ -95,9 +96,9 @@ void logger_task(void * pvParameters) {
       }
 
       // Request the battery percentage from the bettery task
-      xReturned = xQueueSend(battery_requestPercentQueue, &batt_req, 0);
+      xReturned = xQueueSend(batteryRxQueue, &batt_req, 0);
       if (xReturned != pdPASS) {
-        printf("LOG_TASK: Unable to send battery percentage request to battery_requestPercentQueue.\n");
+        printf("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.\n");
       }
       // Wait for response 
       xReturned = xQueueReceive(logger_recvBattPercentQueue, &battery_percent, portMAX_DELAY);

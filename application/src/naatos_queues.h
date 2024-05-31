@@ -22,14 +22,11 @@ extern xQueueHandle heater_usbWaitQueue;
 extern xQueueHandle heater_pwmReqQueue;
 extern xQueueHandle heater_sensorConfQueue;
 
-// Sensor Task Queue(s)
+// Sensor Task Queue
 extern xQueueHandle sensorRxQueue;
 
-// Battery Management Task Queue(s)
-extern xQueueHandle battery_requestPercentQueue;
-extern xQueueHandle battery_mainStateQueue;
-extern xQueueHandle battery_usbWaitQueue;
-extern xQueueHandle battery_mainStateContinueQueue;
+//Battery Task Queue
+extern xQueueHandle batteryRxQueue;
 
 // USB Management Task Queue(s)
 extern xQueueHandle usb_stateChangeQueue;

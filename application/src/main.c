@@ -285,6 +285,12 @@ void main_task(void * pvParameters) {
   uint32_t start_time = 0, end_time = 0, a_t_start = 0;
   uint32_t alert_timeout_ticks;
 
+  
+  const BatteryRxQueueMsg_t batt_req = {
+    .type = BATTERY_SOC_REQUEST,
+    .sendTo = BATTERY_MSG_SOC_MAIN
+  };
+
   // Set Start up state to standby
   main_state_t main_state = MAIN_SLEEP;
   main_state_t next_state = MAIN_STANDBY;
@@ -339,8 +345,16 @@ void main_task(void * pvParameters) {
 
         hal_triggered = false;
         optical_triggered = false; 
+
+
+        // Request the battery percentage from the bettery task
+        xReturned = xQueueSend(batteryRxQueue, &batt_req, 0);
+        if (xReturned != pdPASS) {
+          printf("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.\n");
+        }
+
         // Check for Battery Data in Battery Queue
-        if (xQueueReceive(main_batteryDataQueue, &percent_recv, 0) == pdPASS) {
+        if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(100)) == pdPASS) {
           if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
              next_state = MAIN_SLEEP;
              sendUpdatedMainTaskState(next_state);
@@ -579,6 +593,14 @@ void main_task(void * pvParameters) {
             if (xReturned != pdPASS) {
               printf("Sensor: Unable to send timer update to sensorRxQueue queue.\n");
             }
+
+            BatteryRxQueueMsg_t battMsg;
+            msg.type = BATTERY_MSG_SLEEP;
+
+            xReturned = xQueueSend(batteryRxQueue, &battMsg, 0);
+            if (xReturned != pdPASS) {
+              printf("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.\n");
+            }
         }
           //send out to other tasks we going to sleep
           // wait for response
@@ -602,6 +624,11 @@ void main_task(void * pvParameters) {
 void sendUpdatedMainTaskState(main_state_t new_state) {
   BaseType_t xReturned;
   usb_message_t msg;
+    BatteryRxQueueMsg_t battMsg = {
+    .type = BATTERY_MSG_MAIN_STATE_CHANGE,
+    .mainState = new_state
+  };
+
   bool logger_resp = false, batt_resp = false, usb_resp = false, sensor_resp = false;
   tasks_t task_recv;
   bool main_state_cont = true;
@@ -621,9 +648,9 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   }
 
   // Send the state to the battery task
-  xReturned = xQueueSend(battery_mainStateQueue, &new_state, 0);
+  xReturned = xQueueSend(batteryRxQueue, &battMsg, 0);
   if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send main state change to battery_mainStateQueue.\n");
+    printf("MAIN_TASK: Unable to send main state change to batteryRxQueue.\n");
   }
 
   // Send main state update to usb task
@@ -659,7 +686,6 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
     else {
       vTaskDelay(50);
     }
-
   }
 
   printf("MAIN: All tasks updated... sending continue requests.\n");
@@ -668,10 +694,6 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   xReturned = xQueueSend(logger_mainStateContinueQueue, &main_state_cont, 0);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send main state continue to logger_mainStateContinueQueue.\n");
-  }
-  xReturned = xQueueSend(battery_mainStateContinueQueue, &main_state_cont, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send main state continue to battery_mainStateContinueQueue.\n");
   }
   xReturned = xQueueSend(usb_mainStateContinueQueue, &main_state_cont, 0);
   if (xReturned != pdPASS) {
@@ -894,18 +916,9 @@ void create_queues() {
     printf("Unable to create sensorRxQueue queue\n");
 
   // Battery Management Task Queues
-  battery_requestPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(battery_percent_req_t));
-  if (battery_requestPercentQueue == NULL)
-    printf("Unable to create battery_requestPercentQueue queue\n");
-  battery_mainStateQueue = xQueueCreate(QUEUE_SIZE, sizeof(main_state_t));
-  if (battery_mainStateQueue == NULL)
-    printf("Unable to create battery_mainStateQueue queue\n");
-  battery_usbWaitQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_suspend_req_t));
-  if (battery_usbWaitQueue == NULL)
-    printf("Unable to create battery_usbWaitQueue queue\n");
-  battery_mainStateContinueQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
-  if (battery_mainStateContinueQueue == NULL)
-    printf("Unable to create battery_mainStateContinueQueue queue\n");
+  batteryRxQueue = xQueueCreate(10, sizeof(BatteryRxQueueMsg_t));
+  if (batteryRxQueue == NULL)
+    printf("Unable to create batteryRxQueue queue\n");
 
   // USB Management Task Queues
   usb_stateChangeQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_message_t));
@@ -966,6 +979,7 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
 *
 *   Application entry point.
 */
+
  int main(void) {
  BaseType_t xReturned;
   ret_code_t err_code;

@@ -248,6 +248,28 @@ typedef struct {
   temperature_pwm_data_t pwmData;
 } SensorRxQueueMsg_t;
 
+typedef enum {
+  BATTERY_MSG_USB_SUSPEND,
+  BATTERY_MSG_TIMER_EVENT,
+  BATTERY_SOC_REQUEST,
+  BATTERY_MSG_SLEEP,
+  BATTERY_MSG_WAKEUP,
+  BATTERY_CONFIG_UPDATED,
+  BATTERY_MSG_MAIN_STATE_CHANGE
+} BatteryRxQueueType_t;
+
+typedef enum {
+  BATTERY_MSG_SOC_MAIN,
+  BATTERY_MSG_SOC_LOG
+} BatterySOC_Send_to_t;
+
+typedef struct {
+  BatteryRxQueueType_t type;
+  BatterySOC_Send_to_t sendTo;
+  main_state_t mainState;
+  bool usbSuspend;
+} BatteryRxQueueMsg_t;
+
 // Task Handles
 extern xTaskHandle mainTaskHandle;
 extern xTaskHandle heaterTaskHandle;

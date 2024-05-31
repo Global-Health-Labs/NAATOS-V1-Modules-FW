@@ -153,6 +153,11 @@ void msc_user_ev_handler(app_usbd_class_inst_t const * p_inst,
     UNUSED_PARAMETER(event);
 }
 
+const BatteryRxQueueMsg_t usbBattSuspendReq = {
+  .type = BATTERY_MSG_USB_SUSPEND,
+  .usbSuspend =  true
+};
+
 void usb_suspend_conflicting_tasks(void) {
   BaseType_t xReturned;
   bool batt_acpt = false, heater_acpt = false, pwm_acpt = false, sensor_acpt = false;
@@ -163,10 +168,10 @@ void usb_suspend_conflicting_tasks(void) {
 
   /* Send suspend requests to conflicting tasks */
   // Send to Battery
-  xReturned = xQueueSend(battery_usbWaitQueue, &sus_req, 0);
+  /*xReturned = xQueueSend(batteryRxQueue, &usbBattSuspendReq, 0);
   if (xReturned != pdPASS) {
-    printf("USB: Unable to send usb suspend request to battery_usbWaitQueue.\n");
-  }
+    printf("USB: Unable to send usb suspend request to batteryRxQueue.\n");
+  }*/
   // Send to heater 
   xReturned = xQueueSend(heater_usbWaitQueue, &sus_req, 0);
   if (xReturned != pdPASS) {
@@ -190,7 +195,7 @@ void usb_suspend_conflicting_tasks(void) {
   }
 
   /* Receive back suspend request acceptances */
-  while(!batt_acpt || !heater_acpt || !pwm_acpt || !sensor_acpt) {
+  while(/*!batt_acpt ||*/ !heater_acpt || !pwm_acpt || !sensor_acpt) {
     if (uxQueueMessagesWaiting(usb_recvUsbWaitAcceptQueue) > 0) {
       xReturned = xQueueReceive(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0);
       if (xReturned != pdPASS) {
