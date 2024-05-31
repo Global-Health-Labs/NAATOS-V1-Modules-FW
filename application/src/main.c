@@ -58,6 +58,9 @@ xTaskHandle usbTaskHandle;
 xTaskHandle pwmTaskHandle;
 xTaskHandle wdtTaskHandle;
 xTaskHandle compositeTaskHandle;
+#if USE_MOTOR
+xTaskHandle motorTaskHandle;
+#endif
 
 xQueueHandle main_batteryDataQueue;
 xQueueHandle main_switchQueue;
@@ -747,19 +750,19 @@ void create_tasks() {
       vTaskDelete( sensorsTaskHandle );
   }
   // Battery Management Task
-  xReturned = xTaskCreate(battery_task, "BatteryTask", 1024, NULL, 0, &batteryTaskHandle);
-  if( xReturned != pdPASS ) {
-      // The task was created.  Use the task's handle to delete the task. 
-      printf("Error creating battery management task. Error: %d\n", xReturned);
-      vTaskDelete( batteryTaskHandle );
-  }
+  //xReturned = xTaskCreate(battery_task, "BatteryTask", 1024, NULL, 0, &batteryTaskHandle);
+  //if( xReturned != pdPASS ) {
+  //    // The task was created.  Use the task's handle to delete the task. 
+  //    printf("Error creating battery management task. Error: %d\n", xReturned);
+  //    vTaskDelete( batteryTaskHandle );
+  //}
   // USB Management Task
-  xReturned = xTaskCreate(usb_task, "USBTask", 1024, NULL, 0, &usbTaskHandle);
-  if( xReturned != pdPASS ) {
-      // The task was created.  Use the task's handle to delete the task. 
-      printf("Error creating usb management task. Error: %d\n", xReturned);
-      vTaskDelete( usbTaskHandle );
-  }
+  //xReturned = xTaskCreate(usb_task, "USBTask", 1024, NULL, 0, &usbTaskHandle);
+  //if( xReturned != pdPASS ) {
+  //    // The task was created.  Use the task's handle to delete the task. 
+  //    printf("Error creating usb management task. Error: %d\n", xReturned);
+  //    vTaskDelete( usbTaskHandle );
+  //}
   // PWM Task
   xReturned = xTaskCreate(pwm_task, "PWMTask", 1024, NULL, 0, &pwmTaskHandle);
   if ( xReturned != pdPASS ) {
@@ -767,20 +770,26 @@ void create_tasks() {
       printf("Error creating PWM task. Error: %d\n", xReturned);
       vTaskDelete( pwmTaskHandle );
   }
-
   // WDT Task
-  xReturned = xTaskCreate(wdtFeedTask, "WDTTask", 100, NULL, 0, &wdtTaskHandle);
-  if ( xReturned != pdPASS ) {
-      /* The task was created.  Use the task's handle to delete the task. */
-      printf("Error creating WDT task. Error: %d\n", xReturned);
-      vTaskDelete( wdtTaskHandle );
-  }
+  //xReturned = xTaskCreate(wdtFeedTask, "WDTTask", 100, NULL, 0, &wdtTaskHandle);
+  //if ( xReturned != pdPASS ) {
+  //    /* The task was created.  Use the task's handle to delete the task. */
+  //    printf("Error creating WDT task. Error: %d\n", xReturned);
+  //    vTaskDelete( wdtTaskHandle );
+  //}
   // USB Composite Task
-  xReturned = xTaskCreate(composite_usb_task, "CompositeUSBTask", 1024, NULL, 0, &compositeTaskHandle);
+  //xReturned = xTaskCreate(composite_usb_task, "CompositeUSBTask", 1024, NULL, 0, &compositeTaskHandle);
+  //if ( xReturned != pdPASS ) {
+  //    // The task was created.  Use the task's handle to delete the task. 
+  //    printf("Error creating Composite USB task. Error: %d\n", xReturned);
+  //    vTaskDelete( compositeTaskHandle );
+  //}
+  // Motor Task
+  xReturned = xTaskCreate(pwm_task, "MotorTask", 1024, NULL, 0, &pwmTaskHandle);
   if ( xReturned != pdPASS ) {
       // The task was created.  Use the task's handle to delete the task. 
-      printf("Error creating Composite USB task. Error: %d\n", xReturned);
-      vTaskDelete( compositeTaskHandle );
+      printf("Error creating PWM task. Error: %d\n", xReturned);
+      vTaskDelete( pwmTaskHandle );
   }
 }
 
@@ -828,7 +837,25 @@ void create_queues() {
   heater_sensorConfQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (heater_sensorConfQueue == NULL)
     printf("Unable to create heater_sensorConfQueue queue\n");
-    
+
+#if USE_MOTOR
+  // Motor Task Queues
+  motor_RunQueue = xQueueCreate(QUEUE_SIZE, sizeof(motor_run_req_t));
+  if (motor_RunQueue == NULL)
+    printf("Unable to create motor_RunQueue queue\n");
+  motor_speedDataQueue = xQueueCreate(QUEUE_SIZE, sizeof(long double));
+  if (motor_speedDataQueue == NULL)
+    printf("Unable to create motor_speedDataQueue queue\n");
+  heater_usbWaitQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_suspend_req_t));
+  if (motor_usbWaitQueue == NULL)
+    printf("Unable to create motor_usbWaitQueue queue\n");
+  heater_pwmReqQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (motor_pwmReqQueue == NULL)
+    printf("Unable to create motor_pwmReqQueue queue\n");
+  motor_sensorConfQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (motor_sensorConfQueue == NULL)
+    printf("Unable to create motor_sensorConfQueue queue\n");
+#endif        
 
   // Sensor Task Queues
   sensor_heaterStateQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));

@@ -6,6 +6,7 @@
 #include "bsp.h"
 #include "adc.h"
 #include "tsys01.h"
+#include "motor.h"
 
 #define SENSORS_EN          39
 

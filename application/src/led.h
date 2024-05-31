@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "FreeRTOS.h"
 
-#define ENABLE_LEDS 1
+#define ENABLE_LEDS 0
 
 void set_led1_green_solid(void);
 void set_led1_green_breathe(void);

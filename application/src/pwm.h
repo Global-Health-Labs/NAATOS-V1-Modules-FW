@@ -35,5 +35,8 @@ void update_valve_duty(int duty);
 void update_amp0_duty(int duty);
 void update_amp1_duty(int duty);
 void update_amp2_duty(int duty);
+#if USE_MOTOR
+void update_motor_duty(int duty);
+#endif
 
 #endif

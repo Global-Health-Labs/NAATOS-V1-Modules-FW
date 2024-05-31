@@ -27,7 +27,6 @@ temperature_pwm_data_t pwm_data = {
 static const nrf_drv_timer_t *p_counter1;
 static uint32_t motor_speed_read_t1 = 0;
 static uint32_t motor_speed_read_t2;
-static bool skipped_last_call = false;
 static long double motor_speed = 0.0; //RPM
 #endif
 
@@ -47,6 +46,9 @@ xQueueHandle sensor_motorStateQueue;
 #endif
 
 bool heater_running = false;
+#if USE_MOTOR
+bool motor_running = false;
+#endif
 
 static log_data_message_t log_msg = {
   .data_type = TEMPERATURE_DATA,
@@ -88,6 +90,7 @@ void sensors_task(void * pvParameters) {
 #endif
 
   for (;;) {
+    
     // Check to see if the heater has started or stopped
     if (uxQueueMessagesWaiting(sensor_heaterStateQueue) > 0) {
       xReturned = xQueueReceive(sensor_heaterStateQueue, &heater_running, 0);
@@ -100,7 +103,20 @@ void sensors_task(void * pvParameters) {
         printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
       }
     }
-
+#if USE_MOTOR
+    // Check to see if the motor has started or stopped
+    if (uxQueueMessagesWaiting(sensor_motorStateQueue) > 0) {
+      xReturned = xQueueReceive(sensor_motorStateQueue, &motor_running, 0);
+      if (xReturned != pdPASS) {
+        printf("MOTOR_TASK: Unable to receive state change from sensor_mainStateQueue.\n");
+      }
+      // Respond to motor change
+      xReturned = xQueueSend(motor_sensorConfQueue, &motor_running, 0);
+      if (xReturned != pdPASS) {
+        printf("MOTOR_TASK: Unable to send main state response to main_mainStateRespQueue queue.\n");
+      }
+    }
+#endif
     // Check to see if we need to suspend for USB to be enabled
     if (uxQueueMessagesWaiting(sensor_usbWaitQueue) > 0) {
       xReturned = xQueueReceive(sensor_usbWaitQueue, &sus_req, 0) ;
@@ -165,7 +181,14 @@ void sensors_task(void * pvParameters) {
 
     // I2C Read for Amplification Zone 2 
     temperatures.amp2_zone_temp = readTemp(amp_zone_2);
-    
+#elif (!I2C_CONNECTED) && USE_MOTOR
+    //TODO: How many zones should be simulated when running with the motor? All? None?
+    // Set temps to their setpoints if i2c is not connected
+    temperatures.valve_zone_temp = 85;
+    temperatures.amp0_zone_temp = 65;
+    temperatures.amp1_zone_temp = 65;
+    temperatures.amp2_zone_temp = 65;
+    vTaskDelay(pdMS_TO_TICKS(12 * 4)); // Simulate 12ms delay for each reading    
 #else
     // Set temps to their setpoints if i2c is not connected
     temperatures.valve_zone_temp = 85;
@@ -176,7 +199,7 @@ void sensors_task(void * pvParameters) {
 #endif
 
 #if USE_MOTOR
-    readMotorSpeed();
+    motor_speed = readMotorSpeed();
 #endif
 
     // Put Switch Data into queue
@@ -184,6 +207,17 @@ void sensors_task(void * pvParameters) {
     if (xReturned != pdPASS) {
       printf("SENSORS_TASK: Unable to send switch data in main_switchQueue.\n");
     }
+
+#if USE_MOTOR
+    // Only send motor speed when motor is running 
+    if (motor_running) {
+      // Put motor speed into queue
+      xReturned = xQueueSend(motor_speedDataQueue, (void *)&motor_speed, 0);
+      if (xReturned != pdPASS) {
+        printf("SENSORS_TASK: Unable to send motor speed data in motor_speedDataQueue. Error: %d\n", xReturned);
+      }
+    }
+#endif
     
     // Only send temperature data when we are running 
     if (heater_running) {
@@ -265,7 +299,7 @@ long double readTemp(sensor_selection_t sensor) {
   return temperature;
 }
 
-double readMotorSpeed(void){
+double readMotorSpeed(void) {
   //Check how many pulses have been captured in elapsed time since last call
   motor_speed_read_t2 = xTaskGetTickCount();
   uint32_t delta_t = pdTICKS_TO_MS(motor_speed_read_t2 - motor_speed_read_t1);
@@ -278,7 +312,6 @@ double readMotorSpeed(void){
   //Clear the counter, update variable for tracking elapsed time
   nrf_drv_timer_clear(p_counter1);
   motor_speed_read_t1 = xTaskGetTickCount();
-  skipped_last_call = false;
 
   return motor_speed_rpm;
 }

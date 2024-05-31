@@ -2,8 +2,6 @@
 #include "timers.h"
 #include "motor.h"
 
-#define USE_MOTOR  1 //TODO: Remove
-
 APP_PWM_INSTANCE(PWM0, 0); // Create instance "PWM0" using TIMER0
 APP_PWM_INSTANCE(PWM2, 2); // Create instance "PWM2" using TIMER2
 
@@ -14,13 +12,17 @@ int valve_duty = 0;
 int amp0_duty = 0;
 int amp1_duty = 0;
 int amp2_duty = 0;
+#if USE_MOTOR
 int motor_duty = 0;
+#endif
 
 static bool valve_zone_active = false;
 static bool amp0_zone_active = false;
 static bool amp1_zone_active = false;
 static bool amp2_zone_active = false;
+#if USE_MOTOR
 static bool motor_active = false;
+#endif
 
 xQueueHandle pwm_usbWaitQueue;
 
@@ -122,6 +124,9 @@ void pwm_task(void * pvParameters) {
   // Initalize the pwm channels
   init_pwms();
 
+  //TODO: Remove
+  update_motor_duty(50);
+
   // Set Original Duty Cycles to 0
   app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty);
   app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  amp0_duty);
@@ -133,12 +138,14 @@ void pwm_task(void * pvParameters) {
   app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL,  amp2_duty);
   
   //TODO: Remove
-  amp1_zone_active = true;
+  motor_active = true;
 
   // Main Task Loop
   for (;;) {
     // If not running a duty cycle do nothing
-    if (!valve_zone_active && !amp0_zone_active && !amp1_zone_active && !amp2_zone_active) {
+#if USE_MOTOR
+    if (!valve_zone_active && !amp0_zone_active && !amp1_zone_active && !amp2_zone_active && !motor_active) {
+#endif      
       vTaskDelay(100);
       // Check to see if we need to suspend for USB to be enabled
       if (uxQueueMessagesWaiting(pwm_usbWaitQueue) > 0) {

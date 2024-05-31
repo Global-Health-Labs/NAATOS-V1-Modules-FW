@@ -1,12 +1,19 @@
 #include "nrf_drv_ppi.h"
 #include "nrf_drv_timer.h"
-
 #include "nrf_drv_gpiote.h"
+#include "naatos_queues.h"
 
 //TODO: Change to actual pins
 #define MOTOR_INPUT_PIN 44 //TP1= P1.12
 #define MOTOR_OUTPUT_PIN 47 //TP4 = P1.15
 #define MOTOR_OUTPUT_PIN2 45 //TP2 = P1.13 Only here because PWM.c asks for two pins to cfg a PWM module
+
+#define MOTOR_SETPOINT   1000//Default set to 500 rpm, this will likely need to be changed
+
+//TODO: These are copied from heater, need to be tuned
+#define M_KP    2.250
+#define M_KI    0.025
+#define M_KD    2.25
 
 static const nrf_drv_timer_t m_counter1;
 static nrf_ppi_channel_t m_ppi_channel1;

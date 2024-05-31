@@ -3,6 +3,7 @@
 
 #include "FreeRTOS.h"
 #include "queue.h"
+#include "naatos_config.h"
 
 #define QUEUE_SIZE  1
 #define WATCH_DOG_QUEUE_SIZE 30
@@ -21,6 +22,15 @@ extern xQueueHandle heater_temperatureDataQueue;
 extern xQueueHandle heater_usbWaitQueue;
 extern xQueueHandle heater_pwmReqQueue;
 extern xQueueHandle heater_sensorConfQueue;
+
+#if USE_MOTOR
+// Motor Task Queue(s)
+extern xQueueHandle motor_RunQueue;
+extern xQueueHandle motor_speedDataQueue;
+extern xQueueHandle motor_usbWaitQueue;
+extern xQueueHandle motor_pwmReqQueue;
+extern xQueueHandle motor_sensorConfQueue;
+#endif
 
 // Sensor Task Queue(s)
 extern xQueueHandle sensor_heaterStateQueue;

@@ -49,8 +49,8 @@
 /* Device Debug Parameters */
 #define I2C_CONNECTED           0
 #define GO_STRAIGHT_TO_RUNNING  0
-#define USE_CALENDAR_CHIP       1 
-#define VERBOSE_PID             1
+#define USE_CALENDAR_CHIP       0 
+#define VERBOSE_PID             0
 #define USE_MOTOR               1
 
 /* Log Event Messages */
@@ -79,6 +79,7 @@ typedef enum {
   MAIN,
   BATTERY,
   HEATER,
+  MOTOR,
   LOGGER,
   SENSORS, 
   USB,
