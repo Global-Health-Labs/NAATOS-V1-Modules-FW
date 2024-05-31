@@ -262,13 +262,6 @@ xTaskHandle get_usb_task_handle(void)
     return usbTaskHandle;
 }
 
-void gpiote_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
-{
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    vTaskNotifyGiveFromISR(mainTaskHandle, &xHigherPriorityTaskWoken);
-    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-}
-
 
 /*********************************************************************
 *
@@ -636,6 +629,14 @@ void main_task(void * pvParameters) {
             msg.type = BATTERY_MSG_SLEEP;
 
             xReturned = xQueueSend(batteryRxQueue, &battMsg, 0);
+            if (xReturned != pdPASS) {
+              printf("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.\n");
+            }
+
+            ButtonRxQueueMsg_t buttonMsg;
+            buttonMsg.type = BUTTON_MSG_SLEEP;
+
+            xReturned = xQueueSend(buttonRxQueue, &buttonMsg, 0);
             if (xReturned != pdPASS) {
               printf("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.\n");
             }
@@ -1068,6 +1069,7 @@ int main(void) {
   fuelGauge_init();
   init_sd_card();
   button_init();
+  nrf_drv_gpiote_init();
   //err_code = app_timer_init();
   //APP_ERROR_CHECK(err_code);
   //ret_code_t ret_code = nrf_pwr_mgmt_init();
