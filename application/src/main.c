@@ -571,30 +571,19 @@ void main_task(void * pvParameters) {
       break;
 
       // In Low Power State
-      case MAIN_SLEEP:
+      case MAIN_SLEEP:{
         if(last_state != main_state) {
           //send out to other tasks we going to sleep
           // wait for response
-        }
-        
-        //setup gpio event
-        /*nrf_drv_gpiote_init();
-        nrf_drv_gpiote_in_config_t config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
-        nrf_drv_gpiote_in_init(BUTTON_INPUT_PIN, &config, gpiote_event_handler);
-        nrf_drv_gpiote_in_event_enable(BUTTON_INPUT_PIN, false);
-        // go to sleep
-        nrf_pwr_mgmt_run();
-        nrf_drv_gpiote_in_event_disable(BUTTON_INPUT_PIN);
-        // Reconfigure as standard input
-        nrf_drv_gpiote_in_uninit(BUTTON_INPUT_PIN);
-        nrf_gpio_cfg_input(BUTTON_INPUT_PIN, NRF_GPIO_PIN_NOPULL);
-        // on wakeup event bring up all threads
-        // thread response
-        // go to */
+          // now we just sit in here until we receive a button trigger
+          //maybe setup a switch interrupt for this so it wakes up only on that event
+          // if it doesnt wakeup on that event we will allow the watchdog to be woken
+          // the battery thread should be allowed to wakeup as well so maybe put that on a longer delay?
 
         //main_state = MAIN_STANDBY;
 
-      break;
+       break;
+      }
       // Shouldnt Get here
       default:
       break;
@@ -892,9 +881,9 @@ void create_queues() {
     
 
   // Sensor Task Queues
-  sensor_heaterStateQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
-  if (sensor_heaterStateQueue == NULL)
-    printf("Unable to create sensor_heaterStateQueue queue\n");
+  sensorRxQueue = xQueueCreate(10, sizeof(bool));
+  if (sensorRxQueue == NULL)
+    printf("Unable to create sensorRxQueue queue\n");
   sensor_usbWaitQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_suspend_req_t));
   if (sensor_usbWaitQueue == NULL)
     printf("Unable to create sensor_usbWaitQueue queue\n");

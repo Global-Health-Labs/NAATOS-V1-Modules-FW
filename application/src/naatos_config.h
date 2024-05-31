@@ -231,6 +231,23 @@ typedef struct {
   bool over;
 } usb_suspend_over_t;
 
+typedef enum {
+  SENSOR_MSG_HEATER_STATE,
+  SENSOR_MSG_USB_SUSPEND,
+  SENSOR_MSG_PWM_RESPONSE,
+  SENSOR_MSG_TIMER_EVENT,
+  SENSOR_MSG_SLEEP,
+  SENSOR_MSG_WAKEUP,
+  CONFIG_UPDATED
+} SensorRxQueueType_t;
+
+typedef struct {
+  SensorRxQueueType_t type;
+  bool heaterRunning;
+  bool usbSuspend;
+  temperature_pwm_data_t pwmData;
+} SensorRxQueueMsg_t;
+
 // Task Handles
 extern xTaskHandle mainTaskHandle;
 extern xTaskHandle heaterTaskHandle;

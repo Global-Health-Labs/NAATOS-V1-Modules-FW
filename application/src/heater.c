@@ -42,10 +42,14 @@ void handle_valve_stopstart_heater(bool heating) {
   if (amplification_zone_running && !heating)
     return;
 
+  SensorRxQueueMsg_t msg;
+  msg.type = SENSOR_MSG_HEATER_STATE;
+  msg.heaterRunning = heating;
+
   // Send the heater status
-  xReturned = xQueueSend(sensor_heaterStateQueue, &heating, 0);
+  xReturned = xQueueSend(sensorRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
-    printf("HEATER_TASK: Unable to send heater state to sensor_heaterStateQueue.\n");
+    printf("HEATER_TASK: Unable to send heater state to sensorRxQueue.\n");
   }
   // Get the response that the sensors task has been updated
   xReturned = xQueueReceive(heater_sensorConfQueue, &heating, portMAX_DELAY);
@@ -66,10 +70,15 @@ void handle_amplification_stopstart_heater(bool heating) {
   if (valve_zone_running && !heating)
     return;
 
+  SensorRxQueueMsg_t msg;
+  msg.type = SENSOR_MSG_HEATER_STATE;
+  msg.heaterRunning = heating;
+
+
   // Send the heater status
-  xReturned = xQueueSend(sensor_heaterStateQueue, &heating, 0);
+  xReturned = xQueueSend(sensorRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
-    printf("HEATER_TASK: Unable to send heater state to sensor_heaterStateQueue.\n");
+    printf("HEATER_TASK: Unable to send heater state to sensorRxQueue.\n");
   }
   // Get the response that the sensors task has been updated
   xReturned = xQueueReceive(heater_sensorConfQueue, &heating, portMAX_DELAY);
