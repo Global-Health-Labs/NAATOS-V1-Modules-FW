@@ -1058,7 +1058,7 @@ bool app_usbd_active_check(void)
 
 void app_usbd_event_execute(app_usbd_internal_evt_t const * const p_event)
 {
-    ASSERT(NULL != m_p_first_cinst);
+    //ASSERT(NULL != m_p_first_cinst);
     /* If no event queue is implemented, it has to be ensured that this function is never called
      * from the context higher than USB interrupt level
      * If queue is implemented it would be called always from Thread level

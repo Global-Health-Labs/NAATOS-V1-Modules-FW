@@ -394,11 +394,6 @@ void usb_task(void * pvParameters) {
           break;
         }
 
-        // Stop The USB
-        app_usbd_stop();
-        // Allow for it to update
-        while (usb_started);
-        start_usb(true, false);
         break;
       }
       case USB_MSC: 
@@ -407,11 +402,6 @@ void usb_task(void * pvParameters) {
           break;
         }
 
-        // Stop The USB
-        app_usbd_stop();
-        // Allow for it to update
-        while (usb_started);
-        start_usb(false, true);
         break;
       }
       case USB_MSC_CDC_ACM: 
@@ -421,12 +411,10 @@ void usb_task(void * pvParameters) {
           break;
         }
         // Stop The USB
-        app_usbd_stop();
+        usbd_user_ev_handler(APP_USBD_EVT_POWER_REMOVED);
         app_usbd_disable();
-        app_usbd_class_remove_all();
+        //app_usbd_class_remove_all();
         app_usbd_uninit();
-        // Allow for it to update
-        // while (usb_started);
         start_usb(true, true);
         break;
       }
