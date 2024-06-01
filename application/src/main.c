@@ -74,21 +74,25 @@ xQueueHandle main_usbConnRecvQueue;
 xQueueHandle main_usbChangedConfQueue;
 
 // Zone Request Constants
-const zone_run_req_t run_amplification_zone = {
-  .on = true,
-  .zone = AMPLIFICATION
+const HeaterRxQueueMsg_t run_amplification_zone = {
+  .type = HEATER_MSG_ZONE_STATE,
+  .zoneSelect = AMPLIFICATION,
+  .zoneEnabled = true
 };
-const zone_run_req_t run_valve_zone = {
-  .on = true,
-  .zone = VALVE
+const HeaterRxQueueMsg_t run_valve_zone = {
+  .type = HEATER_MSG_ZONE_STATE,
+  .zoneSelect = VALVE,
+  .zoneEnabled = true
 };
-const zone_run_req_t stop_amplification_zone = {
-  .on = false, 
-  .zone = AMPLIFICATION
+const HeaterRxQueueMsg_t stop_amplification_zone = {
+  .type = HEATER_MSG_ZONE_STATE,
+  .zoneSelect = AMPLIFICATION,
+  .zoneEnabled = false
 };
-const zone_run_req_t stop_valve_zone = {
-  .on = false,
-  .zone = VALVE
+const HeaterRxQueueMsg_t stop_valve_zone = {
+  .type = HEATER_MSG_ZONE_STATE,
+  .zoneSelect = VALVE,
+  .zoneEnabled = false
 };
 
 // Log Event Constants
@@ -756,7 +760,8 @@ bool begin_amplification_zone(void) {
   BaseType_t xReturned;
   bool start_run = false;
   // Send start zone request
-  xReturned = xQueueSend(heater_zoneRunQueue, &run_amplification_zone, 0);
+
+  xReturned = xQueueSend(heaterRxQueue, &run_amplification_zone, 0);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send run amplification zone request.\n");
   }
@@ -783,7 +788,7 @@ void begin_valve_zone(void) {
   BaseType_t xReturned;
   bool heat_conf = false;
   // Send start valve message to heater queue
-  xReturned = xQueueSend(heater_zoneRunQueue, &run_valve_zone, 0);
+  xReturned = xQueueSend(heaterRxQueue, &run_valve_zone, 0);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send run valve zone request.\n");
   }
@@ -803,7 +808,7 @@ void end_amplification_zone(void) {
   BaseType_t xReturned;
   bool heat_conf = false;
   // Send stop amplification message to heater queue
-  xReturned = xQueueSend(heater_zoneRunQueue, &stop_amplification_zone, 0);
+  xReturned = xQueueSend(heaterRxQueue, &stop_amplification_zone, 0);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send stop amplification zone request.\n");
   }
@@ -823,7 +828,7 @@ void end_valve_zone(void) {
   BaseType_t xReturned;
   bool heat_conf = false;
   // Send valve zone stop request
-  xReturned = xQueueSend(heater_zoneRunQueue, &stop_valve_zone, 0);
+  xReturned = xQueueSend(heaterRxQueue, &stop_valve_zone, 0);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send stop valve zone request.\n");
   }
@@ -949,22 +954,11 @@ void create_queues() {
 
     
   // Heater Task Queues
-  heater_zoneRunQueue = xQueueCreate(QUEUE_SIZE, sizeof(zone_run_req_t));
-  if (heater_zoneRunQueue == NULL)
-    printf("Unable to create heater_zoneRunQueue queue\n");
-  heater_temperatureDataQueue = xQueueCreate(QUEUE_SIZE, sizeof(temperature_data_t));
-  if (heater_temperatureDataQueue == NULL)
-    printf("Unable to create heater_temperatureDataQueue queue\n");
-  heater_usbWaitQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_suspend_req_t));
-  if (heater_usbWaitQueue == NULL)
-    printf("Unable to create heater_usbWaitQueue queue\n");
-  heater_pwmReqQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
-  if (heater_pwmReqQueue == NULL)
-    printf("Unable to create heater_pwmReqQueue queue\n");
-  heater_sensorConfQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
-  if (heater_sensorConfQueue == NULL)
-    printf("Unable to create heater_sensorConfQueue queue\n");
-    
+  heaterRxQueue = xQueueCreate(10, sizeof(HeaterRxQueueMsg_t));
+  if (heaterRxQueue == NULL) {
+    printf("Unable to create heaterRxQueue queue\n");
+  }
+
   // Sensor Task Queues
   sensorRxQueue = xQueueCreate(10, sizeof(SensorRxQueueMsg_t));
   if (sensorRxQueue == NULL){

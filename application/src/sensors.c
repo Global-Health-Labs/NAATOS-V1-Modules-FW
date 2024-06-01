@@ -3,8 +3,6 @@
 
 void sensorCollection(void) ;
 
-const bool pwm_req = true;
-
 sensor_switches_t switches;
 temperature_data_t temperatures = {
   .amp0_zone_pwm = 0,
@@ -146,8 +144,13 @@ void sensors_task(void * pvParameters) {
         case SENSOR_MSG_HEATER_STATE: {
           heaterRunning = sensorRxMessage.heaterRunning;
 
+          HeaterRxQueueMsg_t heaterMsg = {
+            .type = HEATER_MSG_SENSOR_CONFIRM,
+            .heaterRunning = heaterRunning
+          };
+
           // Respond to heater change
-          xReturned = xQueueSend(heater_sensorConfQueue, &heaterRunning, 0);
+          xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
           if (xReturned != pdPASS) {
             printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
           }
@@ -223,7 +226,8 @@ void sensors_task(void * pvParameters) {
 }
 
 void sensorCollection(void) {
-     BaseType_t xReturned;
+    BaseType_t xReturned;
+    HeaterRxQueueMsg_t heaterMsg;
 
     // ADC Read for Optical Sensors
     bool prev = switches.optical_tiggered;
@@ -276,16 +280,20 @@ void sensorCollection(void) {
       temperatures.amp2_zone_temp = 65;
       vTaskDelay(pdMS_TO_TICKS(12 * 4)); // Simulate 12ms delay for each reading
 #endif
-      xReturned = xQueueSend(heater_temperatureDataQueue, (void *)&temperatures, 0);
+      heaterMsg.type = HEATER_MSG_TEMPERATURE_DATA;
+      heaterMsg.tempData = temperatures;
+
+      xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
       if (xReturned != pdPASS) {
-        printf("SENSORS_TASK: Unable to send temperature data in heater_temperatureDataQueue. Error: %d\n", xReturned);
+        printf("SENSORS_TASK: Unable to send temperature data in heaterRxQueue. Error: %d\n", xReturned);
       }
       sample_log_index++;
       if (sample_log_index >= sample_log_max) {
+        HeaterRxQueueMsg_t heaterPwmMsg = {.type = HEATER_MSG_PWM_REQUEST};
         // Request PWM from heater
-        xReturned = xQueueSend(heater_pwmReqQueue, &pwm_req, 0);
+        xReturned = xQueueSend(heaterRxQueue, &heaterPwmMsg, 0);
         if (xReturned != pdPASS) {
-          printf("SENSOR_TASK: Unable to send PWM request to heater_pwmReqQueue queue.\n");
+          printf("SENSOR_TASK: Unable to send PWM request to heaterRxQueue queue.\n");
         }
       }
     }

@@ -1,11 +1,11 @@
 #include "heater.h"
 #include "timers.h"
 
-xQueueHandle heater_zoneRunQueue;
-xQueueHandle heater_temperatureDataQueue;
+/*
 xQueueHandle heater_usbWaitQueue;
-xQueueHandle heater_pwmReqQueue;
-xQueueHandle heater_sensorConfQueue;
+*/
+
+xQueueHandle heaterRxQueue;
 
 bool amplification_zone_running = false;
 bool valve_zone_running = false;
@@ -16,7 +16,6 @@ bool heater_run = false;
 int wdtTimeout = 0;
 
 zone_run_req_t zone_req;
-temperature_data_t temperature_data;
 
 temperature_pwm_data_t h_pwm_data = {
   .valve_zone_pwm = 0,
@@ -35,6 +34,8 @@ pid_controller_t amp0_pid_2;
 pid_controller_t amp1_pid_2;
 pid_controller_t amp2_pid_2;
 
+void handleSensorDataRx(temperature_data_t temperature_data);
+
 void handle_valve_stopstart_heater(bool heating) {
   BaseType_t xReturned;
 
@@ -51,16 +52,6 @@ void handle_valve_stopstart_heater(bool heating) {
   if (xReturned != pdPASS) {
     printf("HEATER_TASK: Unable to send heater state to sensorRxQueue.\n");
   }
-  // Get the response that the sensors task has been updated
-  xReturned = xQueueReceive(heater_sensorConfQueue, &heating, portMAX_DELAY);
-  if (xReturned != pdPASS) {
-    printf("HEATER_TASK: Unable to receive sensor confirmation from heater_sensorConfQueue.\n");
-  }
-  // Send the confirmation to the main state
-  xReturned = xQueueSend(main_runConfRespQueue, &heating, 0);
-  if (xReturned != pdPASS) {
-     printf("HEATER_TASK: Unable to send run response to main_runConfRespQueue.\n");
-  }
 }
 
 void handle_amplification_stopstart_heater(bool heating) {
@@ -70,30 +61,18 @@ void handle_amplification_stopstart_heater(bool heating) {
   if (valve_zone_running && !heating)
     return;
 
-  SensorRxQueueMsg_t msg = {};
+  SensorRxQueueMsg_t msg;
   msg.type = SENSOR_MSG_HEATER_STATE;
   msg.heaterRunning = heating;
-
 
   // Send the heater status
   xReturned = xQueueSend(sensorRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
     printf("HEATER_TASK: Unable to send heater state to sensorRxQueue.\n");
   }
-  // Get the response that the sensors task has been updated
-  xReturned = xQueueReceive(heater_sensorConfQueue, &heating, portMAX_DELAY);
-  if (xReturned != pdPASS) {
-    printf("HEATER_TASK: Unable to receive sensor confirmation from heater_sensorConfQueue.\n");
-  }
-  // Send the confirmation to the main state
-  xReturned = xQueueSend(main_runConfRespQueue, &heating, 0);
-  if (xReturned != pdPASS) {
-     printf("HEATER_TASK: Unable to send run response to main_runConfRespQueue.\n");
-  }
-
 }
 
-void handle_usb_sus_req(void) {
+/*void handle_usb_sus_req(void) {
   BaseType_t xReturned;
   usb_suspend_req_t sus_req;
   usb_suspend_acpt_t sus_acpt = {
@@ -125,7 +104,7 @@ void handle_usb_sus_req(void) {
       printf("HEATER: Unable to send usb suspend over to usb_usbWaitOverQueue\n");
     }
   }
-}
+}*/
 
 void heater_reset_all_pids(void){
  // Create PID Controllers 
@@ -171,99 +150,128 @@ void sendWdtHeaterValid() {
 
 void heater_task(void * pvParameters) {
   BaseType_t xReturned;
+  HeaterRxQueueMsg_t heaterRxMessage;
 
   heater_reset_all_pids();
 
   for (;;) {
-    // Check for run heater zone message
-    if (uxQueueMessagesWaiting(heater_zoneRunQueue) == 0) {
-      // Check to see if there is a usb suspend request
-      handle_usb_sus_req();
-      // Task Delay
-      vTaskDelay(100);
-      // Continue
-      if (!amplification_zone_running & !valve_zone_running)
-        continue; // Go back to top of loop if no zones running
-    }
-    // Take message from queue
-    else {
-      xReturned = xQueueReceive(heater_zoneRunQueue, &zone_req, 0);
-      if (xReturned != pdPASS) {
-        printf("HEATER_TASK: unable to receive zone run request from heater_zoneRunQueue\n");
-      }
-      // Set zones enabled
-      if (zone_req.zone == AMPLIFICATION) {
-        amplification_zone_running = zone_req.on;
-        if (!amplification_zone_running)  {
-          amp0_pid.out = 0;
-          amp1_pid.out = 0;
-          amp2_pid.out = 0;
-          update_amp0_duty(amp0_pid.out);
-          update_amp1_duty(amp1_pid.out);
-          update_amp2_duty(amp2_pid.out);
+    xReturned = xQueueReceive(heaterRxQueue, &heaterRxMessage, portMAX_DELAY);
+    if (xReturned != pdPASS) {
+      printf("Unable to Rx data to heater queue\n");
+    } else {
+      switch(heaterRxMessage.type) {
+        case HEATER_MSG_SLEEP:
+          // Handle sleep message
+          break;
+        case HEATER_MSG_WAKE:
+          // Handle wake message
+          break;
+        case HEATER_MSG_ZONE_STATE: {
+          // Set zones enabled
+          if (heaterRxMessage.zoneSelect == AMPLIFICATION) {
+            amplification_zone_running = heaterRxMessage.zoneEnabled;
+            if (!amplification_zone_running) {
+              amp0_pid.out = 0;
+              amp1_pid.out = 0;
+              amp2_pid.out = 0;
+              update_amp0_duty(amp0_pid.out);
+              update_amp1_duty(amp1_pid.out);
+              update_amp2_duty(amp2_pid.out);
 
-          valve_pid.out = 0;
-          update_valve_duty(valve_pid.out);
-          pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  // TODO: Implement defaults
-          // Reinitalize PID Values 
-          pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
-          pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
-          pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
+              valve_pid.out = 0;
+              update_valve_duty(valve_pid.out);
+              pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  // TODO: Implement defaults
+              // Reinitalize PID Values 
+              pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
+              pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
+              pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
           
-          // Send stop heater to sensors task
-          heater_run = false;
-          starting_run = false;
-          handle_amplification_stopstart_heater(heater_run);
+              // Send stop heater to sensors task
+              heater_run = false;
+              starting_run = false;
+              handle_amplification_stopstart_heater(heater_run);
+            }
+            else {
+              starting_run = true;
+              heater_run = true;
+              heater_reset_all_pids();
+              // Send starting heater to sensors task
+              handle_amplification_stopstart_heater(heater_run);
+            }
+          }
+          else if (heaterRxMessage.zoneSelect = VALVE) {
+            valve_zone_running = heaterRxMessage.zoneEnabled;
+            if (!valve_zone_running) {
+              valve_pid.out = 0;
+              amp0_pid.out = 0;
+              amp1_pid.out = 0;
+              amp2_pid.out = 0;
+              update_valve_duty(valve_pid.out);
+              update_amp0_duty(amp0_pid.out);
+              update_amp1_duty(amp1_pid.out);
+              update_amp2_duty(amp2_pid.out);
+              // Reinitalize PID Values
+              pid_controller_init(&valve_pid_2, config.valve_setpoint_2, config.valve_kp_2, config.valve_ki_2, config.valve_kd_2);  
+              pid_controller_init(&amp0_pid_2, config.amp0_setpoint_2, config.amp0_kp_2, config.amp0_ki_2, config.amp0_kd_2);
+              pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2);
+              pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2);
+              // Send stop heater to sensors task
+              heater_run = false;
+              handle_valve_stopstart_heater(heater_run);
+            }
+            else {
+              heater_run = true;
+              heater_reset_all_pids();
+              handle_valve_stopstart_heater(heater_run);
+            } 
+          }
+          break;
         }
-        else {
-          starting_run = true;
-          heater_run = true;
-          heater_reset_all_pids();
-          // Send starting heater to sensors task
-          handle_amplification_stopstart_heater(heater_run);
+        case HEATER_MSG_TEMPERATURE_DATA:
+          handleSensorDataRx(heaterRxMessage.tempData);
+          break;
+        case HEATER_MSG_USB_SUSPEND:
+            // Handle USB suspend message
+            break;
+        case HEATER_MSG_SENSOR_CONFIRM:
+          // Rx confirmation that sensor got heater update
+           // Send the confirmation to the main state
+          xReturned = xQueueSend(main_runConfRespQueue, &heater_run, 0);
+          if (xReturned != pdPASS) {
+             printf("HEATER_TASK: Unable to send run response to main_runConfRespQueue.\n");
+          }
+          break;
+        case HEATER_MSG_PWM_REQUEST:{
+          SensorRxQueueMsg_t msg;
+          msg.type = SENSOR_MSG_PWM_RESPONSE;
+          msg.pwmData = h_pwm_data;
+
+          // Send back the pwm data
+          xReturned = xQueueSend(sensorRxQueue, &msg, 0);
+          if (xReturned != pdPASS) {
+            printf("HEATER_TASK: unable to send pwm data to sensorRxQueue queue.\n");
+          }
+          break;
         }
-      }
-      else if (zone_req.zone = VALVE) {
-        valve_zone_running = zone_req.on;
-        if (!valve_zone_running) {
-          valve_pid.out = 0;
-          amp0_pid.out = 0;
-          amp1_pid.out = 0;
-          amp2_pid.out = 0;
-          update_valve_duty(valve_pid.out);
-          update_amp0_duty(amp0_pid.out);
-          update_amp1_duty(amp1_pid.out);
-          update_amp2_duty(amp2_pid.out);
-          // Reinitalize PID Values
-          pid_controller_init(&valve_pid_2, config.valve_setpoint_2, config.valve_kp_2, config.valve_ki_2, config.valve_kd_2);  
-          pid_controller_init(&amp0_pid_2, config.amp0_setpoint_2, config.amp0_kp_2, config.amp0_ki_2, config.amp0_kd_2);
-          pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2);
-          pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2);
-          // Send stop heater to sensors task
-          heater_run = false;
-          handle_valve_stopstart_heater(heater_run);
-        }
-        else {
-          heater_run = true;
-          heater_reset_all_pids();
-          handle_valve_stopstart_heater(heater_run);
-        } 
+        case HEATER_MSG_CONFIG_UPDATED:
+            // Handle config updated message
+            break;
+        case HEATER_MSG_WDT_UPDATE:
+            // Handle watchdog timer update message
+            break;
+        default:
+            // Handle unknown message
+            break;
       }
     }
+  }
+}
 
-    if (!amplification_zone_running & !valve_zone_running)
-        continue; // Go back to top of loop if no zones running
-    
-
+void handleSensorDataRx(temperature_data_t temperature_data) {
+  BaseType_t xReturned;
     if(wdtTimeout++ > (1/config.sample_rate)){ // send out once a second
       wdtTimeout = 0;
       sendWdtHeaterValid(); // update watchdog
-    }
-
-    // Receive temperature data (blocking till data comes in)
-    xReturned = xQueueReceive(heater_temperatureDataQueue, &temperature_data, portMAX_DELAY);
-    if (xReturned != pdPASS) {
-      printf("HEATER_TASK: unable to receive temperature data from heater_temperatureDataQueue\n");
     }
     
     // Ensure temperatures are below the minimum run zone temperature
@@ -280,7 +288,7 @@ void heater_task(void * pvParameters) {
         if (xReturned != pdPASS) {
           printf("HEATER_TASK: Unable to send cannot start run response.\n");
         }
-        continue;
+        return;
       }
       else if (starting_run && 
           (temperature_data.valve_zone_temp <= config.min_run_zone_temp &&  // TODO: Implement defaults
@@ -378,27 +386,7 @@ void heater_task(void * pvParameters) {
       greater_than_max = false;
     }
 
-    // Check to see if the logger needs the pwm data
-    if (uxQueueMessagesWaiting(heater_pwmReqQueue) > 0) {
-      // Retrieve the request
-      xReturned = xQueueReceive(heater_pwmReqQueue, &h_pwm_req, 0);
-      if (xReturned != pdPASS) {
-        printf("HEATER_TASK: unable to receive pwm request from heater_pwmReqQueue queue.\n");
-      }
-
-
-      SensorRxQueueMsg_t msg;
-      msg.type = SENSOR_MSG_PWM_RESPONSE;
-      msg.pwmData = h_pwm_data;
-
-      // Send back the pwm data
-      xReturned = xQueueSend(sensorRxQueue, &msg, 0);
-      if (xReturned != pdPASS) {
-        printf("HEATER_TASK: unable to send pwm data to sensorRxQueue queue.\n");
-      }
-    }
-
-#if VERBOSE_PID 
+    #if VERBOSE_PID 
     if (amplification_zone_running) {
       printf("Amp0: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp0_zone_temp, amp0_pid.out);
       printf("Amp1: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp1_zone_temp, amp1_pid.out);
@@ -412,5 +400,4 @@ void heater_task(void * pvParameters) {
       printf("Valve_2: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.valve_zone_temp, valve_pid_2.out);
     }
 #endif
-  }
 }

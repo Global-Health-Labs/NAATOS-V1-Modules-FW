@@ -17,13 +17,6 @@ extern xQueueHandle main_runConfRespQueue;
 extern xQueueHandle main_usbConnRecvQueue;
 extern xQueueHandle main_usbChangedConfQueue;
 
-// Heater Task Queue(s)
-extern xQueueHandle heater_zoneRunQueue;
-extern xQueueHandle heater_temperatureDataQueue;
-extern xQueueHandle heater_usbWaitQueue;
-extern xQueueHandle heater_pwmReqQueue;
-extern xQueueHandle heater_sensorConfQueue;
-
 // Sensor Task Queue
 extern xQueueHandle sensorRxQueue;
 
@@ -32,6 +25,9 @@ extern xQueueHandle batteryRxQueue;
 
 //Button Task Queue
 extern xQueueHandle buttonRxQueue;
+
+//Heater Task Queue
+extern xQueueHandle heaterRxQueue;
 
 // USB Management Task Queue(s)
 extern xQueueHandle usb_stateChangeQueue;

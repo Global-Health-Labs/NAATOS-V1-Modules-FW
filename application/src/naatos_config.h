@@ -293,6 +293,29 @@ typedef struct {
   ButtonRxQueueType_t type;
 } ButtonRxQueueMsg_t;
 
+// heater messages
+typedef enum {
+  HEATER_MSG_SLEEP,
+  HEATER_MSG_WAKE,
+  HEATER_MSG_ZONE_STATE,
+  HEATER_MSG_TEMPERATURE_DATA,
+  HEATER_MSG_USB_SUSPEND,
+  HEATER_MSG_SENSOR_CONFIRM,
+  HEATER_MSG_PWM_REQUEST,
+  HEATER_MSG_CONFIG_UPDATED,
+  HEATER_MSG_WDT_UPDATE
+} HeaterRxQueueType_t;
+
+typedef struct {
+  HeaterRxQueueType_t type;
+  zone_t zoneSelect;
+  temperature_data_t tempData;
+  bool zoneEnabled;
+  bool usbSuspend;
+  bool heaterRunning;
+} HeaterRxQueueMsg_t;
+
+
 // Task Handles
 extern xTaskHandle mainTaskHandle;
 extern xTaskHandle heaterTaskHandle;

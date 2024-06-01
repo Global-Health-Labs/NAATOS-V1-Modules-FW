@@ -176,10 +176,10 @@ void usb_suspend_conflicting_tasks(void) {
     printf("USB: Unable to send usb suspend request to batteryRxQueue.\n");
   }*/
   // Send to heater 
-  xReturned = xQueueSend(heater_usbWaitQueue, &sus_req, 0);
+  /*xReturned = xQueueSend(heater_usbWaitQueue, &sus_req, 0);
   if (xReturned != pdPASS) {
     printf("USB: Unable to send usb suspend request to heater_usbWaitQueue.\n");
-  }
+  }*/
   // Send to PWM task
   xReturned = xQueueSend(pwm_usbWaitQueue, &sus_req, 0);
   if (xReturned != pdPASS) {
@@ -198,7 +198,7 @@ void usb_suspend_conflicting_tasks(void) {
   }
 
   /* Receive back suspend request acceptances */
-  while(/*!batt_acpt ||*/ !heater_acpt || !pwm_acpt || !sensor_acpt) {
+  while(/*!batt_acpt ||*/ /*!heater_acpt ||*/ !pwm_acpt || !sensor_acpt) {
     if (uxQueueMessagesWaiting(usb_recvUsbWaitAcceptQueue) > 0) {
       xReturned = xQueueReceive(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0);
       if (xReturned != pdPASS) {
