@@ -182,10 +182,10 @@ void sensors_task(void * pvParameters) {
           log_msg.temperature_data.amp1_zone_temp = temperatures.amp1_zone_temp;
           log_msg.temperature_data.amp2_zone_temp = temperatures.amp2_zone_temp;
           log_msg.temperature_data.valve_zone_temp = temperatures.valve_zone_temp;
-          log_msg.temperature_data.amp0_zone_pwm = pwm_data.amp0_zone_pwm;
-          log_msg.temperature_data.amp1_zone_pwm = pwm_data.amp1_zone_pwm;
-          log_msg.temperature_data.amp2_zone_pwm = pwm_data.amp1_zone_pwm;
-          log_msg.temperature_data.valve_zone_pwm = pwm_data.valve_zone_pwm;
+          log_msg.temperature_data.amp0_zone_pwm = sensorRxMessage.pwmData.amp0_zone_pwm;
+          log_msg.temperature_data.amp1_zone_pwm = sensorRxMessage.pwmData.amp1_zone_pwm;
+          log_msg.temperature_data.amp2_zone_pwm = sensorRxMessage.pwmData.amp1_zone_pwm;
+          log_msg.temperature_data.valve_zone_pwm = sensorRxMessage.pwmData.valve_zone_pwm;
           // Send the Log message
           xReturned = xQueueSend(logger_logMessageQueue, (void *)&log_msg, 0);
           if (xReturned != pdPASS) {

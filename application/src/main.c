@@ -616,6 +616,14 @@ void main_task(void * pvParameters) {
         break;
 
       case MAIN_FILE:
+        if(last_state != main_state){
+          SensorRxQueueMsg_t msg;
+          msg.type = SENSOR_MSG_SLEEP;
+          xReturned = xQueueSend(sensorRxQueue, &msg, 0);
+          if (xReturned != pdPASS) {
+            printf("Sensor: Unable to send timer update to sensorRxQueue queue.\n");
+          }
+        }
         /* **** HANDLE USB AND SWITCH **** */
         // Get switch status if it has changed
         if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
