@@ -7,6 +7,8 @@ xQueueHandle ledRxQueue;
 
 static LEDFlags_t ledFlags;
 
+void handleLedState(LEDRxQueueMsg_t ledMsg);
+
 
 void led_task(void * pvParameters) {
   BaseType_t xReturned;
@@ -19,6 +21,41 @@ void led_task(void * pvParameters) {
     } else {
       updateLedState(ledRxMessage.type, ledRxMessage.active);
     }
+  }
+}
+
+void handleLedState(LEDRxQueueMsg_t ledMsg) {
+  switch(ledMsg.type) {
+    case LED_WAKEUP:
+      ledFlags.wakeupCondition = ledMsg.active;
+      break;
+    case LED_CHARGING:
+      ledFlags.batteryCharging = ledMsg.active;
+      break;
+    case LED_STANDBY:
+      ledFlags.standbyCondition = ledMsg.active;
+      break;
+    case LED_RUN:
+      ledFlags.runCondition = ledMsg.active;
+      break;
+    case LED_DECLINE:
+      ledFlags.testDecline = ledMsg.active;
+      break;
+    case LED_ABORT:
+      ledFlags.testAbort = ledMsg.active;
+      break;
+    case LED_COMPLETE:
+      ledFlags.testComplete = ledMsg.active;
+      break;
+    case LED_INVALID:
+      ledFlags.testInvalid = ledMsg.active;
+      break;
+    case LED_LOW_BATTERY:
+      ledFlags.lowBattey = ledMsg.active;
+      break;
+    default:
+      printf("Handling unknown led state\n");
+      break;
   }
 }
 
@@ -109,46 +146,12 @@ void turn_off_led2(void) {
 }
 
 void updateLedState(LEDEvent_e event, bool active) {
-  switch(event) {
-    case LED_WAKEUP:
-      ledFlags.wakeupCondition = active;
-
-
-      break;
-    case LED_CHARGING:
-      ledFlags.batteryCharging = active;
-
-      break;
-    case LED_STANDBY:
-      ledFlags.standbyCondition = active;
-      break;
-    case LED_RUN:
-      ledFlags.runCondition = active;
-
-      break;
-    case LED_DECLINE:
-      ledFlags.testDecline = active;
-
-      break;
-    case LED_ABORT:
-      ledFlags.testAbort = active;
-
-      break;
-    case LED_COMPLETE:
-      ledFlags.testComplete = active;
-
-      break;
-    case LED_INVALID:
-      ledFlags.testInvalid = active;
-
-      break;
-    case LED_LOW_BATTERY:
-      ledFlags.lowBattey = active;
-
-      break;
-    default:
-      // Handle unknown event
-      printf("Handling unknown event\n");
-      break;
+  BaseType_t xReturned;
+  LEDRxQueueMsg_t ledMsg;
+  ledMsg.type = event;
+  ledMsg.active = active;
+  xReturned = xQueueSend(ledRxQueue, &ledMsg, 0); 
+  if (xReturned != pdPASS) {
+    printf("SENSORS: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\n");
   }
 }
