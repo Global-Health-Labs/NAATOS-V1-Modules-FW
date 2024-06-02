@@ -52,10 +52,9 @@ void stopButtonTimer(void) {
 }
 
 void gpiote_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
-  BaseType_t xHigherPriorityTaskWoken;
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
   BaseType_t xReturned;
 
-  xHigherPriorityTaskWoken = pdFALSE;
   ButtonRxQueueMsg_t msg;
   msg.type = BUTTON_MSG_WAKE;
 

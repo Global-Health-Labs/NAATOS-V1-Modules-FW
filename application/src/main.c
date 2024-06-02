@@ -1018,10 +1018,10 @@ void create_queues() {
     printf("Unable to create logger_mainStateContinueQueue queue\n");
 
   // PWM Task Queues
-  pwm_usbWaitQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_suspend_req_t));
-  if (pwm_usbWaitQueue == NULL)
-    printf("Unable to create pwm_usbWaitQueue queue\n");
-
+  pwmRxQueue = xQueueCreate(10, sizeof(PwmRxQueueMsg_t));
+  if (pwmRxQueue == NULL){
+    printf("Unable to create pwmRxQueue queue\n");
+  }
 }
 
 // Stack Overflow detection.
@@ -1098,9 +1098,10 @@ int main(void) {
 
 void sendWdtHeaterInvalid() {
   BaseType_t xReturned;
-  watchdog_time_update_t wdtUpdate = {};
-  wdtUpdate.taskName = HEATER;
-  wdtUpdate.valid = false;
+  watchdog_time_update_t wdtUpdate = {
+    .taskName = HEATER,
+    .valid = false
+  };
 
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
   if (xReturned != pdPASS) {

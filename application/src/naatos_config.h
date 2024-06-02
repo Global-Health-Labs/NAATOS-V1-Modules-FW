@@ -315,6 +315,18 @@ typedef struct {
   bool heaterRunning;
 } HeaterRxQueueMsg_t;
 
+typedef enum {
+  PWM_MSG_UPDATE_DUTY,
+  PWM_MSG_CALLBACK_EVENT,
+  PWM_MSG_DISABLE,
+  PWM_MSG_ENABLE
+} PWMRxQueueType_t;
+
+typedef struct {
+  PWMRxQueueType_t type;
+
+} PwmRxQueueMsg_t;
+
 
 // Task Handles
 extern xTaskHandle mainTaskHandle;

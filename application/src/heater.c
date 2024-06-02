@@ -24,6 +24,13 @@ temperature_pwm_data_t h_pwm_data = {
   .amp2_zone_pwm = 0
 };
 
+temperature_pwm_data_t outputPwmData = {
+  .valve_zone_pwm = 0,
+  .amp0_zone_pwm = 0,
+  .amp1_zone_pwm = 0,
+  .amp2_zone_pwm = 0
+};
+
 pid_controller_t valve_pid;
 pid_controller_t amp0_pid;
 pid_controller_t amp1_pid;
@@ -52,6 +59,29 @@ void handle_valve_stopstart_heater(bool heating) {
   if (xReturned != pdPASS) {
     printf("HEATER_TASK: Unable to send heater state to sensorRxQueue.\n");
   }
+
+  watchdog_time_update_t wdtUpdate = {
+    .taskName = HEATER,
+    .valid = false
+  };
+  wdtUpdate.valid = heating;
+
+  xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
+  if (xReturned != pdPASS) {
+    printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+  }
+
+  PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_DISABLE};
+
+  if(heating) {
+    pwmMsg.type = PWM_MSG_ENABLE;
+  }
+
+  // Respond to heater change
+  xReturned = xQueueSend(pwmRxQueue, &pwmMsg, 0);
+  if (xReturned != pdPASS) {
+    printf("heater: Unable to send stop to pwmRxQueue.\n");
+  } 
 }
 
 void handle_amplification_stopstart_heater(bool heating) {
@@ -70,6 +100,29 @@ void handle_amplification_stopstart_heater(bool heating) {
   if (xReturned != pdPASS) {
     printf("HEATER_TASK: Unable to send heater state to sensorRxQueue.\n");
   }
+
+  watchdog_time_update_t wdtUpdate = {
+    .taskName = HEATER,
+    .valid = false
+  };
+  wdtUpdate.valid = heating;
+
+  xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
+  if (xReturned != pdPASS) {
+    printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+  }
+
+  PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_DISABLE};
+
+  if(heating) {
+    pwmMsg.type = PWM_MSG_ENABLE;
+  }
+
+  // Respond to heater change
+  xReturned = xQueueSend(pwmRxQueue, &pwmMsg, 0);
+  if (xReturned != pdPASS) {
+    printf("heater: Unable to send stop to pwmRxQueue.\n");
+  } 
 }
 
 /*void handle_usb_sus_req(void) {
@@ -174,12 +227,17 @@ void heater_task(void * pvParameters) {
               amp0_pid.out = 0;
               amp1_pid.out = 0;
               amp2_pid.out = 0;
-              update_amp0_duty(amp0_pid.out);
-              update_amp1_duty(amp1_pid.out);
-              update_amp2_duty(amp2_pid.out);
-
               valve_pid.out = 0;
-              update_valve_duty(valve_pid.out);
+
+              temperature_pwm_data_t pwmData = {
+                .valve_zone_pwm = valve_pid.out,
+                .amp0_zone_pwm = amp0_pid.out,
+                .amp1_zone_pwm = amp1_pid.out,
+                .amp2_zone_pwm = amp2_pid.out
+              };
+              updateDutyCycles(pwmData);
+
+              
               pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  // TODO: Implement defaults
               // Reinitalize PID Values 
               pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
@@ -206,10 +264,13 @@ void heater_task(void * pvParameters) {
               amp0_pid.out = 0;
               amp1_pid.out = 0;
               amp2_pid.out = 0;
-              update_valve_duty(valve_pid.out);
-              update_amp0_duty(amp0_pid.out);
-              update_amp1_duty(amp1_pid.out);
-              update_amp2_duty(amp2_pid.out);
+              temperature_pwm_data_t pwmData = {
+                .valve_zone_pwm = valve_pid.out,
+                .amp0_zone_pwm = amp0_pid.out,
+                .amp1_zone_pwm = amp1_pid.out,
+                .amp2_zone_pwm = amp2_pid.out
+              };
+              updateDutyCycles(pwmData);
               // Reinitalize PID Values
               pid_controller_init(&valve_pid_2, config.valve_setpoint_2, config.valve_kp_2, config.valve_ki_2, config.valve_kd_2);  
               pid_controller_init(&amp0_pid_2, config.amp0_setpoint_2, config.amp0_kp_2, config.amp0_ki_2, config.amp0_kd_2);
@@ -318,19 +379,21 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
       // Update Amplification 0 PID loop with new temperatures
       pid_controller_compute(&amp0_pid, temperature_data.amp0_zone_temp);
       // Update Amplification 0 PWM with PID output
-      update_amp0_duty(amp0_pid.out);
-      // Update Amplification 1 PID loop with new temperatures
       pid_controller_compute(&amp1_pid, temperature_data.amp1_zone_temp);
-      // Update Amplification 1 PWM with PID output
-      update_amp1_duty(amp1_pid.out);
       // Update Amplification 2 PID loop with new temperatures
       pid_controller_compute(&amp2_pid, temperature_data.amp2_zone_temp);
-      // Update Amplification 2 PWM with PID output
-      update_amp2_duty(amp2_pid.out);
       // Update Valve PID loop with new temperatures
       pid_controller_compute(&valve_pid, temperature_data.valve_zone_temp);
-      // Update Valve PWM with PID output
-      update_valve_duty(valve_pid.out);
+
+      temperature_pwm_data_t pwmData = {
+        .valve_zone_pwm = valve_pid.out,
+        .amp0_zone_pwm = amp0_pid.out,
+        .amp1_zone_pwm = amp1_pid.out,
+        .amp2_zone_pwm = amp2_pid.out
+      };
+
+      updateDutyCycles(pwmData);
+
       h_pwm_data.valve_zone_pwm = valve_pid.out;
       // Set the PWMs for the logger
       h_pwm_data.amp0_zone_pwm = amp0_pid.out;
@@ -352,13 +415,20 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
    }
    if (valve_zone_running) {
       pid_controller_compute(&amp0_pid_2, temperature_data.amp0_zone_temp);
-      update_amp0_duty(amp0_pid_2.out);
       pid_controller_compute(&amp1_pid_2, temperature_data.amp1_zone_temp);
-      update_amp1_duty(amp1_pid_2.out);
       pid_controller_compute(&amp2_pid_2, temperature_data.amp2_zone_temp);
-      update_amp2_duty(amp2_pid_2.out);
       pid_controller_compute(&valve_pid_2, temperature_data.valve_zone_temp);
-      update_valve_duty(valve_pid_2.out);
+
+      temperature_pwm_data_t pwmData = {
+        .valve_zone_pwm = valve_pid_2.out,
+        .amp0_zone_pwm = amp0_pid_2.out,
+        .amp1_zone_pwm = amp1_pid_2.out,
+        .amp2_zone_pwm = amp2_pid_2.out
+      };
+
+      updateDutyCycles(pwmData);
+
+
       // Set the PWMs for the logger
       h_pwm_data.valve_zone_pwm = valve_pid.out;
       // Ensure that the temperatures are not greater than the max temperatures allowed

@@ -17,15 +17,41 @@ static bool amp0_zone_active = false;
 static bool amp1_zone_active = false;
 static bool amp2_zone_active = false;
 
-xQueueHandle pwm_usbWaitQueue;
+xQueueHandle pwmRxQueue;
 
 void pwm0_ready_callback(uint32_t pwm_id) {
+  //PwmRxQueueMsg_t msg;
+  //BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  //BaseType_t xReturned;
+
+  //msg.type = PWM_MSG_CALLBACK_EVENT;
+
   pwm0_ready_flag = true;
+  /*if (!valve_zone_active && !amp0_zone_active && !amp1_zone_active && !amp2_zone_active) {
+    xReturned = xQueueSendFromISR(pwmRxQueue, &msg, &xHigherPriorityTaskWoken);
+    if (xReturned != pdPASS) {
+      printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
+    }
+  }*/
 }
 
 void pwm2_ready_callback(uint32_t pwm_id) {
+  //PwmRxQueueMsg_t msg;
+  //BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  //BaseType_t xReturned;
+
+  //msg.type = PWM_MSG_CALLBACK_EVENT;
+
   pwm2_ready_flag = true;
+  /*if (!valve_zone_active && !amp0_zone_active && !amp1_zone_active && !amp2_zone_active) {
+    xReturned = xQueueSendFromISR(pwmRxQueue, &msg, &xHigherPriorityTaskWoken);
+    if (xReturned != pdPASS) {
+      printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
+    }
+  }*/
 }
+
+bool pwmEnabled = false;
 
 void init_pwms() {
   ret_code_t err;
@@ -50,36 +76,39 @@ void init_pwms() {
   /* Enable PWMs */
   app_pwm_enable(&PWM0);
   app_pwm_enable(&PWM2);
+  pwmEnabled = true;
 }
 
-// Updates the Valve PWM Duty Cycle
-void update_valve_duty(int duty) {
-  valve_duty = duty;
+void updateDutyCycles(temperature_pwm_data_t pwmData) {
+  PwmRxQueueMsg_t msg = {
+    .type = PWM_MSG_CALLBACK_EVENT
+  };
+  BaseType_t xReturned;
+
+  valve_duty = pwmData.valve_zone_pwm;
+  amp0_duty = pwmData.amp0_zone_pwm;
+  amp1_duty = pwmData.amp1_zone_pwm;
+  amp2_duty = pwmData.amp2_zone_pwm;
+
   if (valve_duty > 0) {
     valve_zone_active = true; 
   }
-}
-
-// Updates the Amplification 0 PWM Duty Cycle
-void update_amp0_duty(int duty) {
-  amp0_duty = duty;
-  if (amp0_duty > 0) 
+  if (amp0_duty > 0) { 
     amp0_zone_active = true; 
-}
-
-// Updates the Amplification 1 PWM Duty Cycle
-void update_amp1_duty(int duty) {
-  amp1_duty = duty;
-  if (amp1_duty > 0) 
+  }
+  if (amp1_duty > 0) { 
     amp1_zone_active = true; 
+  }
+  if (amp2_duty > 0) { 
+    amp2_zone_active = true; 
+  }
+
+  xReturned = xQueueSend(pwmRxQueue, &msg, 0);
+  if (xReturned != pdPASS) {
+    printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
+  }
 }
 
-// Updates the Amplification 2 PWM Duty Cycle
-void update_amp2_duty(int duty) {
-  amp2_duty = duty;
-  if (amp2_duty > 0) 
-    amp2_zone_active = true; 
-}
 
 void pwm_task(void * pvParameters) {
   BaseType_t xReturned;
@@ -101,17 +130,101 @@ void pwm_task(void * pvParameters) {
   app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  amp0_duty);
   app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  amp1_duty);
   app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL,  amp2_duty);
+
+  PwmRxQueueMsg_t pwmMsg;
   
   // Main Task Loop
   for (;;) {
+    xReturned = xQueueReceive(pwmRxQueue, &pwmMsg, portMAX_DELAY);
+    if (xReturned != pdPASS) {
+      printf("Unable to Rx data to sensor queue\n");
+    } else {
+      switch(pwmMsg.type) {
+        case PWM_MSG_UPDATE_DUTY: {
+          
+          break;
+        }
+
+        case PWM_MSG_CALLBACK_EVENT: {
+          if (pwm0_ready_flag) {
+            if (valve_zone_active || amp0_zone_active) {
+              pwm0_ready_flag = false;
+            }
+
+            if (valve_duty > 0) {
+              app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty); 
+            } else if(valve_zone_active) {
+              valve_zone_active =  false;
+              app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 0);
+            }
+
+            if (amp0_duty > 0){
+              app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  amp0_duty);
+            } else if (amp0_zone_active) {
+              amp0_zone_active = false;
+              app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  0);
+            }
+          }
+
+          // PWM2 Control
+          if (pwm2_ready_flag) {
+            if (amp1_zone_active || amp2_zone_active) {
+              pwm2_ready_flag = false;
+            }
+
+            if (amp1_duty > 0){
+              app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  amp1_duty);
+            } else if(amp1_zone_active) {
+              app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  0);
+              amp1_zone_active = false;
+            }
+    
+            if (amp2_duty > 0) {
+              app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, amp2_duty);
+            } else if(amp2_zone_active)  {
+              amp2_zone_active = false;
+              app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, 0);
+            }
+          }
+          break;
+        }
+
+        case PWM_MSG_DISABLE: {
+          app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 0);
+          app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  0);
+          app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  0);
+          app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, 0);
+          vTaskDelay(pdMS_TO_TICKS(100));
+          if(pwmEnabled) {
+            app_pwm_disable(&PWM0);
+            app_pwm_disable(&PWM2);
+            pwmEnabled = false;
+          }
+          break;
+        }
+
+        case PWM_MSG_ENABLE: {
+          if(!pwmEnabled) {
+            app_pwm_enable(&PWM0);
+            app_pwm_enable(&PWM2);
+            pwmEnabled = true;
+          }
+          break;
+        }
+
+        default:
+        break;
+      }
+    }
+
     // If not running a duty cycle do nothing
-    if (!valve_zone_active && !amp0_zone_active && !amp1_zone_active && !amp2_zone_active) {
+    /*if (!valve_zone_active && !amp0_zone_active && !amp1_zone_active && !amp2_zone_active) {
       vTaskDelay(100);
       // Check to see if we need to suspend for USB to be enabled
-      if (uxQueueMessagesWaiting(pwm_usbWaitQueue) > 0) {
-        xReturned = xQueueReceive(pwm_usbWaitQueue, &sus_req, 0) ;
+      if (uxQueueMessagesWaiting(pwmRxQueue) > 0) {
+        xReturned = xQueueReceive(pwmRxQueue, &sus_req, 0) ;
         if (xReturned != pdPASS) {
-          printf("PWM: Unable to receive usb suspend request from pwm_usbWaitQueue\n");
+          printf("PWM: Unable to receive usb suspend request from pwmRxQueue\n");
         }
         // Send Suspend Accepted
         xReturned = xQueueSend(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0); 
@@ -128,54 +241,7 @@ void pwm_task(void * pvParameters) {
         }
       }
       continue;
-    }
+    }*/
   
-    // PWM0 Control
-    if (pwm0_ready_flag) {
-      if (valve_zone_active || amp0_zone_active) {
-        pwm0_ready_flag = false;
-      }
-
-      if (valve_duty > 0) {
-        app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty); 
-      } else if(valve_zone_active) {
-        valve_zone_active =  false;
-        app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 0);
-      }
-
-      if (amp0_duty > 0){
-        app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  amp0_duty);
-      } else if (amp0_zone_active) {
-        amp0_zone_active = false;
-        app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  0);
-      }
-    }
-    else if (!pwm0_ready_flag && (valve_zone_active || amp0_zone_active)) {
-      vTaskDelay(15);
-    }
-    
-    // PWM2 Control
-    if (pwm2_ready_flag) {
-      if (amp1_zone_active || amp2_zone_active) {
-        pwm2_ready_flag = false;
-      }
-
-      if (amp1_duty > 0){
-        app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  amp1_duty);
-      } else if(amp1_zone_active) {
-        app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  0);
-        amp1_zone_active = false;
-      }
-        
-      if (amp2_duty > 0) {
-        app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, amp2_duty);
-      } else if(amp2_zone_active)  {
-        amp2_zone_active = false;
-        app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, 0);
-      }
-    }
-    else if (!pwm2_ready_flag && (amp1_zone_active || amp2_zone_active)) {
-      vTaskDelay(15);
-    }
   }
 }
