@@ -384,7 +384,7 @@ void main_task(void * pvParameters) {
           }
           usb_needs_update = true;
         }
-        // TODO: Get if USB status has changed
+        // Get if USB status has changed
         //if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
 
         //}
@@ -616,7 +616,50 @@ void main_task(void * pvParameters) {
         break;
 
       case MAIN_FILE:
+        /* **** HANDLE USB AND SWITCH **** */
+        // Get switch status if it has changed
+        if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
+          // Get The USB Connection Status
+          xReturned = xQueueSend(usb_connectionReqQueue, &usb_conn_status, 0);
+          if (xReturned != pdPASS) {
+            printf("MAIN_TASK: Unable to send usb connection request to usb_connectionReqQueue. \n");
+          }
 
+          // Receive the USB Connection Status
+          xReturned =xQueueReceive(main_usbConnRecvQueue, &usb_conn_status, portMAX_DELAY);
+          if (xReturned != pdPASS) {
+            printf("MAIN_TASK: Unable to receive usb connection status from main_usbConnRecvQueue. \n");
+          }
+          usb_needs_update = true;
+        }
+        // Get if USB status has changed
+        //if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
+
+        //}
+
+        if (usb_needs_update) {
+          // Switch ON and USB connected
+          if(buttonData.event == ON_EVENT && usb_conn_status) {
+            next_state = MAIN_STANDBY;
+            send_usb_change(USB_CDC_ACM);
+          }
+          // Switch ON and USB not connected
+          else if (buttonData.event == ON_EVENT && !usb_conn_status) {
+            next_state = MAIN_STANDBY;
+            send_usb_change(USB_DISABLED);
+          }
+          // Switch OFF and USB connected
+          else if (buttonData.event == OFF_EVENT && usb_conn_status) {
+            next_state = MAIN_FILE;
+            send_usb_change(USB_MSC_CDC_ACM);
+          }
+          // Switch off and USB not connected
+          else if (buttonData.event == OFF_EVENT && !usb_conn_status) {
+            next_state = MAIN_SLEEP;
+            send_usb_change(USB_DISABLED);
+          }
+          usb_needs_update = false;
+        }
       break;
 
       // In Low Power State
@@ -667,6 +710,8 @@ void send_usb_change(usb_command_t cmd) {
   BaseType_t xReturned; 
   usb_command_t command = cmd;
   bool confirmed = false;
+  
+  printf("MAIN_TASK: Sending USB change request.\n");
 
   // Send command
   xReturned = xQueueSend(usb_stateChangeQueue, &command, 0);
@@ -678,6 +723,8 @@ void send_usb_change(usb_command_t cmd) {
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to receive usb change confirmation from main_usbChangedConfQueue. \n");
   }
+
+  printf("MAIN_TASK: USB state successfully changed.\n");
 }
 
 void sendUpdatedMainTaskState(main_state_t new_state) {

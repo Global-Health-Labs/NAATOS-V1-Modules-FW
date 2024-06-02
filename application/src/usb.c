@@ -36,6 +36,8 @@ bool usb_detected = false;
 bool msc_active = false, cdc_acm_active = false;
 bool usb_done_config = false;
 bool usb_initalized = false;
+bool restarting = false;
+bool needs_response = false;
 
 /* ***** Instances ***** */
 
@@ -56,6 +58,16 @@ APP_USBD_CDC_ACM_GLOBAL_DEF(m_app_cdc_acm,
                             CDC_ACM_DATA_EPOUT,
                             APP_USBD_CDC_COMM_PROTOCOL_AT_V250
 );
+
+void respond_to_usb_change(void) {
+  BaseType_t xReturned;
+  bool state_changed = true;
+
+  xReturned = xQueueSend(main_usbChangedConfQueue, &state_changed, 0);
+  if (xReturned != pdPASS) {
+    printf("USB_TASK: Unable to send usb changed response to main_usbChangedConfQueue. \n");
+  }
+}
 
 void cdc_acm_user_ev_handler(app_usbd_class_inst_t const * p_inst,
                                     app_usbd_cdc_acm_user_event_t event)
@@ -135,8 +147,11 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
             if (nrf_drv_usbd_is_enabled()) {
               app_usbd_stop();
             }
-            usb_done_config = false;  
-            //usb_detected = false;
+            usb_done_config = false; 
+            if (!restarting)
+              usb_detected = false;
+            else 
+              restarting = false;
             turn_off_led2();
             break;
         case APP_USBD_EVT_POWER_READY:
@@ -282,6 +297,11 @@ void start_usb(bool cdc_acm, bool msc) {
 
       m_usb_connected = true;
   }
+
+  if (command != USB_MSC && command != USB_MSC_CDC_ACM && needs_response) {
+    respond_to_usb_change();
+    needs_response = false;
+  }
   
 }
 
@@ -350,10 +370,12 @@ void composite_usb_task(void * pvParameters) {
         }
       }
 
-      if (batt_over && heater_over && pwm_over && sensor_over) {
+      if (/*batt_over &&*/ heater_over && pwm_over && sensor_over) {
         usb_suspended_tasks = false;
         usb_done_config = true;
         set_led1_green_breathe();
+        respond_to_usb_change();
+        needs_response = false;
       }
     }
     else {
@@ -391,7 +413,7 @@ void usb_task(void * pvParameters) {
       vTaskDelay(USB_TASK_DELAY);
       continue;
     }
-
+    needs_response = true;
     // Handle the new command if there is one
     switch(command) {
       case USB_DISABLED: 
@@ -404,7 +426,13 @@ void usb_task(void * pvParameters) {
         if (last_command == USB_CDC_ACM) {
           break;
         }
-
+        // Stop The USB
+        usbd_user_ev_handler(APP_USBD_EVT_POWER_REMOVED);
+        app_usbd_disable();
+        app_usbd_uninit();
+        // Restart the USB
+        start_usb(true, false);
+        usbd_user_ev_handler(APP_USBD_EVT_POWER_DETECTED);
         break;
       }
       case USB_MSC: 
@@ -412,7 +440,13 @@ void usb_task(void * pvParameters) {
         if (last_command == USB_MSC) {
           break;
         }
-
+        // Stop The USB
+        usbd_user_ev_handler(APP_USBD_EVT_POWER_REMOVED);
+        app_usbd_disable();
+        app_usbd_uninit();
+        // Restart the USB
+        start_usb(false, true);
+        usbd_user_ev_handler(APP_USBD_EVT_POWER_DETECTED);
         break;
       }
       case USB_MSC_CDC_ACM: 
@@ -421,12 +455,12 @@ void usb_task(void * pvParameters) {
         {
           break;
         }
+        restarting = true;
         // Stop The USB
         usbd_user_ev_handler(APP_USBD_EVT_POWER_REMOVED);
         app_usbd_disable();
-        //app_usbd_class_remove_all();
         app_usbd_uninit();
-        //usb_detected = true;
+        // Restart the USB
         start_usb(true, true);
         usbd_user_ev_handler(APP_USBD_EVT_POWER_DETECTED);
         break;
