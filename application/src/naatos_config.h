@@ -327,6 +327,23 @@ typedef struct {
 
 } PwmRxQueueMsg_t;
 
+// LED Handeling
+typedef enum {
+  LED_WAKEUP,
+  LED_CHARGING,
+  LED_STANDBY,
+  LED_RUN,
+  LED_DECLINE,
+  LED_ABORT,
+  LED_COMPLETE,
+  LED_INVALID,
+  LED_LOW_BATTERY
+} LEDEvent_e;
+
+typedef struct {
+  LEDEvent_e type;
+  bool active;
+} LEDRxQueueMsg_t;
 
 // Task Handles
 extern xTaskHandle mainTaskHandle;

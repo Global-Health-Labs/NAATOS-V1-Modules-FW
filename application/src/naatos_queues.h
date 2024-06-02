@@ -50,4 +50,6 @@ extern xQueueHandle watchdog_rxTimesQueue;
 
 extern xQueueHandle button_mainStateQueue;
 
+extern xQueueHandle ledRxQueue;
+
 #endif

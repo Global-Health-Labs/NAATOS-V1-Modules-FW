@@ -62,6 +62,7 @@ xTaskHandle pwmTaskHandle;
 xTaskHandle wdtTaskHandle;
 xTaskHandle compositeTaskHandle;
 xTaskHandle buttonTaskHandle;
+xTaskHandle ledTaskHandle;
 
 xQueueHandle main_batteryDataQueue;
 xQueueHandle main_switchQueue;
@@ -969,8 +970,15 @@ void create_tasks() {
   xReturned = xTaskCreate(buttonTask, "ButtonTask", 1024, NULL, 0, &buttonTaskHandle);
   if ( xReturned != pdPASS ) {
       // The task was created.  Use the task's handle to delete the task. 
-      printf("Error creating Composite USB task. Error: %d\n", xReturned);
+      printf("Error creating Composite Button task. Error: %d\n", xReturned);
       vTaskDelete( buttonTaskHandle );
+  }
+  //LED Task
+  xReturned = xTaskCreate(led_task, "LedTask", 1024, NULL, 0, &ledTaskHandle);
+  if ( xReturned != pdPASS ) {
+      // The task was created.  Use the task's handle to delete the task. 
+      printf("Error creating Composite ledTaskHandle task. Error: %d\n", xReturned);
+      vTaskDelete( ledTaskHandle );
   }
 }
 
@@ -1076,6 +1084,11 @@ void create_queues() {
   pwmRxQueue = xQueueCreate(10, sizeof(PwmRxQueueMsg_t));
   if (pwmRxQueue == NULL){
     printf("Unable to create pwmRxQueue queue\n");
+  }
+
+  ledRxQueue = xQueueCreate(10, sizeof(LEDRxQueueMsg_t));
+  if (pwmRxQueue == NULL){
+    printf("Unable to create ledRxQueue queue\n");
   }
 }
 

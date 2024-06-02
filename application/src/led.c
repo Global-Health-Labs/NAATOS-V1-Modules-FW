@@ -3,6 +3,25 @@
 led_color led1_current_color = blue;
 led_color led2_current_color = blue;
 
+xQueueHandle ledRxQueue;
+
+static LEDFlags_t ledFlags;
+
+
+void led_task(void * pvParameters) {
+  BaseType_t xReturned;
+  LEDRxQueueMsg_t ledRxMessage;
+
+  for (;;) {
+    xReturned = xQueueReceive(ledRxQueue, &ledRxMessage, portMAX_DELAY);
+    if (xReturned != pdPASS) {
+      printf("Unable to Rx data to sensor queue\n");
+    } else {
+      updateLedState(ledRxMessage.type, ledRxMessage.active);
+    }
+  }
+}
+
 /* LED 1 */
 void set_led1_green_solid(void) {
 #if ENABLE_LEDS
@@ -87,4 +106,49 @@ void turn_off_led2(void) {
   led_driver_disable_channel(LED2, green, NULL);
   led_driver_disable_channel(LED2, blue, NULL);
 #endif
+}
+
+void updateLedState(LEDEvent_e event, bool active) {
+  switch(event) {
+    case LED_WAKEUP:
+      ledFlags.wakeupCondition = active;
+
+
+      break;
+    case LED_CHARGING:
+      ledFlags.batteryCharging = active;
+
+      break;
+    case LED_STANDBY:
+      ledFlags.standbyCondition = active;
+      break;
+    case LED_RUN:
+      ledFlags.runCondition = active;
+
+      break;
+    case LED_DECLINE:
+      ledFlags.testDecline = active;
+
+      break;
+    case LED_ABORT:
+      ledFlags.testAbort = active;
+
+      break;
+    case LED_COMPLETE:
+      ledFlags.testComplete = active;
+
+      break;
+    case LED_INVALID:
+      ledFlags.testInvalid = active;
+
+      break;
+    case LED_LOW_BATTERY:
+      ledFlags.lowBattey = active;
+
+      break;
+    default:
+      // Handle unknown event
+      printf("Handling unknown event\n");
+      break;
+  }
 }
