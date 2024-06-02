@@ -332,12 +332,14 @@ void main_task(void * pvParameters) {
           // Check to see if there was an error during the last run
           if (error_during_run) {
             // Set LEDs
-            set_led1_red_fast_blink();
-            set_led2_red_fast_blink();
+            //set_led1_red_fast_blink();
+            //set_led2_red_fast_blink();
             // Get current time
             a_t_start = xTaskGetTickCount();
             printf("MAIN_TASK: Alert Timeout - %dms\n", pdTICKS_TO_MS(alert_timeout_ticks));
           }
+          updateLedState(LED_RUN, false);
+          updateLedState(LED_STANDBY, true);
         } 
         
         // Reset Run Switches
@@ -346,7 +348,8 @@ void main_task(void * pvParameters) {
         
         // Check to see if alert timeout is over
         if (error_during_run && xTaskGetTickCount() >= (a_t_start + alert_timeout_ticks)) {
-          set_led1_green_breathe();
+          updateLedState( LED_CLEAR_ALL_ERROR, true);
+          //set_led1_green_breathe();
           error_during_run = false;
         }
 
@@ -435,6 +438,11 @@ void main_task(void * pvParameters) {
 
       // In Running State (Will block task for the duration of the test)
       case MAIN_RUNNING:
+        if(last_state != main_state) {
+          updateLedState(LED_STANDBY, false);
+          updateLedState(LED_RUN, true);
+        }
+
         vTaskDelay(pdMS_TO_TICKS(100));
         /* ***** Start Sample Preperation ***** */
 #if GO_STRAIGHT_TO_RUNNING
@@ -453,6 +461,7 @@ void main_task(void * pvParameters) {
           next_state = MAIN_STANDBY;
           sendUpdatedMainTaskState(next_state);
           // Set error during run and wait alert timeout
+          updateLedState(LED_DECLINE, true);
           error_during_run = true;
           break;
         }
@@ -470,12 +479,14 @@ void main_task(void * pvParameters) {
           next_state = MAIN_STANDBY;
           sendUpdatedMainTaskState(next_state);
           // Set error during run and wait alert timeout
+          updateLedState(LED_DECLINE, true);
           error_during_run = true;
           break;
         }
         // Set LED1 to solid green
         if (last_state != main_state) {
-          set_led1_green_solid();
+          updateLedState(LED_RUN, true);
+          //set_led1_green_solid();
         }
         // Get the start time and end time
         start_time = xTaskGetTickCount();
@@ -493,6 +504,7 @@ void main_task(void * pvParameters) {
             if (xReturned != pdPASS) {
               printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
             }
+            updateLedState(LED_ABORT, true);
             error_during_run = true;
             over_temp = true;
             break;
@@ -502,6 +514,7 @@ void main_task(void * pvParameters) {
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
           if (!hal_triggered || !optical_triggered) {
+            updateLedState(LED_ABORT, true);
             error_during_run = true;
             break;
           }
@@ -559,6 +572,7 @@ void main_task(void * pvParameters) {
             if (xReturned != pdPASS) {
               printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
             }
+            updateLedState(LED_ABORT, true);
             error_during_run = true;
             over_temp = true;
             break;
@@ -568,6 +582,7 @@ void main_task(void * pvParameters) {
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
           if (!hal_triggered || !optical_triggered) {
+            updateLedState(LED_ABORT, true);
             error_during_run = true;
             break;
           }
@@ -605,9 +620,11 @@ void main_task(void * pvParameters) {
 
         // Wait for the sample to be removed prior to going back to STANDBY state
         do {
+          updateLedState(LED_COMPLETE, true);
           xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
+          //TODO need to determine if test is invaluid due to being here too long
         } while(hal_triggered && optical_triggered);
         // Update current main state
 
@@ -624,6 +641,9 @@ void main_task(void * pvParameters) {
           if (xReturned != pdPASS) {
             printf("Sensor: Unable to send timer update to sensorRxQueue queue.\n");
           }
+          updateLedState(LED_RUN, false);
+          updateLedState(LED_STANDBY, false);
+          updateLedState(LED_USB_MSC_STARTING, true);
         }
         /* **** HANDLE USB AND SWITCH **** */
         // Get switch status if it has changed
@@ -649,11 +669,13 @@ void main_task(void * pvParameters) {
         if (usb_needs_update) {
           // Switch ON and USB connected
           if(buttonData.event == ON_EVENT && usb_conn_status) {
+            updateLedState(LED_USB_MSC_STARTING, false);
             next_state = MAIN_STANDBY;
             send_usb_change(USB_CDC_ACM);
           }
           // Switch ON and USB not connected
           else if (buttonData.event == ON_EVENT && !usb_conn_status) {
+            updateLedState(LED_USB_MSC_STARTING, false);
             next_state = MAIN_STANDBY;
             send_usb_change(USB_DISABLED);
           }
@@ -664,6 +686,7 @@ void main_task(void * pvParameters) {
           }
           // Switch off and USB not connected
           else if (buttonData.event == OFF_EVENT && !usb_conn_status) {
+            updateLedState(LED_USB_MSC_STARTING, false);
             next_state = MAIN_SLEEP;
             send_usb_change(USB_DISABLED);
           }
@@ -696,6 +719,9 @@ void main_task(void * pvParameters) {
             if (xReturned != pdPASS) {
               printf("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.\n");
             }
+          updateLedState(LED_RUN, false);
+          updateLedState(LED_STANDBY, false);
+          updateLedState(LED_USB_MSC_STARTING, false);
         }
           //send out to other tasks we going to sleep
           // wait for response

@@ -124,7 +124,7 @@ void logger_task(void * pvParameters) {
           // Set new temp to true
           new_temp = true;
           // Format: Time,ValveTemp,ValvePWM,Amp0Temp,Amp0PWM,Amp1Temp,Amp1PWM,Amp2Temp,Amp2PWM,Batt,Event
-          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%d,NONE\n", 
+          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%d, \n", 
                                     time.hour, 
                                     time.minute, 
                                     time.second, 

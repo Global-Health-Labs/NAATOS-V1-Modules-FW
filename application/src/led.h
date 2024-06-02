@@ -26,6 +26,7 @@ typedef struct {
   bool testComplete;
   bool testInvalid;
   bool lowBattey;
+  bool usbMscStarting;
 } LEDFlags_t;
 
 
@@ -37,11 +38,10 @@ void set_led1_blue_slow_blink(void);
 void set_led1_red_slow_blink(void);
 void set_led1_red_fast_blink(void);
 void set_led1_red_solid(void);
+void set_led1_blue_breathe(void);
 
 void set_led2_red_slow_blink(void);
 void set_led2_red_fast_blink(void);
 void set_led2_green_solid(void);
 void set_led2_blue_breathe(void);
 void turn_off_led2(void);
-
-void updateLedState(LEDEvent_e event, bool active);

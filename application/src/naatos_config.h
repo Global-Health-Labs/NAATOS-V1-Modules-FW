@@ -337,13 +337,16 @@ typedef enum {
   LED_ABORT,
   LED_COMPLETE,
   LED_INVALID,
-  LED_LOW_BATTERY
+  LED_LOW_BATTERY,
+  LED_USB_MSC_STARTING,
+  LED_CLEAR_ALL_ERROR
 } LEDEvent_e;
 
 typedef struct {
   LEDEvent_e type;
   bool active;
 } LEDRxQueueMsg_t;
+
 
 // Task Handles
 extern xTaskHandle mainTaskHandle;

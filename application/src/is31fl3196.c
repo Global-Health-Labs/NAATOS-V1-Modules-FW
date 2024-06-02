@@ -182,8 +182,8 @@ void led_driver_init(void)
     uint8_t ramp_mode_buf[2] = {LED_DRIVER_RAMP_MODE_REG, 0b00110000};
     led_driver_writeRegisterBlocking(ramp_mode_buf, 2);
     
-    led_driver_enable_channel(LED1, blue, NULL);
-    led_driver_set_channel_animation_flashing(LED1, blue, true, NULL);
+    //led_driver_enable_channel(LED1, blue, NULL);
+    //led_driver_set_channel_animation_flashing(LED1, blue, true, NULL);
 
     led_driver_writeRegisterBlocking(one_shot_buf, 2);
 
@@ -268,6 +268,7 @@ led_driver_errors_t led_driver_set_channel_animation_solid(led_driver_led_select
     return led_driver_success;
 
 }
+
 
 led_driver_errors_t led_driver_set_channel_animation_flashing(led_driver_led_selection led_selection, led_color color, bool enable, led_driver_opDoneCallback_t cb)
 {
