@@ -1,10 +1,6 @@
 #include "heater.h"
 #include "timers.h"
 
-/*
-xQueueHandle heater_usbWaitQueue;
-*/
-
 xQueueHandle heaterRxQueue;
 
 bool amplification_zone_running = false;
@@ -124,40 +120,6 @@ void handle_amplification_stopstart_heater(bool heating) {
     printf("heater: Unable to send stop to pwmRxQueue.\n");
   } 
 }
-
-/*void handle_usb_sus_req(void) {
-  BaseType_t xReturned;
-  usb_suspend_req_t sus_req;
-  usb_suspend_acpt_t sus_acpt = {
-    .task = HEATER,
-    .suspended = true
-  };
-  usb_suspend_over_t sus_over = {
-    .task = HEATER,
-    .over = true
-  };
-
-  // Check to see if we need to suspend for USB to be enabled
-  if (uxQueueMessagesWaiting(heater_usbWaitQueue) > 0) {
-    xReturned = xQueueReceive(heater_usbWaitQueue, &sus_req, 0) ;
-    if (xReturned != pdPASS) {
-      printf("HEATER: Unable to receive usb suspend request from heater_usbWaitQueue\n");
-    }
-    // Send Suspend Accepted
-    xReturned = xQueueSend(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0); 
-    if (xReturned != pdPASS) {
-      printf("HEATER: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\n");
-    }
-    printf("HEATER: Suspending for 15 seconds.\n");
-    // Delay Task for 15 Seconds
-    vTaskDelay(pdMS_TO_TICKS(USB_SUSPEND_TASKS_TIME));
-    // Send Suspend Over
-    xReturned = xQueueSend(usb_usbWaitOverQueue, &sus_over, 0); 
-    if (xReturned != pdPASS) {
-      printf("HEATER: Unable to send usb suspend over to usb_usbWaitOverQueue\n");
-    }
-  }
-}*/
 
 void heater_reset_all_pids(void){
  // Create PID Controllers 
@@ -427,7 +389,6 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
       };
 
       updateDutyCycles(pwmData);
-
 
       // Set the PWMs for the logger
       h_pwm_data.valve_zone_pwm = valve_pid.out;

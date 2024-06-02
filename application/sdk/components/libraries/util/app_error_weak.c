@@ -74,6 +74,9 @@ __WEAK void app_error_fault_handler(uint32_t id, uint32_t pc, uint32_t info)
         case NRF_FAULT_ID_SDK_ASSERT:
         {
             assert_info_t * p_info = (assert_info_t *)info;
+            printf("ASSERTION FAILED at %s:%u",
+                          p_info->p_file_name,
+                          p_info->line_num);
             NRF_LOG_ERROR("ASSERTION FAILED at %s:%u",
                           p_info->p_file_name,
                           p_info->line_num);

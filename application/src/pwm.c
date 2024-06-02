@@ -20,35 +20,11 @@ static bool amp2_zone_active = false;
 xQueueHandle pwmRxQueue;
 
 void pwm0_ready_callback(uint32_t pwm_id) {
-  //PwmRxQueueMsg_t msg;
-  //BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-  //BaseType_t xReturned;
-
-  //msg.type = PWM_MSG_CALLBACK_EVENT;
-
   pwm0_ready_flag = true;
-  /*if (!valve_zone_active && !amp0_zone_active && !amp1_zone_active && !amp2_zone_active) {
-    xReturned = xQueueSendFromISR(pwmRxQueue, &msg, &xHigherPriorityTaskWoken);
-    if (xReturned != pdPASS) {
-      printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
-    }
-  }*/
 }
 
 void pwm2_ready_callback(uint32_t pwm_id) {
-  //PwmRxQueueMsg_t msg;
-  //BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-  //BaseType_t xReturned;
-
-  //msg.type = PWM_MSG_CALLBACK_EVENT;
-
   pwm2_ready_flag = true;
-  /*if (!valve_zone_active && !amp0_zone_active && !amp1_zone_active && !amp2_zone_active) {
-    xReturned = xQueueSendFromISR(pwmRxQueue, &msg, &xHigherPriorityTaskWoken);
-    if (xReturned != pdPASS) {
-      printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
-    }
-  }*/
 }
 
 bool pwmEnabled = false;
@@ -216,32 +192,5 @@ void pwm_task(void * pvParameters) {
         break;
       }
     }
-
-    // If not running a duty cycle do nothing
-    /*if (!valve_zone_active && !amp0_zone_active && !amp1_zone_active && !amp2_zone_active) {
-      vTaskDelay(100);
-      // Check to see if we need to suspend for USB to be enabled
-      if (uxQueueMessagesWaiting(pwmRxQueue) > 0) {
-        xReturned = xQueueReceive(pwmRxQueue, &sus_req, 0) ;
-        if (xReturned != pdPASS) {
-          printf("PWM: Unable to receive usb suspend request from pwmRxQueue\n");
-        }
-        // Send Suspend Accepted
-        xReturned = xQueueSend(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0); 
-        if (xReturned != pdPASS) {
-          printf("PWM: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\n");
-        }
-        printf("PWM: Suspending for 15 seconds.\n");
-        // Delay Task for 15 Seconds
-        vTaskDelay(pdMS_TO_TICKS(USB_SUSPEND_TASKS_TIME));
-        // Send Suspend Over
-        xReturned = xQueueSend(usb_usbWaitOverQueue, &sus_over, 0); 
-        if (xReturned != pdPASS) {
-          printf("PWM: Unable to send usb suspend over to usb_usbWaitOverQueue\n");
-        }
-      }
-      continue;
-    }*/
-  
   }
 }
