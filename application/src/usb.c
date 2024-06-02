@@ -370,7 +370,7 @@ void composite_usb_task(void * pvParameters) {
         }
       }
 
-      if (/*batt_over &&*/ heater_over && pwm_over && sensor_over) {
+      if (/*batt_over &&*/ /*heater_over && pwm_over &&*/ sensor_over) {
         usb_suspended_tasks = false;
         usb_done_config = true;
         set_led1_green_breathe();

@@ -626,7 +626,7 @@ void main_task(void * pvParameters) {
           }
 
           // Receive the USB Connection Status
-          xReturned =xQueueReceive(main_usbConnRecvQueue, &usb_conn_status, portMAX_DELAY);
+          xReturned = xQueueReceive(main_usbConnRecvQueue, &usb_conn_status, portMAX_DELAY);
           if (xReturned != pdPASS) {
             printf("MAIN_TASK: Unable to receive usb connection status from main_usbConnRecvQueue. \n");
           }
