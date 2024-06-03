@@ -248,7 +248,7 @@ void usb_suspend_conflicting_tasks(void) {
 void start_usb(bool cdc_acm, bool msc) {
    ret_code_t ret;
 
-  if (sd_card_inited) {
+  if (sd_card_inited && msc) {
     uninit_sd_card();
   }
   
@@ -398,6 +398,7 @@ void usb_task(void * pvParameters) {
 
   // Set the first event to make sure that USB queue is processed after it is started
   for (;;) {
+
     // Check for usb connection status request
     if (xQueueReceive(usb_connectionReqQueue, &conn_state_req, 0) == pdPASS) {
       // Respond to connection status request
@@ -413,6 +414,7 @@ void usb_task(void * pvParameters) {
       vTaskDelay(USB_TASK_DELAY);
       continue;
     }
+
     needs_response = true;
     // Handle the new command if there is one
     switch(command) {
