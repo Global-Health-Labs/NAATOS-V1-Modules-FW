@@ -98,7 +98,7 @@ void buttonTask(void * pvParameters) {
           nrf_drv_gpiote_in_init(BUTTON_INPUT_PIN, &config, gpiote_event_handler);
           nrf_drv_gpiote_in_event_enable(BUTTON_INPUT_PIN, true);
           
-          //set button as a edge detect event and send that  event over to main queue
+          //set button as a edge detect event and send that event over to main queue
           //if button is already true here then send event anyway
           //send to main queue that we are asleep
         break;

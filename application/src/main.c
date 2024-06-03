@@ -723,14 +723,9 @@ void main_task(void * pvParameters) {
           updateLedState(LED_STANDBY, false);
           updateLedState(LED_USB_MSC_STARTING, false);
         }
-          //send out to other tasks we going to sleep
-          // wait for response
-          // now we just sit in here until we receive a button trigger
-          //maybe setup a switch interrupt for this so it wakes up only on that event
-          // if it doesnt wakeup on that event we will allow the watchdog to be woken
-          // the battery thread should be allowed to wakeup as well so maybe put that on a longer delay?
-
-        //main_state = MAIN_STANDBY;
+        // this queue is blocked indefinitly until a switch interrupt or usb  interrupt
+        //TODO implement indefinite blocker here
+        main_state = MAIN_STANDBY;
 
        break;
       }
