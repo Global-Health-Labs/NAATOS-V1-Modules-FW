@@ -91,9 +91,6 @@ void stopTimer(void) {
   }
 }
 
-int readMotorSpeed(void);
-
-
 void sensors_task(void * pvParameters) {
   BaseType_t xReturned;
   tasks_t sensor_task = SENSORS;

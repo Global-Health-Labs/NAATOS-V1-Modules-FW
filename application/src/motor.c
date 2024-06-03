@@ -1,6 +1,7 @@
 #include "nrf_drv_ppi.h"
 #include "nrf_drv_timer.h"
 #include "nrf_drv_gpiote.h"
+#include "FreeRTOS.h"
 #include "timers.h"
 
 #include "motor.h"
@@ -95,7 +96,7 @@ nrf_drv_timer_t* motor_tach_init(void)
     return &m_counter1;
 }
 
-#if 1
+#if 0
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //TODO: Unsure which of these you need
