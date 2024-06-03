@@ -94,7 +94,7 @@ void buttonTask(void * pvParameters) {
             stopButtonTimer();
           }
 
-          nrf_drv_gpiote_in_config_t config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
+          nrf_drv_gpiote_in_config_t config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true); //NRFX_GPIOTE_CONFIG_IN_SENSE_LOTOHI
           nrf_drv_gpiote_in_init(BUTTON_INPUT_PIN, &config, gpiote_event_handler);
           nrf_drv_gpiote_in_event_enable(BUTTON_INPUT_PIN, true);
           
