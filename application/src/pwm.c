@@ -1,5 +1,8 @@
 #include "pwm.h"
 #include "timers.h"
+#include "motor.h"
+
+#define USE_MOTOR  1 //TODO: Remove
 
 APP_PWM_INSTANCE(PWM0, 0); // Create instance "PWM0" using TIMER0
 APP_PWM_INSTANCE(PWM2, 2); // Create instance "PWM2" using TIMER2
@@ -11,11 +14,13 @@ int valve_duty = 0;
 int amp0_duty = 0;
 int amp1_duty = 0;
 int amp2_duty = 0;
+int motor_duty = 0;
 
 static bool valve_zone_active = false;
 static bool amp0_zone_active = false;
 static bool amp1_zone_active = false;
 static bool amp2_zone_active = false;
+static bool motor_active = false;
 
 xQueueHandle pwmRxQueue;
 
@@ -31,17 +36,26 @@ bool pwmEnabled = false;
 
 void init_pwms() {
   ret_code_t err;
-
-  /* Create Configurations */
+  
+    /* Create Configurations */
   /* 1 Channel PWM, 200Hz, Active High, Valve Zone Pin */
   app_pwm_config_t pwm0_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, VALVE_ZONE_PIN, AMP0_ZONE_PIN);
   pwm0_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
   pwm0_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
-  /* 1 Channel PWM, 200Hz, Active High, Amplification Zone Pin */
+  
+  
+  #if USE_MOTOR
+  //1 Channel PWM, 10kHz, Active High, Motor Control Pin */
+  app_pwm_config_t pwm2_cfg = APP_PWM_DEFAULT_CONFIG_2CH(100L, MOTOR_OUTPUT_PIN, MOTOR_OUTPUT_PIN2);
+  pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
+  pwm2_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
+  #else
+  //1 Channel PWM, 200Hz, Active High, Amplification Zone Pin */
   app_pwm_config_t pwm2_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, AMP1_ZONE_PIN, AMP2_ZONE_PIN);
   pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
   pwm2_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
-  
+  #endif
+
   /* Initalize with configurations */
   /* Initalize PWM0 */
   err = app_pwm_init(&PWM0, &pwm0_cfg, pwm0_ready_callback);
@@ -86,6 +100,18 @@ void updateDutyCycles(temperature_pwm_data_t pwmData) {
 }
 
 
+#if USE_MOTOR
+// Updates the Motor PWM Duty Cycle
+void update_motor_duty(int duty) {
+  motor_duty = duty;
+  if (motor_duty > 0) 
+    motor_active = true; 
+  else 
+    motor_active = false;
+}
+#endif
+
+
 void pwm_task(void * pvParameters) {
   BaseType_t xReturned;
   usb_suspend_req_t sus_req;
@@ -104,11 +130,18 @@ void pwm_task(void * pvParameters) {
   // Set Original Duty Cycles to 0
   app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty);
   app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  amp0_duty);
+  #if USE_MOTOR
+  app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  motor_duty);
+  #else
   app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  amp1_duty);
+  #endif
   app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL,  amp2_duty);
 
   PwmRxQueueMsg_t pwmMsg;
   
+  //TODO: Remove
+  amp1_zone_active = true;
+
   // Main Task Loop
   for (;;) {
     xReturned = xQueueReceive(pwmRxQueue, &pwmMsg, portMAX_DELAY);
@@ -120,7 +153,6 @@ void pwm_task(void * pvParameters) {
           
           break;
         }
-
         case PWM_MSG_CALLBACK_EVENT: {
           if (pwm0_ready_flag) {
             if (valve_zone_active || amp0_zone_active) {
@@ -143,6 +175,21 @@ void pwm_task(void * pvParameters) {
           }
 
           // PWM2 Control
+              // PWM2 Control
+#if USE_MOTOR
+          if (pwm2_ready_flag) {
+            if (motor_active) {
+              pwm2_ready_flag = false;
+            }
+
+            if (motor_duty > 0){
+              app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL,  motor_duty);
+            } else if(amp1_zone_active) {
+              app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL,  0);
+              motor_active = false;
+            }
+          }
+#else
           if (pwm2_ready_flag) {
             if (amp1_zone_active || amp2_zone_active) {
               pwm2_ready_flag = false;
@@ -154,7 +201,6 @@ void pwm_task(void * pvParameters) {
               app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  0);
               amp1_zone_active = false;
             }
-    
             if (amp2_duty > 0) {
               app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, amp2_duty);
             } else if(amp2_zone_active)  {
@@ -162,6 +208,7 @@ void pwm_task(void * pvParameters) {
               app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, 0);
             }
           }
+#endif
           break;
         }
 

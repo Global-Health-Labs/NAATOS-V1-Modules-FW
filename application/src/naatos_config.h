@@ -5,6 +5,8 @@
 #include "FreeRTOS.h"
 #include  "task.h"
 
+#define SAMPLE_PREP_BOARD
+
 #define NAATOS_FW_VERSON  "v0.1.0_c"
 
 #define pdTICKS_TO_MS( xTimeInTicks )    ( ( TickType_t ) ( ( ( uint64_t ) ( xTimeInTicks ) * ( uint64_t ) 1000U ) / ( uint64_t ) configTICK_RATE_HZ ) )
@@ -51,6 +53,7 @@
 #define GO_STRAIGHT_TO_RUNNING  0
 #define USE_CALENDAR_CHIP       1 
 #define VERBOSE_PID             1
+#define USE_MOTOR               1
 
 /* Log Event Messages */
 #define START_EVENT_MSG           "Sample Preperation Started."
@@ -141,6 +144,12 @@ typedef struct {
   bool on;
   zone_t zone;
 } zone_run_req_t;
+
+// Motor Speed Request Struct
+typedef struct {
+  bool on;
+  double speed;   //RPM
+} motor_run_req_t;
 
 // Temperature Data Struct
 typedef struct {

@@ -190,7 +190,6 @@ void heater_task(void * pvParameters) {
               amp1_pid.out = 0;
               amp2_pid.out = 0;
               valve_pid.out = 0;
-
               temperature_pwm_data_t pwmData = {
                 .valve_zone_pwm = valve_pid.out,
                 .amp0_zone_pwm = amp0_pid.out,
@@ -338,6 +337,25 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     
     // Update PID and PWM
     if (amplification_zone_running) {
+      #ifdef SAMPLE_PREP_BOARD
+      // Update Amplification 2 PID loop with new temperatures
+      pid_controller_compute(&amp2_pid, temperature_data.amp2_zone_temp);
+      
+      temperature_pwm_data_t pwmData = {
+        .valve_zone_pwm = valve_pid.out,
+        .amp0_zone_pwm = amp0_pid.out,
+        .amp1_zone_pwm = amp1_pid.out,
+        .amp2_zone_pwm = amp2_pid.out
+      };
+
+      // Update Amplification 2 PWM with PID output
+      updateDutyCycles(pwmData);
+      h_pwm_data.amp2_zone_pwm = amp2_pid.out;
+
+      if (config.amp2_max_temp < temperature_data.amp2_zone_temp) {
+        greater_than_max = true;
+      }
+      #else
       // Update Amplification 0 PID loop with new temperatures
       pid_controller_compute(&amp0_pid, temperature_data.amp0_zone_temp);
       // Update Amplification 0 PWM with PID output
@@ -374,6 +392,7 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
       if (config.valve_max_temp < temperature_data.valve_zone_temp) {
         greater_than_max = true;
       }
+      #endif
    }
    if (valve_zone_running) {
       pid_controller_compute(&amp0_pid_2, temperature_data.amp0_zone_temp);

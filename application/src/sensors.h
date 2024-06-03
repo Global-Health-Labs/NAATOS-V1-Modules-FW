@@ -15,3 +15,4 @@
 void sensors_task(void * pvParameters);
 void init_sensors_gpios(void);
 long double readTemp(sensor_selection_t sensor);
+double readMotorSpeed(void);

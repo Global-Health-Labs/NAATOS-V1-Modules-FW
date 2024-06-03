@@ -13,8 +13,11 @@
 
 #define VALVE_ZONE_PIN  20  // P0.20
 #define AMP0_ZONE_PIN   19  // P0.19
-#define AMP1_ZONE_PIN   34  // P1.03
-#define AMP2_ZONE_PIN   33  // P1.04
+#define AMP1_ZONE_PIN   34  // P1.02
+#define AMP2_ZONE_PIN   33  // P1.01
+
+#define SAMPLE_HEATER_PIN 33 // P1.01
+#define SAMPLE_HEATER_CHANNEL 0
 
 //#define VALVE_ZONE_PIN  19
 //#define AMP0_ZONE_PIN   20
@@ -25,6 +28,9 @@
 #define AMP0_CHANNEL    1
 #define AMP1_CHANNEL    0
 #define AMP2_CHANNEL    1
+#if USE_MOTOR
+#define MOTOR_CHANNEL 0
+#endif
 
 void init_pwms();
 void pwm_task(void * pvParameters);

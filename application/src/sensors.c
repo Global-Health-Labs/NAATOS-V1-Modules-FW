@@ -1,5 +1,7 @@
 #include "sensors.h"
 #include "timers.h"
+#include "nrf_drv_timer.h"
+#include "motor.h"
 
 void sensorCollection(void) ;
 
@@ -21,6 +23,14 @@ temperature_pwm_data_t pwm_data = {
   .amp1_zone_pwm = 0,
   .amp2_zone_pwm = 0
 };
+
+#if USE_MOTOR
+static const nrf_drv_timer_t *p_counter1;
+static uint32_t motor_speed_read_t1 = 0;
+static uint32_t motor_speed_read_t2;
+static bool skipped_last_call = false;
+static long double motor_speed = 0.0; //RPM
+#endif
 
 static tsys01_errors_t tsys01_err;
 
@@ -81,6 +91,9 @@ void stopTimer(void) {
   }
 }
 
+int readMotorSpeed(void);
+
+
 void sensors_task(void * pvParameters) {
   BaseType_t xReturned;
   tasks_t sensor_task = SENSORS;
@@ -106,10 +119,14 @@ void sensors_task(void * pvParameters) {
 
   /* Get TSYS01 Calibration Values */
 #if I2C_CONNECTED
+#ifdef SAMPLE_PREP_BOARD
+  tsys01_err = tsys01_getCalibrationValues(amp_zone_2);
+#else
   tsys01_err = tsys01_getCalibrationValues(valve_zone);
   tsys01_err = tsys01_getCalibrationValues(amp_zone_0);
   tsys01_err = tsys01_getCalibrationValues(amp_zone_1);
   tsys01_err = tsys01_getCalibrationValues(amp_zone_2);
+#endif
 #endif
 
   SensorRxQueueMsg_t sensorRxMessage;
@@ -255,6 +272,36 @@ void sensorCollection(void) {
       }
     }
 
+
+ #if I2C_CONNECTED
+ #ifdef SAMPLE_PREP_BOARD
+    temperatures.amp2_zone_temp = readTemp(amp_zone_2);
+ #else
+    // I2C Read for Valve Zone
+    temperatures.valve_zone_temp = readTemp(valve_zone);
+
+    // I2C Read for Amplification Zone 0 
+    temperatures.amp0_zone_temp = readTemp(amp_zone_0); 
+  
+    // I2C Read for Amplification Zone 1 
+    temperatures.amp1_zone_temp = readTemp(amp_zone_1);
+
+    // I2C Read for Amplification Zone 2 
+    temperatures.amp2_zone_temp = readTemp(amp_zone_2);
+#endif
+#else
+    // Set temps to their setpoints if i2c is not connected
+    temperatures.valve_zone_temp = 85;
+    temperatures.amp0_zone_temp = 65;
+    temperatures.amp1_zone_temp = 65;
+    temperatures.amp2_zone_temp = 65;
+    vTaskDelay(pdMS_TO_TICKS(12 * 4)); // Simulate 12ms delay for each reading
+#endif
+
+#if USE_MOTOR
+    readMotorSpeed();
+#endif
+
     // Put Switch Data into queue
     xReturned = xQueueSend(main_switchQueue, (void *)&switches, 0);
     if (xReturned != pdPASS) {
@@ -307,6 +354,9 @@ void init_sensors_gpios(void) {
   nrf_gpio_cfg_output(SENSORS_EN);
   nrf_gpio_pin_set(SENSORS_EN);
 
+  /* Setup Motor Speed Sensor Input*/
+  p_counter1 = motor_tach_init();
+
   nrf_gpio_cfg_output(NRF_GPIO_PIN_MAP(1,3));
   //nrf_gpio_pin_write(NRF_GPIO_PIN_MAP(1,3), 1);
   nrf_gpio_pin_set(NRF_GPIO_PIN_MAP(1,3));
@@ -323,4 +373,22 @@ long double readTemp(sensor_selection_t sensor) {
     printf("HEATER_TASK: Unable to read temperature!\n");
   }
   return temperature;
+}
+
+double readMotorSpeed(void){
+  //Check how many pulses have been captured in elapsed time since last call
+  motor_speed_read_t2 = xTaskGetTickCount();
+  uint32_t delta_t = pdTICKS_TO_MS(motor_speed_read_t2 - motor_speed_read_t1);
+  uint32_t pulse_count = (nrf_drv_timer_capture(p_counter1, NRF_TIMER_CC_CHANNEL0)) / 2; //Divide by two because counter increments for every rising AND falling edge
+ 
+  //Convert pulse count to rotational speed
+  double motor_speed_rpm = (1000 * 60 * ((double) pulse_count / (double) delta_t)) / 9; 
+  printf("Motor speed: %f\r\n", motor_speed_rpm);
+ 
+  //Clear the counter, update variable for tracking elapsed time
+  nrf_drv_timer_clear(p_counter1);
+  motor_speed_read_t1 = xTaskGetTickCount();
+  skipped_last_call = false;
+
+  return motor_speed_rpm;
 }

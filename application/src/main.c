@@ -1144,8 +1144,14 @@ int main(void) {
   // Full Peripheral Initalizations
   init_adc();             // ADC
   init_sensors_gpios();   // Sensor GPIOs
+  
+
+  #ifdef SAMPLE_PREP_BOARD
+  vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
+  #else
   vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_400k);   // I2C
   vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k);   // I2C
+  #endif
 #if ENABLE_LEDS
   led_driver_init();
 #endif
