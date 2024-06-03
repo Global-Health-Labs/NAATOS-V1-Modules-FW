@@ -256,6 +256,22 @@ led_driver_errors_t led_driver_set_rgb(led_driver_led_selection led_selection, l
 
 }
 
+led_driver_errors_t led_driver_set_leds_off(led_driver_led_selection led_selection, led_driver_opDoneCallback_t cb) {
+
+  // ramp mode reg, 0x70 == hold on T2 ON
+  led_ramp_mode_reg_val |= 1 << led_selection + 4;
+  uint8_t ramp_write_buf[2] = {LED_DRIVER_RAMP_MODE_REG, led_ramp_mode_reg_val};
+  led_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
+
+
+ // uint8_t led_off_buf[3] = {LED_DRIVER_CTRL_REG_1, 0x00};
+//  led_driver_writeRegister(led_off_buf, 2, write_reg, cb);
+
+
+
+  return led_driver_i2c_error;
+}
+
 // Just need to set T2 hold in ramp mode register
 led_driver_errors_t led_driver_set_channel_animation_solid(led_driver_led_selection led_selection, led_color color, bool enable, led_driver_opDoneCallback_t cb)
 {
@@ -266,7 +282,6 @@ led_driver_errors_t led_driver_set_channel_animation_solid(led_driver_led_select
     led_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
 
     return led_driver_success;
-
 }
 
 
