@@ -742,8 +742,8 @@ void send_usb_change(usb_command_t cmd) {
   bool confirmed = false;
   
   printf("MAIN_TASK: Sending USB change request.\n");
-  if (cmd != USB_CDC_ACM)
-    uninit_sd_card();
+  //if (cmd != USB_CDC_ACM)
+  uninit_sd_card();
 
   // Send command
   xReturned = xQueueSend(usb_stateChangeQueue, &command, 0);

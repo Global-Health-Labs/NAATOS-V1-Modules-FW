@@ -207,13 +207,13 @@ static ret_code_t block_dev_sdc_uninit(nrf_block_dev_t const * p_blk_dev)
     if (m_active_sdc_dev != p_sdc_dev)
     {
         /* SDC instance is busy. */
-        return NRF_ERROR_BUSY;
+        //return NRF_ERROR_BUSY;
     }
 
     if (app_sdc_busy_check())
     {
         /* Previous asynchronous operation in progress. */
-        return NRF_ERROR_BUSY;
+        //return NRF_ERROR_BUSY;
     }
 
     ret_code_t err_code = app_sdc_uninit();
