@@ -93,7 +93,11 @@ static led_driver_errors_t led_driver_writeRegister(uint8_t* buf,
 
     current_op_type = led_operation;
 
+#ifdef SAMPLE_PREP_BOARD
+    err_code = xUtil_TWI_Write_Single(i2c_interface_sensors, IS31FL3199_ADDR_low, reg, buf, 2);//acquire data
+#else
     err_code = xUtil_TWI_Write_Single(i2c_interface_sensors, IS31FL3199_ADDR, reg, buf, 2);//acquire data
+#endif
     
     if (err_code != NRF_SUCCESS) {
         driverIsBusy = false;
