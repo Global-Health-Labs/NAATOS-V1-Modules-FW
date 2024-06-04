@@ -427,6 +427,15 @@ void main_task(void * pvParameters) {
         hal_triggered = switch_data.hal_triggered;
         optical_triggered = switch_data.optical_tiggered;
 
+#ifdef SAMPLE_PREP_BOARD
+        // Check if we can go to RUN state
+        if (hal_triggered && !error_during_run) {
+          next_state = MAIN_RUNNING;
+          sendUpdatedMainTaskState(next_state);
+          // Delay
+          vTaskDelay(100);
+        }
+#else
         // Check if we can go to RUN state
         if (hal_triggered && optical_triggered && !error_during_run) {
           next_state = MAIN_RUNNING;
@@ -434,6 +443,7 @@ void main_task(void * pvParameters) {
           // Delay
           vTaskDelay(100);
         }
+#endif
       break;
 
       // In Running State (Will block task for the duration of the test)
@@ -513,11 +523,20 @@ void main_task(void * pvParameters) {
           xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
+
+#ifdef SAMPLE_PREP_BOARD
+          if (!hal_triggered) {
+            updateLedState(LED_ABORT, true);
+            error_during_run = true;
+            break;
+          }
+#else
           if (!hal_triggered || !optical_triggered) {
             updateLedState(LED_ABORT, true);
             error_during_run = true;
             break;
           }
+#endif
         } while ( pdTICKS_TO_MS(xTaskGetTickCount() - start_time) < end_time);
         
         // End amplification zone
@@ -546,12 +565,14 @@ void main_task(void * pvParameters) {
               printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
             }
           }
+#ifndef SAMPLE_PREP_BOARD
           else if (!optical_triggered) {
             xReturned = xQueueSend(logger_logMessageQueue, &interrupt_opt_log_msg, 0);
             if (xReturned != pdPASS) {
               printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
             }
           }
+#endif
           else if (over_temp) {
             xReturned = xQueueSend(logger_logMessageQueue, &over_temp_msg, 0);
             if (xReturned != pdPASS) {
@@ -581,11 +602,20 @@ void main_task(void * pvParameters) {
           xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
           hal_triggered = switch_data.hal_triggered;
           optical_triggered = switch_data.optical_tiggered;
+
+#ifdef SAMPLE_PREP_BOARD
+          if (!hal_triggered) {
+            updateLedState(LED_ABORT, true);
+            error_during_run = true;
+            break;
+          }
+#else
           if (!hal_triggered || !optical_triggered) {
             updateLedState(LED_ABORT, true);
             error_during_run = true;
             break;
           }
+#endif
         } while (pdTICKS_TO_MS(xTaskGetTickCount() - start_time) < end_time);
        
         // Stop the valve zone
@@ -599,12 +629,14 @@ void main_task(void * pvParameters) {
                 printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
               }
             }
+#ifndef SAMPLE_PREP_BOARD
             else if (!optical_triggered) {
               xReturned = xQueueSend(logger_logMessageQueue, &interrupt_opt_log_msg, 0);
               if (xReturned != pdPASS) {
                 printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
               }
             }
+#endif
             else if (over_temp) {
               xReturned = xQueueSend(logger_logMessageQueue, &over_temp_msg, 0);
               if (xReturned != pdPASS) {
@@ -623,7 +655,11 @@ void main_task(void * pvParameters) {
           updateLedState(LED_COMPLETE, true);
           xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
           hal_triggered = switch_data.hal_triggered;
+#ifdef SAMPLE_PREP_BOARD
+          optical_triggered = true;
+#else
           optical_triggered = switch_data.optical_tiggered;
+#endif
           //TODO need to determine if test is invaluid due to being here too long
         } while(hal_triggered && optical_triggered);
         // Update current main state
