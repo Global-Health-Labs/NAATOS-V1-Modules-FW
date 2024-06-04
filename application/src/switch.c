@@ -10,6 +10,8 @@ TimerHandle_t buttonTimer;
 
 void checkButtonState(void);
 
+void samplePrepButtonState(void);
+
 void button_init(void) {
   /* Setup Hal Sensor */
   nrf_gpio_cfg_input(BUTTON_INPUT_PIN, NRF_GPIO_PIN_NOPULL); // tied to 3.3v internally 
@@ -68,6 +70,7 @@ void gpiote_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action
 static bool previousSwitchState =  true;
 static int switchCounter = 0;
 static TickType_t lastSwitchTime = 0;
+static TickType_t buttonPressStartTime = 0;
 button_update_t updateMsg;
 button_event_e currentEvent = ON_EVENT;
 button_event_e previousEvent = ON_EVENT;
@@ -113,7 +116,11 @@ void buttonTask(void * pvParameters) {
         break;
 
         case BUTTON_MSG_TIMER_EVENT:
+#ifdef SAMPLE_PREP_BOARD
+          samplePrepButtonState();
+#else
           checkButtonState();
+#endif
         break;
 
         default:
@@ -154,5 +161,52 @@ void checkButtonState(void) {
     
     // Update previous state
     previousSwitchState = switchState;
+
+}
+
+bool buttonHeld = false;
+
+void samplePrepButtonState(void) {
+  bool switchState = nrf_gpio_pin_read(BUTTON_INPUT_PIN);
+
+  TickType_t currentTime = xTaskGetTickCount();
+
+  
+  if (switchState != previousSwitchState) {
+      if (switchState == false) { // Button pressed
+          switchCounter++;
+          lastSwitchTime = currentTime;
+          buttonPressStartTime = currentTime;
+          buttonHeld = true;
+      } else { // Button released
+          buttonHeld = false;
+          if ((lastSwitchTime - buttonPressStartTime) < pdMS_TO_TICKS(3000) && switchCounter == 1) {
+              currentEvent = ON_EVENT;
+          }
+      }
+  }
+
+  // Check for long press
+  if (buttonHeld && (currentTime - buttonPressStartTime) >= pdMS_TO_TICKS(3000)) {
+      currentEvent = OFF_EVENT;
+      buttonHeld = false;
+  }
+  
+  // Check for triple press
+  if ((currentTime - lastSwitchTime) >= pdMS_TO_TICKS(2000)) {
+      if (switchCounter >= 3) {
+          currentEvent = BOOTLOADER_EVENT;
+      }
+      switchCounter = 0;
+  }
+  
+  if(currentEvent != previousEvent) {
+    updateMsg.event = currentEvent;
+    sendButtonUpdate(updateMsg);
+    previousEvent = currentEvent;
+  }
+
+  // Update previous state
+  previousSwitchState = switchState;
 
 }
