@@ -161,6 +161,7 @@ typedef struct {
   float amp2_zone_temp;
   float valve_zone_temp;
   float amp2_zone_pwm;
+  double motorSpeed;
 } temperature_data_t;
 
 // Temperature PWM Data Struct
