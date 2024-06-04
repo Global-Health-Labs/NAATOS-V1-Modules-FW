@@ -128,8 +128,14 @@ void pwm_task(void * pvParameters) {
   init_pwms();
 
   // Set Original Duty Cycles to 0
+  #ifdef SAMPLE_PREP_BOARD
+  app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 0);
+  app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  0);
+  #else
   app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty);
   app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  amp0_duty);
+  #endif
+
   #if USE_MOTOR
   app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  motor_duty);
   #else

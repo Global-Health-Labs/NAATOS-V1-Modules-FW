@@ -242,9 +242,10 @@ void sensors_task(void * pvParameters) {
 void sensorCollection(void) {
     BaseType_t xReturned;
     HeaterRxQueueMsg_t heaterMsg;
-
+    bool prev = false;
+ #ifndef SAMPLE_PREP_BOARD
     // ADC Read for Optical Sensors
-    bool prev = switches.optical_tiggered;
+    prev = switches.optical_tiggered;
     switches.optical_tiggered = get_optical_triggered();
     if (prev != switches.optical_tiggered) {
       if (switches.optical_tiggered) {
@@ -254,6 +255,8 @@ void sensorCollection(void) {
         printf("Optical sensor no longer triggered!\n");
       }
     }
+#endif
+
     // GPIO Read for Hall Sensor
     prev = switches.hal_triggered;
     if (nrf_gpio_pin_read(HAL_INPUT_PIN))    

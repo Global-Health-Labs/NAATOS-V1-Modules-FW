@@ -185,7 +185,7 @@ void heater_task(void * pvParameters) {
           // Set zones enabled
           if (heaterRxMessage.zoneSelect == AMPLIFICATION) {
             amplification_zone_running = heaterRxMessage.zoneEnabled;
-            if (!amplification_zone_running) {
+            if (!amplification_zone_running) { //AMP2 will be used in sample prep fro heating
               amp0_pid.out = 0;
               amp1_pid.out = 0;
               amp2_pid.out = 0;
@@ -337,7 +337,7 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     
     // Update PID and PWM
     if (amplification_zone_running) {
-      #ifdef SAMPLE_PREP_BOARD
+#ifdef SAMPLE_PREP_BOARD
       // Update Amplification 2 PID loop with new temperatures
       pid_controller_compute(&amp2_pid, temperature_data.amp2_zone_temp);
       
@@ -355,7 +355,7 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
       if (config.amp2_max_temp < temperature_data.amp2_zone_temp) {
         greater_than_max = true;
       }
-      #else
+#else
       // Update Amplification 0 PID loop with new temperatures
       pid_controller_compute(&amp0_pid, temperature_data.amp0_zone_temp);
       // Update Amplification 0 PWM with PID output
@@ -392,9 +392,19 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
       if (config.valve_max_temp < temperature_data.valve_zone_temp) {
         greater_than_max = true;
       }
-      #endif
+#endif
    }
-   if (valve_zone_running) {
+   if (valve_zone_running) { //AMP 1 will be used for motor
+#ifdef SAMPLE_PREP_BOARD
+      //TODO  put MOTOR PID here
+      temperature_pwm_data_t pwmData = {
+        .valve_zone_pwm = 0,
+        .amp0_zone_pwm = 0,
+        .amp1_zone_pwm = 40, //amp1_pid_2.out, TODO replace with motor pid
+        .amp2_zone_pwm = 0
+      };
+
+#else
       pid_controller_compute(&amp0_pid_2, temperature_data.amp0_zone_temp);
       pid_controller_compute(&amp1_pid_2, temperature_data.amp1_zone_temp);
       pid_controller_compute(&amp2_pid_2, temperature_data.amp2_zone_temp);
@@ -407,10 +417,22 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
         .amp2_zone_pwm = amp2_pid_2.out
       };
 
+#endif
+
       updateDutyCycles(pwmData);
 
       // Set the PWMs for the logger
       h_pwm_data.valve_zone_pwm = valve_pid.out;
+      // Set the PWMs for the logger
+      h_pwm_data.amp0_zone_pwm = amp0_pid.out;
+      h_pwm_data.amp1_zone_pwm = amp1_pid.out;
+      h_pwm_data.amp2_zone_pwm = amp2_pid.out;
+
+#ifdef SAMPLE_PREP_BOARD
+      if (config.amp2_max_temp < temperature_data.amp2_zone_temp) {
+        greater_than_max = true;
+      }
+#else
       // Ensure that the temperatures are not greater than the max temperatures allowed
       if (config.valve_max_temp < temperature_data.valve_zone_temp) {
         greater_than_max = true;
@@ -424,6 +446,8 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
       if (config.valve_max_temp < temperature_data.valve_zone_temp) {
         greater_than_max = true;
       }
+#endif
+
     }
 
     // Handle being greater than the maximum temperature
