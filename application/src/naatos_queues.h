@@ -5,6 +5,7 @@
 #include "queue.h"
 
 #define QUEUE_SIZE  1
+#define WATCH_DOG_QUEUE_SIZE 30
 
 // Main Task Queue(s)
 extern xQueueHandle main_batteryDataQueue;
@@ -13,30 +14,27 @@ extern xQueueHandle main_mainStateRespQueue;
 extern xQueueHandle main_runRespQueue;
 extern xQueueHandle main_runErrorQueue;
 extern xQueueHandle main_runConfRespQueue;
+extern xQueueHandle main_usbConnRecvQueue;
+extern xQueueHandle main_usbChangedConfQueue;
 
-// Heater Task Queue(s)
-extern xQueueHandle heater_zoneRunQueue;
-extern xQueueHandle heater_temperatureDataQueue;
-extern xQueueHandle heater_usbWaitQueue;
-extern xQueueHandle heater_pwmReqQueue;
-extern xQueueHandle heater_sensorConfQueue;
+// Sensor Task Queue
+extern xQueueHandle sensorRxQueue;
 
-// Sensor Task Queue(s)
-extern xQueueHandle sensor_heaterStateQueue;
-extern xQueueHandle sensor_usbWaitQueue;
-extern xQueueHandle sensor_pwmRecvQueue;
+//Battery Task Queue
+extern xQueueHandle batteryRxQueue;
 
-// Battery Management Task Queue(s)
-extern xQueueHandle battery_requestPercentQueue;
-extern xQueueHandle battery_mainStateQueue;
-extern xQueueHandle battery_usbWaitQueue;
-extern xQueueHandle battery_mainStateContinueQueue;
+//Button Task Queue
+extern xQueueHandle buttonRxQueue;
+
+//Heater Task Queue
+extern xQueueHandle heaterRxQueue;
 
 // USB Management Task Queue(s)
 extern xQueueHandle usb_stateChangeQueue;
 extern xQueueHandle usb_recvUsbWaitAcceptQueue;
 extern xQueueHandle usb_usbWaitOverQueue;
-extern xQueueHandle usb_mainStateContinueQueue;
+//extern xQueueHandle usb_mainStateContinueQueue;
+extern xQueueHandle usb_connectionReqQueue;
 
 // Logger Task Queue(s)
 extern xQueueHandle logger_recvBattPercentQueue;
@@ -45,6 +43,13 @@ extern xQueueHandle logger_mainStateChangeQueue;
 extern xQueueHandle logger_mainStateContinueQueue;
 
 // PWM Task Queue(s)
-extern xQueueHandle pwm_usbWaitQueue;
+extern xQueueHandle pwmRxQueue;
+
+//Watchdog Task Queue
+extern xQueueHandle watchdog_rxTimesQueue;
+
+extern xQueueHandle button_mainStateQueue;
+
+extern xQueueHandle ledRxQueue;
 
 #endif

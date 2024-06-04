@@ -1,4 +1,7 @@
 #include "sd_card.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* SD Card Variables */
 static FATFS fs;
@@ -37,6 +40,8 @@ void init_sd_card(void) {
                  NRF_GPIO_PIN_H0H1,       // Require High Drive low/high level
                  NRF_GPIO_PIN_NOSENSE);
 
+  disk_state = STA_NOINIT;
+
   memset(&fs, 0, sizeof(FATFS));
 
   // Register the drives we have 
@@ -68,6 +73,7 @@ void init_sd_card(void) {
 }
 
 void uninit_sd_card(void) {
+  disk_state = 0;
 
   UNUSED_RETURN_VALUE(sd_card_unmount());
   UNUSED_RETURN_VALUE(disk_uninitialize(0));
@@ -548,7 +554,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
   char configBuffer[50];
   FRESULT res;
   char * pch;
-  char * val = (char *)malloc(50 * sizeof(char));
+  char val[50];
   int num;
 
   // Re-Mount SD Card
@@ -582,6 +588,12 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
     sprintf(val, "%s", pch);
     pch = strtok(NULL, ":");
     sprintf(val, "%s", pch);
+    char *newline = strchr(val, '\n');
+    if (newline) {
+        // Replace newline character with null terminator
+        *newline = '\0';
+    }
+
     switch((naatos_config_params_t)i) {
       case SAMPLE_RATE:
             parameters->sample_rate = atof(val);
@@ -634,7 +646,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
             parameters->min_run_zone_temp = atof(val);
             break;
         case MIN_RUN_ZONE_TEMP_EN:
-            num = strcmp(val, "true\n");
+            num = strcmp(val, "true");
             parameters->min_run_zone_temp_en = num ? false : true;
             break;
         case ALERT_TIMEOUT_TIME:
@@ -744,8 +756,6 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
   if (res != FR_OK) {
       return res;
   }
-
-  free(val);
 
   return FR_OK;
 }

@@ -28,9 +28,6 @@
 
 void init_pwms();
 void pwm_task(void * pvParameters);
-void update_valve_duty(int duty);
-void update_amp0_duty(int duty);
-void update_amp1_duty(int duty);
-void update_amp2_duty(int duty);
+void updateDutyCycles(temperature_pwm_data_t pwmData);
 
 #endif

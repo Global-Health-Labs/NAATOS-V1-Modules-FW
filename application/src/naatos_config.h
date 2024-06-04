@@ -69,9 +69,10 @@
 
 /* Main States */
 typedef enum {
-  LOW_POWER,
-  STANDBY,
-  RUNNING
+  MAIN_STANDBY,
+  MAIN_RUNNING,
+  MAIN_FILE,
+  MAIN_SLEEP
 } main_state_t;
 
 typedef enum {
@@ -122,6 +123,13 @@ typedef enum {
   // Add more events here
 } event_t;
 
+typedef enum {
+  USB_DISABLED = 0,
+  USB_CDC_ACM = 1,
+  USB_MSC = 2,
+  USB_MSC_CDC_ACM = 3
+} usb_command_t;
+
 // Holds data for Hal and Optical Switch
 typedef struct {
    bool hal_triggered;
@@ -154,10 +162,18 @@ typedef struct {
   float amp2_zone_pwm;
 } temperature_pwm_data_t;
 
+
+typedef enum {
+  USB_TO_FILE,
+  USB_TO_COM
+} usb_requested_state;
+
+
 // Composite USB Update Message
 typedef struct {
   usb_message_type_t message_type;
   main_state_t current_state;
+  usb_requested_state request_state;
   charge_state_t charge_state;
 } usb_message_t;
 
@@ -177,6 +193,22 @@ typedef struct {
 typedef struct {
   tasks_t task_req;
 } battery_percent_req_t; 
+
+
+typedef struct {
+  tasks_t taskName;
+  bool valid; // if the task is meant to not run anymore this should be set to false
+} watchdog_time_update_t;
+
+typedef enum {
+  ON_EVENT,
+  OFF_EVENT,
+  BOOTLOADER_EVENT
+} button_event_e;
+
+typedef struct {
+  button_event_e event;
+} button_update_t;
 
 // Calendar time struct
 typedef struct {
@@ -206,6 +238,116 @@ typedef struct {
   bool over;
 } usb_suspend_over_t;
 
+// Sensor messages
+
+typedef enum {
+  SENSOR_MSG_HEATER_STATE,
+  SENSOR_MSG_USB_SUSPEND,
+  SENSOR_MSG_PWM_RESPONSE,
+  SENSOR_MSG_TIMER_EVENT,
+  SENSOR_MSG_SLEEP,
+  SENSOR_MSG_WAKEUP,
+  CONFIG_UPDATED
+} SensorRxQueueType_t;
+
+typedef struct {
+  SensorRxQueueType_t type;
+  bool heaterRunning;
+  bool usbSuspend;
+  temperature_pwm_data_t pwmData;
+} SensorRxQueueMsg_t;
+
+// Battery messages
+
+typedef enum {
+  BATTERY_MSG_USB_SUSPEND,
+  BATTERY_MSG_TIMER_EVENT,
+  BATTERY_SOC_REQUEST,
+  BATTERY_MSG_SLEEP,
+  BATTERY_MSG_WAKEUP,
+  BATTERY_CONFIG_UPDATED,
+  BATTERY_MSG_MAIN_STATE_CHANGE
+} BatteryRxQueueType_t;
+
+typedef enum {
+  BATTERY_MSG_SOC_MAIN,
+  BATTERY_MSG_SOC_LOG
+} BatterySOC_Send_to_t;
+
+typedef struct {
+  BatteryRxQueueType_t type;
+  BatterySOC_Send_to_t sendTo;
+  main_state_t mainState;
+  bool usbSuspend;
+} BatteryRxQueueMsg_t;
+
+
+// Button/Switch messages
+typedef enum {
+  BUTTON_MSG_SLEEP,
+  BUTTON_MSG_WAKE,
+  BUTTON_MSG_TIMER_EVENT,
+} ButtonRxQueueType_t;
+
+typedef struct {
+  ButtonRxQueueType_t type;
+} ButtonRxQueueMsg_t;
+
+// heater messages
+typedef enum {
+  HEATER_MSG_SLEEP,
+  HEATER_MSG_WAKE,
+  HEATER_MSG_ZONE_STATE,
+  HEATER_MSG_TEMPERATURE_DATA,
+  HEATER_MSG_USB_SUSPEND,
+  HEATER_MSG_SENSOR_CONFIRM,
+  HEATER_MSG_PWM_REQUEST,
+  HEATER_MSG_CONFIG_UPDATED,
+  HEATER_MSG_WDT_UPDATE
+} HeaterRxQueueType_t;
+
+typedef struct {
+  HeaterRxQueueType_t type;
+  zone_t zoneSelect;
+  temperature_data_t tempData;
+  bool zoneEnabled;
+  bool usbSuspend;
+  bool heaterRunning;
+} HeaterRxQueueMsg_t;
+
+typedef enum {
+  PWM_MSG_UPDATE_DUTY,
+  PWM_MSG_CALLBACK_EVENT,
+  PWM_MSG_DISABLE,
+  PWM_MSG_ENABLE
+} PWMRxQueueType_t;
+
+typedef struct {
+  PWMRxQueueType_t type;
+
+} PwmRxQueueMsg_t;
+
+// LED Handeling
+typedef enum {
+  LED_WAKEUP,
+  LED_CHARGING,
+  LED_STANDBY,
+  LED_RUN,
+  LED_DECLINE,
+  LED_ABORT,
+  LED_COMPLETE,
+  LED_INVALID,
+  LED_LOW_BATTERY,
+  LED_USB_MSC_STARTING,
+  LED_CLEAR_ALL_ERROR
+} LEDEvent_e;
+
+typedef struct {
+  LEDEvent_e type;
+  bool active;
+} LEDRxQueueMsg_t;
+
+
 // Task Handles
 extern xTaskHandle mainTaskHandle;
 extern xTaskHandle heaterTaskHandle;
@@ -215,6 +357,7 @@ extern xTaskHandle batteryTaskHandle;
 extern xTaskHandle usbTaskHandle;
 extern xTaskHandle pwmTaskHandle;
 extern xTaskHandle compositeTaskHandle;
+extern xTaskHandle buttonTaskHandle;
 
 // Config parameters
 typedef struct {

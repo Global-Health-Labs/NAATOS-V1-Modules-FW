@@ -15,8 +15,9 @@ calendar_time_t time = {
     .year = 0
   };
 
-const battery_percent_req_t batt_req = {
-  .task_req = LOGGER
+const BatteryRxQueueMsg_t batt_req = {
+  .type = BATTERY_SOC_REQUEST,
+  .sendTo = BATTERY_MSG_SOC_LOG
 };
 
 // Puts log file name in char pointer
@@ -31,7 +32,7 @@ void getLogFileName(const char * _logFileName) {
 
 void logger_task(void * pvParameters) {
   BaseType_t xReturned;
-  main_state_t main_state = STANDBY;
+  main_state_t main_state = MAIN_STANDBY;
   log_data_message_t log_message;
   log_data_message_t last_temp_message;
   int battery_percent;
@@ -69,7 +70,7 @@ void logger_task(void * pvParameters) {
       printf("USB: Unable to recevive continue to logger_mainStateContinueQueue queue.\n");
     }
 
-    if (main_state == RUNNING) {
+    if (main_state == MAIN_RUNNING) {
       // Create Log File based on the UTC Time of the Sample preperation
       getLogFileName(logFileName);
       res = sd_card_create_log_file(logFileName);
@@ -82,7 +83,7 @@ void logger_task(void * pvParameters) {
     }
 
     // Log sample data while we are running
-    while (main_state == RUNNING && !run_stopped) {
+    while (main_state == MAIN_RUNNING && !run_stopped) {
       new_temp = false;
       // Check if state has changed
       if (uxQueueMessagesWaiting(logger_mainStateChangeQueue) > 0) {
@@ -95,9 +96,9 @@ void logger_task(void * pvParameters) {
       }
 
       // Request the battery percentage from the bettery task
-      xReturned = xQueueSend(battery_requestPercentQueue, &batt_req, 0);
+      xReturned = xQueueSend(batteryRxQueue, &batt_req, 0);
       if (xReturned != pdPASS) {
-        printf("LOG_TASK: Unable to send battery percentage request to battery_requestPercentQueue.\n");
+        printf("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.\n");
       }
       // Wait for response 
       xReturned = xQueueReceive(logger_recvBattPercentQueue, &battery_percent, portMAX_DELAY);
@@ -123,7 +124,7 @@ void logger_task(void * pvParameters) {
           // Set new temp to true
           new_temp = true;
           // Format: Time,ValveTemp,ValvePWM,Amp0Temp,Amp0PWM,Amp1Temp,Amp1PWM,Amp2Temp,Amp2PWM,Batt,Event
-          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%d,NONE\n", 
+          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%d, \n", 
                                     time.hour, 
                                     time.minute, 
                                     time.second, 
