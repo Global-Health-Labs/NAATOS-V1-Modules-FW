@@ -742,6 +742,8 @@ void send_usb_change(usb_command_t cmd) {
   bool confirmed = false;
   
   printf("MAIN_TASK: Sending USB change request.\n");
+  //if (cmd != USB_CDC_ACM)
+  uninit_sd_card();
 
   // Send command
   xReturned = xQueueSend(usb_stateChangeQueue, &command, 0);
@@ -753,6 +755,9 @@ void send_usb_change(usb_command_t cmd) {
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to receive usb change confirmation from main_usbChangedConfQueue. \n");
   }
+
+  if (cmd == USB_CDC_ACM)
+    init_sd_card();
 
   printf("MAIN_TASK: USB state successfully changed.\n");
 }
@@ -1168,7 +1173,7 @@ int main(void) {
   }
 
   // Uninitalize the SD card
-  uninit_sd_card();
+  //uninit_sd_card();
 
   // Create Queues
   create_queues();

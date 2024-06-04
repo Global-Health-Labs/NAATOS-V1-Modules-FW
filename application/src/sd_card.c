@@ -40,6 +40,8 @@ void init_sd_card(void) {
                  NRF_GPIO_PIN_H0H1,       // Require High Drive low/high level
                  NRF_GPIO_PIN_NOSENSE);
 
+  disk_state = STA_NOINIT;
+
   memset(&fs, 0, sizeof(FATFS));
 
   // Register the drives we have 
@@ -71,6 +73,7 @@ void init_sd_card(void) {
 }
 
 void uninit_sd_card(void) {
+  disk_state = 0;
 
   UNUSED_RETURN_VALUE(sd_card_unmount());
   UNUSED_RETURN_VALUE(disk_uninitialize(0));
