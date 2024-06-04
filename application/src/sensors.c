@@ -298,10 +298,6 @@ void sensorCollection(void) {
     vTaskDelay(pdMS_TO_TICKS(12 * 4)); // Simulate 12ms delay for each reading
 #endif
 
-#if USE_MOTOR
-    readMotorSpeed();
-#endif
-
     // Put Switch Data into queue
     xReturned = xQueueSend(main_switchQueue, (void *)&switches, 0);
     if (xReturned != pdPASS) {
@@ -309,7 +305,11 @@ void sensorCollection(void) {
     }
     // Send temperature data to Log Data queue
     if (heaterRunning) { 
- #if I2C_CONNECTED
+#if USE_MOTOR
+    double motorSpeed = readMotorSpeed();
+#endif
+
+#if I2C_CONNECTED
       // I2C Read for Valve Zone
       temperatures.valve_zone_temp = readTemp(valve_zone);
       // I2C Read for Amplification Zone 0 
@@ -329,6 +329,7 @@ void sensorCollection(void) {
 #endif
       heaterMsg.type = HEATER_MSG_TEMPERATURE_DATA;
       heaterMsg.tempData = temperatures;
+      heaterMsg.motorSpeed = motorSpeed;
 
       xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
       if (xReturned != pdPASS) {

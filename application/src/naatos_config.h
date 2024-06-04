@@ -322,6 +322,7 @@ typedef struct {
   bool zoneEnabled;
   bool usbSuspend;
   bool heaterRunning;
+  double motorSpeed;
 } HeaterRxQueueMsg_t;
 
 typedef enum {
