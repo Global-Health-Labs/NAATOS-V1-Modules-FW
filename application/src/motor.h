@@ -5,7 +5,7 @@
 
 //TODO: Change to actual pins
 #define MOTOR_INPUT_PIN 44 //TP1= P1.12
-#define MOTOR_OUTPUT_PIN 47 //TP4 = P1.15
+#define MOTOR_OUTPUT_PIN 26 //47 //TP4 = P1.15
 #define MOTOR_OUTPUT_PIN2 45 //TP2 = P1.13 Only here because PWM.c asks for two pins to cfg a PWM module
 
 static const nrf_drv_timer_t m_counter1;

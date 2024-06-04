@@ -314,11 +314,11 @@ void sensorCollection(void) {
 
 #if I2C_CONNECTED
       // I2C Read for Valve Zone
-      temperatures.valve_zone_temp = readTemp(valve_zone);
+      //temperatures.valve_zone_temp = readTemp(valve_zone);
       // I2C Read for Amplification Zone 0 
-      temperatures.amp0_zone_temp = readTemp(amp_zone_0); 
+      //temperatures.amp0_zone_temp = readTemp(amp_zone_0); 
       // I2C Read for Amplification Zone 1 
-      temperatures.amp1_zone_temp = readTemp(amp_zone_1);
+      //temperatures.amp1_zone_temp = readTemp(amp_zone_1);
       // I2C Read for Amplification Zone 2 
       temperatures.amp2_zone_temp = readTemp(amp_zone_2);
     

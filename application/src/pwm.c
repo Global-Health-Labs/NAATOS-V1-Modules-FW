@@ -38,23 +38,28 @@ void init_pwms() {
   ret_code_t err;
   
     /* Create Configurations */
-  /* 1 Channel PWM, 200Hz, Active High, Valve Zone Pin */
-  app_pwm_config_t pwm0_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, VALVE_ZONE_PIN, AMP0_ZONE_PIN);
+  
+  //SAMPLE_HEATER_PIN
+
+#if USE_MOTOR
+    /* 1 Channel PWM, 200Hz, Active High, Valve Zone Pin */
+  app_pwm_config_t pwm0_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, VALVE_ZONE_PIN, SAMPLE_HEATER_PIN);
   pwm0_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
   pwm0_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
-  
-  
-  #if USE_MOTOR
   //1 Channel PWM, 10kHz, Active High, Motor Control Pin */
   app_pwm_config_t pwm2_cfg = APP_PWM_DEFAULT_CONFIG_2CH(100L, MOTOR_OUTPUT_PIN, MOTOR_OUTPUT_PIN2);
   pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
   pwm2_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
-  #else
+#else
+    /* 1 Channel PWM, 200Hz, Active High, Valve Zone Pin */
+  app_pwm_config_t pwm0_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, VALVE_ZONE_PIN, AMP0_ZONE_PIN);
+  pwm0_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
+  pwm0_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
   //1 Channel PWM, 200Hz, Active High, Amplification Zone Pin */
   app_pwm_config_t pwm2_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, AMP1_ZONE_PIN, AMP2_ZONE_PIN);
   pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
   pwm2_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
-  #endif
+#endif
 
   /* Initalize with configurations */
   /* Initalize PWM0 */
@@ -130,10 +135,11 @@ void pwm_task(void * pvParameters) {
   // Set Original Duty Cycles to 0
   #ifdef SAMPLE_PREP_BOARD
   app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 0);
-  app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  0);
+  app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  amp0_duty);
   #else
   app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty);
   app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  amp0_duty);
+  app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL,  amp2_duty);
   #endif
 
   #if USE_MOTOR
@@ -141,7 +147,8 @@ void pwm_task(void * pvParameters) {
   #else
   app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  amp1_duty);
   #endif
-  app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL,  amp2_duty);
+
+
 
   PwmRxQueueMsg_t pwmMsg;
   
