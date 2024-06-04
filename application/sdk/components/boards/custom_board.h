@@ -69,7 +69,7 @@ extern "C" {
 
 
 #define LEDS_NUMBER    0
-#define BUTTONS_NUMBER 1
+#define BUTTONS_NUMBER 0
 #define BUTTONS_ACTIVE_STATE 0
 #define BUTTON_PULL NRF_GPIO_PIN_PULLUP
 
@@ -78,6 +78,13 @@ extern "C" {
 #define BSP_BUTTON_0 PIN_USER_SW
 
 #define LEDS_ACTIVE_STATE 0
+
+#define BSP_QSPI_SCK_PIN   19
+#define BSP_QSPI_CSN_PIN   17
+#define BSP_QSPI_IO0_PIN   20
+#define BSP_QSPI_IO1_PIN   21
+#define BSP_QSPI_IO2_PIN   22
+#define BSP_QSPI_IO3_PIN   23
 
 
 #ifdef __cplusplus
