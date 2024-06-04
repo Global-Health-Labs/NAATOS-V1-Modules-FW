@@ -143,7 +143,7 @@ void pwm_task(void * pvParameters) {
   #endif
 
   #if USE_MOTOR
-  app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  motor_duty);
+  app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  amp1_duty);
   #else
   app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  amp1_duty);
   #endif
@@ -191,15 +191,22 @@ void pwm_task(void * pvParameters) {
               // PWM2 Control
 #if USE_MOTOR
           if (pwm2_ready_flag) {
-            if (motor_active) {
+            if (amp1_zone_active) {
               pwm2_ready_flag = false;
             }
 
-            if (motor_duty > 0){
+           /* if (motor_duty > 0){
               app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL,  motor_duty);
             } else if(amp1_zone_active) {
               app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL,  0);
               motor_active = false;
+            }*/
+
+            if (amp1_duty > 0){
+              app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  amp1_duty);
+            } else if(amp1_zone_active) {
+              app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  0);
+              amp1_zone_active = false;
             }
           }
 #else

@@ -38,6 +38,7 @@ SDK Version: 17.1
 #include "fuel.h"
 #include "led.h"
 #include "switch.h"
+#include "motor.h"
 
 #include "nrf_drv_power.h"
 #include "nrf_pwr_mgmt.h"
@@ -648,20 +649,25 @@ void main_task(void * pvParameters) {
             break;
         }
 
-        vTaskDelay(100);
-
+        #ifdef SAMPLE_PREP_BOARD
+          // Wait for the sample to be removed prior to going back to STANDBY state
+          do {
+            updateLedState(LED_COMPLETE, true);
+            xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
+            hal_triggered = switch_data.hal_triggered;
+            //TODO need to determine if test is invaluid due to being here too long
+          } while(hal_triggered);
+        #else
         // Wait for the sample to be removed prior to going back to STANDBY state
         do {
           updateLedState(LED_COMPLETE, true);
           xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
           hal_triggered = switch_data.hal_triggered;
-#ifdef SAMPLE_PREP_BOARD
-          optical_triggered = true;
-#else
           optical_triggered = switch_data.optical_tiggered;
-#endif
           //TODO need to determine if test is invaluid due to being here too long
         } while(hal_triggered && optical_triggered);
+        #endif
+
         // Update current main state
 
         next_state = MAIN_STANDBY;
@@ -1200,6 +1206,8 @@ int main(void) {
   init_sd_card();
   button_init();
   nrf_drv_gpiote_init();
+
+  nrf_gpio_cfg_output(MOTOR_POWER_ENABLE);
   //err_code = app_timer_init();
   //APP_ERROR_CHECK(err_code);
   //ret_code_t ret_code = nrf_pwr_mgmt_init();

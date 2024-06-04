@@ -1,4 +1,5 @@
 #include "heater.h"
+#include "motor.h"
 #include "timers.h"
 
 xQueueHandle heaterRxQueue;
@@ -61,6 +62,12 @@ void handle_valve_stopstart_heater(bool heating) {
     .valid = false
   };
   wdtUpdate.valid = heating;
+
+  if(heating){
+    nrf_gpio_pin_set(MOTOR_POWER_ENABLE);
+  } else {
+    nrf_gpio_pin_clear(MOTOR_POWER_ENABLE);
+  }
 
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
   if (xReturned != pdPASS) {
