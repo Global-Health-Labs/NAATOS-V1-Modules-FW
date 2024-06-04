@@ -81,6 +81,7 @@ typedef struct {
 led_driver_errors_t led_driver_set_rgb(led_driver_led_selection led_selection, led_color color, uint8_t pwm, led_driver_opDoneCallback_t cb);
 led_driver_errors_t led_driver_enable_channel(led_driver_led_selection led_selection, led_color color, led_driver_opDoneCallback_t cb);
 led_driver_errors_t led_driver_disable_channel(led_driver_led_selection led_selection, led_color color, led_driver_opDoneCallback_t cb);
+led_driver_errors_t led_driver_set_leds_off(led_driver_led_selection led_selection, led_driver_opDoneCallback_t cb);
 led_driver_errors_t led_driver_set_channel_animation_solid(led_driver_led_selection led_selection, led_color color, bool enable, led_driver_opDoneCallback_t cb);
 led_driver_errors_t led_driver_set_channel_animation_flashing(led_driver_led_selection led_selection, led_color color, bool enable, led_driver_opDoneCallback_t cb);
 led_driver_errors_t led_driver_set_channel_animation_breathing(led_driver_led_selection led_selection, led_color color, bool enable, led_driver_opDoneCallback_t cb);

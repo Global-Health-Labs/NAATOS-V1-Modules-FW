@@ -45,3 +45,4 @@ void set_led2_red_fast_blink(void);
 void set_led2_green_solid(void);
 void set_led2_blue_breathe(void);
 void turn_off_led2(void);
+void updateLedState(LEDEvent_e event, bool active);
