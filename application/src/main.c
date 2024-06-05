@@ -283,6 +283,35 @@ void reset_and_enter_dfu(void)
     asm volatile("nop");
 }
 
+void read_sd_and_notify_tasks(void) {
+  BaseType_t xReturned;
+  HeaterRxQueueMsg_t heaterConfigMsg = {
+    .type = HEATER_MSG_CONFIG_UPDATED,
+  };
+
+  SensorRxQueueMsg_t sensorConfigMsg = {
+    .type = CONFIG_UPDATED,
+  };
+
+  xReturned = get_naatos_configuration_parameters(&config);
+  if (xReturned != FR_OK) {
+    printf("Warning: configuration file was not able to be read. Using default configuration parameters.");
+    use_default_configuration_parameters = true;
+  } else {
+    use_default_configuration_parameters = false;
+  }
+
+  xReturned = xQueueSend(heaterRxQueue, &heaterConfigMsg, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send run amplification zone request.\n");
+  }
+
+    // Send to Sensors task
+  xReturned = xQueueSend(sensorRxQueue, &sensorConfigMsg, 0);
+  if (xReturned != pdPASS) {
+    printf("USB: Unable to send usb suspend request to sensorRxQueue.\n");
+  }
+}
 
 
 /*********************************************************************
@@ -355,6 +384,8 @@ void main_task(void * pvParameters) {
             a_t_start = xTaskGetTickCount();
             printf("MAIN_TASK: Alert Timeout - %dms\n", pdTICKS_TO_MS(alert_timeout_ticks));
           }
+
+          read_sd_and_notify_tasks();
           updateLedState(LED_RUN, false);
           updateLedState(LED_STANDBY, true);
         } 

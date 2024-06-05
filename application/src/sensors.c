@@ -44,6 +44,9 @@ static log_data_message_t log_msg = {
   .temperature_data = NULL
 };
 
+
+void updateSampleLogMax(void);
+
 void vSensorTimerCallback( TimerHandle_t xTimer ) {
   BaseType_t xReturned;
   SensorRxQueueMsg_t msg;
@@ -215,13 +218,31 @@ void sensors_task(void * pvParameters) {
         break;
 
         case CONFIG_UPDATED:
+          if(xTimerIsTimerActive(sensorTimer) == pdTRUE) {
+            stopTimer();
+          }
+          
+          updateSampleLogMax();
 
+          if(xTimerIsTimerActive(sensorTimer) == pdFALSE) {
+            startTimer();
+          }
         break;
 
         default:
         break;
       }
     }
+  }
+}
+
+void updateSampleLogMax(void) {
+  // Set the last sample based on config
+  if (use_default_configuration_parameters) {
+    sample_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE); 
+  }
+  else {
+    sample_log_max = (config.logging_rate / config.sample_rate);
   }
 }
 
