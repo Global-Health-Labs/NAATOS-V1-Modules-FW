@@ -257,6 +257,7 @@ void heater_task(void * pvParameters) {
           break;
         }
         case HEATER_MSG_TEMPERATURE_DATA:
+          heaterRxMessage.tempData.motorSpeed = heaterRxMessage.motorSpeed;
           handleSensorDataRx(heaterRxMessage.tempData);
           break;
         case HEATER_MSG_USB_SUSPEND:
@@ -429,12 +430,19 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
 
       updateDutyCycles(pwmData);
 
+#ifndef SAMPLE_PREP_BOARD
       // Set the PWMs for the logger
       h_pwm_data.valve_zone_pwm = valve_pid.out;
       // Set the PWMs for the logger
       h_pwm_data.amp0_zone_pwm = amp0_pid.out;
       h_pwm_data.amp1_zone_pwm = amp1_pid.out;
       h_pwm_data.amp2_zone_pwm = amp2_pid.out;
+#else 
+      h_pwm_data.valve_zone_pwm = pwmData.valve_zone_pwm;
+      h_pwm_data.amp0_zone_pwm = pwmData.amp0_zone_pwm;
+      h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
+      h_pwm_data.amp2_zone_pwm = pwmData.amp2_zone_pwm;
+#endif
 
 #ifdef SAMPLE_PREP_BOARD
       if (config.amp2_max_temp < temperature_data.amp2_zone_temp) {
@@ -469,6 +477,7 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     }
 
     #if VERBOSE_PID 
+ #ifndef SAMPLE_PREP_BOARD
     if (amplification_zone_running) {
       printf("Amp0: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp0_zone_temp, amp0_pid.out);
       printf("Amp1: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp1_zone_temp, amp1_pid.out);
@@ -481,5 +490,15 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
       printf("Amp2_2: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp2_zone_temp, amp2_pid_2.out);
       printf("Valve_2: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.valve_zone_temp, valve_pid_2.out);
     }
+ #else 
+    if (amplification_zone_running) {
+      printf("Heater: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp2_zone_temp, amp0_pid.out);
+      printf("Motor: Speed: %0.2f\tDuty: %0.2f\n",temperature_data.motorSpeed, h_pwm_data.amp1_zone_pwm);
+    }
+    if (valve_zone_running) {
+      printf("Heater: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp2_zone_temp, amp0_pid.out);
+      printf("Motor: Speed: %0.2f\tDuty: %0.2f\n",temperature_data.motorSpeed, h_pwm_data.amp1_zone_pwm);
+    }
+ #endif
 #endif
 }

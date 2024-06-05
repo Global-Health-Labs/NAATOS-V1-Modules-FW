@@ -26,8 +26,8 @@
 
 #define NAATOS_CONFIG_FILE  "config.txt"
 
-#define CSV_HEADER        "Time,ValveTemp,ValvePWM,Amp0Temp,Amp0PWM,Amp1Temp,Amp1PWM,Amp2Temp,Amp2PWM,Batt,Event\n"
-#define CSV_HEADER_SIZE   86
+#define CSV_HEADER        "Time,HeaterTemp,HeaterPWM,MotorSpeed,MotorPWM,Battery,Event\n"
+#define CSV_HEADER_SIZE   61
 
 /**
  * @brief  QSPI block device definition
