@@ -72,7 +72,7 @@ static int switchCounter = 0;
 static TickType_t lastSwitchTime = 0;
 static TickType_t buttonPressStartTime = 0;
 button_update_t updateMsg;
-button_event_e currentEvent = ON_EVENT;
+button_event_e currentEvent = NONE;
 button_event_e previousEvent = ON_EVENT;
 
 void buttonTask(void * pvParameters) {
@@ -200,10 +200,10 @@ void samplePrepButtonState(void) {
       switchCounter = 0;
   }
   
-  if(currentEvent != previousEvent) {
+  if(currentEvent != NONE) {
     updateMsg.event = currentEvent;
     sendButtonUpdate(updateMsg);
-    previousEvent = currentEvent;
+    currentEvent = NONE;
   }
 
   // Update previous state

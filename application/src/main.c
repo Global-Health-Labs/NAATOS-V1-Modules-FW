@@ -298,7 +298,7 @@ void main_task(void * pvParameters) {
   uint8_t queue_size;
   sensor_switches_t switch_data;
   int percent_recv;   
-  button_update_t buttonData;
+  button_update_t buttonData = {.event = NONE};
   bool hal_triggered = false, optical_triggered = false; 
   bool error_during_run = false;
   bool over_temp;
@@ -401,7 +401,7 @@ void main_task(void * pvParameters) {
           }
 
           // Receive the USB Connection Status
-          xReturned =xQueueReceive(main_usbConnRecvQueue, &usb_conn_status, portMAX_DELAY);
+          xReturned = xQueueReceive(main_usbConnRecvQueue, &usb_conn_status, portMAX_DELAY);
           if (xReturned != pdPASS) {
             printf("MAIN_TASK: Unable to receive usb connection status from main_usbConnRecvQueue. \n");
           }
@@ -429,16 +429,6 @@ void main_task(void * pvParameters) {
           // Switch off and USB not connected
           else if (buttonData.event == OFF_EVENT && !usb_conn_status) {
             next_state = MAIN_SLEEP;
-            send_usb_change(USB_DISABLED);
-          }
-          // Switch ON and USB connected
-          else if(usb_conn_status) {
-            next_state = MAIN_STANDBY;
-            send_usb_change(USB_CDC_ACM);
-          }
-          // Switch ON and USB not connected
-          else if (!usb_conn_status) {
-            next_state = MAIN_STANDBY;
             send_usb_change(USB_DISABLED);
           }
           usb_needs_update = false;
@@ -471,6 +461,7 @@ void main_task(void * pvParameters) {
           vTaskDelay(100);
         }
 #endif
+      buttonData.event = NONE;
       break;
 
       // In Running State (Will block task for the duration of the test)

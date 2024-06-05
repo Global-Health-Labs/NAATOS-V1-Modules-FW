@@ -214,7 +214,8 @@ typedef struct {
 typedef enum {
   ON_EVENT,
   OFF_EVENT,
-  BOOTLOADER_EVENT
+  BOOTLOADER_EVENT,
+  NONE
 } button_event_e;
 
 typedef struct {
