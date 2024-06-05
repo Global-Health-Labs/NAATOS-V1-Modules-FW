@@ -129,7 +129,7 @@ extern "C" {
 #define MAX77658_SFT_RESET 0x01
 #define BATT_CHARGER_WDT_PERIOD 64000 //ms
 #define CHARGING_CABLE_CONNECTED 0x0C
-#define BATTERY_MAH 7000 //mAh
+#define BATTERY_MAH 14000 //mAh
 /*=========================================================================*/
 
 typedef enum {
