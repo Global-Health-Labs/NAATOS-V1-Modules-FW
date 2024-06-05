@@ -20,3 +20,4 @@ application/solution/*.emSession
 application/solution/*.jlink
 bootloader/solution/*.emSession
 bootloader/solution/*.jlink
+application/solution/NAATOS_fw.emSession
