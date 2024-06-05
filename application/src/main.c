@@ -46,6 +46,8 @@ SDK Version: 17.1
 #include "nrf_drv_power.h"
 #include "nrf_pwr_mgmt.h"
 #include "nrf_drv_gpiote.h"
+#include "nrf_bootloader_info.h"
+#include "core_cm4.h"
 
 #include "app_error.h"
 #include "app_util.h"
@@ -286,6 +288,35 @@ void reset_and_enter_dfu(void)
     asm volatile("nop");
 }
 
+void read_sd_and_notify_tasks(void) {
+  BaseType_t xReturned;
+  HeaterRxQueueMsg_t heaterConfigMsg = {
+    .type = HEATER_MSG_CONFIG_UPDATED,
+  };
+
+  SensorRxQueueMsg_t sensorConfigMsg = {
+    .type = CONFIG_UPDATED,
+  };
+
+  xReturned = get_naatos_configuration_parameters(&config);
+  if (xReturned != FR_OK) {
+    printf("Warning: configuration file was not able to be read. Using default configuration parameters.");
+    use_default_configuration_parameters = true;
+  } else {
+    use_default_configuration_parameters = false;
+  }
+
+  xReturned = xQueueSend(heaterRxQueue, &heaterConfigMsg, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send run amplification zone request.\n");
+  }
+
+    // Send to Sensors task
+  xReturned = xQueueSend(sensorRxQueue, &sensorConfigMsg, 0);
+  if (xReturned != pdPASS) {
+    printf("USB: Unable to send usb suspend request to sensorRxQueue.\n");
+  }
+}
 
 /*********************************************************************
 *
@@ -357,6 +388,8 @@ void main_task(void * pvParameters) {
             a_t_start = xTaskGetTickCount();
             printf("MAIN_TASK: Alert Timeout - %dms\n", pdTICKS_TO_MS(alert_timeout_ticks));
           }
+
+          read_sd_and_notify_tasks();
           updateLedState(LED_RUN, false);
           updateLedState(LED_STANDBY, true);
         } 
@@ -693,7 +726,7 @@ void main_task(void * pvParameters) {
         break;
 
       case MAIN_FILE:
-        if(last_state != main_state){
+        if(last_state != main_state) {
           SensorRxQueueMsg_t msg;
           msg.type = SENSOR_MSG_SLEEP;
           xReturned = xQueueSend(sensorRxQueue, &msg, 0);
@@ -790,7 +823,6 @@ void main_task(void * pvParameters) {
         reset_and_enter_dfu();
         break;
       }
-
       // Shouldnt Get here
       default:
       break;

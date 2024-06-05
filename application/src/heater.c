@@ -284,6 +284,7 @@ void heater_task(void * pvParameters) {
         }
         case HEATER_MSG_CONFIG_UPDATED:
             // Handle config updated message
+            
             break;
         case HEATER_MSG_WDT_UPDATE:
             // Handle watchdog timer update message
