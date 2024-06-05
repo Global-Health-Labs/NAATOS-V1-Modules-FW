@@ -418,18 +418,8 @@ void main_task(void * pvParameters) {
         }
 
         if (usb_needs_update) {
-          // Switch ON and USB connected
-          if(buttonData.event == ON_EVENT && usb_conn_status) {
-            next_state = MAIN_STANDBY;
-            send_usb_change(USB_CDC_ACM);
-          }
-          // Switch ON and USB not connected
-          else if (buttonData.event == ON_EVENT && !usb_conn_status) {
-            next_state = MAIN_STANDBY;
-            send_usb_change(USB_DISABLED);
-          }
           // Switch OFF and USB connected
-          else if (buttonData.event == OFF_EVENT && usb_conn_status) {
+          if (buttonData.event == OFF_EVENT && usb_conn_status) {
             next_state = MAIN_FILE;
             updateLedState(LED_RUN, false);
             updateLedState(LED_STANDBY, false);
@@ -439,6 +429,16 @@ void main_task(void * pvParameters) {
           // Switch off and USB not connected
           else if (buttonData.event == OFF_EVENT && !usb_conn_status) {
             next_state = MAIN_SLEEP;
+            send_usb_change(USB_DISABLED);
+          }
+          // Switch ON and USB connected
+          else if(usb_conn_status) {
+            next_state = MAIN_STANDBY;
+            send_usb_change(USB_CDC_ACM);
+          }
+          // Switch ON and USB not connected
+          else if (!usb_conn_status) {
+            next_state = MAIN_STANDBY;
             send_usb_change(USB_DISABLED);
           }
           usb_needs_update = false;
@@ -456,7 +456,7 @@ void main_task(void * pvParameters) {
 
 #ifdef SAMPLE_PREP_BOARD
         // Check if we can go to RUN state
-        if (hal_triggered && !error_during_run) {
+        if (hal_triggered && buttonData.event == ON_EVENT && !error_during_run) {
           next_state = MAIN_RUNNING;
           sendUpdatedMainTaskState(next_state);
           // Delay
@@ -677,12 +677,12 @@ void main_task(void * pvParameters) {
 
         #ifdef SAMPLE_PREP_BOARD
           // Wait for the sample to be removed prior to going back to STANDBY state
-          do {
-            updateLedState(LED_COMPLETE, true);
-            xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
-            hal_triggered = switch_data.hal_triggered;
-            //TODO need to determine if test is invaluid due to being here too long
-          } while(hal_triggered);
+        do {
+          updateLedState(LED_COMPLETE, true);
+          xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
+          hal_triggered = switch_data.hal_triggered;
+          //TODO need to determine if test is invaluid due to being here too long
+        } while(hal_triggered);
         #else
         // Wait for the sample to be removed prior to going back to STANDBY state
         do {

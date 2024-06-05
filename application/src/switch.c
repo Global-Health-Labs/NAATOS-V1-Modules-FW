@@ -3,7 +3,7 @@
 #include "timers.h"
 #include "nrf_drv_gpiote.h"
 
-#define BUTTON_TASK_DELAY 150 // msec
+#define BUTTON_TASK_DELAY 80 // msec
 
 xQueueHandle buttonRxQueue;
 TimerHandle_t buttonTimer;
@@ -180,14 +180,14 @@ void samplePrepButtonState(void) {
           buttonHeld = true;
       } else { // Button released
           buttonHeld = false;
-          if ((lastSwitchTime - buttonPressStartTime) < pdMS_TO_TICKS(3000) && switchCounter == 1) {
+          if ((lastSwitchTime - buttonPressStartTime) < pdMS_TO_TICKS(1000) && switchCounter == 1) {
               currentEvent = ON_EVENT;
           }
       }
   }
 
   // Check for long press
-  if (buttonHeld && (currentTime - buttonPressStartTime) >= pdMS_TO_TICKS(3000)) {
+  if (buttonHeld && (currentTime - buttonPressStartTime) >= pdMS_TO_TICKS(2000)) {
       currentEvent = OFF_EVENT;
       buttonHeld = false;
   }
