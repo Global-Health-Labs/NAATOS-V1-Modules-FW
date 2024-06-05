@@ -10,6 +10,7 @@ bool get_optical_triggered(void) {
   nrfx_saadc_sample_convert(OPTICAL_CHANNEL, &adc_val);
   //printf("Optical Value: %d\n", adc_val);
   // Check to see if adc value is below threshold
+#ifndef SAMPLE_PREP_BOARD
   if (use_default_configuration_parameters) {
     if (adc_val < OPTICAL_TRIG_THRES) 
       return true;
@@ -18,6 +19,7 @@ bool get_optical_triggered(void) {
     if (adc_val < config.optical_distance) 
       return true;
   }
+#endif
   return false;
 }
 

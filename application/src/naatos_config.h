@@ -47,6 +47,8 @@
 #define DEFAULT_ALERT_TIMEOUT_M       0.5   // Minutes
 #define DEFAULT_RECOVERY_THRES        40    // Percent
 #define OPTICAL_TRIG_THRES            800
+#define DEFAULT_HEATER_SETPOINT       65.0
+#define DEFAULT_MOTOR_SPEED_RPM       400
 
 /* Device Debug Parameters */
 #define I2C_CONNECTED           1
@@ -373,6 +375,7 @@ extern xTaskHandle compositeTaskHandle;
 extern xTaskHandle buttonTaskHandle;
 
 // Config parameters
+#ifndef SAMPLE_PREP_BOARD
 typedef struct {
   float sample_rate;
   float logging_rate;
@@ -421,6 +424,25 @@ typedef struct {
   float amp2_ki_2;
   float amp2_kd_2;
 } naatos_config_parameters;
+#else 
+typedef struct {
+  float sample_rate;
+  float logging_rate;
+  uint16_t valve_zone_run_time_m;
+  uint16_t amplification_zone_run_time_m;
+  uint16_t low_power_threshold;
+  uint16_t recovery_power_thresh;
+  float heater_setpoint;
+  float heater_max_temp;
+  float min_run_zone_temp;
+  bool  min_run_zone_temp_en;
+  float alert_timeout_time_m;
+  float heater_kp;
+  float heater_ki;
+  float heater_kd;
+  uint16_t motor_speed_rpm;
+} naatos_config_parameters;
+#endif
 
 /* Configuration Parameters Variables */
 extern bool use_default_configuration_parameters;

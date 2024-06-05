@@ -217,6 +217,7 @@ const usb_message_t running_update = {
 };
 
 // Configuration Parameters
+#ifndef SAMPLE_PREP_BOARD
 naatos_config_parameters config = {
   .logging_rate = 0,
   .sample_rate = 0,
@@ -256,6 +257,20 @@ naatos_config_parameters config = {
   .amp2_ki_2 = 0,
   .amp2_kd_2 = 0
 };
+#else 
+naatos_config_parameters config = {
+  .logging_rate = 0,
+  .sample_rate = 0,
+  .amplification_zone_run_time_m = 0,
+  .valve_zone_run_time_m = 0,
+  .low_power_threshold = 0,
+  .heater_setpoint = 0,
+  .heater_kp = 0,
+  .heater_ki = 0,
+  .heater_kd = 0,
+  .motor_speed_rpm = 0
+};
+#endif
 bool use_default_configuration_parameters = false;
 
 // Function defs

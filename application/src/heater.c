@@ -131,19 +131,20 @@ void handle_amplification_stopstart_heater(bool heating) {
 void heater_reset_all_pids(void){
  // Create PID Controllers 
   if (use_default_configuration_parameters) {
-    pid_controller_init(&valve_pid, VALVE_SETPOINT, V_KP, V_KI, V_KD);  
-    pid_controller_init(&amp0_pid, AMP0_SETPOINT, A0_KP, A0_KI, A0_KD);
-    pid_controller_init(&amp1_pid, AMP1_SETPOINT, A1_KP, A1_KI, A1_KD);
-    pid_controller_init(&amp2_pid, AMP1_SETPOINT, A2_KP, A2_KI, A2_KD);
+    //pid_controller_init(&valve_pid, VALVE_SETPOINT, V_KP, V_KI, V_KD);  
+    pid_controller_init(&amp0_pid, DEFAULT_HEATER_SETPOINT, H_KP, H_KI, H_KD);
+    //pid_controller_init(&amp1_pid, AMP1_SETPOINT, A1_KP, A1_KI, A1_KD);
+    //pid_controller_init(&amp2_pid, AMP1_SETPOINT, A2_KP, A2_KI, A2_KD);
   } else {
-    pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);   
-    pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
-    pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
-    pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
+    //pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);   
+    pid_controller_init(&amp0_pid, config.heater_setpoint, config.heater_kp, config.heater_ki, config.heater_kd);
+    //pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
+    //pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
   }
 
   
   // Create PID Controllers 
+  /* Depreciated -> Dont need to run heater on sample prep board during "Valve Zone Active"
   if (use_default_configuration_parameters) {
     pid_controller_init(&valve_pid_2, VALVE_SETPOINT_2, V_KP_2, V_KI_2, V_KD_2);  
     pid_controller_init(&amp0_pid_2, AMP0_SETPOINT_2, A0_KP_2, A0_KI_2, A0_KD_2);
@@ -155,7 +156,7 @@ void heater_reset_all_pids(void){
     pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2);
     pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2);
   }
-
+  */
 }
 
 void sendWdtHeaterValid() {
@@ -206,11 +207,11 @@ void heater_task(void * pvParameters) {
               updateDutyCycles(pwmData);
 
               
-              pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  // TODO: Implement defaults
+              //pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  // TODO: Implement defaults
               // Reinitalize PID Values 
-              pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
-              pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
-              pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
+              pid_controller_init(&amp0_pid, config.heater_setpoint, config.heater_kp, config.heater_ki, config.heater_kd);
+              //pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
+              //pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
           
               // Send stop heater to sensors task
               heater_run = false;
@@ -240,10 +241,10 @@ void heater_task(void * pvParameters) {
               };
               updateDutyCycles(pwmData);
               // Reinitalize PID Values
-              pid_controller_init(&valve_pid_2, config.valve_setpoint_2, config.valve_kp_2, config.valve_ki_2, config.valve_kd_2);  
-              pid_controller_init(&amp0_pid_2, config.amp0_setpoint_2, config.amp0_kp_2, config.amp0_ki_2, config.amp0_kd_2);
-              pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2);
-              pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2);
+              //pid_controller_init(&valve_pid_2, config.valve_setpoint_2, config.valve_kp_2, config.valve_ki_2, config.valve_kd_2);  
+              //pid_controller_init(&amp0_pid_2, config.amp0_setpoint_2, config.amp0_kp_2, config.amp0_ki_2, config.amp0_kd_2);
+              //pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2);
+              //pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2);
               // Send stop heater to sensors task
               heater_run = false;
               handle_valve_stopstart_heater(heater_run);
@@ -361,7 +362,7 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
       updateDutyCycles(pwmData);
       h_pwm_data.amp0_zone_pwm = amp0_pid.out;
 
-      if (config.amp0_max_temp < temperature_data.amp2_zone_temp) {
+      if (config.heater_max_temp < temperature_data.amp2_zone_temp) {
         greater_than_max = true;
       }
 #else
@@ -445,7 +446,7 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
 #endif
 
 #ifdef SAMPLE_PREP_BOARD
-      if (config.amp2_max_temp < temperature_data.amp2_zone_temp) {
+      if (config.heater_max_temp < temperature_data.amp2_zone_temp) {
         greater_than_max = true;
       }
 #else

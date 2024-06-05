@@ -56,6 +56,7 @@ NRF_BLOCK_DEV_SDC_DEFINE(
     NRF_BLOCKDEV_BASE_ADDR(m_block_dev_sdc, block_dev)      \
 )
 
+#ifndef SAMPLE_PREP_BOARD
 typedef enum {
   SAMPLE_RATE,
   LOGGING_RATE,
@@ -105,6 +106,26 @@ typedef enum {
   AMP2_KD_2,
   NUM_PARAMETERS
 } naatos_config_params_t;
+#else 
+typedef enum {
+  SAMPLE_RATE,
+  LOGGING_RATE,
+  VALVE_ZONE_RUN_TIME,
+  AMP_ZONE_RUN_TIME,
+  LOW_POWER_THRESHOLD,
+  RECOVERY_POWER_THRESHOLD,
+  HEATER_SETPOINT_C,
+  HEATER_MAX_TEMP_C,
+  MIN_RUN_ZONE_TEMP_C,
+  MIN_RUN_ZONE_TEMP_EN,
+  ALERT_TIMEOUT_TIME,
+  HEATER_KP,
+  HEATER_KI,
+  HEATER_KD,
+  MOTOR_SPEED,
+  NUM_PARAMETERS
+} naatos_config_params_t;
+#endif
 
 typedef struct {
   bool log_dir_needed;

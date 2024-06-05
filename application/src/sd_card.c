@@ -298,6 +298,7 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
+ #ifndef SAMPLE_PREP_BOARD
   // Write Valve Zone Setpoint
   configBufferSize = sprintf(configBuffer, "valve_setpoint:%0.2f\n", VALVE_SETPOINT);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
@@ -341,6 +342,20 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
+#else 
+  // Write Valve Zone Setpoint
+  configBufferSize = sprintf(configBuffer, "heater_setpoint:%0.2f\n", DEFAULT_HEATER_SETPOINT);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Heater Max Temperature
+  configBufferSize = sprintf(configBuffer, "heater_max_temp:%0.2f\n", DEFAULT_VALVE_MAX_TEMP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+#endif
   // Write Minimum Run Zone Temperature and Enable
   configBufferSize = sprintf(configBuffer, "min_run_zone_temp:%0.2f\n", DEFAULT_MIN_RUN_ZONE_TEMP);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
@@ -358,6 +373,7 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
+ #ifndef SAMPLE_PREP_BOARD
   // Write Valve Kp
   configBufferSize = sprintf(configBuffer, "valve_kp:%0.3f\n", V_KP);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
@@ -530,6 +546,32 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
+ #else 
+  // Write Heater Kp
+  configBufferSize = sprintf(configBuffer, "heater_kp:%0.3f\n", H_KP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Heater Ki
+  configBufferSize = sprintf(configBuffer, "heater_ki:%0.3f\n", H_KI);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Heater Kd
+  configBufferSize = sprintf(configBuffer, "heater_kd:%0.3f\n", H_KD);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Motor Speed
+  configBufferSize = sprintf(configBuffer, "motor_speed_rpm:%d\n", DEFAULT_MOTOR_SPEED_RPM);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+ #endif
 
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
@@ -618,6 +660,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
         case RECOVERY_POWER_THRESHOLD:
             parameters->recovery_power_thresh = atoi(val);
             break;
+#ifndef SAMPLE_PREP_BOARD
         case VALVE_SETPOINT_C:
             parameters->valve_setpoint = atof(val); 
             break;
@@ -642,6 +685,15 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
         case AMP2_MAX_TEMP_C:
             parameters->amp2_max_temp = atof(val);
             break;
+        
+#else 
+        case HEATER_SETPOINT_C:
+            parameters->heater_setpoint = atof(val);
+            break;
+         case HEATER_MAX_TEMP_C:
+            parameters->heater_max_temp = atof(val);
+           break;
+#endif      
         case MIN_RUN_ZONE_TEMP_C:
             parameters->min_run_zone_temp = atof(val);
             break;
@@ -652,6 +704,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
         case ALERT_TIMEOUT_TIME:
             parameters->alert_timeout_time_m = atof(val);
             break;
+#ifndef SAMPLE_PREP_BOARD
         case VALVE_KP:
             parameters->valve_kp = atof(val);
             break;
@@ -739,6 +792,20 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
         case AMP2_KD_2:
             parameters->amp2_kd_2 = atof(val);
             break;
+ #else 
+        case HEATER_KP:
+            parameters->heater_kp = atof(val);
+            break;
+        case HEATER_KI:
+            parameters->heater_ki = atof(val);
+            break;
+        case HEATER_KD:
+            parameters->heater_kd = atof(val);
+            break;
+        case MOTOR_SPEED:
+            parameters->motor_speed_rpm = atoi(val);
+            break;
+ #endif
         default:
             // Handle default case
             break;
