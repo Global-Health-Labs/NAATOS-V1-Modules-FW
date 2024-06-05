@@ -72,7 +72,8 @@ typedef enum {
   MAIN_STANDBY,
   MAIN_RUNNING,
   MAIN_FILE,
-  MAIN_SLEEP
+  MAIN_SLEEP,
+  MAIN_BOOTLOADER
 } main_state_t;
 
 typedef enum {

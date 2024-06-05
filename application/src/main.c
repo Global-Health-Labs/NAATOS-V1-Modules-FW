@@ -42,6 +42,8 @@ SDK Version: 17.1
 #include "nrf_drv_power.h"
 #include "nrf_pwr_mgmt.h"
 #include "nrf_drv_gpiote.h"
+#include "nrf_bootloader_info.h"
+#include "core_cm4.h"
 
 #include "app_error.h"
 #include "app_util.h"
@@ -267,6 +269,21 @@ xTaskHandle get_usb_task_handle(void)
     return usbTaskHandle;
 }
 
+// Function for setting general purpose register for entering DFU
+void reset_and_enter_dfu(void)
+{
+    uint32_t volatile * const p_gpreg1 = (uint32_t volatile * const)0x4000051C;
+    // Clear then set (matches behavior when softdevice is used)
+    *p_gpreg1 = 0;
+    *p_gpreg1 = BOOTLOADER_DFU_START;
+
+    // Device will enter bootloader on next reset, 
+    // use this line of code to perform the reset:
+    NVIC_SystemReset();
+    asm volatile("nop");
+}
+
+
 
 /*********************************************************************
 *
@@ -392,6 +409,12 @@ void main_task(void * pvParameters) {
         //if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
 
         //}
+
+        
+        if(buttonData.event == BOOTLOADER_EVENT) {
+          next_state = MAIN_BOOTLOADER;
+          break;
+        }
 
         if (usb_needs_update) {
           // Switch ON and USB connected
@@ -728,6 +751,11 @@ void main_task(void * pvParameters) {
         main_state = MAIN_STANDBY;
 
        break;
+      }
+
+      case MAIN_BOOTLOADER:{
+        reset_and_enter_dfu();
+        break;
       }
       // Shouldnt Get here
       default:
