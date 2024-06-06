@@ -405,7 +405,13 @@ void main_task(void * pvParameters) {
           }
 
           read_sd_and_notify_tasks();
+            if (!use_default_configuration_parameters) {
+              alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(config.alert_timeout_time_s * 1000.0));
+            } else {
+               alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(DEFAULT_ALERT_TIMEOUT_S * 1000.0));
+            }
           updateLedState(LED_RUN, false);
+          updateLedState(LED_COMPLETE, false);
           updateLedState(LED_STANDBY, true);
         } 
         
@@ -737,7 +743,7 @@ void main_task(void * pvParameters) {
 
         next_state = MAIN_STANDBY;
         sendUpdatedMainTaskState(next_state);
-        vTaskDelay(250);
+        //vTaskDelay(250);
         break;
 
       case MAIN_FILE:
@@ -1239,7 +1245,6 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
 *
 *   Application entry point.
 */
-
 int main(void) {
  BaseType_t xReturned;
   ret_code_t err_code;
