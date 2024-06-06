@@ -13,8 +13,8 @@
 #define DEFAULT_LOW_POWER_THRESHOLD     20
 
 /* Heater Zones' Parameters */
-#define DEFAULT_AMPLIFICATION_ZONE_ON_TIME  30    // Minutes
-#define DEFAULT_VALVE_ZONE_ON_TIME          3     // Minutes
+#define DEFAULT_AMPLIFICATION_ZONE_ON_TIME  2400    // 40min in seconds
+#define DEFAULT_VALVE_ZONE_ON_TIME          300     // 5min in seconds
 
 /* I2C Pins */
 #define I2C0_SDA_PIN    17
@@ -36,13 +36,13 @@
 */ 
 #define DEFAULT_SAMPLE_RATE           0.200  // 0.048 minimum
 #define DEFAULT_LOGGING_RATE          5.000
-#define DEFAULT_VALVE_MAX_TEMP        95.0
+#define DEFAULT_VALVE_MAX_TEMP        105.0
 #define DEFAULT_AMP0_MAX_TEMP         80.0
 #define DEFAULT_AMP1_MAX_TEMP         80.0
 #define DEFAULT_AMP2_MAX_TEMP         80.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP     50.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP_EN  true
-#define DEFAULT_ALERT_TIMEOUT_M       0.5   // Minutes
+#define DEFAULT_ALERT_TIMEOUT_M       10   // seconds
 #define DEFAULT_RECOVERY_THRES        40    // Percent
 #define OPTICAL_TRIG_THRES            800
 

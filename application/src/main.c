@@ -348,9 +348,9 @@ void main_task(void * pvParameters) {
 
   // Get the alert timeout
   if (!use_default_configuration_parameters) {
-    alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((config.alert_timeout_time_m * 60.0) * 1000.0));
+    alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((config.alert_timeout_time_m) * 1000.0));
   } else {
-     alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((DEFAULT_ALERT_TIMEOUT_M * 60.0) * 1000.0));
+     alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((DEFAULT_ALERT_TIMEOUT_M) * 1000.0));
   }
 
   create_tasks();
@@ -548,10 +548,10 @@ void main_task(void * pvParameters) {
         // Get the start time and end time
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
-          end_time = pdMS_TO_TICKS((DEFAULT_AMPLIFICATION_ZONE_ON_TIME * 60) * 1000);
+          end_time = pdMS_TO_TICKS((DEFAULT_AMPLIFICATION_ZONE_ON_TIME) * 1000);
         }
         else {
-          end_time = pdMS_TO_TICKS((config.amplification_zone_run_time_m * 60) * 1000);
+          end_time = pdMS_TO_TICKS((config.amplification_zone_run_time_m) * 1000);
         }
         // Get sensor switch data ensuring sample is still in position
         do {
