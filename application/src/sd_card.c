@@ -368,7 +368,7 @@ FRESULT check_for_config_file(void) {
     return res;
   }
   // Write Alert Timeout (minutes)
-  configBufferSize = sprintf(configBuffer, "alert_timeout_time_m:%0.2f\n", DEFAULT_ALERT_TIMEOUT_M);
+  configBufferSize = sprintf(configBuffer, "alert_timeout_time_s:%0.2f\n", DEFAULT_ALERT_TIMEOUT_S);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -573,10 +573,6 @@ FRESULT check_for_config_file(void) {
   }
  #endif
 
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
   // Close the file
   res = f_close(&file);
   if (res != FR_OK) {
@@ -702,7 +698,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
             parameters->min_run_zone_temp_en = num ? false : true;
             break;
         case ALERT_TIMEOUT_TIME:
-            parameters->alert_timeout_time_m = atof(val);
+            parameters->alert_timeout_time_s = atof(val);
             break;
 #ifndef SAMPLE_PREP_BOARD
         case VALVE_KP:

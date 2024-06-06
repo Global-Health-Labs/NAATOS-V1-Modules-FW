@@ -367,9 +367,9 @@ void main_task(void * pvParameters) {
 
   // Get the alert timeout
   if (!use_default_configuration_parameters) {
-    alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((config.alert_timeout_time_m * 60.0) * 1000.0));
+    alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(config.alert_timeout_time_s * 1000.0));
   } else {
-     alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((DEFAULT_ALERT_TIMEOUT_M * 60.0) * 1000.0));
+     alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(DEFAULT_ALERT_TIMEOUT_S * 1000.0));
   }
 
   create_tasks();

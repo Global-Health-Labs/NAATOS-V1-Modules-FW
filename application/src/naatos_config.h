@@ -44,7 +44,7 @@
 #define DEFAULT_AMP2_MAX_TEMP         80.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP     50.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP_EN  true
-#define DEFAULT_ALERT_TIMEOUT_M       0.5   // Minutes
+#define DEFAULT_ALERT_TIMEOUT_S       30.0   // Seconds
 #define DEFAULT_RECOVERY_THRES        40    // Percent
 #define OPTICAL_TRIG_THRES            800
 #define DEFAULT_HEATER_SETPOINT       65.0
@@ -436,7 +436,7 @@ typedef struct {
   float heater_max_temp;
   float min_run_zone_temp;
   bool  min_run_zone_temp_en;
-  float alert_timeout_time_m;
+  float alert_timeout_time_s;
   float heater_kp;
   float heater_ki;
   float heater_kd;
