@@ -15,8 +15,8 @@
 #define DEFAULT_LOW_POWER_THRESHOLD     20
 
 /* Heater Zones' Parameters */
-#define DEFAULT_AMPLIFICATION_ZONE_ON_TIME  30    // Minutes
-#define DEFAULT_VALVE_ZONE_ON_TIME          3     // Minutes
+#define DEFAULT_AMPLIFICATION_ZONE_ON_TIME  120    // Seconds
+#define DEFAULT_VALVE_ZONE_ON_TIME          120     // Seconds
 
 /* I2C Pins */
 #define I2C0_SDA_PIN    17
