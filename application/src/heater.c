@@ -28,6 +28,9 @@ temperature_pwm_data_t outputPwmData = {
   .amp2_zone_pwm = 0
 };
 
+pid_controller_t heater_pid_1;
+pid_controller_t heater_pid_2;
+
 pid_controller_t valve_pid;
 pid_controller_t amp0_pid;
 pid_controller_t amp1_pid;
@@ -110,6 +113,12 @@ void handle_amplification_stopstart_heater(bool heating) {
   };
   wdtUpdate.valid = heating;
 
+  if(heating){
+    nrf_gpio_pin_set(MOTOR_POWER_ENABLE);
+  } else {
+    nrf_gpio_pin_clear(MOTOR_POWER_ENABLE);
+  }
+
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
   if (xReturned != pdPASS) {
     printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
@@ -129,27 +138,18 @@ void handle_amplification_stopstart_heater(bool heating) {
 }
 
 void heater_reset_all_pids(void){
- // Create PID Controllers 
-  if (use_default_configuration_parameters) {
-    pid_controller_init(&amp0_pid, DEFAULT_HEATER_SETPOINT, H_KP, H_KI, H_KD);
-  } else {  
-    pid_controller_init(&amp0_pid, config.heater_setpoint, config.heater_kp, config.heater_ki, config.heater_kd);
-  }
-  
   // Create PID Controllers 
-  /* Depreciated -> Dont need to run heater on sample prep board during "Valve Zone Active"
   if (use_default_configuration_parameters) {
-    pid_controller_init(&valve_pid_2, VALVE_SETPOINT_2, V_KP_2, V_KI_2, V_KD_2);  
-    pid_controller_init(&amp0_pid_2, AMP0_SETPOINT_2, A0_KP_2, A0_KI_2, A0_KD_2);
-    pid_controller_init(&amp1_pid_2, AMP1_SETPOINT_2, A1_KP_2, A1_KI_2, A1_KD_2);
-    pid_controller_init(&amp2_pid_2, AMP1_SETPOINT_2, A2_KP_2, A2_KI_2, A2_KD_2);
-  } else {
-    pid_controller_init(&valve_pid_2, config.valve_setpoint_2, config.valve_kp_2, config.valve_ki_2, config.valve_kd_2);  
-    pid_controller_init(&amp0_pid_2, config.amp0_setpoint_2, config.amp0_kp_2, config.amp0_ki_2, config.amp0_kd_2);
-    pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2);
-    pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2);
+    pid_controller_init(&heater_pid_1, DEFAULT_HEATER_SETPOINT, H_KP, H_KI, H_KD);
+  } else {  
+    pid_controller_init(&heater_pid_1, config.heater_setpoint_1, config.heater_kp_1, config.heater_ki_1, config.heater_kd_1);
   }
-  */
+
+  if (use_default_configuration_parameters) {
+    pid_controller_init(&heater_pid_2, DEFAULT_HEATER_SETPOINT, H_KP, H_KI, H_KD);
+  } else {  
+    pid_controller_init(&heater_pid_2, config.heater_setpoint_2, config.heater_kp_2, config.heater_ki_2, config.heater_kd_2);
+  }
 }
 
 void sendWdtHeaterValid() {
@@ -187,25 +187,15 @@ void heater_task(void * pvParameters) {
           if (heaterRxMessage.zoneSelect == AMPLIFICATION) {
             amplification_zone_running = heaterRxMessage.zoneEnabled;
             if (!amplification_zone_running) { //AMP2 will be used in sample prep fro heating
-              amp0_pid.out = 0;
-              amp1_pid.out = 0;
-              amp2_pid.out = 0;
-              valve_pid.out = 0;
+              heater_pid_1.out = 0;
               temperature_pwm_data_t pwmData = {
-                .valve_zone_pwm = valve_pid.out,
-                .amp0_zone_pwm = amp0_pid.out,
-                .amp1_zone_pwm = amp1_pid.out,
-                .amp2_zone_pwm = amp2_pid.out
+                .valve_zone_pwm = 0,
+                .amp0_zone_pwm = heater_pid_1.out,
+                .amp1_zone_pwm = 0,
+                .amp2_zone_pwm = 0
               };
               updateDutyCycles(pwmData);
 
-              
-              //pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  // TODO: Implement defaults
-              // Reinitalize PID Values 
-              //pid_controller_init(&amp0_pid, config.heater_setpoint, config.heater_kp, config.heater_ki, config.heater_kd);
-              //pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
-              //pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
-          
               // Send stop heater to sensors task
               heater_run = false;
               starting_run = false;
@@ -222,22 +212,15 @@ void heater_task(void * pvParameters) {
           else if (heaterRxMessage.zoneSelect = VALVE) {
             valve_zone_running = heaterRxMessage.zoneEnabled;
             if (!valve_zone_running) {
-              valve_pid.out = 0;
-              amp0_pid.out = 0;
-              amp1_pid.out = 0;
-              amp2_pid.out = 0;
+              heater_pid_2.out = 0;
               temperature_pwm_data_t pwmData = {
-                .valve_zone_pwm = valve_pid.out,
-                .amp0_zone_pwm = amp0_pid.out,
-                .amp1_zone_pwm = amp1_pid.out,
-                .amp2_zone_pwm = amp2_pid.out
+                .valve_zone_pwm = 0,
+                .amp0_zone_pwm = heater_pid_2.out,
+                .amp1_zone_pwm = 0,
+                .amp2_zone_pwm = 0
               };
               updateDutyCycles(pwmData);
-              // Reinitalize PID Values
-              //pid_controller_init(&valve_pid_2, config.valve_setpoint_2, config.valve_kp_2, config.valve_ki_2, config.valve_kd_2);  
-              //pid_controller_init(&amp0_pid_2, config.amp0_setpoint_2, config.amp0_kp_2, config.amp0_ki_2, config.amp0_kd_2);
-              //pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2);
-              //pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2);
+              
               // Send stop heater to sensors task
               heater_run = false;
               handle_valve_stopstart_heater(heater_run);
@@ -342,18 +325,29 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     if (amplification_zone_running) {
 #ifdef SAMPLE_PREP_BOARD
       // Update Amplification 2 PID loop with new temperatures
-      pid_controller_compute(&amp0_pid, temperature_data.amp2_zone_temp);
+      if (config.run_heater_1) {
+        pid_controller_compute(&heater_pid_1, temperature_data.amp2_zone_temp);
+      }
       
       temperature_pwm_data_t pwmData = {
-        .valve_zone_pwm = valve_pid.out,
-        .amp0_zone_pwm = amp0_pid.out,
-        .amp1_zone_pwm = amp1_pid.out,
-        .amp2_zone_pwm = amp2_pid.out
+        .valve_zone_pwm = 0,
+        .amp0_zone_pwm = heater_pid_1.out,
+        .amp1_zone_pwm = 0,
+        .amp2_zone_pwm = 0
       };
+      if (!use_default_configuration_parameters && config.run_motor_1) {
+        pwmData.amp1_zone_pwm = config.motor_speed_pwm_1;
+      }
+      else if (use_default_configuration_parameters && DEFAULT_RUN_MOTOR_1) {
+        pwmData.amp1_zone_pwm = DEFAULT_MOTOR_SPEED_PWM;
+      }
 
       // Update Amplification 2 PWM with PID output
       updateDutyCycles(pwmData);
-      h_pwm_data.amp0_zone_pwm = amp0_pid.out;
+      h_pwm_data.valve_zone_pwm = pwmData.valve_zone_pwm;
+      h_pwm_data.amp0_zone_pwm = pwmData.amp0_zone_pwm;
+      h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
+      h_pwm_data.amp2_zone_pwm = pwmData.amp2_zone_pwm;
 
       if (config.heater_max_temp < temperature_data.amp2_zone_temp) {
         greater_than_max = true;
@@ -399,14 +393,22 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
    }
    if (valve_zone_running) { //AMP 1 will be used for motor
 #ifdef SAMPLE_PREP_BOARD
+      // Update Amplification 2 PID loop with new temperatures
+      if (config.run_heater_2) {
+        pid_controller_compute(&heater_pid_2, temperature_data.amp2_zone_temp);
+      }
+      
       temperature_pwm_data_t pwmData = {
-          .valve_zone_pwm = 0,
-          .amp0_zone_pwm = 0,
-          .amp1_zone_pwm = DEFAULT_MOTOR_SPEED_PWM, 
-          .amp2_zone_pwm = 0
+        .valve_zone_pwm = 0,
+        .amp0_zone_pwm = heater_pid_2.out,
+        .amp1_zone_pwm = 0,
+        .amp2_zone_pwm = 0
       };
-      if (!use_default_configuration_parameters) {
-        pwmData.amp1_zone_pwm = config.motor_speed_pwm;
+      if (!use_default_configuration_parameters && config.run_motor_2) {
+        pwmData.amp1_zone_pwm = config.motor_speed_pwm_2;
+      }
+      else if (use_default_configuration_parameters && DEFAULT_RUN_MOTOR_2) {
+        pwmData.amp1_zone_pwm = DEFAULT_MOTOR_SPEED_PWM;
       }
 
 #else
@@ -488,11 +490,11 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     }
  #else 
     if (amplification_zone_running) {
-      printf("Heater: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp2_zone_temp, amp0_pid.out);
+      printf("Heater: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp2_zone_temp, heater_pid_1.out);
       printf("Motor: Speed: %0.2f\tDuty: %0.2f\n",temperature_data.motorSpeed, h_pwm_data.amp1_zone_pwm);
     }
     if (valve_zone_running) {
-      printf("Heater: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp2_zone_temp, amp0_pid.out);
+      printf("Heater: Temp: %0.2f\tDuty: %0.2f\n",temperature_data.amp2_zone_temp, heater_pid_2.out);
       printf("Motor: Speed: %0.2f\tDuty: %0.2f\n",temperature_data.motorSpeed, h_pwm_data.amp1_zone_pwm);
     }
  #endif

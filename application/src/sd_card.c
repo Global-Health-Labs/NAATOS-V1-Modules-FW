@@ -344,7 +344,12 @@ FRESULT check_for_config_file(void) {
   }
 #else 
   // Write Valve Zone Setpoint
-  configBufferSize = sprintf(configBuffer, "heater_setpoint:%0.2f\n", DEFAULT_HEATER_SETPOINT);
+  configBufferSize = sprintf(configBuffer, "heater_setpoint_1:%0.2f\n", DEFAULT_HEATER_SETPOINT);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "heater_setpoint_2:%0.2f\n", DEFAULT_HEATER_SETPOINT);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -547,26 +552,74 @@ FRESULT check_for_config_file(void) {
     return res;
   }
  #else 
-  // Write Heater Kp
-  configBufferSize = sprintf(configBuffer, "heater_kp:%0.3f\n", H_KP);
+  // Write Heater 1 Kp
+  configBufferSize = sprintf(configBuffer, "heater_kp_1:%0.3f\n", H_KP);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
-  // Write Heater Ki
-  configBufferSize = sprintf(configBuffer, "heater_ki:%0.3f\n", H_KI);
+  // Write Heater 1 Ki
+  configBufferSize = sprintf(configBuffer, "heater_ki_1:%0.3f\n", H_KI);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
-  // Write Heater Kd
-  configBufferSize = sprintf(configBuffer, "heater_kd:%0.3f\n", H_KD);
+  // Write Heater 1 Kd
+  configBufferSize = sprintf(configBuffer, "heater_kd_1:%0.3f\n", H_KD);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
-  // Write Motor Speed
-  configBufferSize = sprintf(configBuffer, "motor_speed_pwm:%d\n", DEFAULT_MOTOR_SPEED_PWM);
+  // Write Heater 2 Kp
+  configBufferSize = sprintf(configBuffer, "heater_kp_2:%0.3f\n", H_KP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Heater 2 Ki
+  configBufferSize = sprintf(configBuffer, "heater_ki_2:%0.3f\n", H_KI);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Heater 2 Kd
+  configBufferSize = sprintf(configBuffer, "heater_kd_2:%0.3f\n", H_KD);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Motor Speed 1
+  configBufferSize = sprintf(configBuffer, "motor_speed_pwm_1:%d\n", DEFAULT_MOTOR_SPEED_PWM);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Motor Speed 2
+  configBufferSize = sprintf(configBuffer, "motor_speed_pwm_2:%d\n", DEFAULT_MOTOR_SPEED_PWM);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Run Motor 1
+  configBufferSize = sprintf(configBuffer, "run_motor_1:%s\n", DEFAULT_RUN_MOTOR_1 ? "true" : "false");
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Run Heater 1
+  configBufferSize = sprintf(configBuffer, "run_heater_1:%s\n", DEFAULT_RUN_HEATER_1 ? "true" : "false");
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Run Motor 2
+  configBufferSize = sprintf(configBuffer, "run_motor_2:%s\n", DEFAULT_RUN_MOTOR_2 ? "true" : "false");
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Run Heater 2
+  configBufferSize = sprintf(configBuffer, "run_heater_2:%s\n", DEFAULT_RUN_HEATER_2 ? "true" : "false");
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -683,10 +736,13 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
             break;
         
 #else 
-        case HEATER_SETPOINT_C:
-            parameters->heater_setpoint = atof(val);
+        case HEATER_SETPOINT_1_C:
+            parameters->heater_setpoint_1 = atof(val);
             break;
-         case HEATER_MAX_TEMP_C:
+        case HEATER_SETPOINT_2_C:
+            parameters->heater_setpoint_2 = atof(val);
+            break;
+        case HEATER_MAX_TEMP_C:
             parameters->heater_max_temp = atof(val);
            break;
 #endif      
@@ -789,17 +845,45 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
             parameters->amp2_kd_2 = atof(val);
             break;
  #else 
-        case HEATER_KP:
-            parameters->heater_kp = atof(val);
+        case HEATER_KP_1:
+            parameters->heater_kp_1 = atof(val);
             break;
-        case HEATER_KI:
-            parameters->heater_ki = atof(val);
+        case HEATER_KI_1:
+            parameters->heater_ki_1 = atof(val);
             break;
-        case HEATER_KD:
-            parameters->heater_kd = atof(val);
+        case HEATER_KD_1:
+            parameters->heater_kd_1 = atof(val);
             break;
-        case MOTOR_SPEED:
-            parameters->motor_speed_pwm = atoi(val);
+        case HEATER_KP_2:
+            parameters->heater_kp_2 = atof(val);
+            break;
+        case HEATER_KI_2:
+            parameters->heater_ki_2 = atof(val);
+            break;
+        case HEATER_KD_2:
+            parameters->heater_kd_2 = atof(val);
+            break;
+        case MOTOR_SPEED_PWM_1:
+            parameters->motor_speed_pwm_1 = atoi(val);
+            break;
+        case MOTOR_SPEED_PWM_2:
+            parameters->motor_speed_pwm_2 = atoi(val);
+            break;
+        case RUN_MOTOR_1:
+            num = strcmp(val, "true");
+            parameters->run_motor_1 = num ? false : true;
+            break;
+        case RUN_HEATER_1:
+            num = strcmp(val, "true");
+            parameters->run_heater_1 = num ? false : true;
+            break;
+        case RUN_MOTOR_2:
+            num = strcmp(val, "true");
+            parameters->run_motor_2 = num ? false : true;
+            break;
+        case RUN_HEATER_2:
+            num = strcmp(val, "true");
+            parameters->run_heater_2 = num ? false : true;
             break;
  #endif
         default:

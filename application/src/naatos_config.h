@@ -49,6 +49,10 @@
 #define OPTICAL_TRIG_THRES            800
 #define DEFAULT_HEATER_SETPOINT       65.0
 #define DEFAULT_MOTOR_SPEED_PWM       40
+#define DEFAULT_RUN_MOTOR_1           false
+#define DEFAULT_RUN_HEATER_1          true
+#define DEFAULT_RUN_MOTOR_2           true
+#define DEFAULT_RUN_HEATER_2          false
 
 /* Device Debug Parameters */
 #define I2C_CONNECTED           1
@@ -432,15 +436,24 @@ typedef struct {
   uint16_t amplification_zone_run_time_m;
   uint16_t low_power_threshold;
   uint16_t recovery_power_thresh;
-  float heater_setpoint;
+  float heater_setpoint_1;
+  float heater_setpoint_2;
   float heater_max_temp;
   float min_run_zone_temp;
   bool  min_run_zone_temp_en;
   float alert_timeout_time_s;
-  float heater_kp;
-  float heater_ki;
-  float heater_kd;
-  uint16_t motor_speed_pwm;
+  float heater_kp_1;
+  float heater_ki_1;
+  float heater_kd_1;
+  float heater_kp_2;
+  float heater_ki_2;
+  float heater_kd_2;
+  uint16_t motor_speed_pwm_1;
+  uint16_t motor_speed_pwm_2;
+  bool run_motor_1;
+  bool run_heater_1;
+  bool run_motor_2;
+  bool run_heater_2;
 } naatos_config_parameters;
 #endif
 
