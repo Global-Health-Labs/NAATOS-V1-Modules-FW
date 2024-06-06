@@ -48,7 +48,7 @@
 #define DEFAULT_RECOVERY_THRES        40    // Percent
 #define OPTICAL_TRIG_THRES            800
 #define DEFAULT_HEATER_SETPOINT       65.0
-#define DEFAULT_MOTOR_SPEED_RPM       400
+#define DEFAULT_MOTOR_SPEED_PWM       40
 
 /* Device Debug Parameters */
 #define I2C_CONNECTED           1
@@ -440,7 +440,7 @@ typedef struct {
   float heater_kp;
   float heater_ki;
   float heater_kd;
-  uint16_t motor_speed_rpm;
+  uint16_t motor_speed_pwm;
 } naatos_config_parameters;
 #endif
 

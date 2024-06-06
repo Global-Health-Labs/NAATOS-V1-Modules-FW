@@ -268,7 +268,7 @@ naatos_config_parameters config = {
   .heater_kp = 0,
   .heater_ki = 0,
   .heater_kd = 0,
-  .motor_speed_rpm = 0
+  .motor_speed_pwm = 0
 };
 #endif
 bool use_default_configuration_parameters = false;
@@ -1239,6 +1239,7 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
 *
 *   Application entry point.
 */
+
 int main(void) {
  BaseType_t xReturned;
   ret_code_t err_code;

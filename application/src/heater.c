@@ -131,17 +131,10 @@ void handle_amplification_stopstart_heater(bool heating) {
 void heater_reset_all_pids(void){
  // Create PID Controllers 
   if (use_default_configuration_parameters) {
-    //pid_controller_init(&valve_pid, VALVE_SETPOINT, V_KP, V_KI, V_KD);  
     pid_controller_init(&amp0_pid, DEFAULT_HEATER_SETPOINT, H_KP, H_KI, H_KD);
-    //pid_controller_init(&amp1_pid, AMP1_SETPOINT, A1_KP, A1_KI, A1_KD);
-    //pid_controller_init(&amp2_pid, AMP1_SETPOINT, A2_KP, A2_KI, A2_KD);
-  } else {
-    //pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);   
+  } else {  
     pid_controller_init(&amp0_pid, config.heater_setpoint, config.heater_kp, config.heater_ki, config.heater_kd);
-    //pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
-    //pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
   }
-
   
   // Create PID Controllers 
   /* Depreciated -> Dont need to run heater on sample prep board during "Valve Zone Active"
@@ -209,7 +202,7 @@ void heater_task(void * pvParameters) {
               
               //pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);  // TODO: Implement defaults
               // Reinitalize PID Values 
-              pid_controller_init(&amp0_pid, config.heater_setpoint, config.heater_kp, config.heater_ki, config.heater_kd);
+              //pid_controller_init(&amp0_pid, config.heater_setpoint, config.heater_kp, config.heater_ki, config.heater_kd);
               //pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
               //pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
           
@@ -406,13 +399,15 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
    }
    if (valve_zone_running) { //AMP 1 will be used for motor
 #ifdef SAMPLE_PREP_BOARD
-      //TODO  put MOTOR PID here
       temperature_pwm_data_t pwmData = {
-        .valve_zone_pwm = 0,
-        .amp0_zone_pwm = 0,
-        .amp1_zone_pwm = 40, //amp1_pid_2.out, TODO replace with motor pid
-        .amp2_zone_pwm = 0
+          .valve_zone_pwm = 0,
+          .amp0_zone_pwm = 0,
+          .amp1_zone_pwm = DEFAULT_MOTOR_SPEED_PWM, 
+          .amp2_zone_pwm = 0
       };
+      if (!use_default_configuration_parameters) {
+        pwmData.amp1_zone_pwm = config.motor_speed_pwm;
+      }
 
 #else
       pid_controller_compute(&amp0_pid_2, temperature_data.amp0_zone_temp);

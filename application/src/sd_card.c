@@ -566,7 +566,7 @@ FRESULT check_for_config_file(void) {
     return res;
   }
   // Write Motor Speed
-  configBufferSize = sprintf(configBuffer, "motor_speed_rpm:%d\n", DEFAULT_MOTOR_SPEED_RPM);
+  configBufferSize = sprintf(configBuffer, "motor_speed_pwm:%d\n", DEFAULT_MOTOR_SPEED_PWM);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -799,7 +799,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
             parameters->heater_kd = atof(val);
             break;
         case MOTOR_SPEED:
-            parameters->motor_speed_rpm = atoi(val);
+            parameters->motor_speed_pwm = atoi(val);
             break;
  #endif
         default:
