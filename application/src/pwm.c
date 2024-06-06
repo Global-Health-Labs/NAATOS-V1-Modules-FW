@@ -151,9 +151,6 @@ void pwm_task(void * pvParameters) {
 
 
   PwmRxQueueMsg_t pwmMsg;
-  
-  //TODO: Remove
-  amp1_zone_active = true;
 
   // Main Task Loop
   for (;;) {
@@ -163,7 +160,7 @@ void pwm_task(void * pvParameters) {
     } else {
       switch(pwmMsg.type) {
         case PWM_MSG_UPDATE_DUTY: {
-          
+
           break;
         }
         case PWM_MSG_CALLBACK_EVENT: {

@@ -264,11 +264,20 @@ naatos_config_parameters config = {
   .amplification_zone_run_time_m = 0,
   .valve_zone_run_time_m = 0,
   .low_power_threshold = 0,
-  .heater_setpoint = 0,
-  .heater_kp = 0,
-  .heater_ki = 0,
-  .heater_kd = 0,
-  .motor_speed_pwm = 0
+  .heater_setpoint_1 = 0,
+  .heater_setpoint_2 = 0,
+  .heater_kp_1 = 0,
+  .heater_ki_1 = 0,
+  .heater_kd_1 = 0,
+  .heater_kp_2 = 0,
+  .heater_ki_2 = 0,
+  .heater_kd_2 = 0,
+  .motor_speed_pwm_1 = 0,
+  .motor_speed_pwm_2 = 0,
+  .run_motor_1 = false,
+  .run_heater_1 = false,
+  .run_motor_2 = false,
+  .run_heater_2 = false
 };
 #endif
 bool use_default_configuration_parameters = false;
@@ -405,11 +414,11 @@ void main_task(void * pvParameters) {
           }
 
           read_sd_and_notify_tasks();
-            if (!use_default_configuration_parameters) {
-              alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(config.alert_timeout_time_s * 1000.0));
-            } else {
-               alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(DEFAULT_ALERT_TIMEOUT_S * 1000.0));
-            }
+          if (!use_default_configuration_parameters) {
+            alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(config.alert_timeout_time_s * 1000.0));
+          } else {
+             alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(DEFAULT_ALERT_TIMEOUT_S * 1000.0));
+          }
           updateLedState(LED_RUN, false);
           updateLedState(LED_COMPLETE, false);
           updateLedState(LED_STANDBY, true);
