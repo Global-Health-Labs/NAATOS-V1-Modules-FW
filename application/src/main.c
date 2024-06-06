@@ -776,6 +776,11 @@ void main_task(void * pvParameters) {
 
         //}
 
+        if(buttonData.event == BOOTLOADER_EVENT) {
+          next_state = MAIN_BOOTLOADER;
+          break;
+        }
+
         if (usb_needs_update) {
           // Switch ON and USB connected
           if(buttonData.event == ON_EVENT && usb_conn_status) {
