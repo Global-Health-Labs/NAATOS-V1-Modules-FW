@@ -256,6 +256,15 @@ typedef struct {
   bool over;
 } usb_suspend_over_t;
 
+// Composite USB
+
+typedef enum {
+  COMPOSITE_MSG_CONTINUE,
+  COMPOSITE_MSG_SLEEP,
+  COMPOSITE_MSG_WAKEUP
+} CompositeUSBRxQueueType_t;
+
+
 // Sensor messages
 
 typedef enum {

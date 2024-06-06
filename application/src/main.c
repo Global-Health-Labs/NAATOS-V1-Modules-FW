@@ -1209,6 +1209,12 @@ void create_queues() {
   if (usb_connectionReqQueue == NULL)
     printf("Unable to create usb_connectionReqQueue queue\n");
 
+  // Composite USB Task Queues
+  compositeRxQueue = xQueueCreate(QUEUE_SIZE, sizeof(CompositeUSBRxQueueType_t));
+  if (compositeRxQueue == NULL)
+    printf("Unable to create compositeRxQueue queue\n");
+  
+
   // Logger Task Queues
   logger_recvBattPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
   if (logger_recvBattPercentQueue == NULL)

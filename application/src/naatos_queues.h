@@ -36,6 +36,9 @@ extern xQueueHandle usb_usbWaitOverQueue;
 //extern xQueueHandle usb_mainStateContinueQueue;
 extern xQueueHandle usb_connectionReqQueue;
 
+// Composite USB Task Queue(s)
+extern xQueueHandle compositeRxQueue;
+
 // Logger Task Queue(s)
 extern xQueueHandle logger_recvBattPercentQueue;
 extern xQueueHandle logger_logMessageQueue;

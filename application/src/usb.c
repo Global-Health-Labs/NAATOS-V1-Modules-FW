@@ -11,6 +11,7 @@
 #include "nrf_drv_usbd.h"
 #include "nrf_drv_power.h"
 #include "naatos_config.h"
+#include "timers.h"
 
 /* ***** Variables ***** */
 // USB connection status
@@ -22,6 +23,8 @@ xQueueHandle usb_recvUsbWaitAcceptQueue;
 xQueueHandle usb_usbWaitOverQueue;
 //xQueueHandle usb_mainStateContinueQueue;
 xQueueHandle usb_connectionReqQueue;
+
+xQueueHandle compositeRxQueue;
 
 // Main Loop 
 usb_message_t recv_msg;
@@ -38,6 +41,10 @@ bool usb_done_config = false;
 bool usb_initalized = false;
 bool restarting = false;
 bool needs_response = false;
+
+// Timers
+TimerHandle_t usbTimer;
+TimerHandle_t compositeUsbTimer;
 
 /* ***** Instances ***** */
 
@@ -58,6 +65,38 @@ APP_USBD_CDC_ACM_GLOBAL_DEF(m_app_cdc_acm,
                             CDC_ACM_DATA_EPOUT,
                             APP_USBD_CDC_COMM_PROTOCOL_AT_V250
 );
+
+void vUSBTimerCallback( TimerHandle_t xTimer ) {
+
+}
+
+void vCompositeUSBTimerCallback( TimerHandle_t xTimer ) {
+  BaseType_t xReturned;
+  CompositeUSBRxQueueType_t msg = COMPOSITE_MSG_CONTINUE;
+
+  xReturned = xQueueSend(compositeRxQueue, &msg, 0);
+  if (xReturned != pdPASS) {
+    printf("COMPOSITE_TASK: Unable to send continue from timer.\n");
+  }
+}
+
+void startCompositeTimer(void) {
+  TickType_t sampleRateTicks = USB_TASK_DELAY; 
+
+  if(xTimerChangePeriod(compositeUsbTimer, sampleRateTicks, 100) != pdPASS) {
+    printf("Cannot change period of composite usb timer. \n");
+  }
+
+  if( xTimerStart( compositeUsbTimer, 0 ) != pdPASS ){
+     printf("Failed to start composite usb timer. \n");
+  }
+}
+
+void stopCompositeTimer(void) {
+  if( xTimerStop(compositeUsbTimer, 100) != pdPASS ){
+    printf("Failed to stop composite usb timer. \n");
+  }
+}
 
 void respond_to_usb_change(void) {
   BaseType_t xReturned;
@@ -321,8 +360,11 @@ void composite_usb_task(void * pvParameters) {
   BaseType_t xReturned;
   usb_suspend_over_t sus_over;
   bool batt_over = false, heater_over = false, pwm_over = false, sensor_over = false;
-
-  vTaskDelay(pdMS_TO_TICKS(100));
+  CompositeUSBRxQueueType_t msg;
+  
+  
+  compositeUsbTimer = xTimerCreate ("CompositeUSBTimer", USB_TASK_DELAY, pdTRUE, (void*)0, vCompositeUSBTimerCallback);
+  startCompositeTimer();
 
   // Start the USB
   if (!usb_started) {
@@ -330,58 +372,80 @@ void composite_usb_task(void * pvParameters) {
     command = USB_CDC_ACM;
   }
 
-  for (;;) {
-    
-    while (app_usbd_event_queue_process()) {
-        // Nothing to do 
-    }
+  CompositeUSBRxQueueType_t temp_msg = COMPOSITE_MSG_CONTINUE;
 
-    if (msc_active && usb_detected && !usb_suspended_tasks && !usb_done_config && (command == USB_MSC || command == USB_MSC_CDC_ACM)) {
-      usb_suspend_conflicting_tasks();
-      //set_led1_blue_slow_blink();
-      batt_over = false; heater_over = false; pwm_over = false; sensor_over = false;
-    }
-    
-    if (usb_suspended_tasks) {
-      if (uxQueueMessagesWaiting(usb_usbWaitOverQueue) > 0) {
-        xReturned = xQueueReceive(usb_usbWaitOverQueue, &sus_over, 0);
-        if (xReturned != pdPASS) {
-          printf("USB: Unable to receive usb wait over from usb_usbWaitOverQueue\n");
-        }
-        switch(sus_over.task) {
-        case BATTERY:
-          if (sus_over.over) batt_over = true;
-          printf("USB: battery task suspension over.\n");
-          break;
-        case HEATER:
-          if (sus_over.over) heater_over = true;
-          printf("USB: heater task suspension over.\n");
-          break;
-        case PWM:
-          if (sus_over.over) pwm_over = true;
-          printf("USB: pwm task suspension over.\n");
-          break;
-        case SENSORS:
-          if (sus_over.over) sensor_over = true;
-          printf("USB: sensor task suspension over.\n");
-          break;
-        default:
-          break;
-        }
-      }
-
-      if (/*batt_over &&*/ /*heater_over && pwm_over &&*/ sensor_over) {
-        usb_suspended_tasks = false;
-        usb_done_config = true;
-        //set_led1_green_breathe();
-        respond_to_usb_change();
-        needs_response = false;
-      }
-    }
-    else {
-      vTaskDelay(50);
-    }
+  xReturned = xQueueSend(compositeRxQueue, &temp_msg, 0);
+  if (xReturned != pdPASS) {
+    printf("COMPOSITE_TASK: Unable to send continue from timer.\n");
   }
+
+  for (;;) {
+
+    xReturned = xQueueReceive(compositeRxQueue, &msg, portMAX_DELAY);
+    if (xReturned != pdPASS) {
+      printf("COMPOSITE_TASK: Unable to receive continue from composite timer");
+    }
+
+    switch(msg) {
+    case COMPOSITE_MSG_CONTINUE: {
+      while (app_usbd_event_queue_process()) {
+        // Nothing to do 
+      }
+
+      if (msc_active && usb_detected && !usb_suspended_tasks && !usb_done_config && (command == USB_MSC || command == USB_MSC_CDC_ACM)) {
+        usb_suspend_conflicting_tasks();
+        //set_led1_blue_slow_blink();
+        batt_over = false; heater_over = false; pwm_over = false; sensor_over = false;
+      }
+    
+      if (usb_suspended_tasks) {
+        if (uxQueueMessagesWaiting(usb_usbWaitOverQueue) > 0) {
+          xReturned = xQueueReceive(usb_usbWaitOverQueue, &sus_over, 0);
+          if (xReturned != pdPASS) {
+            printf("USB: Unable to receive usb wait over from usb_usbWaitOverQueue\n");
+          }
+          switch(sus_over.task) {
+          case BATTERY:
+            if (sus_over.over) batt_over = true;
+            printf("USB: battery task suspension over.\n");
+            break;
+          case HEATER:
+            if (sus_over.over) heater_over = true;
+            printf("USB: heater task suspension over.\n");
+            break;
+          case PWM:
+            if (sus_over.over) pwm_over = true;
+            printf("USB: pwm task suspension over.\n");
+            break;
+          case SENSORS:
+            if (sus_over.over) sensor_over = true;
+            printf("USB: sensor task suspension over.\n");
+            break;
+          default:
+            break;
+          }
+        }
+
+        if (/*batt_over &&*/ /*heater_over && pwm_over &&*/ sensor_over) {
+          usb_suspended_tasks = false;
+          usb_done_config = true;
+          //set_led1_green_breathe();
+          respond_to_usb_change();
+          needs_response = false;
+        }
+      }
+    }
+    break;
+
+    case COMPOSITE_MSG_SLEEP:
+
+    break;
+
+    case  COMPOSITE_MSG_WAKEUP:
+
+    break;
+    }
+  } 
 }
 
 void usb_task(void * pvParameters) {
