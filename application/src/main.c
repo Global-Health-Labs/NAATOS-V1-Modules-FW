@@ -361,7 +361,7 @@ void main_task(void * pvParameters) {
   uint32_t alert_timeout_ticks;
   bool usb_conn_status = false;
   bool usb_needs_update = false;
-
+  int mainWatchDogKickCount = 0;
   const BatteryRxQueueMsg_t batt_req = {
     .type = BATTERY_SOC_REQUEST,
     .sendTo = BATTERY_MSG_SOC_MAIN
@@ -765,8 +765,15 @@ void main_task(void * pvParameters) {
           if (xReturned != pdPASS) {
             printf("Sensor: Unable to send timer update to sensorRxQueue queue.\n");
           }
+          mainWatchDogKickCount = 0;
+          sendWatchdogKickFromTask(MAIN, true); 
         }
-        sendWatchdogKickFromTask(MAIN, true);
+
+        if(mainWatchDogKickCount++ >= 10){
+          mainWatchDogKickCount = 0;
+          sendWatchdogKickFromTask(MAIN, true); 
+        }
+        
         /* **** HANDLE USB AND SWITCH **** */
         // Get switch status if it has changed
         if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
@@ -831,6 +838,7 @@ void main_task(void * pvParameters) {
           }
           usb_needs_update = false;
         }
+        vTaskDelay(pdMS_TO_TICKS(100));
       break;
 
       // In Low Power State
