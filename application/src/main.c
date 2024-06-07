@@ -493,7 +493,7 @@ void main_task(void * pvParameters) {
           }
           // Switch off and USB not connected
           else if (buttonData.event == OFF_EVENT && !usb_conn_status) {
-            next_state = MAIN_SLEEP;
+            //next_state = MAIN_SLEEP;
             send_usb_change(USB_DISABLED);
           }
           usb_needs_update = false;
