@@ -47,6 +47,9 @@ int heaterTicks = 0;
 bool batteryValid = false;
 int batteryTicks = 0;
 
+bool mainValid = false;
+int mainTicks = 0;
+
 #if NAATOS_ENABLE_WATCHDOG
 watchdog_init();
 #endif
@@ -69,8 +72,13 @@ while (true) {
          break;
 
          case HEATER:
-          heaterValid = recv_req.valid;\
+          heaterValid = recv_req.valid;
           heaterTicks = 0;
+         break;
+
+         case MAIN:
+          mainValid = recv_req.valid;
+          mainTicks = 0;
          break;
 
          default:
@@ -87,8 +95,12 @@ while (true) {
       batteryTicks++;
     }
 
+    if(mainValid){
+      mainTicks++;
+    }
 
-    if(heaterTicks < MAX_WDT_TASK_TIMEOUT && batteryTicks < MAX_WDT_TASK_TIMEOUT) {
+
+    if(heaterTicks < MAX_WDT_TASK_TIMEOUT && batteryTicks < MAX_WDT_TASK_TIMEOUT && mainTicks < MAX_WDT_TASK_TIMEOUT) {
       nrf_drv_wdt_channel_feed(m_channel_id);
     }
 #endif
@@ -96,4 +108,16 @@ while (true) {
     vTaskDelay(WDT_TASK_DELAY); 
   }
 
+}
+
+void sendWatchdogKickFromTask(tasks_t task, bool valid) {
+  BaseType_t xReturned;
+  watchdog_time_update_t wdtUpdate;
+  wdtUpdate.taskName = task;
+  wdtUpdate.valid = valid;
+
+  xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
+  if (xReturned != pdPASS) {
+    printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+  }
 }

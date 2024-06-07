@@ -15,4 +15,6 @@ void wdt_event_handler(void);
 
 void watchdog_init(void);
 
+void sendWatchdogKickFromTask(tasks_t task, bool valid);
+
 void wdtFeedTask(void * pvParameters);

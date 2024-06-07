@@ -764,6 +764,7 @@ void main_task(void * pvParameters) {
             printf("Sensor: Unable to send timer update to sensorRxQueue queue.\n");
           }
         }
+        sendWatchdogKickFromTask(MAIN, true);
         /* **** HANDLE USB AND SWITCH **** */
         // Get switch status if it has changed
         if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
@@ -796,12 +797,14 @@ void main_task(void * pvParameters) {
             updateLedState(LED_USB_MSC_STARTING, false);
             next_state = MAIN_STANDBY;
             send_usb_change(USB_CDC_ACM);
+            sendWatchdogKickFromTask(MAIN, false);
           }
           // Switch ON and USB not connected
           else if (buttonData.event == ON_EVENT && !usb_conn_status) {
             updateLedState(LED_USB_MSC_STARTING, false);
             next_state = MAIN_STANDBY;
             send_usb_change(USB_DISABLED);
+            sendWatchdogKickFromTask(MAIN, false);
           }
           // Switch OFF and USB connected
           else if (buttonData.event == OFF_EVENT && usb_conn_status) {
@@ -813,6 +816,7 @@ void main_task(void * pvParameters) {
             updateLedState(LED_USB_MSC_STARTING, false);
             next_state = MAIN_SLEEP;
             send_usb_change(USB_DISABLED);
+            sendWatchdogKickFromTask(MAIN, false);
           }
           usb_needs_update = false;
         }
