@@ -388,6 +388,7 @@ void main_task(void * pvParameters) {
           read_sd_and_notify_tasks();
           updateLedState(LED_RUN, false);
           updateLedState(LED_STANDBY, true);
+          updateLedState(LED_COMPLETE, false);
         } 
         
         // Reset Run Switches
@@ -414,9 +415,9 @@ void main_task(void * pvParameters) {
         // Check for Battery Data in Battery Queue
         if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(100)) == pdPASS) {
           if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
-             next_state = MAIN_SLEEP;
-             sendUpdatedMainTaskState(next_state);
-             break;
+             //next_state = MAIN_SLEEP;
+             //sendUpdatedMainTaskState(next_state);
+             //break;
           }
         }
         
