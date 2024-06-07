@@ -152,6 +152,10 @@ tsys01_errors_t tsys01_getCalibrationValues(sensor_selection_t sensor)
 {
     uint8_t temp[2];
     tsys01_errors_t err_code = tsys01_readRegister(sensor, TSYS01_CAL_K0_REG, tsys01_cal, temp, TSYS01_CAL_DATA_LEN);
+    if(err_code == tsys01_i2c_error) {
+      //sensor not connected 
+      return err_code;
+    }
     calibration[sensor].k0 = (temp[0] << 8) + temp[1];
     err_code = tsys01_readRegister(sensor, TSYS01_CAL_K1_REG, tsys01_cal, temp, TSYS01_CAL_DATA_LEN);
     calibration[sensor].k1 = (temp[0] << 8) + temp[1];

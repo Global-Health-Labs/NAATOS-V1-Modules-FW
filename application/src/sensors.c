@@ -123,6 +123,10 @@ void sensors_task(void * pvParameters) {
 #if I2C_CONNECTED
 #ifdef SAMPLE_PREP_BOARD
   tsys01_err = tsys01_getCalibrationValues(amp_zone_2);
+  if(tsys01_err == tsys01_i2c_error){
+    NVIC_SystemReset();
+    asm volatile("nop");
+  }
 #else
   tsys01_err = tsys01_getCalibrationValues(valve_zone);
   tsys01_err = tsys01_getCalibrationValues(amp_zone_0);
