@@ -204,7 +204,8 @@ typedef struct {
 typedef enum {
   ON_EVENT,
   OFF_EVENT,
-  BOOTLOADER_EVENT
+  BOOTLOADER_EVENT,
+  NONE
 } button_event_e;
 
 typedef struct {
@@ -238,6 +239,29 @@ typedef struct {
   tasks_t task;
   bool over;
 } usb_suspend_over_t;
+
+// Composite USB
+
+typedef enum {
+  COMPOSITE_MSG_CONTINUE,
+  COMPOSITE_MSG_SLEEP,
+  COMPOSITE_MSG_WAKEUP
+} CompositeUSBRxQueueType_t;
+
+// USB 
+
+typedef enum {
+  USB_MSG_CONN_STATUS_REQ,
+  USB_MSG_COMMAND,
+  USB_MSG_CHECK_CONN,
+  USB_MSG_SLEEP,
+  USB_MSG_WAKEUP
+} usbRxQueueType_t;
+
+typedef struct {
+  usbRxQueueType_t msg_type;
+  usb_command_t cmd;
+} usbRxMsgType_t;
 
 // Sensor messages
 

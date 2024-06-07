@@ -173,6 +173,12 @@
       <file file_name="../src/switch.c" />
       <file file_name="../src/switch.h" />
       <file file_name="../src/sensors.c" />
+      <file file_name="../src/motor.c">
+        <configuration Name="Debug" build_exclude_from_build="Yes" />
+      </file>
+      <file file_name="../src/motor.h">
+        <configuration Name="Debug" build_exclude_from_build="Yes" />
+      </file>
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../sdk/external/segger_rtt/SEGGER_RTT.c" />

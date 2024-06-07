@@ -8,6 +8,9 @@
 xQueueHandle buttonRxQueue;
 TimerHandle_t buttonTimer;
 
+bool skip_debounce = false;
+int skip_cnt = 0;
+
 void checkButtonState(void);
 
 void button_init(void) {
@@ -55,13 +58,24 @@ void gpiote_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
   BaseType_t xReturned;
 
+  if (skip_debounce) {
+    skip_debounce = false;
+    return;
+  }
+
+  if (skip_cnt > 0 && !skip_debounce) {
+    return;
+  }
+
   ButtonRxQueueMsg_t msg;
   msg.type = BUTTON_MSG_WAKE;
 
   xReturned = xQueueSendFromISR(buttonRxQueue, &msg, &xHigherPriorityTaskWoken);
   if (xReturned != pdPASS) {
-    printf("Battery: Unable to send timer update to buttonRxQueue queue.\n");
+    printf("SWITCH_TASK:: Unable to send timer update to buttonRxQueue queue.\n");
   }
+
+  skip_cnt++;
 }
 
 
@@ -71,6 +85,7 @@ static TickType_t lastSwitchTime = 0;
 button_update_t updateMsg;
 button_event_e currentEvent = ON_EVENT;
 button_event_e previousEvent = ON_EVENT;
+bool awake = true;
 
 void buttonTask(void * pvParameters) {
   BaseType_t xReturned;
@@ -94,6 +109,9 @@ void buttonTask(void * pvParameters) {
             stopButtonTimer();
           }
 
+          skip_debounce = true;
+          skip_cnt = 0;
+
           nrf_drv_gpiote_in_config_t config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
           nrf_drv_gpiote_in_init(BUTTON_INPUT_PIN, &config, gpiote_event_handler);
           nrf_drv_gpiote_in_event_enable(BUTTON_INPUT_PIN, true);
@@ -108,7 +126,11 @@ void buttonTask(void * pvParameters) {
           if(xTimerIsTimerActive(buttonTimer) == pdFALSE) {
             startButtonTimer();
           }
-          //TODO Notify main queue here
+          // Notify main queue 
+          xReturned = xQueueSend(main_wakeupTasksQueue, &awake, 0);
+          if (xReturned != pdPASS) {
+            printf("SWITCH_TASK: Unable to send tasks wake up to main_wakeupTasksQueue. \n");
+          }
 
         break;
 
