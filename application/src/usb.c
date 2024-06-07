@@ -469,11 +469,17 @@ void composite_usb_task(void * pvParameters) {
     break;
 
     case COMPOSITE_MSG_SLEEP:
-
+      // Go to Sleep
+      if(xTimerIsTimerActive(compositeUsbTimer) == pdTRUE) {
+        stopCompositeTimer();
+      }
     break;
 
     case  COMPOSITE_MSG_WAKEUP:
-
+      // Wakeup
+      if(xTimerIsTimerActive(compositeUsbTimer) == pdFALSE) {
+        startCompositeTimer();
+      }
     break;
     }
   } 
@@ -594,11 +600,17 @@ void usb_task(void * pvParameters) {
       break;
 
       case USB_MSG_SLEEP:
-
+        // Go to Sleep
+        if(xTimerIsTimerActive(usbTimer) == pdTRUE) {
+          stopUSBTimer();
+        }
       break;
 
       case USB_MSG_WAKEUP:
-
+        // Wakeup
+        if(xTimerIsTimerActive(usbTimer) == pdFALSE) {
+          startUSBTimer();
+        }
       break;
     }
   }

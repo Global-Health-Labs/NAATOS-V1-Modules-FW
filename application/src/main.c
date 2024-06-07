@@ -848,7 +848,7 @@ void main_task(void * pvParameters) {
             msg.type = SENSOR_MSG_SLEEP;
             xReturned = xQueueSend(sensorRxQueue, &msg, 0);
             if (xReturned != pdPASS) {
-              printf("Sensor: Unable to send timer update to sensorRxQueue queue.\n");
+              printf("MAIN_TASK: Unable to send sensor sleep to sensorRxQueue queue.\n");
             }
 
             BatteryRxQueueMsg_t battMsg;
@@ -856,7 +856,7 @@ void main_task(void * pvParameters) {
 
             xReturned = xQueueSend(batteryRxQueue, &battMsg, 0);
             if (xReturned != pdPASS) {
-              printf("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.\n");
+              printf("MAIN_TASK: Unable to send battery sleep to batteryRxQueue.\n");
             }
 
             ButtonRxQueueMsg_t buttonMsg;
@@ -864,15 +864,31 @@ void main_task(void * pvParameters) {
 
             xReturned = xQueueSend(buttonRxQueue, &buttonMsg, 0);
             if (xReturned != pdPASS) {
-              printf("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.\n");
+              printf("MAIN_TASK: Unable to send button sleep to batteryRxQueue.\n");
             }
+            
+            usbRxMsgType_t usbMsg;
+            usbMsg.msg_type = USB_MSG_SLEEP;
+            xReturned = xQueueSend(usbRxQueue, &usbMsg, 0);
+            if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to send usb sleep to usbRxQueue. \n");
+            }
+
+            CompositeUSBRxQueueType_t compositeMsg = COMPOSITE_MSG_SLEEP;
+            xReturned = xQueueSend(compositeRxQueue, &compositeMsg, 0);
+            if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to send composite sleep to usbRxQueue. \n");
+            }
+
           updateLedState(LED_RUN, false);
           updateLedState(LED_STANDBY, false);
           updateLedState(LED_USB_MSC_STARTING, false);
         }
         // this queue is blocked indefinitly until a switch interrupt or usb  interrupt
         //TODO implement indefinite blocker here
-        main_state = MAIN_STANDBY;
+        //main_state = MAIN_STANDBY;
+
+        while(1);
 
        break;
       }
@@ -1223,12 +1239,12 @@ void create_queues() {
   }
 
   // USB Management Task Queues
-  usbRxQueue = xQueueCreate(QUEUE_SIZE, sizeof(usbRxMsgType_t));
+  usbRxQueue = xQueueCreate(10, sizeof(usbRxMsgType_t));
   if (usbRxQueue == NULL)
     printf("Unable to create usbRxQueue queue\n");
 
   // Composite USB Task Queues
-  compositeRxQueue = xQueueCreate(QUEUE_SIZE, sizeof(CompositeUSBRxQueueType_t));
+  compositeRxQueue = xQueueCreate(10, sizeof(CompositeUSBRxQueueType_t));
   if (compositeRxQueue == NULL)
     printf("Unable to create compositeRxQueue queue\n");
   
@@ -1319,10 +1335,6 @@ int main(void) {
   nrf_drv_gpiote_init();
 
   nrf_gpio_cfg_output(MOTOR_POWER_ENABLE);
-  //err_code = app_timer_init();
-  //APP_ERROR_CHECK(err_code);
-  //ret_code_t ret_code = nrf_pwr_mgmt_init();
-  //APP_ERROR_CHECK(ret_code);
 
   // Get the configuration parameters
   res = get_naatos_configuration_parameters(&config);
@@ -1332,9 +1344,6 @@ int main(void) {
   } else {
     use_default_configuration_parameters = false;
   }
-
-  // Uninitalize the SD card
-  //uninit_sd_card();
 
   // Create Queues
   create_queues();
