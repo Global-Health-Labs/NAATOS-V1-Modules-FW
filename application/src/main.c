@@ -890,7 +890,7 @@ void main_task(void * pvParameters) {
         }
 
         // this queue is blocked indefinitly until a switch interrupt or usb  interrupt
-        xReturned = xQueueReceiveFromISR(main_wakeupTasksQueue, &wake_up, &xHigherPriorityTaskWoken);
+        xReturned = xQueueReceive(main_wakeupTasksQueue, &wake_up, portMAX_DELAY);
         if (xReturned != pdPASS) {
           printf("MAIN_TASK: Unable to receive tasks wakeup from main_wakeupTasksQueue. \n");
         }
@@ -1347,7 +1347,7 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
 *   Application entry point.
 */
 int main(void) {
- BaseType_t xReturned;
+  BaseType_t xReturned;
   ret_code_t err_code;
   FRESULT res;
 
