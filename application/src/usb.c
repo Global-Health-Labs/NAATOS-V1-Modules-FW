@@ -18,11 +18,13 @@
 static bool m_usb_connected = false;
 
 // Queue Handles
-xQueueHandle usb_stateChangeQueue;
+xQueueHandle usbRxQueue;
+
+//xQueueHandle usb_stateChangeQueue;
 xQueueHandle usb_recvUsbWaitAcceptQueue;
 xQueueHandle usb_usbWaitOverQueue;
 //xQueueHandle usb_mainStateContinueQueue;
-xQueueHandle usb_connectionReqQueue;
+//xQueueHandle usb_connectionReqQueue;
 
 xQueueHandle compositeRxQueue;
 
@@ -41,6 +43,7 @@ bool usb_done_config = false;
 bool usb_initalized = false;
 bool restarting = false;
 bool needs_response = false;
+bool usb_conn_updated = false;
 
 // Timers
 TimerHandle_t usbTimer;
@@ -67,7 +70,34 @@ APP_USBD_CDC_ACM_GLOBAL_DEF(m_app_cdc_acm,
 );
 
 void vUSBTimerCallback( TimerHandle_t xTimer ) {
+  BaseType_t xReturned;
+  usbRxMsgType_t msg =  {
+    .cmd = NULL,
+    .msg_type = USB_MSG_CHECK_CONN
+  };
 
+  xReturned = xQueueSend(usbRxQueue, &msg, 0);
+  if (xReturned != pdPASS) {
+    printf("USB_TASK: Unable to send check connection from timer.\n");
+  }
+}
+
+void startUSBTimer(void) {
+  TickType_t sampleRateTicks = USB__TASK_DELAY; 
+
+  if(xTimerChangePeriod(usbTimer, sampleRateTicks, 100) != pdPASS) {
+    printf("Cannot change period of usb timer. \n");
+  }
+
+  if( xTimerStart( usbTimer, 0 ) != pdPASS ){
+     printf("Failed to start usb timer. \n");
+  }
+}
+
+void stopUSBTimer(void) {
+  if( xTimerStop(usbTimer, 100) != pdPASS ){
+    printf("Failed to stop usb timer. \n");
+  }
 }
 
 void vCompositeUSBTimerCallback( TimerHandle_t xTimer ) {
@@ -175,6 +205,7 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
         case APP_USBD_EVT_POWER_DETECTED:
             printf("USB: Power detected\n");
             usb_detected = true;
+            usb_conn_updated = true;
             //set_led2_blue_breathe();
             if (!nrf_drv_usbd_is_enabled())
             {
@@ -191,7 +222,7 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
               usb_detected = false;
             else 
               restarting = false;
-            //turn_off_led2();
+            usb_conn_updated = true;
             break;
         case APP_USBD_EVT_POWER_READY:
             printf("USB: Ready\n");
@@ -456,87 +487,119 @@ void usb_task(void * pvParameters) {
   volatile int hi;
   bool usb_updated = false;
   usb_command_t last_command;
+  usbRxMsgType_t rx_msg;
 
   // Set connection state to not charging
   connection_state = NOT_CHARGING;
 
+  usbTimer = xTimerCreate ("USBTimer", USB__TASK_DELAY, pdTRUE, (void*)0, vUSBTimerCallback);
+  startUSBTimer();
+
   // Set the first event to make sure that USB queue is processed after it is started
   for (;;) {
 
-    // Check for usb connection status request
-    if (xQueueReceive(usb_connectionReqQueue, &conn_state_req, 0) == pdPASS) {
-      // Respond to connection status request
-      xReturned = xQueueSend(main_usbConnRecvQueue, &usb_detected, 0);
-      if (xReturned != pdPASS) {
-        printf("USB_TASK: Unable to send usb connection status to main_usbConnRecvQueue. \n");
-      }
-    }
-    // Save Last Command
-    last_command = command;
-    // Check the USB queue for an update message
-    if (xReturned = xQueueReceive(usb_stateChangeQueue, &command, 0) != pdPASS) {
-      vTaskDelay(USB_TASK_DELAY);
-      continue;
+    // Receive from usbRxQueue
+    xReturned = xQueueReceive(usbRxQueue, &rx_msg, portMAX_DELAY);
+    if (xReturned != pdPASS) {
+      printf("USB_TASK: Unable to recieve usb message from usbRxQueue. \n");
     }
 
-    needs_response = true;
-    // Handle the new command if there is one
-    switch(command) {
-      case USB_DISABLED: 
-      {
-        // Do Nothing
-        break;
-      }
-      case USB_CDC_ACM:
-      {
-        if (last_command == USB_CDC_ACM) {
-          break;
+    switch(rx_msg.msg_type) {
+      case USB_MSG_CONN_STATUS_REQ: {
+        // Respond to connection status request
+        xReturned = xQueueSend(main_usbConnRecvQueue, &usb_detected, 0);
+        if (xReturned != pdPASS) {
+          printf("USB_TASK: Unable to send usb connection status to main_usbConnRecvQueue. \n");
         }
-        // Stop The USB
-        usbd_user_ev_handler(APP_USBD_EVT_POWER_REMOVED);
-        app_usbd_disable();
-        app_usbd_uninit();
-        disk_uninitialize(0);
-        // Restart the USB
-        start_usb(true, false);
-        usbd_user_ev_handler(APP_USBD_EVT_POWER_DETECTED);
-        break;
+      break;
       }
-      case USB_MSC: 
-      {
-        if (last_command == USB_MSC) {
-          break;
+      case USB_MSG_COMMAND: {
+        needs_response = true;
+        // Handle the new command if there is one
+        switch(rx_msg.cmd) {
+          case USB_DISABLED: 
+          {
+            if (usb_detected) {
+              usbd_user_ev_handler(APP_USBD_EVT_POWER_REMOVED);
+              app_usbd_disable();
+              app_usbd_uninit();
+              disk_uninitialize(0);
+              // Restart the USB
+              start_usb(true, false); 
+            }
+            respond_to_usb_change();
+            break;
+          }
+          case USB_CDC_ACM:
+          {
+            if (last_command == USB_CDC_ACM) {
+              break;
+            }
+            // Stop The USB
+            usbd_user_ev_handler(APP_USBD_EVT_POWER_REMOVED);
+            app_usbd_disable();
+            app_usbd_uninit();
+            disk_uninitialize(0);
+            // Restart the USB
+            start_usb(true, false);
+            usbd_user_ev_handler(APP_USBD_EVT_POWER_DETECTED);
+            break;
+          }
+          case USB_MSC: 
+          {
+            if (last_command == USB_MSC) {
+              break;
+            }
+            // Stop The USB
+            usbd_user_ev_handler(APP_USBD_EVT_POWER_REMOVED);
+            app_usbd_disable();
+            app_usbd_uninit();
+            // Restart the USB
+            start_usb(false, true);
+            usbd_user_ev_handler(APP_USBD_EVT_POWER_DETECTED);
+            break;
+          }
+          case USB_MSC_CDC_ACM: 
+          {
+            if (last_command == USB_MSC_CDC_ACM) 
+            {
+              break;
+            }
+            restarting = true;
+            // Stop The USB
+            usbd_user_ev_handler(APP_USBD_EVT_POWER_REMOVED);
+            app_usbd_disable();
+            app_usbd_uninit();
+            // Restart the USB
+            start_usb(true, true);
+            usbd_user_ev_handler(APP_USBD_EVT_POWER_DETECTED);
+            break;
+          }
+          default:
+          {
+            app_usbd_stop();
+            break;
+          }
         }
-        // Stop The USB
-        usbd_user_ev_handler(APP_USBD_EVT_POWER_REMOVED);
-        app_usbd_disable();
-        app_usbd_uninit();
-        // Restart the USB
-        start_usb(false, true);
-        usbd_user_ev_handler(APP_USBD_EVT_POWER_DETECTED);
-        break;
+      break;
       }
-      case USB_MSC_CDC_ACM: 
-      {
-        if (last_command == USB_MSC_CDC_ACM) 
-        {
-          break;
+      case USB_MSG_CHECK_CONN:
+        if (usb_conn_updated) {
+          xReturned = xQueueSend(main_usbConnRecvQueue, &usb_detected, 0);
+          if (xReturned != pdPASS) {
+            printf("USB_TASK: Unable to send updated usb connection state to main_usbConnRecvQueue");
+          }
+          usb_conn_updated = false;
         }
-        restarting = true;
-        // Stop The USB
-        usbd_user_ev_handler(APP_USBD_EVT_POWER_REMOVED);
-        app_usbd_disable();
-        app_usbd_uninit();
-        // Restart the USB
-        start_usb(true, true);
-        usbd_user_ev_handler(APP_USBD_EVT_POWER_DETECTED);
-        break;
-      }
-      default:
-      {
-        app_usbd_stop();
-        break;
-      }
+      break;
+
+      case USB_MSG_SLEEP:
+
+      break;
+
+      case USB_MSG_WAKEUP:
+
+      break;
     }
   }
 }

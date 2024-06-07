@@ -265,6 +265,21 @@ typedef enum {
 } CompositeUSBRxQueueType_t;
 
 
+// USB 
+
+typedef enum {
+  USB_MSG_CONN_STATUS_REQ,
+  USB_MSG_COMMAND,
+  USB_MSG_CHECK_CONN,
+  USB_MSG_SLEEP,
+  USB_MSG_WAKEUP
+} usbRxQueueType_t;
+
+typedef struct {
+  usbRxQueueType_t msg_type;
+  usb_command_t cmd;
+} usbRxMsgType_t;
+
 // Sensor messages
 
 typedef enum {
