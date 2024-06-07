@@ -86,6 +86,7 @@ button_update_t updateMsg;
 button_event_e currentEvent = ON_EVENT;
 button_event_e previousEvent = ON_EVENT;
 bool awake = true;
+int notify = 0;
 
 void buttonTask(void * pvParameters) {
   BaseType_t xReturned;
@@ -111,6 +112,7 @@ void buttonTask(void * pvParameters) {
 
           skip_debounce = true;
           skip_cnt = 0;
+          notify = 0;
 
           nrf_drv_gpiote_in_config_t config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
           nrf_drv_gpiote_in_init(BUTTON_INPUT_PIN, &config, gpiote_event_handler);
@@ -127,9 +129,12 @@ void buttonTask(void * pvParameters) {
             startButtonTimer();
           }
           // Notify main queue 
-          xReturned = xQueueSend(main_wakeupTasksQueue, &awake, 0);
-          if (xReturned != pdPASS) {
-            printf("SWITCH_TASK: Unable to send tasks wake up to main_wakeupTasksQueue. \n");
+          if (notify <= 0) {
+            xReturned = xQueueSend(main_wakeupTasksQueue, &awake, 0);
+            if (xReturned != pdPASS) {
+              printf("SWITCH_TASK: Unable to send tasks wake up to main_wakeupTasksQueue. \n");
+            }
+            notify++;
           }
 
         break;

@@ -795,6 +795,12 @@ void main_task(void * pvParameters) {
             if (xReturned != pdPASS) {
               printf("MAIN_TASK: Unable to send button sleep to batteryRxQueue.\n");
             }
+
+            CompositeUSBRxQueueType_t compositeMsg = COMPOSITE_MSG_SLEEP;
+            xReturned = xQueueSend(compositeRxQueue, &compositeMsg, 0);
+            if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to send composite sleep to usbRxQueue. \n");
+            }
             
             usbRxMsgType_t usbMsg;
             usbMsg.msg_type = USB_MSG_SLEEP;
@@ -803,19 +809,13 @@ void main_task(void * pvParameters) {
               printf("MAIN_TASK: Unable to send usb sleep to usbRxQueue. \n");
             }
 
-            CompositeUSBRxQueueType_t compositeMsg = COMPOSITE_MSG_SLEEP;
-            xReturned = xQueueSend(compositeRxQueue, &compositeMsg, 0);
-            if (xReturned != pdPASS) {
-              printf("MAIN_TASK: Unable to send composite sleep to usbRxQueue. \n");
-            }
-
           updateLedState(LED_RUN, false);
           updateLedState(LED_STANDBY, false);
           updateLedState(LED_USB_MSC_STARTING, false);
         }
 
         // this queue is blocked indefinitly until a switch interrupt or usb  interrupt
-        xReturned = xQueueReceiveFromISR(main_wakeupTasksQueue, &wake_up, &xHigherPriorityTaskWoken);
+        xReturned = xQueueReceive(main_wakeupTasksQueue, &wake_up, portMAX_DELAY);
         if (xReturned != pdPASS) {
           printf("MAIN_TASK: Unable to receive tasks wakeup from main_wakeupTasksQueue. \n");
         }
