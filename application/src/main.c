@@ -810,8 +810,8 @@ void main_task(void * pvParameters) {
           }
           // Switch OFF and USB connected
           else if (buttonData.event == OFF_EVENT && usb_conn_status) {
-            next_state = MAIN_FILE;
-            send_usb_change(USB_MSC_CDC_ACM);
+            //next_state = MAIN_FILE;
+            //send_usb_change(USB_MSC_CDC_ACM);
           }
           // Switch off and USB not connected
           else if (buttonData.event == OFF_EVENT && !usb_conn_status) {
