@@ -79,6 +79,7 @@ xQueueHandle main_runConfRespQueue;
 xQueueHandle button_mainStateQueue;
 xQueueHandle main_usbConnRecvQueue;
 xQueueHandle main_usbChangedConfQueue;
+xQueueHandle main_wakeupTasksQueue;
 
 // Zone Request Constants
 const HeaterRxQueueMsg_t run_amplification_zone = {
@@ -361,11 +362,13 @@ void main_task(void * pvParameters) {
   uint32_t alert_timeout_ticks;
   bool usb_conn_status = false;
   bool usb_needs_update = false;
+  bool wake_up = false;
   int mainWatchDogKickCount = 0;
   const BatteryRxQueueMsg_t batt_req = {
     .type = BATTERY_SOC_REQUEST,
     .sendTo = BATTERY_MSG_SOC_MAIN
   };
+  BaseType_t xHigherPriorityTaskWoken = pdTRUE;
 
   // Set Start up state to standby
   main_state_t main_state = MAIN_SLEEP;
@@ -493,7 +496,7 @@ void main_task(void * pvParameters) {
           }
           // Switch off and USB not connected
           else if (buttonData.event == OFF_EVENT && !usb_conn_status) {
-            //next_state = MAIN_SLEEP;
+            next_state = MAIN_SLEEP;
             send_usb_change(USB_DISABLED);
           }
           usb_needs_update = false;
@@ -844,6 +847,7 @@ void main_task(void * pvParameters) {
       // In Low Power State
       case MAIN_SLEEP:{
         if(last_state != main_state) {
+            printf("Going to sleep...\n");
             SensorRxQueueMsg_t msg;
             msg.type = SENSOR_MSG_SLEEP;
             xReturned = xQueueSend(sensorRxQueue, &msg, 0);
@@ -884,11 +888,52 @@ void main_task(void * pvParameters) {
           updateLedState(LED_STANDBY, false);
           updateLedState(LED_USB_MSC_STARTING, false);
         }
-        // this queue is blocked indefinitly until a switch interrupt or usb  interrupt
-        //TODO implement indefinite blocker here
-        //main_state = MAIN_STANDBY;
 
-        while(1);
+        // this queue is blocked indefinitly until a switch interrupt or usb  interrupt
+        xReturned = xQueueReceiveFromISR(main_wakeupTasksQueue, &wake_up, &xHigherPriorityTaskWoken);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to receive tasks wakeup from main_wakeupTasksQueue. \n");
+        }
+
+        printf("Waking up...\n");
+
+        SensorRxQueueMsg_t msg;
+        msg.type = SENSOR_MSG_WAKEUP;
+        xReturned = xQueueSend(sensorRxQueue, &msg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send sensor sleep to sensorRxQueue queue.\n");
+        }
+
+        BatteryRxQueueMsg_t battMsg;
+        msg.type = BATTERY_MSG_WAKEUP;
+
+        xReturned = xQueueSend(batteryRxQueue, &battMsg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send battery sleep to batteryRxQueue.\n");
+        }
+
+        ButtonRxQueueMsg_t buttonMsg;
+        buttonMsg.type = BUTTON_MSG_WAKE;
+
+        xReturned = xQueueSend(buttonRxQueue, &buttonMsg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send button sleep to batteryRxQueue.\n");
+        }
+        
+        usbRxMsgType_t usbMsg;
+        usbMsg.msg_type = USB_MSG_WAKEUP;
+        xReturned = xQueueSend(usbRxQueue, &usbMsg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send usb sleep to usbRxQueue. \n");
+        }
+
+        CompositeUSBRxQueueType_t compositeMsg = COMPOSITE_MSG_WAKEUP;
+        xReturned = xQueueSend(compositeRxQueue, &compositeMsg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send composite sleep to usbRxQueue. \n");
+        }
+        
+        next_state = MAIN_STANDBY;
 
        break;
       }
@@ -1212,7 +1257,9 @@ void create_queues() {
   main_usbChangedConfQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (main_usbChangedConfQueue == NULL)
     printf("Unable to create main_usbChangedConfQueue queue\n");
-
+  main_wakeupTasksQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (main_wakeupTasksQueue == NULL)
+    printf("Unable to create main_wakeupTasksQueue queue\n");
     
   // Heater Task Queues
   heaterRxQueue = xQueueCreate(10, sizeof(HeaterRxQueueMsg_t));

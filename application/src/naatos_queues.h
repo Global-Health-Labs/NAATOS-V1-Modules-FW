@@ -16,6 +16,7 @@ extern xQueueHandle main_runErrorQueue;
 extern xQueueHandle main_runConfRespQueue;
 extern xQueueHandle main_usbConnRecvQueue;
 extern xQueueHandle main_usbChangedConfQueue;
+extern xQueueHandle main_wakeupTasksQueue;
 
 // Sensor Task Queue
 extern xQueueHandle sensorRxQueue;
