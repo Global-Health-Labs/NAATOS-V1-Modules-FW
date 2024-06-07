@@ -919,18 +919,18 @@ void main_task(void * pvParameters) {
         if (xReturned != pdPASS) {
           printf("MAIN_TASK: Unable to send button sleep to batteryRxQueue.\n");
         }
+
+        CompositeUSBRxQueueType_t compositeMsg = COMPOSITE_MSG_WAKEUP;
+        xReturned = xQueueSend(compositeRxQueue, &compositeMsg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send composite sleep to usbRxQueue. \n");
+        }
         
         usbRxMsgType_t usbMsg;
         usbMsg.msg_type = USB_MSG_WAKEUP;
         xReturned = xQueueSend(usbRxQueue, &usbMsg, 0);
         if (xReturned != pdPASS) {
           printf("MAIN_TASK: Unable to send usb sleep to usbRxQueue. \n");
-        }
-
-        CompositeUSBRxQueueType_t compositeMsg = COMPOSITE_MSG_WAKEUP;
-        xReturned = xQueueSend(compositeRxQueue, &compositeMsg, 0);
-        if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send composite sleep to usbRxQueue. \n");
         }
         
         next_state = MAIN_STANDBY;
