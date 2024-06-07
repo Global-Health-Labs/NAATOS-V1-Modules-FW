@@ -85,9 +85,15 @@ ret_code_t xUtil_TWI_Read( i2c_interface_selection_t interface, uint8_t slave_ad
     } else if( xSemaphoreTake( m_i2c_semaphores[interface], portMAX_DELAY ) == pdPASS ) { // execute operation only if resuorce is free
         nrf_drv_twi_enable( &m_i2c[interface] ); // enable I2C
         err_code = nrf_drv_twi_tx( &m_i2c[interface], slave_addr, &reg_addr, 1, true );
-        APP_ERROR_CHECK( err_code );
+        if(err_code == 33281){
+          return err_code;
+        }
+        //APP_ERROR_CHECK( err_code );
         err_code = nrf_drv_twi_rx( &m_i2c[interface], slave_addr, p_buff, length );
-        APP_ERROR_CHECK( err_code );
+        if(err_code == 33281){
+          return err_code;
+        }
+        //APP_ERROR_CHECK( err_code );
         nrf_drv_twi_disable( &m_i2c[interface] );
         xSemaphoreGive( m_i2c_semaphores[interface] ); // 'Give' the semaphore to unblock the blocked task.
 
