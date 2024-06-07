@@ -362,7 +362,6 @@ void main_task(void * pvParameters) {
   bool usb_conn_status = false;
   bool usb_needs_update = false;
 
-  
   const BatteryRxQueueMsg_t batt_req = {
     .type = BATTERY_SOC_REQUEST,
     .sendTo = BATTERY_MSG_SOC_MAIN
@@ -474,9 +473,9 @@ void main_task(void * pvParameters) {
           usb_needs_update = true;
         }
         // Get if USB status has changed
-        //if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
-
-        //}
+        if (xQueueReceive(main_usbConnRecvQueue, &usb_conn_status, 0) == pdPASS) {
+          usb_needs_update = true;
+        }
 
         if(buttonData.event == BOOTLOADER_EVENT) {
           next_state = MAIN_BOOTLOADER;
@@ -787,9 +786,9 @@ void main_task(void * pvParameters) {
           usb_needs_update = true;
         }
         // Get if USB status has changed
-        //if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
-
-        //}
+        if (xQueueReceive(main_usbConnRecvQueue, &usb_conn_status, 0) == pdPASS) {
+          usb_needs_update = true;
+        }
 
         if(buttonData.event == BOOTLOADER_EVENT) {
           next_state = MAIN_BOOTLOADER;
@@ -818,6 +817,12 @@ void main_task(void * pvParameters) {
           else if (buttonData.event == OFF_EVENT && !usb_conn_status) {
             updateLedState(LED_USB_MSC_STARTING, false);
             next_state = MAIN_SLEEP;
+            send_usb_change(USB_DISABLED);
+          }
+          // Updated USB Connection Status
+          else if (buttonData.event == NONE && !usb_conn_status) {
+            updateLedState(LED_USB_MSC_STARTING, false);
+            next_state = MAIN_STANDBY;
             send_usb_change(USB_DISABLED);
           }
           usb_needs_update = false;

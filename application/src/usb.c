@@ -43,6 +43,7 @@ bool usb_done_config = false;
 bool usb_initalized = false;
 bool restarting = false;
 bool needs_response = false;
+bool usb_conn_updated = false;
 
 // Timers
 TimerHandle_t usbTimer;
@@ -204,6 +205,7 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
         case APP_USBD_EVT_POWER_DETECTED:
             printf("USB: Power detected\n");
             usb_detected = true;
+            usb_conn_updated = true;
             //set_led2_blue_breathe();
             if (!nrf_drv_usbd_is_enabled())
             {
@@ -220,7 +222,7 @@ void usbd_user_ev_handler(app_usbd_event_type_t event)
               usb_detected = false;
             else 
               restarting = false;
-            //turn_off_led2();
+            usb_conn_updated = true;
             break;
         case APP_USBD_EVT_POWER_READY:
             printf("USB: Ready\n");
@@ -517,7 +519,15 @@ void usb_task(void * pvParameters) {
         switch(rx_msg.cmd) {
           case USB_DISABLED: 
           {
-            // Do Nothing
+            if (usb_detected) {
+              usbd_user_ev_handler(APP_USBD_EVT_POWER_REMOVED);
+              app_usbd_disable();
+              app_usbd_uninit();
+              disk_uninitialize(0);
+              // Restart the USB
+              start_usb(true, false); 
+            }
+            respond_to_usb_change();
             break;
           }
           case USB_CDC_ACM:
@@ -574,7 +584,13 @@ void usb_task(void * pvParameters) {
       break;
       }
       case USB_MSG_CHECK_CONN:
-
+        if (usb_conn_updated) {
+          xReturned = xQueueSend(main_usbConnRecvQueue, &usb_detected, 0);
+          if (xReturned != pdPASS) {
+            printf("USB_TASK: Unable to send updated usb connection state to main_usbConnRecvQueue");
+          }
+          usb_conn_updated = false;
+        }
       break;
 
       case USB_MSG_SLEEP:
