@@ -30,11 +30,9 @@ extern xQueueHandle buttonRxQueue;
 extern xQueueHandle heaterRxQueue;
 
 // USB Management Task Queue(s)
-extern xQueueHandle usb_stateChangeQueue;
+extern xQueueHandle usbRxQueue;
 extern xQueueHandle usb_recvUsbWaitAcceptQueue;
 extern xQueueHandle usb_usbWaitOverQueue;
-//extern xQueueHandle usb_mainStateContinueQueue;
-extern xQueueHandle usb_connectionReqQueue;
 
 // Composite USB Task Queue(s)
 extern xQueueHandle compositeRxQueue;

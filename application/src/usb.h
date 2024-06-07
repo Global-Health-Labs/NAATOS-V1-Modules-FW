@@ -35,6 +35,7 @@
 #endif
 
 #define USB_TASK_DELAY  pdMS_TO_TICKS(10)
+#define USB__TASK_DELAY   pdMS_TO_TICKS(100)
 
 // SD card enable/disable
 #define USE_SD_CARD       1

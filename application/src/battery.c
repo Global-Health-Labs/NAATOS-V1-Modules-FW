@@ -95,18 +95,18 @@ void battery_task(void * pvParameters) {
 
         case BATTERY_MSG_USB_SUSPEND:
           // Send Suspend Accepted
-          xReturned = xQueueSend(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0); 
-          if (xReturned != pdPASS) {
-            printf("BATTERY: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\n");
-          }
-          printf("BATTERY: Suspending for 15 seconds.\n");
+          //xReturned = xQueueSend(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0); 
+          //if (xReturned != pdPASS) {
+          //  printf("BATTERY: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\n");
+          // }
+          //printf("BATTERY: Suspending for 15 seconds.\n");
           // Delay Task for 15 Seconds
-          vTaskDelay(pdMS_TO_TICKS(USB_SUSPEND_TASKS_TIME));
+          //vTaskDelay(pdMS_TO_TICKS(USB_SUSPEND_TASKS_TIME));
           // Send Suspend Over
-          xReturned = xQueueSend(usb_usbWaitOverQueue, &sus_over, 0); 
-          if (xReturned != pdPASS) {
-            printf("BATTERY: Unable to send usb suspend over to usb_usbWaitOverQueue\n");
-          }
+          //xReturned = xQueueSend(usb_usbWaitOverQueue, &sus_over, 0); 
+          //if (xReturned != pdPASS) {
+          //  printf("BATTERY: Unable to send usb suspend over to usb_usbWaitOverQueue\n");
+          //}
         break;
 
         case BATTERY_MSG_TIMER_EVENT:{

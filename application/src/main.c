@@ -457,12 +457,15 @@ void main_task(void * pvParameters) {
         /* **** HANDLE USB AND SWITCH **** */
         // Get switch status if it has changed
         if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
+          usbRxMsgType_t conn_req_msg = {
+            .cmd = NULL,
+            .msg_type = USB_MSG_CONN_STATUS_REQ
+          };
           // Get The USB Connection Status
-          xReturned = xQueueSend(usb_connectionReqQueue, &usb_conn_status, 0);
+          xReturned = xQueueSend(usbRxQueue, &conn_req_msg, 0);
           if (xReturned != pdPASS) {
-            printf("MAIN_TASK: Unable to send usb connection request to usb_connectionReqQueue. \n");
+            printf("MAIN_TASK: Unable to send usb connection request to usbRxQueue. \n");
           }
-
           // Receive the USB Connection Status
           xReturned = xQueueReceive(main_usbConnRecvQueue, &usb_conn_status, portMAX_DELAY);
           if (xReturned != pdPASS) {
@@ -767,12 +770,15 @@ void main_task(void * pvParameters) {
         /* **** HANDLE USB AND SWITCH **** */
         // Get switch status if it has changed
         if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
+          usbRxMsgType_t conn_req_msg = {
+            .cmd = NULL,
+            .msg_type = USB_MSG_CONN_STATUS_REQ
+          };
           // Get The USB Connection Status
-          xReturned = xQueueSend(usb_connectionReqQueue, &usb_conn_status, 0);
+          xReturned = xQueueSend(usbRxQueue, &conn_req_msg, 0);
           if (xReturned != pdPASS) {
-            printf("MAIN_TASK: Unable to send usb connection request to usb_connectionReqQueue. \n");
+            printf("MAIN_TASK: Unable to send usb connection request to usbRxQueue. \n");
           }
-
           // Receive the USB Connection Status
           xReturned = xQueueReceive(main_usbConnRecvQueue, &usb_conn_status, portMAX_DELAY);
           if (xReturned != pdPASS) {
@@ -867,15 +873,19 @@ void main_task(void * pvParameters) {
 
 void send_usb_change(usb_command_t cmd) {
   BaseType_t xReturned; 
-  usb_command_t command = cmd;
   bool confirmed = false;
+
+  usbRxMsgType_t usb_msg = {
+    .cmd = cmd,
+    .msg_type = USB_MSG_COMMAND
+  };
   
   printf("MAIN_TASK: Sending USB change request.\n");
   //if (cmd != USB_CDC_ACM)
   uninit_sd_card();
 
   // Send command
-  xReturned = xQueueSend(usb_stateChangeQueue, &command, 0);
+  xReturned = xQueueSend(usbRxQueue, &usb_msg, 0);
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send usb command to usb_stateChangeQueue. \n");
   }
@@ -1196,18 +1206,9 @@ void create_queues() {
   }
 
   // USB Management Task Queues
-  usb_stateChangeQueue = xQueueCreate(QUEUE_SIZE, sizeof(usb_message_t));
-  if (usb_stateChangeQueue == NULL)
-    printf("Unable to create usb_stateChangeQueue queue\n");
-  usb_recvUsbWaitAcceptQueue = xQueueCreate(4, sizeof(usb_suspend_acpt_t));
-  if (usb_recvUsbWaitAcceptQueue == NULL)
-    printf("Unable to create usb_recvUsbWaitAcceptQueue queue\n");
-  usb_usbWaitOverQueue = xQueueCreate(4, sizeof(usb_suspend_over_t));
-  if (usb_usbWaitOverQueue == NULL)
-    printf("Unable to create usb_usbWaitOverQueue queue\n");
-  usb_connectionReqQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
-  if (usb_connectionReqQueue == NULL)
-    printf("Unable to create usb_connectionReqQueue queue\n");
+  usbRxQueue = xQueueCreate(QUEUE_SIZE, sizeof(usbRxMsgType_t));
+  if (usbRxQueue == NULL)
+    printf("Unable to create usbRxQueue queue\n");
 
   // Composite USB Task Queues
   compositeRxQueue = xQueueCreate(QUEUE_SIZE, sizeof(CompositeUSBRxQueueType_t));
