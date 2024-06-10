@@ -123,9 +123,8 @@ static led_driver_errors_t led_driver_writeRegisterBlocking(uint8_t *buf, uint8_
 
 void led_driver_init(void) 
 {
-    // Enable normal operation
-    uint8_t shutdown_buf[2] = {LED_DRIVER_SHUTDOWN_REG, 0x01};
-    led_driver_writeRegisterBlocking(shutdown_buf, 2);
+    nrf_gpio_cfg_output(LED_HARDWARE_DRIVER_ENABLE_PIN);
+    enable_led_driver(true);
 
     // Set LED current to 20mA
     uint8_t led_drv_current_buf[2] = {LED_DRIVER_CONFIG_REG_2, LED_CURRENT_30MA};
@@ -364,4 +363,17 @@ led_driver_errors_t led_driver_set_channel_animation_flash_fast(led_driver_led_s
     led_ramp_mode_reg_val &= ~(1 << led_selection + 4);
     uint8_t ramp_write_buf[2] = {LED_DRIVER_RAMP_MODE_REG, led_ramp_mode_reg_val};
     led_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
+}
+
+void enable_led_driver(bool enable) {
+  if(enable){
+    nrf_gpio_pin_set(LED_HARDWARE_DRIVER_ENABLE_PIN);
+    uint8_t shutdown_buf[2] = {LED_DRIVER_SHUTDOWN_REG, 0x01};
+    led_driver_writeRegisterBlocking(shutdown_buf, 2);
+  } else {
+    uint8_t shutdown_buf[2] = {LED_DRIVER_SHUTDOWN_REG, 0x00};
+    led_driver_writeRegisterBlocking(shutdown_buf, 2);
+    nrf_gpio_pin_clear(LED_HARDWARE_DRIVER_ENABLE_PIN);
+  }
+
 }

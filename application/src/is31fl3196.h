@@ -7,6 +7,9 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include "i2c_hal_freertos.h"
+#include "nrf_gpio.h"
+
+#define LED_HARDWARE_DRIVER_ENABLE_PIN NRF_GPIO_PIN_MAP(1,2) //1.02
 
 #define IS31FL3199_ADDR 0b1100111
 #define IS31FL3199_ADDR_low 0b1100100
@@ -78,6 +81,7 @@ typedef struct {
     led_driver_opDoneCallback_t cb;
 } scheduled_led_evt_data_t;
 
+void enable_led_driver(bool enable);
 led_driver_errors_t led_driver_set_rgb(led_driver_led_selection led_selection, led_color color, uint8_t pwm, led_driver_opDoneCallback_t cb);
 led_driver_errors_t led_driver_enable_channel(led_driver_led_selection led_selection, led_color color, led_driver_opDoneCallback_t cb);
 led_driver_errors_t led_driver_disable_channel(led_driver_led_selection led_selection, led_color color, led_driver_opDoneCallback_t cb);

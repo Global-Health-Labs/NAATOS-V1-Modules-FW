@@ -416,14 +416,18 @@ void main_task(void * pvParameters) {
           }
 
           read_sd_and_notify_tasks();
+          // Get the alert timeout
           if (!use_default_configuration_parameters) {
             alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(config.alert_timeout_time_s * 1000.0));
           } else {
              alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(DEFAULT_ALERT_TIMEOUT_S * 1000.0));
           }
-          updateLedState(LED_RUN, false);
-          updateLedState(LED_COMPLETE, false);
-          updateLedState(LED_STANDBY, true);
+          if(!error_during_run){
+            updateLedState(LED_WAKEUP, true);
+            updateLedState(LED_RUN, false);
+            updateLedState(LED_STANDBY, true);
+            updateLedState(LED_COMPLETE, false);
+          }
         } 
         
         // Reset Run Switches
@@ -433,6 +437,10 @@ void main_task(void * pvParameters) {
         // Check to see if alert timeout is over
         if (error_during_run && xTaskGetTickCount() >= (a_t_start + alert_timeout_ticks)) {
           updateLedState( LED_CLEAR_ALL_ERROR, true);
+          updateLedState(LED_WAKEUP, true);
+          updateLedState(LED_RUN, false);
+          updateLedState(LED_STANDBY, true);
+          updateLedState(LED_COMPLETE, false);
           //set_led1_green_breathe();
           error_during_run = false;
         }
@@ -847,6 +855,10 @@ void main_task(void * pvParameters) {
       // In Low Power State
       case MAIN_SLEEP:{
         if(last_state != main_state) {
+            updateLedState(LED_RUN, false);
+            updateLedState(LED_STANDBY, false);
+            updateLedState(LED_USB_MSC_STARTING, false);
+            updateLedState(LED_WAKEUP, false);  
             printf("Going to sleep...\n");
             SensorRxQueueMsg_t msg;
             msg.type = SENSOR_MSG_SLEEP;
@@ -887,6 +899,9 @@ void main_task(void * pvParameters) {
           updateLedState(LED_RUN, false);
           updateLedState(LED_STANDBY, false);
           updateLedState(LED_USB_MSC_STARTING, false);
+
+          vTaskDelay(100);
+          nrf_gpio_pin_clear(SENSORS_EN);
         }
 
         // this queue is blocked indefinitly until a switch interrupt or usb  interrupt
@@ -896,6 +911,10 @@ void main_task(void * pvParameters) {
         }
 
         printf("Waking up...\n");
+
+        nrf_gpio_pin_set(SENSORS_EN);
+        vTaskDelay(100);
+
 
         SensorRxQueueMsg_t msg;
         msg.type = SENSOR_MSG_WAKEUP;
