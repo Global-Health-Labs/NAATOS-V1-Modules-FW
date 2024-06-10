@@ -409,6 +409,10 @@ void main_task(void * pvParameters) {
         // Check to see if alert timeout is over
         if (error_during_run && xTaskGetTickCount() >= (a_t_start + alert_timeout_ticks)) {
           updateLedState( LED_CLEAR_ALL_ERROR, true);
+          updateLedState(LED_WAKEUP, true);
+          updateLedState(LED_RUN, false);
+          updateLedState(LED_STANDBY, true);
+          updateLedState(LED_COMPLETE, false);
           //set_led1_green_breathe();
           error_during_run = false;
         }
