@@ -65,37 +65,43 @@ void handleLedState(LEDRxQueueMsg_t ledMsg) {
       break;
   }
 
-  turn_off_led2();
-  if(ledFlags.testDecline) {
-    set_led1_red_slow_blink();
-    set_led2_red_slow_blink();
-  } else if (ledFlags.testAbort) {
-    set_led1_red_fast_blink();
-    set_led2_red_fast_blink();
-  } else if(ledFlags.testComplete) {
-    set_led1_green_solid();
-    set_led2_green_solid();
-  } else if(ledFlags.standbyCondition) {
-    set_led1_green_breathe();
-    //if battery charging
-    if(ledFlags.batteryCharging){
-      set_led2_blue_breathe();
-    } else {
-      //turn_off_led2();
-    }
-  } else if(ledFlags.runCondition) {
-    set_led1_green_solid();
-    //if battery charging
-    if(ledFlags.batteryCharging){
-      set_led2_blue_breathe();
-    } else {
-      //turn_off_led2();
-    }
-  } else if (ledFlags.usbMscStarting) {
-    set_led1_blue_breathe();
-    set_led2_blue_breathe();
-  }
 
+
+  if(!ledFlags.wakeupCondition){
+    enable_led_driver(false);
+  } else {
+    enable_led_driver(true);
+    turn_off_led2();
+    if(ledFlags.testDecline) {
+      set_led1_red_slow_blink();
+      set_led2_red_slow_blink();
+    } else if (ledFlags.testAbort) {
+      set_led1_red_fast_blink();
+      set_led2_red_fast_blink();
+    } else if(ledFlags.testComplete) {
+      set_led1_green_solid();
+      set_led2_green_solid();
+    } else if(ledFlags.standbyCondition) {
+      set_led1_green_breathe();
+      //if battery charging
+      if(ledFlags.batteryCharging){
+        set_led2_blue_breathe();
+      } else {
+        //turn_off_led2();
+      }
+    } else if(ledFlags.runCondition) {
+      set_led1_green_solid();
+      //if battery charging
+      if(ledFlags.batteryCharging){
+        set_led2_blue_breathe();
+      } else {
+        //turn_off_led2();
+      }
+    } else if (ledFlags.usbMscStarting) {
+      set_led1_blue_breathe();
+      set_led2_blue_breathe();
+    }
+  }
 }
 
 /* LED 1 */
@@ -199,8 +205,12 @@ void turn_off_led2(void) {
 #if ENABLE_LEDS
   //led_driver_set_leds_off(LED1,  NULL);
   //led_driver_set_leds_off(LED2,  NULL);
-  led_driver_disable_channel(LED2, led1_current_color, NULL);
-  led_driver_disable_channel(LED1, led1_current_color, NULL);
+  led_driver_disable_channel(LED2, red, NULL);
+  led_driver_disable_channel(LED2, green, NULL);
+  led_driver_disable_channel(LED2, blue, NULL);
+  led_driver_disable_channel(LED1, red, NULL);
+  led_driver_disable_channel(LED1, green, NULL);
+  led_driver_disable_channel(LED1, blue, NULL);
 
 
   

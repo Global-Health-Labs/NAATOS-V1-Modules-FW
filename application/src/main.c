@@ -388,6 +388,7 @@ void main_task(void * pvParameters) {
           }
 
           read_sd_and_notify_tasks();
+          updateLedState(LED_WAKEUP, true);
           updateLedState(LED_RUN, false);
           updateLedState(LED_STANDBY, true);
           updateLedState(LED_COMPLETE, false);
@@ -772,46 +773,53 @@ void main_task(void * pvParameters) {
       // In Low Power State
       case MAIN_SLEEP:{
         if(last_state != main_state) {
-            printf("Going to sleep...\n");
-            SensorRxQueueMsg_t msg;
-            msg.type = SENSOR_MSG_SLEEP;
-            xReturned = xQueueSend(sensorRxQueue, &msg, 0);
-            if (xReturned != pdPASS) {
-              printf("MAIN_TASK: Unable to send sensor sleep to sensorRxQueue queue.\n");
-            }
+          updateLedState(LED_RUN, false);
+          updateLedState(LED_STANDBY, false);
+          updateLedState(LED_USB_MSC_STARTING, false);
+          updateLedState(LED_WAKEUP, false);
+          printf("Going to sleep...\n");
+          SensorRxQueueMsg_t msg;
+          msg.type = SENSOR_MSG_SLEEP;
+          xReturned = xQueueSend(sensorRxQueue, &msg, 0);
+          if (xReturned != pdPASS) {
+            printf("MAIN_TASK: Unable to send sensor sleep to sensorRxQueue queue.\n");
+          }
 
-            BatteryRxQueueMsg_t battMsg;
-            msg.type = BATTERY_MSG_SLEEP;
+          BatteryRxQueueMsg_t battMsg;
+          msg.type = BATTERY_MSG_SLEEP;
 
-            xReturned = xQueueSend(batteryRxQueue, &battMsg, 0);
-            if (xReturned != pdPASS) {
-              printf("MAIN_TASK: Unable to send battery sleep to batteryRxQueue.\n");
-            }
+          xReturned = xQueueSend(batteryRxQueue, &battMsg, 0);
+          if (xReturned != pdPASS) {
+            printf("MAIN_TASK: Unable to send battery sleep to batteryRxQueue.\n");
+          }
 
-            ButtonRxQueueMsg_t buttonMsg;
-            buttonMsg.type = BUTTON_MSG_SLEEP;
+          ButtonRxQueueMsg_t buttonMsg;
+          buttonMsg.type = BUTTON_MSG_SLEEP;
 
-            xReturned = xQueueSend(buttonRxQueue, &buttonMsg, 0);
-            if (xReturned != pdPASS) {
-              printf("MAIN_TASK: Unable to send button sleep to batteryRxQueue.\n");
-            }
+          xReturned = xQueueSend(buttonRxQueue, &buttonMsg, 0);
+          if (xReturned != pdPASS) {
+            printf("MAIN_TASK: Unable to send button sleep to batteryRxQueue.\n");
+          }
 
-            CompositeUSBRxQueueType_t compositeMsg = COMPOSITE_MSG_SLEEP;
-            xReturned = xQueueSend(compositeRxQueue, &compositeMsg, 0);
-            if (xReturned != pdPASS) {
-              printf("MAIN_TASK: Unable to send composite sleep to usbRxQueue. \n");
-            }
-            
-            usbRxMsgType_t usbMsg;
-            usbMsg.msg_type = USB_MSG_SLEEP;
-            xReturned = xQueueSend(usbRxQueue, &usbMsg, 0);
-            if (xReturned != pdPASS) {
-              printf("MAIN_TASK: Unable to send usb sleep to usbRxQueue. \n");
-            }
+          CompositeUSBRxQueueType_t compositeMsg = COMPOSITE_MSG_SLEEP;
+          xReturned = xQueueSend(compositeRxQueue, &compositeMsg, 0);
+          if (xReturned != pdPASS) {
+            printf("MAIN_TASK: Unable to send composite sleep to usbRxQueue. \n");
+          }
+          
+          usbRxMsgType_t usbMsg;
+          usbMsg.msg_type = USB_MSG_SLEEP;
+          xReturned = xQueueSend(usbRxQueue, &usbMsg, 0);
+          if (xReturned != pdPASS) {
+            printf("MAIN_TASK: Unable to send usb sleep to usbRxQueue. \n");
+          }
 
           updateLedState(LED_RUN, false);
           updateLedState(LED_STANDBY, false);
           updateLedState(LED_USB_MSC_STARTING, false);
+
+          vTaskDelay(100);
+          nrf_gpio_pin_clear(SENSORS_EN);
         }
 
         // this queue is blocked indefinitly until a switch interrupt or usb  interrupt
@@ -821,6 +829,9 @@ void main_task(void * pvParameters) {
         }
 
         printf("Waking up...\n");
+
+        nrf_gpio_pin_set(SENSORS_EN);
+        vTaskDelay(100);
 
         SensorRxQueueMsg_t msg;
         msg.type = SENSOR_MSG_WAKEUP;
