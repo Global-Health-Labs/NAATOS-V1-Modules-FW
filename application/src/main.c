@@ -388,10 +388,18 @@ void main_task(void * pvParameters) {
           }
 
           read_sd_and_notify_tasks();
-          updateLedState(LED_WAKEUP, true);
-          updateLedState(LED_RUN, false);
-          updateLedState(LED_STANDBY, true);
-          updateLedState(LED_COMPLETE, false);
+          // Get the alert timeout
+          if (!use_default_configuration_parameters) {
+            alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((config.alert_timeout_time_m) * 1000.0));
+          } else {
+             alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((DEFAULT_ALERT_TIMEOUT_M) * 1000.0));
+          }
+          if(!error_during_run){
+            updateLedState(LED_WAKEUP, true);
+            updateLedState(LED_RUN, false);
+            updateLedState(LED_STANDBY, true);
+            updateLedState(LED_COMPLETE, false);
+          }
         } 
         
         // Reset Run Switches
