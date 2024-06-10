@@ -165,9 +165,9 @@ void checkButtonState(void) {
           currentEvent = BOOTLOADER_EVENT;
         } else {
           if (switchState) {
-            currentEvent = ON_EVENT;
-          } else {
             currentEvent = OFF_EVENT;
+          } else {
+            currentEvent = ON_EVENT;
           }
         }
         switchCounter = 0;
