@@ -44,11 +44,11 @@
 #define DEFAULT_AMP2_MAX_TEMP         80.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP     50.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP_EN  true
-#define DEFAULT_ALERT_TIMEOUT_S       30.0   // Seconds
-#define DEFAULT_RECOVERY_THRES        40    // Percent
+#define DEFAULT_ALERT_TIMEOUT_S       15.0   // Seconds
+#define DEFAULT_RECOVERY_THRES        20    // Percent
 #define OPTICAL_TRIG_THRES            800
 #define DEFAULT_HEATER_SETPOINT       65.0
-#define DEFAULT_MOTOR_SPEED_PWM       40
+#define DEFAULT_MOTOR_SPEED_PWM       71
 #define DEFAULT_RUN_MOTOR_1           false
 #define DEFAULT_RUN_HEATER_1          true
 #define DEFAULT_RUN_MOTOR_2           true
