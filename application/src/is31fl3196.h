@@ -9,7 +9,7 @@ extern "C" {
 #include "i2c_hal_freertos.h"
 #include "nrf_gpio.h"
 
-#define LED_HARDWARE_DRIVER_ENABLE_PIN NRF_GPIO_PIN_MAP(1,2) //1.02
+#define LED_HARDWARE_DRIVER_ENABLE_PIN NRF_GPIO_PIN_MAP(1,3) //1.03
 
 #define IS31FL3199_ADDR 0b1100111
 #define IS31FL3199_ADDR_low 0b1100100
