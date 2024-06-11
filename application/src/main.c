@@ -413,7 +413,7 @@ void main_task(void * pvParameters) {
             a_t_start = xTaskGetTickCount();
             printf("MAIN_TASK: Alert Timeout - %dms\n", pdTICKS_TO_MS(alert_timeout_ticks));
           }
-
+          vTaskDelay(300);
           read_sd_and_notify_tasks();
           // Get the alert timeout
           if (!use_default_configuration_parameters) {

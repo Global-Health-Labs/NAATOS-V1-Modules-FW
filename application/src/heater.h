@@ -15,9 +15,9 @@
 #define AMP1_SETPOINT_2   67.0
 #define AMP2_SETPOINT_2   67.0
 
-#define H_KP    1.225
+#define H_KP    2.0
 #define H_KI    0.010
-#define H_KD    1.225
+#define H_KD    8
 
 #define V_KP    2.250
 #define V_KI    0.025
