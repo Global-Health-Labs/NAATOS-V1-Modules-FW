@@ -47,7 +47,7 @@ void vInit_TWI_Hardware(i2c_interface_selection_t interface, uint32_t sda_pin, u
             .hold_bus_uninit = false // Hold pull up state on gpio pins after uninit.
     };
     err_code = nrf_drv_twi_init( &m_i2c[interface], &twi_config, NULL, NULL );
-    APP_ERROR_CHECK( err_code );
+    //APP_ERROR_CHECK( err_code );
     //
     nrf_gpio_cfg( scl_pin, // pin_number
                     NRF_GPIO_PIN_DIR_INPUT, // Input.
