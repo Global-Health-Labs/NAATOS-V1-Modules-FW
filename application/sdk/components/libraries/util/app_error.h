@@ -57,6 +57,7 @@
 #include "sdk_errors.h"
 #include "nordic_common.h"
 #include "app_error_weak.h"
+#include "nrf_bootloader_info.h"
 #ifdef ANT_STACK_SUPPORT_REQD
 #include "ant_error.h"
 #endif // ANT_STACK_SUPPORT_REQD

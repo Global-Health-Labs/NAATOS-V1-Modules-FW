@@ -71,7 +71,15 @@ void app_error_handler_bare(ret_code_t error_code)
     };
 
     app_error_fault_handler(NRF_FAULT_ID_SDK_ERROR, 0, (uint32_t)(&error_info));
+    uint32_t volatile * const p_gpreg1 = (uint32_t volatile * const)0x4000051C;
+    // Clear then set (matches behavior when softdevice is used)
+    *p_gpreg1 = 0;
+    *p_gpreg1 = BOOTLOADER_DFU_START;
 
+    // Device will enter bootloader on next reset, 
+    // use this line of code to perform the reset:
+    NVIC_SystemReset();
+    asm volatile("nop");
     UNUSED_VARIABLE(error_info);
 }
 

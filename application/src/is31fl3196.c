@@ -124,6 +124,10 @@ static led_driver_errors_t led_driver_writeRegisterBlocking(uint8_t *buf, uint8_
 void led_driver_init(void) 
 {
     nrf_gpio_cfg_output(LED_HARDWARE_DRIVER_ENABLE_PIN);
+    enable_led_driver(false);
+    for(int i = 0; i < 100; i++){
+      asm volatile ("nop");
+    }
     enable_led_driver(true);
 
     // Set LED current to 20mA

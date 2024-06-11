@@ -40,7 +40,6 @@ SDK Version: 17.1
 #include "switch.h"
 #include "motor.h"
 
-#include "nrf_bootloader_info.h"
 #include "core_cm4.h"
 
 #include "nrf_drv_power.h"
@@ -1384,6 +1383,9 @@ int main(void) {
   // Full Peripheral Initalizations
   init_adc();             // ADC
   init_sensors_gpios();   // Sensor GPIOs
+
+  nrf_gpio_cfg_output(MOTOR_POWER_ENABLE);
+  nrf_gpio_pin_clear(MOTOR_POWER_ENABLE);
   
 
   #ifdef SAMPLE_PREP_BOARD
@@ -1400,7 +1402,6 @@ int main(void) {
   button_init();
   nrf_drv_gpiote_init();
 
-  nrf_gpio_cfg_output(MOTOR_POWER_ENABLE);
 
   // Get the configuration parameters
   res = get_naatos_configuration_parameters(&config);
