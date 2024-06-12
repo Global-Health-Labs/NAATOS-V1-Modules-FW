@@ -500,6 +500,7 @@ void main_task(void * pvParameters) {
             updateLedState(LED_STANDBY, false);
             updateLedState(LED_USB_MSC_STARTING, true);
             send_usb_change(USB_MSC_CDC_ACM);
+            break;
           }
           // Switch off and USB not connected
           else if (buttonData.event == OFF_EVENT && !usb_conn_status) {
