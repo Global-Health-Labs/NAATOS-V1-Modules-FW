@@ -318,7 +318,7 @@ void main_task(void *pvParameters) {
   if (!use_default_configuration_parameters) {
     alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((config.alert_timeout_time_m) * 1000.0));
   } else {
-    alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((DEFAULT_ALERT_TIMEOUT_M)*1000.0));
+    alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((DEFAULT_ALERT_TIMEOUT_S)*1000.0));
   }
 
   create_tasks();
@@ -358,7 +358,7 @@ void main_task(void *pvParameters) {
         if (!use_default_configuration_parameters) {
           alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((config.alert_timeout_time_m) * 1000.0));
         } else {
-          alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((DEFAULT_ALERT_TIMEOUT_M)*1000.0));
+          alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((DEFAULT_ALERT_TIMEOUT_S)*1000.0));
         }
         if (!error_during_run) {
           updateLedState(LED_WAKEUP, true);

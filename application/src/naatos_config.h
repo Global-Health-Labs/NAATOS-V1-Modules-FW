@@ -42,7 +42,8 @@
 #define DEFAULT_AMP2_MAX_TEMP 80.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP 50.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP_EN true
-#define DEFAULT_ALERT_TIMEOUT_M 10 // seconds
+#define DEFAULT_ALERT_TIMEOUT_S 10 // seconds
+#define DEFAULT_VALID_TIMEOUT_S 3600 // 1 hour
 #define DEFAULT_RECOVERY_THRES 40  // Percent
 #define OPTICAL_TRIG_THRES 800
 
@@ -380,6 +381,7 @@ extern xTaskHandle compositeTaskHandle;
 extern xTaskHandle buttonTaskHandle;
 
 // Config parameters
+#ifndef SAMPLE_PREP_BOARD
 typedef struct {
   float sample_rate;
   float logging_rate;
@@ -387,6 +389,7 @@ typedef struct {
   uint16_t amplification_zone_run_time_m;
   uint16_t low_power_threshold;
   uint16_t recovery_power_thresh;
+  uint16_t min_wait_time_after_valve_s;
   float valve_setpoint;
   float amp0_setpoint;
   float amp1_setpoint;
@@ -398,6 +401,7 @@ typedef struct {
   float min_run_zone_temp;
   bool min_run_zone_temp_en;
   float alert_timeout_time_m;
+  float sample_valid_timeout_s;
   float valve_kp;
   float valve_ki;
   float valve_kd;
@@ -428,6 +432,37 @@ typedef struct {
   float amp2_ki_2;
   float amp2_kd_2;
 } naatos_config_parameters;
+#else
+typedef struct {
+  float sample_rate;
+  float logging_rate;
+  uint16_t cycle_1_run_time_m;
+  uint16_t cycle_2_run_time_m;
+  bool ramp_to_temp_before_start_cycle_1;
+  bool ramp_to_temp_before_start_cycle_2;
+  uint16_t low_power_threshold;
+  uint16_t recovery_power_thresh;
+  float heater_setpoint_1;
+  float heater_setpoint_2;
+  float heater_max_temp;
+  float min_run_zone_temp;
+  bool min_run_zone_temp_en;
+  float alert_timeout_time_s;
+  float sample_valid_timeout_s;
+  float heater_kp_1;
+  float heater_ki_1;
+  float heater_kd_1;
+  float heater_kp_2;
+  float heater_ki_2;
+  float heater_kd_2;
+  uint16_t motor_speed_pwm_1;
+  uint16_t motor_speed_pwm_2;
+  bool run_motor_1;
+  bool run_heater_1;
+  bool run_motor_2;
+  bool run_heater_2;
+} naatos_config_parameters;
+#endif
 
 /* Configuration Parameters Variables */
 extern bool use_default_configuration_parameters;

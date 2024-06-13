@@ -26,8 +26,8 @@
 
 #define NAATOS_CONFIG_FILE "config.txt"
 
-#define CSV_HEADER "Time,ValveTemp,ValvePWM,Amp0Temp,Amp0PWM,Amp1Temp,Amp1PWM,Amp2Temp,Amp2PWM,Batt,Event\n"
-#define CSV_HEADER_SIZE 86
+#define CSV_HEADER "Time,HeaterTemp,HeaterPWM,MotorSpeed,MotorPWM,Battery,Event\n"
+#define CSV_HEADER_SIZE 61
 
 /**
  * @brief  QSPI block device definition
@@ -51,6 +51,7 @@ NRF_BLOCK_DEV_SDC_DEFINE(
 #define BLOCKDEV_LIST() ( \
     NRF_BLOCKDEV_BASE_ADDR(m_block_dev_sdc, block_dev))
 
+#ifndef SAMPLE_PREP_BOARD
 typedef enum {
   SAMPLE_RATE,
   LOGGING_RATE,
@@ -69,6 +70,8 @@ typedef enum {
   MIN_RUN_ZONE_TEMP_C,
   MIN_RUN_ZONE_TEMP_EN,
   ALERT_TIMEOUT_TIME,
+  SAMPLE_VALID_TIMEOUT,
+  MIN_WAIT_TIME_AFTER_VALVE,
   VALVE_KP,
   VALVE_KI,
   VALVE_KD,
@@ -100,6 +103,38 @@ typedef enum {
   AMP2_KD_2,
   NUM_PARAMETERS
 } naatos_config_params_t;
+#else
+typedef enum {
+  SAMPLE_RATE,
+  LOGGING_RATE,
+  CYCLE_1_RUN_TIME,
+  CYCLE_2_RUN_TIME,
+  RAMP_TO_TEMP_BEFORE_CYCLE_1_START,
+  RAMP_TO_TEMP_BEFORE_CYCLE_2_START,
+  LOW_POWER_THRESHOLD,
+  RECOVERY_POWER_THRESHOLD,
+  HEATER_SETPOINT_1_C,
+  HEATER_SETPOINT_2_C,
+  HEATER_MAX_TEMP_C,
+  MIN_RUN_ZONE_TEMP_C,
+  MIN_RUN_ZONE_TEMP_EN,
+  ALERT_TIMEOUT_TIME,
+  SAMPLE_VALID_TIMEOUT,
+  HEATER_KP_1,
+  HEATER_KI_1,
+  HEATER_KD_1,
+  HEATER_KP_2,
+  HEATER_KI_2,
+  HEATER_KD_2,
+  MOTOR_SPEED_PWM_1,
+  MOTOR_SPEED_PWM_2,
+  RUN_MOTOR_1,
+  RUN_HEATER_1,
+  RUN_MOTOR_2,
+  RUN_HEATER_2,
+  NUM_PARAMETERS
+} naatos_config_params_t;
+#endif
 
 typedef struct {
   bool log_dir_needed;
