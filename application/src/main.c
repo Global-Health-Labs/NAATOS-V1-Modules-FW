@@ -193,6 +193,7 @@ naatos_config_parameters config = {
     .sample_rate = 0,
     .amplification_zone_run_time_m = 0,
     .valve_zone_run_time_m = 0,
+    .sample_valid_timeout_s = 0,
     .low_power_threshold = 0,
     .valve_setpoint = 0,
     .amp0_setpoint = 0,
@@ -230,8 +231,9 @@ naatos_config_parameters config = {
 naatos_config_parameters config = {
     .logging_rate = 0,
     .sample_rate = 0,
-    .amplification_zone_run_time_m = 0,
-    .valve_zone_run_time_m = 0,
+    .cycle_1_run_time_m = 0,
+    .cycle_2_run_time_m = 0,
+    .sample_valid_timeout_s = 0,
     .low_power_threshold = 0,
     .heater_setpoint_1 = 0,
     .heater_setpoint_2 = 0,
@@ -507,10 +509,6 @@ void main_task(void *pvParameters) {
 
       vTaskDelay(pdMS_TO_TICKS(100));
       /* ***** Start Sample Preperation ***** */
-#if GO_STRAIGHT_TO_RUNNING
-      // Allow for other tasks to get ready to receive main state change
-      vTaskDelay(2000);
-#endif
       /* ***** Amplification Zone Run ***** */
       // Check to make sure we are above the recovery battery percentage
       if (config.recovery_power_thresh > percent_recv) {
@@ -555,7 +553,7 @@ void main_task(void *pvParameters) {
       if (use_default_configuration_parameters) {
         end_time = pdMS_TO_TICKS((DEFAULT_AMPLIFICATION_ZONE_ON_TIME)*1000);
       } else {
-        end_time = pdMS_TO_TICKS((config.amplification_zone_run_time_m) * 1000);
+        end_time = pdMS_TO_TICKS((config.cycle_1_run_time_m) * 1000);
       }
       // Get sensor switch data ensuring sample is still in position
       do {
@@ -604,7 +602,7 @@ void main_task(void *pvParameters) {
         if (use_default_configuration_parameters) {
           end_time = pdMS_TO_TICKS((DEFAULT_VALVE_ZONE_ON_TIME)*1000);
         } else {
-          end_time = pdMS_TO_TICKS((config.valve_zone_run_time_m) * 1000);
+          end_time = pdMS_TO_TICKS((config.cycle_2_run_time_m) * 1000);
         }
       } else {
         // Send Interrupt Event to logging task
@@ -980,12 +978,6 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
   if (xReturned != pdPASS) {
     printf("MAIN_TASK: Unable to send main state change to batteryRxQueue.\n");
   }
-
-  // Send main state update to usb task
-  //xReturned = xQueueSend(usb_stateChangeQueue, &msg, 0);
-  //if (xReturned != pdPASS) {
-  //  printf("MAIN_TASK: Unable to send main state change to usb_stateChangeQueue.\n");
-  //}
 
   /* Get responses from the states to ensure all configurations for the run or standby have been made */
   while (!logger_resp || !batt_resp /*|| !usb_resp || !sensor_resp*/) {

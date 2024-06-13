@@ -45,6 +45,7 @@
 #define DEFAULT_MIN_RUN_ZONE_TEMP 50.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP_EN true
 #define DEFAULT_ALERT_TIMEOUT_S 15.0 // Seconds
+#define DEFAULT_VALID_TIMEOUT_S 3600 // 1 hour
 #define DEFAULT_RECOVERY_THRES 20    // Percent
 #define OPTICAL_TRIG_THRES 800
 #define DEFAULT_HEATER_SETPOINT 65.0
@@ -56,7 +57,6 @@
 
 /* Device Debug Parameters */
 #define I2C_CONNECTED 1
-#define GO_STRAIGHT_TO_RUNNING 0
 #define USE_CALENDAR_CHIP 1
 #define VERBOSE_PID 1
 #define USE_MOTOR 1
@@ -405,6 +405,7 @@ typedef struct {
   uint16_t amplification_zone_run_time_m;
   uint16_t low_power_threshold;
   uint16_t recovery_power_thresh;
+  uint16_t min_wait_time_after_valve_s;
   float valve_setpoint;
   float amp0_setpoint;
   float amp1_setpoint;
@@ -450,8 +451,10 @@ typedef struct {
 typedef struct {
   float sample_rate;
   float logging_rate;
-  uint16_t valve_zone_run_time_m;
-  uint16_t amplification_zone_run_time_m;
+  uint16_t cycle_1_run_time_m;
+  uint16_t cycle_2_run_time_m;
+  bool ramp_to_temp_before_start_cycle_1;
+  bool ramp_to_temp_before_start_cycle_2;
   uint16_t low_power_threshold;
   uint16_t recovery_power_thresh;
   float heater_setpoint_1;
@@ -460,6 +463,7 @@ typedef struct {
   float min_run_zone_temp;
   bool min_run_zone_temp_en;
   float alert_timeout_time_s;
+  float sample_valid_timeout_s;
   float heater_kp_1;
   float heater_ki_1;
   float heater_kd_1;

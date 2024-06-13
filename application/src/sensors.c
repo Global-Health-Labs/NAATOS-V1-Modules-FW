@@ -323,15 +323,7 @@ void sensorCollection(void) {
 #endif
 
 #if I2C_CONNECTED
-    // I2C Read for Valve Zone
-    //temperatures.valve_zone_temp = readTemp(valve_zone);
-    // I2C Read for Amplification Zone 0
-    //temperatures.amp0_zone_temp = readTemp(amp_zone_0);
-    // I2C Read for Amplification Zone 1
-    //temperatures.amp1_zone_temp = readTemp(amp_zone_1);
-    // I2C Read for Amplification Zone 2
     temperatures.amp2_zone_temp = readTemp(amp_zone_2);
-
 #else
     // Set temps to their setpoints if i2c is not connected
     temperatures.valve_zone_temp = 85;
@@ -372,7 +364,6 @@ void init_sensors_gpios(void) {
   p_counter1 = motor_tach_init();
 
   nrf_gpio_cfg_output(NRF_GPIO_PIN_MAP(1, 3));
-  //nrf_gpio_pin_write(NRF_GPIO_PIN_MAP(1,3), 1);
   nrf_gpio_pin_set(NRF_GPIO_PIN_MAP(1, 3));
 }
 

@@ -210,7 +210,6 @@
       <file file_name="../sdk/external/freertos/source/timers.c" />
       <file file_name="../sdk/external/freertos/config/FreeRTOSConfig.h" />
       <file file_name="../sdk/external/freertos/source/include/croutine.h" />
-      <file file_name="../sdk/external/freertos/source/include/deprecated_definitions.h" />
       <file file_name="../sdk/external/freertos/source/include/event_groups.h" />
       <file file_name="../sdk/external/freertos/source/include/FreeRTOS.h" />
       <file file_name="../sdk/external/freertos/source/include/list.h" />
@@ -255,6 +254,7 @@
         Name="Debug"
         build_exclude_from_build="No"
         c_preprocessor_undefinitions="APP_TIMER_V2_RTC1_ENABLED" />
+      <file file_name="../sdk/external/freertos/source/include/deprecated_definitions.h" />
     </folder>
     <configuration
       Name="Debug"

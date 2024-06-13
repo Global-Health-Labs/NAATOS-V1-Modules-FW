@@ -263,12 +263,55 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
+
   // Write logging rate
   configBufferSize = sprintf(configBuffer, "logging_rate:%0.2f\n", DEFAULT_LOGGING_RATE);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
+
+  // Write Low Power Threshold
+  configBufferSize = sprintf(configBuffer, "low_power_threshold:%d\n", DEFAULT_LOW_POWER_THRESHOLD);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Write Recovery Power Threshold
+  configBufferSize = sprintf(configBuffer, "recovery_power_threshold:%d\n", DEFAULT_RECOVERY_THRES);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Write Minimum Run Zone Temperature and Enable
+  configBufferSize = sprintf(configBuffer, "min_run_zone_temp:%0.2f\n", DEFAULT_MIN_RUN_ZONE_TEMP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  configBufferSize = sprintf(configBuffer, "min_run_zone_temp_en:%s\n", DEFAULT_MIN_RUN_ZONE_TEMP_EN ? "true" : "false");
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Write Alert Timeout (minutes)
+  configBufferSize = sprintf(configBuffer, "alert_timeout_time_s:%0.2f\n", DEFAULT_ALERT_TIMEOUT_S);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  configBufferSize = sprintf(configBuffer, "sample_valid_timeout_s:%0.2f\n", DEFAULT_VALID_TIMEOUT_S);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+#ifndef SAMPLE_PREP_BOARD
   // Write Amplification Zone Run Time
   configBufferSize = sprintf(configBuffer, "amp_zone_run_time:%d\n", DEFAULT_AMPLIFICATION_ZONE_ON_TIME);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
@@ -281,19 +324,6 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
-  // Write Low Power Threshold
-  configBufferSize = sprintf(configBuffer, "low_power_threshold:%d\n", DEFAULT_LOW_POWER_THRESHOLD);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Recovery Power Threshold
-  configBufferSize = sprintf(configBuffer, "recovery_power_threshold:%d\n", DEFAULT_RECOVERY_THRES);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-#ifndef SAMPLE_PREP_BOARD
   // Write Valve Zone Setpoint
   configBufferSize = sprintf(configBuffer, "valve_setpoint:%0.2f\n", VALVE_SETPOINT);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
@@ -337,43 +367,7 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
-#else
-  // Write Valve Zone Setpoint
-  configBufferSize = sprintf(configBuffer, "heater_setpoint_1:%0.2f\n", DEFAULT_HEATER_SETPOINT);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  configBufferSize = sprintf(configBuffer, "heater_setpoint_2:%0.2f\n", DEFAULT_HEATER_SETPOINT);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Heater Max Temperature
-  configBufferSize = sprintf(configBuffer, "heater_max_temp:%0.2f\n", DEFAULT_VALVE_MAX_TEMP);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-#endif
-  // Write Minimum Run Zone Temperature and Enable
-  configBufferSize = sprintf(configBuffer, "min_run_zone_temp:%0.2f\n", DEFAULT_MIN_RUN_ZONE_TEMP);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  configBufferSize = sprintf(configBuffer, "min_run_zone_temp_en:%s\n", DEFAULT_MIN_RUN_ZONE_TEMP_EN ? "true" : "false");
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Alert Timeout (minutes)
-  configBufferSize = sprintf(configBuffer, "alert_timeout_time_s:%0.2f\n", DEFAULT_ALERT_TIMEOUT_S);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-#ifndef SAMPLE_PREP_BOARD
+
   // Write Valve Kp
   configBufferSize = sprintf(configBuffer, "valve_kp:%0.3f\n", V_KP);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
@@ -547,6 +541,24 @@ FRESULT check_for_config_file(void) {
     return res;
   }
 #else
+  // Write heater Zone Setpoint
+  configBufferSize = sprintf(configBuffer, "heater_setpoint_1:%0.2f\n", DEFAULT_HEATER_SETPOINT);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  configBufferSize = sprintf(configBuffer, "heater_setpoint_2:%0.2f\n", DEFAULT_HEATER_SETPOINT);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Heater Max Temperature
+  configBufferSize = sprintf(configBuffer, "heater_max_temp:%0.2f\n", DEFAULT_VALVE_MAX_TEMP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
   // Write Heater 1 Kp
   configBufferSize = sprintf(configBuffer, "heater_kp_1:%0.3f\n", H_KP);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
@@ -692,19 +704,35 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case LOGGING_RATE:
       parameters->logging_rate = atof(val);
       break;
-    case VALVE_ZONE_RUN_TIME:
-      parameters->amplification_zone_run_time_m = atoi(val); // TODO: Figure out why this is backwards
-      break;
-    case AMP_ZONE_RUN_TIME:
-      parameters->valve_zone_run_time_m = atoi(val); // TODO: Figure out why this is backwards
-      break;
     case LOW_POWER_THRESHOLD:
       parameters->low_power_threshold = atoi(val);
       break;
     case RECOVERY_POWER_THRESHOLD:
       parameters->recovery_power_thresh = atoi(val);
       break;
+    case MIN_RUN_ZONE_TEMP_C:
+      parameters->min_run_zone_temp = atof(val);
+      break;
+    case MIN_RUN_ZONE_TEMP_EN:
+      num = strcmp(val, "true");
+      parameters->min_run_zone_temp_en = num ? false : true;
+      break;
+    case ALERT_TIMEOUT_TIME:
+      parameters->alert_timeout_time_s = atof(val);
+      break;
+    case SAMPLE_VALID_TIMEOUT:
+      parameters->sample_valid_timeout_s = atof(val);
+      break;
 #ifndef SAMPLE_PREP_BOARD
+    case VALVE_ZONE_RUN_TIME:
+      parameters->amplification_zone_run_time_m = atoi(val); // TODO: Figure out why this is backwards
+      break;
+    case AMP_ZONE_RUN_TIME:
+      parameters->valve_zone_run_time_m = atoi(val); // TODO: Figure out why this is backwards
+      break;
+    case MIN_WAIT_TIME_AFTER_VALVE:
+      parameters->min_wait_time_after_valve_s = atoi(val); // TODO: Figure out why this is backwards
+      break;
     case VALVE_SETPOINT_C:
       parameters->valve_setpoint = atof(val);
       break;
@@ -729,29 +757,6 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case AMP2_MAX_TEMP_C:
       parameters->amp2_max_temp = atof(val);
       break;
-
-#else
-    case HEATER_SETPOINT_1_C:
-      parameters->heater_setpoint_1 = atof(val);
-      break;
-    case HEATER_SETPOINT_2_C:
-      parameters->heater_setpoint_2 = atof(val);
-      break;
-    case HEATER_MAX_TEMP_C:
-      parameters->heater_max_temp = atof(val);
-      break;
-#endif
-    case MIN_RUN_ZONE_TEMP_C:
-      parameters->min_run_zone_temp = atof(val);
-      break;
-    case MIN_RUN_ZONE_TEMP_EN:
-      num = strcmp(val, "true");
-      parameters->min_run_zone_temp_en = num ? false : true;
-      break;
-    case ALERT_TIMEOUT_TIME:
-      parameters->alert_timeout_time_s = atof(val);
-      break;
-#ifndef SAMPLE_PREP_BOARD
     case VALVE_KP:
       parameters->valve_kp = atof(val);
       break;
@@ -840,6 +845,29 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       parameters->amp2_kd_2 = atof(val);
       break;
 #else
+    case CYCLE_1_RUN_TIME:
+      parameters->cycle_1_run_time_m = atoi(val);
+      break;
+    case CYCLE_2_RUN_TIME:
+      parameters->cycle_2_run_time_m = atoi(val);
+      break;
+    case RAMP_TO_TEMP_BEFORE_CYCLE_1_START:
+      num = strcmp(val, "true");
+      parameters->ramp_to_temp_before_start_cycle_1 = num ? false : true;
+      break;
+    case RAMP_TO_TEMP_BEFORE_CYCLE_2_START:
+      num = strcmp(val, "true");
+      parameters->ramp_to_temp_before_start_cycle_2 = num ? false : true;
+      break;
+    case HEATER_SETPOINT_1_C:
+      parameters->heater_setpoint_1 = atof(val);
+      break;
+    case HEATER_SETPOINT_2_C:
+      parameters->heater_setpoint_2 = atof(val);
+      break;
+    case HEATER_MAX_TEMP_C:
+      parameters->heater_max_temp = atof(val);
+      break;
     case HEATER_KP_1:
       parameters->heater_kp_1 = atof(val);
       break;
@@ -881,6 +909,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       parameters->run_heater_2 = num ? false : true;
       break;
 #endif
+
     default:
       // Handle default case
       break;

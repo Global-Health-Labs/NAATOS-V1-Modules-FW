@@ -17,7 +17,7 @@
 
 #define H_KP 2.0
 #define H_KI 0.010
-#define H_KD 8
+#define H_KD 8.0
 
 #define V_KP 2.250
 #define V_KI 0.025
