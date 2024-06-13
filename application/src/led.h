@@ -1,11 +1,11 @@
 #pragma once
 
+#include "FreeRTOS.h"
+#include "is31fl3196.h"
 #include "naatos_config.h"
 #include "naatos_queues.h"
-#include "is31fl3196.h"
 #include "stdbool.h"
 #include <stdint.h>
-#include "FreeRTOS.h"
 
 #define ENABLE_LEDS 1
 
@@ -29,8 +29,7 @@ typedef struct {
   bool usbMscStarting;
 } LEDFlags_t;
 
-
-void led_task(void * pvParameters);
+void led_task(void *pvParameters);
 
 void set_led1_green_solid(void);
 void set_led1_green_breathe(void);

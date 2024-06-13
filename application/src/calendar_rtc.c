@@ -11,7 +11,7 @@ uint8_t calendar_encode(uint8_t reading) {
 }
 
 // Get the current time on the calendar chip
-bool calendar_get_time(calendar_time_t * now) {
+bool calendar_get_time(calendar_time_t *now) {
   uint8_t buff[7];
   ret_code_t ret;
 
@@ -22,37 +22,37 @@ bool calendar_get_time(calendar_time_t * now) {
     printf("Unable to i2c communicate with calendar chip!\n");
     return false;
   }
-  
+
   // Decode the retreived data
-  now->second   = calendar_decode(buff[0] & ~0x80);
-  now->minute   = calendar_decode(buff[1] & ~0x80);
-  now->hour     = calendar_decode(buff[2] & ~0xC0);
-  now->day      = calendar_decode(buff[3] & ~0xC0);
+  now->second = calendar_decode(buff[0] & ~0x80);
+  now->minute = calendar_decode(buff[1] & ~0x80);
+  now->hour = calendar_decode(buff[2] & ~0xC0);
+  now->day = calendar_decode(buff[3] & ~0xC0);
   now->week_day = calendar_decode(buff[4] & ~0xF8);
-  now->month    = calendar_decode(buff[5] & ~0xE0);
-  now->year     = calendar_decode(buff[6]);
-  
+  now->month = calendar_decode(buff[5] & ~0xE0);
+  now->year = calendar_decode(buff[6]);
+
   return ~(buff[0] & 0x80);
-#else 
-  now->second   = 59;
-  now->minute   = 59; 
-  now->hour     = 12;
-  now->day      = 30;
+#else
+  now->second = 59;
+  now->minute = 59;
+  now->hour = 12;
+  now->day = 30;
   now->week_day = 6;
-  now->month    = 12;
-  now->year     = 24;
-  
+  now->month = 12;
+  now->year = 24;
+
   return true;
 #endif
 }
 
 // Set the time on the calendar chip, this should only be done once.
-//      * TODO: Need to figure out how we want to use this to set the time and date when 
+//      * TODO: Need to figure out how we want to use this to set the time and date when
 //        boards are being brought up.
-bool calendar_set_time(calendar_time_t * now) {
+bool calendar_set_time(calendar_time_t *now) {
   uint8_t buff[7];
-  ret_code_t ret; 
-#if I2C_CONNECTED  
+  ret_code_t ret;
+#if I2C_CONNECTED
   buff[0] = calendar_encode(now->second);
   buff[1] = calendar_encode(now->minute);
   buff[2] = calendar_encode(now->hour);
@@ -60,13 +60,13 @@ bool calendar_set_time(calendar_time_t * now) {
   buff[4] = calendar_encode(now->week_day);
   buff[5] = calendar_encode(now->month);
   buff[6] = calendar_encode(now->year);
-  
+
   ret = xUtil_TWI_Write(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
   if (ret) {
     return false;
   }
   return true;
-#else 
+#else
   // Always return false if i2c is not enabled
   return false;
 #endif
@@ -81,9 +81,8 @@ bool calendar_reset(void) {
   if (ret)
     return false;
   return true;
-#else 
+#else
   // Always return false if i2c is not enabled
   return false;
-#endif  
-
+#endif
 }

@@ -1,6 +1,6 @@
 #include "adc.h"
 
-void saadc_callback_handler(nrf_drv_saadc_evt_t const * p_event) {
+void saadc_callback_handler(nrf_drv_saadc_evt_t const *p_event) {
   // Empty handler function
 }
 
@@ -11,11 +11,10 @@ bool get_optical_triggered(void) {
   //printf("Optical Value: %d\n", adc_val);
   // Check to see if adc value is below threshold
   if (use_default_configuration_parameters) {
-    if (adc_val < OPTICAL_TRIG_THRES) 
+    if (adc_val < OPTICAL_TRIG_THRES)
       return true;
-  }
-  else {
-    if (adc_val < config.optical_distance) 
+  } else {
+    if (adc_val < config.optical_distance)
       return true;
   }
   return false;

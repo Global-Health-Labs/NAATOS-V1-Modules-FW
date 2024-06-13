@@ -4,12 +4,12 @@
 extern "C" {
 #endif
 
-#include <stdint.h>
-#include <stdbool.h>
 #include "i2c_hal_freertos.h"
 #include "nrf_gpio.h"
+#include <stdbool.h>
+#include <stdint.h>
 
-#define LED_HARDWARE_DRIVER_ENABLE_PIN NRF_GPIO_PIN_MAP(1,3) //1.03
+#define LED_HARDWARE_DRIVER_ENABLE_PIN NRF_GPIO_PIN_MAP(1, 3) //1.03
 
 #define IS31FL3199_ADDR 0b1100111
 #define IS31FL3199_ADDR_low 0b1100100
@@ -39,46 +39,46 @@ extern "C" {
 #define LED_MAX_BRIGHTNESS 0x4D
 
 typedef enum {
-    led_driver_success,
-    led_driver_i2c_error,
-    led_driver_busy,
-    led_driver_timeout
+  led_driver_success,
+  led_driver_i2c_error,
+  led_driver_busy,
+  led_driver_timeout
 } led_driver_errors_t;
 
 typedef enum {
-    enable_channel_op,
-    disable_channel_op,
-    change_pwm_op,
-    reset_op,
-    write_reg,
+  enable_channel_op,
+  disable_channel_op,
+  change_pwm_op,
+  reset_op,
+  write_reg,
 } led_driver_op_type_t;
 
 typedef enum {
-    LED1,
-    LED2,
+  LED1,
+  LED2,
 } led_driver_led_selection;
 
 typedef enum {
-    red,
-    green,
-    blue,
+  red,
+  green,
+  blue,
 } led_color;
 
 typedef struct {
-    led_driver_op_type_t data_type;
-    uint8_t *data;
+  led_driver_op_type_t data_type;
+  uint8_t *data;
 } led_driver_callback_data_t;
 
 typedef void (*led_driver_opDoneCallback_t)(led_driver_errors_t outcome, led_driver_callback_data_t *p_data);
 
 typedef struct {
-    led_driver_op_type_t op_type;
-    led_driver_led_selection led_selection;
-    led_color color;
-    uint8_t pwm;
-    uint8_t reg_selection;
-    uint8_t reg_value;
-    led_driver_opDoneCallback_t cb;
+  led_driver_op_type_t op_type;
+  led_driver_led_selection led_selection;
+  led_color color;
+  uint8_t pwm;
+  uint8_t reg_selection;
+  uint8_t reg_value;
+  led_driver_opDoneCallback_t cb;
 } scheduled_led_evt_data_t;
 
 void enable_led_driver(bool enable);
@@ -90,7 +90,7 @@ led_driver_errors_t led_driver_set_channel_animation_solid(led_driver_led_select
 led_driver_errors_t led_driver_set_channel_animation_flashing(led_driver_led_selection led_selection, led_color color, bool enable, led_driver_opDoneCallback_t cb);
 led_driver_errors_t led_driver_set_channel_animation_breathing(led_driver_led_selection led_selection, led_color color, bool enable, led_driver_opDoneCallback_t cb);
 void led_driver_init(void);
-void led_driver_scheduled_evt_handler(void * p_context, uint16_t size);
+void led_driver_scheduled_evt_handler(void *p_context, uint16_t size);
 led_driver_errors_t led_driver_set_channel_animation_flash_fast(led_driver_led_selection led_selection, led_color color, bool enable, led_driver_opDoneCallback_t cb);
 
 #ifdef __cplusplus

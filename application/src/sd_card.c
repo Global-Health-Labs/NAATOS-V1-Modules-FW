@@ -18,7 +18,7 @@ uint32_t b_written;
 bool sd_card_inited = false;
 
 // Initialize FATFS disk I/O interface by providing the block device.
-static diskio_blkdev_t drives[] = { DISKIO_BLOCKDEV_CONFIG(NRF_BLOCKDEV_BASE_ADDR(m_block_dev_sdc, block_dev), NULL) };
+static diskio_blkdev_t drives[] = {DISKIO_BLOCKDEV_CONFIG(NRF_BLOCKDEV_BASE_ADDR(m_block_dev_sdc, block_dev), NULL)};
 
 // "private" functions
 FRESULT remount_goto_logs_dir(void);
@@ -26,25 +26,25 @@ FRESULT check_for_config_file(void);
 
 // Initalize Function
 void init_sd_card(void) {
- nrf_gpio_cfg(SPI_SCK_PIN,
-                 NRF_GPIO_PIN_DIR_OUTPUT,
-                 NRF_GPIO_PIN_INPUT_DISCONNECT,
-                 NRF_GPIO_PIN_NOPULL,
-                 NRF_GPIO_PIN_H0H1,       // Require High Drive low/high level
-                 NRF_GPIO_PIN_NOSENSE);
+  nrf_gpio_cfg(SPI_SCK_PIN,
+      NRF_GPIO_PIN_DIR_OUTPUT,
+      NRF_GPIO_PIN_INPUT_DISCONNECT,
+      NRF_GPIO_PIN_NOPULL,
+      NRF_GPIO_PIN_H0H1, // Require High Drive low/high level
+      NRF_GPIO_PIN_NOSENSE);
 
   nrf_gpio_cfg(SPI_MOSI_PIN,
-                 NRF_GPIO_PIN_DIR_OUTPUT,
-                 NRF_GPIO_PIN_INPUT_DISCONNECT,
-                 NRF_GPIO_PIN_NOPULL,
-                 NRF_GPIO_PIN_H0H1,       // Require High Drive low/high level
-                 NRF_GPIO_PIN_NOSENSE);
+      NRF_GPIO_PIN_DIR_OUTPUT,
+      NRF_GPIO_PIN_INPUT_DISCONNECT,
+      NRF_GPIO_PIN_NOPULL,
+      NRF_GPIO_PIN_H0H1, // Require High Drive low/high level
+      NRF_GPIO_PIN_NOSENSE);
 
   disk_state = STA_NOINIT;
 
   memset(&fs, 0, sizeof(FATFS));
 
-  // Register the drives we have 
+  // Register the drives we have
   diskio_blockdev_register(drives, ARRAY_SIZE(drives));
 
   // Initalize the disk on the SD
@@ -54,12 +54,12 @@ void init_sd_card(void) {
   if (disk_state) {
     printf("SD Card initialization failed.\n");
   }
-  
+
   // Get SD Card Specifications
   blocks_per_mb = (1024uL * 1024uL) / m_block_dev_sdc.block_dev.p_ops->geometry(&m_block_dev_sdc.block_dev)->blk_size;
   capacity = m_block_dev_sdc.block_dev.p_ops->geometry(&m_block_dev_sdc.block_dev)->blk_count / blocks_per_mb;
   printf("Capactity: %d MB\n", capacity);
-  
+
   // Mount SD Card
   ff_result = sd_card_mount();
   if (ff_result != FR_OK) {
@@ -77,7 +77,7 @@ void uninit_sd_card(void) {
 
   UNUSED_RETURN_VALUE(sd_card_unmount());
   UNUSED_RETURN_VALUE(disk_uninitialize(0));
-  
+
   sd_card_inited = false;
   printf("SD Card Uninitalized.\n");
 }
@@ -108,17 +108,15 @@ void create_naatos_directories() {
   res = check_for_config_file();
   if (res == FR_OK) {
     printf("New config.txt config file in config subdirectory created with default parameters.\n");
-  }
-  else if (res != FR_EXIST) {
+  } else if (res != FR_EXIST) {
     printf("Unable to retreive config.txt from sd card.\n");
   }
-  
 }
 
 // Create a new file under the log subdirectory ** NO NAMES WITH : ALLOWED **
-FRESULT sd_card_create_log_file(const char * file_name) {
+FRESULT sd_card_create_log_file(const char *file_name) {
   FRESULT res;
-  
+
   // Go to the logs directory
   res = remount_goto_logs_dir();
   if (res != FR_OK) {
@@ -140,20 +138,20 @@ FRESULT sd_card_create_log_file(const char * file_name) {
   // Close the file
   res = f_close(&file);
   if (res != FR_OK) {
-      return res;
+    return res;
   }
 
   // Change back directories
   res = f_chdir("..");
   if (res != FR_OK) {
-      return res;
+    return res;
   }
 
   return res;
 }
 
-// Write a line to the log file on the SD card 
-FRESULT sd_card_write_log_line(const char * logName, const char * writeBuff, uint32_t writeBuffSize) {
+// Write a line to the log file on the SD card
+FRESULT sd_card_write_log_line(const char *logName, const char *writeBuff, uint32_t writeBuffSize) {
   FRESULT res;
   uint32_t b_written;
 
@@ -178,13 +176,13 @@ FRESULT sd_card_write_log_line(const char * logName, const char * writeBuff, uin
   // Close the file
   res = f_close(&file);
   if (res != FR_OK) {
-      return res;
+    return res;
   }
 
   // Change back directories
   res = f_chdir("..");
   if (res != FR_OK) {
-      return res;
+    return res;
   }
 
   return res;
@@ -196,28 +194,26 @@ void sd_card_list_contents(void) {
   // Open Root Directory
   ff_result = f_opendir(&dir, "/");
   if (ff_result) {
-      printf("Directory listing failed!\n");
-      return;
+    printf("Directory listing failed!\n");
+    return;
   }
 
   // Get the other directories
   do {
-      ff_result = f_readdir(&dir, &fno);
-      if (ff_result != FR_OK) {
-          printf("Directory read failed.\n");
-          return;
-      }
+    ff_result = f_readdir(&dir, &fno);
+    if (ff_result != FR_OK) {
+      printf("Directory read failed.\n");
+      return;
+    }
 
-      if (fno.fname[0]) {
-          if (fno.fattrib & AM_DIR) {
-              printf("   <DIR>   %s\n",(uint32_t)fno.fname);
-          }
-          else {
-              printf("%9lu  %s\n", fno.fsize, (uint32_t)fno.fname);
-          }
+    if (fno.fname[0]) {
+      if (fno.fattrib & AM_DIR) {
+        printf("   <DIR>   %s\n", (uint32_t)fno.fname);
+      } else {
+        printf("%9lu  %s\n", fno.fsize, (uint32_t)fno.fname);
       }
-  }
-  while (fno.fname[0]);
+    }
+  } while (fno.fname[0]);
 }
 
 FRESULT remount_goto_logs_dir(void) {
@@ -232,7 +228,7 @@ FRESULT remount_goto_logs_dir(void) {
   // Open root directory
   res = f_opendir(&dir, "/");
   if (res != FR_OK) {
-      return res;
+    return res;
   }
 
   // Change directory into logs
@@ -241,7 +237,6 @@ FRESULT remount_goto_logs_dir(void) {
     return res;
   }
 }
-
 
 FRESULT check_for_config_file(void) {
   FRESULT res;
@@ -256,9 +251,9 @@ FRESULT check_for_config_file(void) {
   }
   // Try to create new naatos_config.txt
   res = f_open(&file, NAATOS_CONFIG_FILE, FA_CREATE_NEW | FA_WRITE);
-  if (res == FR_EXIST) {              
-    // Return that it already exists  
-    return res; 
+  if (res == FR_EXIST) {
+    // Return that it already exists
+    return res;
   }
 
   // Populate new config file
@@ -538,22 +533,22 @@ FRESULT check_for_config_file(void) {
   // Close the file
   res = f_close(&file);
   if (res != FR_OK) {
-      return res;
+    return res;
   }
 
   // Change back directories
   res = f_chdir("..");
   if (res != FR_OK) {
-      return res;
+    return res;
   }
 
   return res;
 }
 
-FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameters) {
+FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters) {
   char configBuffer[50];
   FRESULT res;
-  char * pch;
+  char *pch;
   char val[50];
   int num;
 
@@ -566,7 +561,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
   // Open root directory
   res = f_opendir(&dir, "/");
   if (res != FR_OK) {
-      return res;
+    return res;
   }
 
   // Change directory into configs
@@ -576,13 +571,13 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
   }
   // Open naatos config file
   res = f_open(&file, NAATOS_CONFIG_FILE, FA_READ);
-  if (res != FR_OK) {              
-    // Return that it already exists  
-    return res; 
+  if (res != FR_OK) {
+    // Return that it already exists
+    return res;
   }
 
   // Set the struct
-  for (int i = 0; i < NUM_PARAMETERS; i ++) {
+  for (int i = 0; i < NUM_PARAMETERS; i++) {
     pch = f_gets(configBuffer, 50, &file);
     pch = strtok(configBuffer, ":");
     sprintf(val, "%s", pch);
@@ -590,171 +585,171 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters * parameter
     sprintf(val, "%s", pch);
     char *newline = strchr(val, '\n');
     if (newline) {
-        // Replace newline character with null terminator
-        *newline = '\0';
+      // Replace newline character with null terminator
+      *newline = '\0';
     }
 
-    switch((naatos_config_params_t)i) {
-      case SAMPLE_RATE:
-            parameters->sample_rate = atof(val);
-            if (parameters->sample_rate < 0.048) {
-              printf("Warning: Sample rate lower than minimum (0.048), setting sample rate to minimum.");
-              parameters->sample_rate = 0.048;
-              break;
-            }
-            break;
-        case LOGGING_RATE:
-            parameters->logging_rate = atof(val);
-            break;
-        case VALVE_ZONE_RUN_TIME:
-            parameters->amplification_zone_run_time_m = atoi(val);// TODO: Figure out why this is backwards
-            break;
-        case AMP_ZONE_RUN_TIME:
-            parameters->valve_zone_run_time_m = atoi(val);// TODO: Figure out why this is backwards
-            break;
-        case LOW_POWER_THRESHOLD:
-            parameters->low_power_threshold = atoi(val);
-            break;
-        case RECOVERY_POWER_THRESHOLD:
-            parameters->recovery_power_thresh = atoi(val);
-            break;
-        case VALVE_SETPOINT_C:
-            parameters->valve_setpoint = atof(val); 
-            break;
-        case AMP0_SETPOINT_C:
-            parameters->amp0_setpoint = atof(val); 
-            break;
-        case AMP1_SETPOINT_C:
-            parameters->amp1_setpoint = atof(val); 
-            break;
-        case AMP2_SETPOINT_C:
-            parameters->amp2_setpoint = atof(val); 
-            break;
-        case VALVE_MAX_TEMP_C:
-            parameters->valve_max_temp = atof(val); 
-            break;
-        case AMP0_MAX_TEMP_C:
-            parameters->amp0_max_temp = atof(val);
-            break;
-        case AMP1_MAX_TEMP_C:
-            parameters->amp1_max_temp = atof(val);
-            break;
-        case AMP2_MAX_TEMP_C:
-            parameters->amp2_max_temp = atof(val);
-            break;
-        case MIN_RUN_ZONE_TEMP_C:
-            parameters->min_run_zone_temp = atof(val);
-            break;
-        case MIN_RUN_ZONE_TEMP_EN:
-            num = strcmp(val, "true");
-            parameters->min_run_zone_temp_en = num ? false : true;
-            break;
-        case ALERT_TIMEOUT_TIME:
-            parameters->alert_timeout_time_m = atof(val);
-            break;
-        case VALVE_KP:
-            parameters->valve_kp = atof(val);
-            break;
-        case VALVE_KI:
-            parameters->valve_ki = atof(val);
-            break;
-        case VALVE_KD:
-            parameters->valve_kd = atof(val);
-            break;
-        case AMP0_KP:
-            parameters->amp0_kp = atof(val);
-            break;
-        case AMP0_KI:
-            parameters->amp0_ki = atof(val);
-            break;
-        case AMP0_KD:
-            parameters->amp0_kd = atof(val);
-            break;
-        case AMP1_KP:
-            parameters->amp1_kp = atof(val);
-            break;
-        case AMP1_KI:
-            parameters->amp1_ki = atof(val);
-            break;
-        case AMP1_KD:
-            parameters->amp1_kd = atof(val);
-            break;
-        case AMP2_KP:
-            parameters->amp2_kp = atof(val);
-            break;
-        case AMP2_KI:
-            parameters->amp2_ki = atof(val);
-            break;
-        case AMP2_KD:
-            parameters->amp2_kd = atof(val);
-            break;
-        case OPTICAL_DISTANCE:
-            parameters->optical_distance = atoi(val);
-            break;
-        case VALVE_SETPOINT_C_2:
-            parameters->valve_setpoint_2 = atof(val); 
-            break;
-        case AMP0_SETPOINT_C_2:
-            parameters->amp0_setpoint_2 = atof(val); 
-            break;
-        case AMP1_SETPOINT_C_2:
-            parameters->amp1_setpoint_2 = atof(val); 
-            break;
-        case AMP2_SETPOINT_C_2:
-            parameters->amp2_setpoint_2 = atof(val); 
-            break;
-        case VALVE_KP_2:
-            parameters->valve_kp_2 = atof(val);
-            break;
-        case VALVE_KI_2:
-            parameters->valve_ki_2 = atof(val);
-            break;
-        case VALVE_KD_2:
-            parameters->valve_kd_2 = atof(val);
-            break;
-        case AMP0_KP_2:
-            parameters->amp0_kp_2 = atof(val);
-            break;
-        case AMP0_KI_2:
-            parameters->amp0_ki_2 = atof(val);
-            break;
-        case AMP0_KD_2:
-            parameters->amp0_kd_2 = atof(val);
-            break;
-        case AMP1_KP_2:
-            parameters->amp1_kp_2 = atof(val);
-            break;
-        case AMP1_KI_2:
-            parameters->amp1_ki_2 = atof(val);
-            break;
-        case AMP1_KD_2:
-            parameters->amp1_kd_2 = atof(val);
-            break;
-        case AMP2_KP_2:
-            parameters->amp2_kp_2 = atof(val);
-            break;
-        case AMP2_KI_2:
-            parameters->amp2_ki_2 = atof(val);
-            break;
-        case AMP2_KD_2:
-            parameters->amp2_kd_2 = atof(val);
-            break;
-        default:
-            // Handle default case
-            break;
+    switch ((naatos_config_params_t)i) {
+    case SAMPLE_RATE:
+      parameters->sample_rate = atof(val);
+      if (parameters->sample_rate < 0.048) {
+        printf("Warning: Sample rate lower than minimum (0.048), setting sample rate to minimum.");
+        parameters->sample_rate = 0.048;
+        break;
+      }
+      break;
+    case LOGGING_RATE:
+      parameters->logging_rate = atof(val);
+      break;
+    case VALVE_ZONE_RUN_TIME:
+      parameters->amplification_zone_run_time_m = atoi(val); // TODO: Figure out why this is backwards
+      break;
+    case AMP_ZONE_RUN_TIME:
+      parameters->valve_zone_run_time_m = atoi(val); // TODO: Figure out why this is backwards
+      break;
+    case LOW_POWER_THRESHOLD:
+      parameters->low_power_threshold = atoi(val);
+      break;
+    case RECOVERY_POWER_THRESHOLD:
+      parameters->recovery_power_thresh = atoi(val);
+      break;
+    case VALVE_SETPOINT_C:
+      parameters->valve_setpoint = atof(val);
+      break;
+    case AMP0_SETPOINT_C:
+      parameters->amp0_setpoint = atof(val);
+      break;
+    case AMP1_SETPOINT_C:
+      parameters->amp1_setpoint = atof(val);
+      break;
+    case AMP2_SETPOINT_C:
+      parameters->amp2_setpoint = atof(val);
+      break;
+    case VALVE_MAX_TEMP_C:
+      parameters->valve_max_temp = atof(val);
+      break;
+    case AMP0_MAX_TEMP_C:
+      parameters->amp0_max_temp = atof(val);
+      break;
+    case AMP1_MAX_TEMP_C:
+      parameters->amp1_max_temp = atof(val);
+      break;
+    case AMP2_MAX_TEMP_C:
+      parameters->amp2_max_temp = atof(val);
+      break;
+    case MIN_RUN_ZONE_TEMP_C:
+      parameters->min_run_zone_temp = atof(val);
+      break;
+    case MIN_RUN_ZONE_TEMP_EN:
+      num = strcmp(val, "true");
+      parameters->min_run_zone_temp_en = num ? false : true;
+      break;
+    case ALERT_TIMEOUT_TIME:
+      parameters->alert_timeout_time_m = atof(val);
+      break;
+    case VALVE_KP:
+      parameters->valve_kp = atof(val);
+      break;
+    case VALVE_KI:
+      parameters->valve_ki = atof(val);
+      break;
+    case VALVE_KD:
+      parameters->valve_kd = atof(val);
+      break;
+    case AMP0_KP:
+      parameters->amp0_kp = atof(val);
+      break;
+    case AMP0_KI:
+      parameters->amp0_ki = atof(val);
+      break;
+    case AMP0_KD:
+      parameters->amp0_kd = atof(val);
+      break;
+    case AMP1_KP:
+      parameters->amp1_kp = atof(val);
+      break;
+    case AMP1_KI:
+      parameters->amp1_ki = atof(val);
+      break;
+    case AMP1_KD:
+      parameters->amp1_kd = atof(val);
+      break;
+    case AMP2_KP:
+      parameters->amp2_kp = atof(val);
+      break;
+    case AMP2_KI:
+      parameters->amp2_ki = atof(val);
+      break;
+    case AMP2_KD:
+      parameters->amp2_kd = atof(val);
+      break;
+    case OPTICAL_DISTANCE:
+      parameters->optical_distance = atoi(val);
+      break;
+    case VALVE_SETPOINT_C_2:
+      parameters->valve_setpoint_2 = atof(val);
+      break;
+    case AMP0_SETPOINT_C_2:
+      parameters->amp0_setpoint_2 = atof(val);
+      break;
+    case AMP1_SETPOINT_C_2:
+      parameters->amp1_setpoint_2 = atof(val);
+      break;
+    case AMP2_SETPOINT_C_2:
+      parameters->amp2_setpoint_2 = atof(val);
+      break;
+    case VALVE_KP_2:
+      parameters->valve_kp_2 = atof(val);
+      break;
+    case VALVE_KI_2:
+      parameters->valve_ki_2 = atof(val);
+      break;
+    case VALVE_KD_2:
+      parameters->valve_kd_2 = atof(val);
+      break;
+    case AMP0_KP_2:
+      parameters->amp0_kp_2 = atof(val);
+      break;
+    case AMP0_KI_2:
+      parameters->amp0_ki_2 = atof(val);
+      break;
+    case AMP0_KD_2:
+      parameters->amp0_kd_2 = atof(val);
+      break;
+    case AMP1_KP_2:
+      parameters->amp1_kp_2 = atof(val);
+      break;
+    case AMP1_KI_2:
+      parameters->amp1_ki_2 = atof(val);
+      break;
+    case AMP1_KD_2:
+      parameters->amp1_kd_2 = atof(val);
+      break;
+    case AMP2_KP_2:
+      parameters->amp2_kp_2 = atof(val);
+      break;
+    case AMP2_KI_2:
+      parameters->amp2_ki_2 = atof(val);
+      break;
+    case AMP2_KD_2:
+      parameters->amp2_kd_2 = atof(val);
+      break;
+    default:
+      // Handle default case
+      break;
     }
   }
 
   // Close the file
   res = f_close(&file);
   if (res != FR_OK) {
-      return res;
+    return res;
   }
 
   // Change back directories
   res = f_chdir("..");
   if (res != FR_OK) {
-      return res;
+    return res;
   }
 
   return FR_OK;

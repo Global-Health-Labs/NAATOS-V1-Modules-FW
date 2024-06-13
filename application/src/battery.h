@@ -1,11 +1,9 @@
 #pragma once
 
+#include "FreeRTOS.h"
+#include "fuel.h"
 #include "naatos_config.h"
 #include "naatos_queues.h"
-#include "naatos_config.h"
-#include "FreeRTOS.h"
 #include "queue.h"
-#include "fuel.h"
 
-void battery_task(void * pvParameters);
-
+void battery_task(void *pvParameters);
