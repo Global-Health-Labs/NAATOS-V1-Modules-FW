@@ -1,80 +1,80 @@
 #pragma once
 
-#include "stdbool.h"
-#include <stdint.h>
 #include "FreeRTOS.h"
-#include  "task.h"
+#include "stdbool.h"
+#include "task.h"
+#include <stdint.h>
 
 #define SAMPLE_PREP_BOARD
 
-#define NAATOS_FW_VERSON  "V1.0.0"
+#define NAATOS_FW_VERSON "V1.0.0"
 
-#define pdTICKS_TO_MS( xTimeInTicks )    ( ( TickType_t ) ( ( ( uint64_t ) ( xTimeInTicks ) * ( uint64_t ) 1000U ) / ( uint64_t ) configTICK_RATE_HZ ) )
+#define pdTICKS_TO_MS(xTimeInTicks) ((TickType_t)(((uint64_t)(xTimeInTicks) * (uint64_t)1000U) / (uint64_t)configTICK_RATE_HZ))
 
 /* Battery Parameters */
-#define DEFAULT_LOW_POWER_THRESHOLD     20
+#define DEFAULT_LOW_POWER_THRESHOLD 20
 
 /* Heater Zones' Parameters */
-#define DEFAULT_AMPLIFICATION_ZONE_ON_TIME  120    // Seconds
-#define DEFAULT_VALVE_ZONE_ON_TIME          120     // Seconds
+#define DEFAULT_AMPLIFICATION_ZONE_ON_TIME 120 // Seconds
+#define DEFAULT_VALVE_ZONE_ON_TIME 120         // Seconds
 
 /* I2C Pins */
-#define I2C0_SDA_PIN    17
-#define I2C0_SCL_PIN    16
-#define I2C1_SDA_PIN    24
-#define I2C1_SCL_PIN    23
+#define I2C0_SDA_PIN 17
+#define I2C0_SCL_PIN 16
+#define I2C1_SDA_PIN 24
+#define I2C1_SCL_PIN 23
 
 /* SPI Pins */
-#define SPI_SCK_PIN     15    /* P0.15 */
-#define SPI_MOSI_PIN    13    /* P0.13 */
-#define SPI_MISO_PIN    14    /* P0.14 */
-#define SPI_SD_SS_PIN   12    /* P0.12 */
+#define SPI_SCK_PIN 15   /* P0.15 */
+#define SPI_MOSI_PIN 13  /* P0.13 */
+#define SPI_MISO_PIN 14  /* P0.14 */
+#define SPI_SD_SS_PIN 12 /* P0.12 */
 
 /* Default Rates
  * These rates are only used when there is no configuration file seen in the 
    naatos_config.txt file on the sd card. When a new config files is created
    these rates will be used in the system.
  * Rates are in seconds
-*/ 
-#define DEFAULT_SAMPLE_RATE           0.200  // 0.048 minimum
-#define DEFAULT_LOGGING_RATE          5.000
-#define DEFAULT_VALVE_MAX_TEMP        95.0
-#define DEFAULT_AMP0_MAX_TEMP         80.0
-#define DEFAULT_AMP1_MAX_TEMP         80.0
-#define DEFAULT_AMP2_MAX_TEMP         80.0
-#define DEFAULT_MIN_RUN_ZONE_TEMP     50.0
-#define DEFAULT_MIN_RUN_ZONE_TEMP_EN  true
-#define DEFAULT_ALERT_TIMEOUT_S       15.0   // Seconds
-#define DEFAULT_RECOVERY_THRES        20    // Percent
-#define OPTICAL_TRIG_THRES            800
-#define DEFAULT_HEATER_SETPOINT       65.0
-#define DEFAULT_MOTOR_SPEED_PWM       71
-#define DEFAULT_RUN_MOTOR_1           false
-#define DEFAULT_RUN_HEATER_1          true
-#define DEFAULT_RUN_MOTOR_2           true
-#define DEFAULT_RUN_HEATER_2          false
+*/
+#define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
+#define DEFAULT_LOGGING_RATE 5.000
+#define DEFAULT_VALVE_MAX_TEMP 95.0
+#define DEFAULT_AMP0_MAX_TEMP 80.0
+#define DEFAULT_AMP1_MAX_TEMP 80.0
+#define DEFAULT_AMP2_MAX_TEMP 80.0
+#define DEFAULT_MIN_RUN_ZONE_TEMP 50.0
+#define DEFAULT_MIN_RUN_ZONE_TEMP_EN true
+#define DEFAULT_ALERT_TIMEOUT_S 15.0 // Seconds
+#define DEFAULT_RECOVERY_THRES 20    // Percent
+#define OPTICAL_TRIG_THRES 800
+#define DEFAULT_HEATER_SETPOINT 65.0
+#define DEFAULT_MOTOR_SPEED_PWM 71
+#define DEFAULT_RUN_MOTOR_1 false
+#define DEFAULT_RUN_HEATER_1 true
+#define DEFAULT_RUN_MOTOR_2 true
+#define DEFAULT_RUN_HEATER_2 false
 
 /* Device Debug Parameters */
-#define I2C_CONNECTED           1
-#define GO_STRAIGHT_TO_RUNNING  0
-#define USE_CALENDAR_CHIP       1 
-#define VERBOSE_PID             1
-#define USE_MOTOR               1
+#define I2C_CONNECTED 1
+#define GO_STRAIGHT_TO_RUNNING 0
+#define USE_CALENDAR_CHIP 1
+#define VERBOSE_PID 1
+#define USE_MOTOR 1
 
 /* Log Event Messages */
-#define START_EVENT_MSG           "Sample Preperation Started."
-#define STOP_EVENT_MSG            "Sample Preperation Completed."
-#define INTERRUPT_HAL_EVENT_MSG   "Sample Preperation Interrupted. Cover Removed."
-#define INTERRUPT_OPT_EVENT_MSG   "Sample Preperation Interrupted. Sample Removed."
-#define AMP_START_MSG             "Amplification Zone Heating Started."
-#define AMP_END_MSG               "Amplification Zone Heating Stopped."
-#define VALV_START_MSG            "Valve Zone Heating Started."
-#define VALV_STOP_MSG             "Valve Zone Heating Stopped."
-#define TEMPS_NOT_STABLE          "Zone Temperatures are no below the minimum run temperature. Aborting run."
-#define RECOVERY_BATT             "Battery Percentage lower than the recovery threshold. Charge Battery More."
-#define OVER_TEMP_MSG             "A Zone went over its maximum temperature. Run stopped."
+#define START_EVENT_MSG "Sample Preperation Started."
+#define STOP_EVENT_MSG "Sample Preperation Completed."
+#define INTERRUPT_HAL_EVENT_MSG "Sample Preperation Interrupted. Cover Removed."
+#define INTERRUPT_OPT_EVENT_MSG "Sample Preperation Interrupted. Sample Removed."
+#define AMP_START_MSG "Amplification Zone Heating Started."
+#define AMP_END_MSG "Amplification Zone Heating Stopped."
+#define VALV_START_MSG "Valve Zone Heating Started."
+#define VALV_STOP_MSG "Valve Zone Heating Stopped."
+#define TEMPS_NOT_STABLE "Zone Temperatures are no below the minimum run temperature. Aborting run."
+#define RECOVERY_BATT "Battery Percentage lower than the recovery threshold. Charge Battery More."
+#define OVER_TEMP_MSG "A Zone went over its maximum temperature. Run stopped."
 
-#define USB_SUSPEND_TASKS_TIME    15000
+#define USB_SUSPEND_TASKS_TIME 15000
 
 /* Main States */
 typedef enum {
@@ -90,7 +90,7 @@ typedef enum {
   BATTERY,
   HEATER,
   LOGGER,
-  SENSORS, 
+  SENSORS,
   USB,
   PWM,
   COMPOSITE
@@ -112,7 +112,7 @@ typedef enum {
 typedef enum {
   USB_CONNECTION_TYPE,
   MAIN_STATE_TYPE
-} usb_message_type_t; 
+} usb_message_type_t;
 
 typedef enum {
   TEMPERATURE_DATA,
@@ -142,8 +142,8 @@ typedef enum {
 
 // Holds data for Hal and Optical Switch
 typedef struct {
-   bool hal_triggered;
-   bool optical_tiggered;
+  bool hal_triggered;
+  bool optical_tiggered;
 } sensor_switches_t;
 
 // Zone Request Struct
@@ -155,7 +155,7 @@ typedef struct {
 // Motor Speed Request Struct
 typedef struct {
   bool on;
-  double speed;   //RPM
+  double speed; //RPM
 } motor_run_req_t;
 
 // Temperature Data Struct
@@ -179,12 +179,10 @@ typedef struct {
   float amp2_zone_pwm;
 } temperature_pwm_data_t;
 
-
 typedef enum {
   USB_TO_FILE,
   USB_TO_COM
 } usb_requested_state;
-
 
 // Composite USB Update Message
 typedef struct {
@@ -196,7 +194,7 @@ typedef struct {
 
 typedef struct {
   event_t event;
-  char * message;
+  char *message;
 } log_event_t;
 
 // Log Message
@@ -209,8 +207,7 @@ typedef struct {
 // Battery Request with task to send to
 typedef struct {
   tasks_t task_req;
-} battery_percent_req_t; 
-
+} battery_percent_req_t;
 
 typedef struct {
   tasks_t taskName;
@@ -264,8 +261,7 @@ typedef enum {
   COMPOSITE_MSG_WAKEUP
 } CompositeUSBRxQueueType_t;
 
-
-// USB 
+// USB
 
 typedef enum {
   USB_MSG_CONN_STATUS_REQ,
@@ -322,7 +318,6 @@ typedef struct {
   main_state_t mainState;
   bool usbSuspend;
 } BatteryRxQueueMsg_t;
-
 
 // Button/Switch messages
 typedef enum {
@@ -390,7 +385,6 @@ typedef struct {
   bool active;
 } LEDRxQueueMsg_t;
 
-
 // Task Handles
 extern xTaskHandle mainTaskHandle;
 extern xTaskHandle heaterTaskHandle;
@@ -420,7 +414,7 @@ typedef struct {
   float amp1_max_temp;
   float amp2_max_temp;
   float min_run_zone_temp;
-  bool  min_run_zone_temp_en;
+  bool min_run_zone_temp_en;
   float alert_timeout_time_m;
   float valve_kp;
   float valve_ki;
@@ -452,7 +446,7 @@ typedef struct {
   float amp2_ki_2;
   float amp2_kd_2;
 } naatos_config_parameters;
-#else 
+#else
 typedef struct {
   float sample_rate;
   float logging_rate;
@@ -464,7 +458,7 @@ typedef struct {
   float heater_setpoint_2;
   float heater_max_temp;
   float min_run_zone_temp;
-  bool  min_run_zone_temp_en;
+  bool min_run_zone_temp_en;
   float alert_timeout_time_s;
   float heater_kp_1;
   float heater_ki_1;

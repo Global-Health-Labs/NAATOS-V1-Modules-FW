@@ -9,8 +9,7 @@ static LEDFlags_t ledFlags;
 
 void handleLedState(LEDRxQueueMsg_t ledMsg);
 
-
-void led_task(void * pvParameters) {
+void led_task(void *pvParameters) {
   BaseType_t xReturned;
   LEDRxQueueMsg_t ledRxMessage;
 
@@ -25,72 +24,72 @@ void led_task(void * pvParameters) {
 }
 
 void handleLedState(LEDRxQueueMsg_t ledMsg) {
-  switch(ledMsg.type) {
-    case LED_WAKEUP:
-      ledFlags.wakeupCondition = ledMsg.active;
-      break;
-    case LED_CHARGING:
-      ledFlags.batteryCharging = ledMsg.active;
-      break;
-    case LED_STANDBY:
-      ledFlags.standbyCondition = ledMsg.active;
-      break;
-    case LED_RUN:
-      ledFlags.runCondition = ledMsg.active;
-      break;
-    case LED_DECLINE:
-      ledFlags.testDecline = ledMsg.active;
-      break;
-    case LED_ABORT:
-      ledFlags.testAbort = ledMsg.active;
-      break;
-    case LED_COMPLETE:
-      ledFlags.testComplete = ledMsg.active;
-      break;
-    case LED_INVALID:
-      ledFlags.testInvalid = ledMsg.active;
-      break;
-    case LED_LOW_BATTERY:
-      ledFlags.lowBattey = ledMsg.active;
-      break;
-    case LED_USB_MSC_STARTING:
-      ledFlags.usbMscStarting = ledMsg.active;
-      break;
-    case LED_CLEAR_ALL_ERROR:
-      ledFlags.testDecline = false;
-      ledFlags.testAbort  = false;
+  switch (ledMsg.type) {
+  case LED_WAKEUP:
+    ledFlags.wakeupCondition = ledMsg.active;
     break;
-    default:
-      printf("Handling unknown led state\n");
-      break;
+  case LED_CHARGING:
+    ledFlags.batteryCharging = ledMsg.active;
+    break;
+  case LED_STANDBY:
+    ledFlags.standbyCondition = ledMsg.active;
+    break;
+  case LED_RUN:
+    ledFlags.runCondition = ledMsg.active;
+    break;
+  case LED_DECLINE:
+    ledFlags.testDecline = ledMsg.active;
+    break;
+  case LED_ABORT:
+    ledFlags.testAbort = ledMsg.active;
+    break;
+  case LED_COMPLETE:
+    ledFlags.testComplete = ledMsg.active;
+    break;
+  case LED_INVALID:
+    ledFlags.testInvalid = ledMsg.active;
+    break;
+  case LED_LOW_BATTERY:
+    ledFlags.lowBattey = ledMsg.active;
+    break;
+  case LED_USB_MSC_STARTING:
+    ledFlags.usbMscStarting = ledMsg.active;
+    break;
+  case LED_CLEAR_ALL_ERROR:
+    ledFlags.testDecline = false;
+    ledFlags.testAbort = false;
+    break;
+  default:
+    printf("Handling unknown led state\n");
+    break;
   }
 
-  if(!ledFlags.wakeupCondition){
+  if (!ledFlags.wakeupCondition) {
     enable_led_driver(false);
   } else {
     enable_led_driver(true);
     turn_off_led2();
-    if(ledFlags.testDecline) {
+    if (ledFlags.testDecline) {
       set_led1_red_slow_blink();
       set_led2_red_slow_blink();
     } else if (ledFlags.testAbort) {
       set_led1_red_fast_blink();
       set_led2_red_fast_blink();
-    } else if(ledFlags.testComplete) {
+    } else if (ledFlags.testComplete) {
       set_led1_green_solid();
       set_led2_green_solid();
-    } else if(ledFlags.standbyCondition) {
+    } else if (ledFlags.standbyCondition) {
       set_led1_green_breathe();
       //if battery charging
-      if(ledFlags.batteryCharging){
+      if (ledFlags.batteryCharging) {
         set_led2_blue_breathe();
       } else {
         //turn_off_led2();
       }
-    } else if(ledFlags.runCondition) {
+    } else if (ledFlags.runCondition) {
       set_led1_green_solid();
       //if battery charging
-      if(ledFlags.batteryCharging){
+      if (ledFlags.batteryCharging) {
         set_led2_blue_breathe();
       } else {
         //turn_off_led2();
@@ -100,7 +99,6 @@ void handleLedState(LEDRxQueueMsg_t ledMsg) {
       set_led2_blue_breathe();
     }
   }
-
 }
 
 /* LED 1 */
@@ -207,8 +205,6 @@ void turn_off_led2(void) {
   led_driver_disable_channel(LED2, led1_current_color, NULL);
   led_driver_disable_channel(LED1, led1_current_color, NULL);
 
-
-  
 #endif
 }
 
@@ -217,7 +213,7 @@ void updateLedState(LEDEvent_e event, bool active) {
   LEDRxQueueMsg_t ledMsg;
   ledMsg.type = event;
   ledMsg.active = active;
-  xReturned = xQueueSend(ledRxQueue, &ledMsg, 0); 
+  xReturned = xQueueSend(ledRxQueue, &ledMsg, 0);
   if (xReturned != pdPASS) {
     printf("SENSORS: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\n");
   }

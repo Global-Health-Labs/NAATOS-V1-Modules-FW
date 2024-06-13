@@ -1,25 +1,24 @@
-#include <stdint.h>
-#include <stdbool.h>
-#include <math.h>
-#include <string.h>
 #include "tsys01.h"
-#include "i2c_hal_freertos.h"
 #include "app_scheduler.h"
+#include "i2c_hal_freertos.h"
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
+#include <math.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
 
 #define WRITE_BUFFER_SIZE 1
 #define READ_BUFFER_SIZE 4
 
-
 typedef enum {
-    tsys01_init_read_op,
-    tsys01_init_write_op,
-    tsys01_reset_op,
-    tsys01_read_serial_op,
-    tsys01_start_conversion_op,
-    tsys01_read_adc_op
+  tsys01_init_read_op,
+  tsys01_init_write_op,
+  tsys01_reset_op,
+  tsys01_read_serial_op,
+  tsys01_start_conversion_op,
+  tsys01_read_adc_op
 } tsys01_internal_op_type_t;
 
 static bool sensorIsBusy = false;
@@ -31,140 +30,126 @@ static uint8_t writeBuffer = 0;
 
 static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t reg, tsys01_internal_op_type_t ts_operation, uint8_t *read_buf, uint8_t read_len);
 
+static tsys01_errors_t tsys01_writeRegister(sensor_selection_t sensor, uint8_t reg,
+    tsys01_internal_op_type_t ts_operation) {
+  if (sensorIsBusy) {
+    return tsys01_busy;
+  }
 
-static tsys01_errors_t tsys01_writeRegister(sensor_selection_t sensor, uint8_t reg, 
-                                                   tsys01_internal_op_type_t ts_operation)
-{
-    if (sensorIsBusy) {
-        return tsys01_busy;
-    }
-    
-    sensorIsBusy = true;
+  sensorIsBusy = true;
 
-    writeBuffer = reg;
-    uint32_t err_code;
-    i2c_interface_selection_t interface;
-    uint8_t slave_addr;
+  writeBuffer = reg;
+  uint32_t err_code;
+  i2c_interface_selection_t interface;
+  uint8_t slave_addr;
 
-    current_op_type = ts_operation;
+  current_op_type = ts_operation;
 
-    switch (sensor)
-    {
-        case valve_zone:
-            interface = i2c_interface_system;
-            slave_addr = TSYS01_ADDR_ALT;
-            break;
-        case amp_zone_0:
-            interface = i2c_interface_system;
-            slave_addr = TSYS01_ADDR;
-            break;
-        case amp_zone_1:
-            interface = i2c_interface_sensors;
-            slave_addr = TSYS01_ADDR_ALT;
-            break;
-        case amp_zone_2:
-            interface = i2c_interface_sensors;
-            slave_addr = TSYS01_ADDR;
-            break;
-    }
-    err_code = xUtil_TWI_Write( interface, slave_addr, reg, &writeBuffer, 1 );
-    
-    if (err_code != NRF_SUCCESS) {
-        sensorIsBusy = false;
-        if (err_code == NRF_ERROR_BUSY) {
-            return tsys01_busy;
-        }
-        return tsys01_i2c_error;
-    }
+  switch (sensor) {
+  case valve_zone:
+    interface = i2c_interface_system;
+    slave_addr = TSYS01_ADDR_ALT;
+    break;
+  case amp_zone_0:
+    interface = i2c_interface_system;
+    slave_addr = TSYS01_ADDR;
+    break;
+  case amp_zone_1:
+    interface = i2c_interface_sensors;
+    slave_addr = TSYS01_ADDR_ALT;
+    break;
+  case amp_zone_2:
+    interface = i2c_interface_sensors;
+    slave_addr = TSYS01_ADDR;
+    break;
+  }
+  err_code = xUtil_TWI_Write(interface, slave_addr, reg, &writeBuffer, 1);
+
+  if (err_code != NRF_SUCCESS) {
     sensorIsBusy = false;
-    return tsys01_success;
+    if (err_code == NRF_ERROR_BUSY) {
+      return tsys01_busy;
+    }
+    return tsys01_i2c_error;
+  }
+  sensorIsBusy = false;
+  return tsys01_success;
 }
 
-static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t reg, tsys01_internal_op_type_t ts_operation, uint8_t *read_buf, uint8_t read_len)
-{
-    if (sensorIsBusy) {
-        return tsys01_busy;
-    }
-    
-    sensorIsBusy = true;
+static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t reg, tsys01_internal_op_type_t ts_operation, uint8_t *read_buf, uint8_t read_len) {
+  if (sensorIsBusy) {
+    return tsys01_busy;
+  }
 
-    uint32_t err_code;
-    i2c_interface_selection_t interface;
-    uint8_t slave_addr;
+  sensorIsBusy = true;
 
-    current_op_type = ts_operation;
+  uint32_t err_code;
+  i2c_interface_selection_t interface;
+  uint8_t slave_addr;
 
-    switch (sensor)
-    {
-        case valve_zone:
-            interface = i2c_interface_system;
-            slave_addr = TSYS01_ADDR_ALT;
-            break;
-        case amp_zone_0:
-            interface = i2c_interface_system;
-            slave_addr = TSYS01_ADDR;
-            break;
-        case amp_zone_1:
-            interface = i2c_interface_sensors;
-            slave_addr = TSYS01_ADDR_ALT;
-            break;
-        case amp_zone_2:
-            interface = i2c_interface_sensors;
-            slave_addr = TSYS01_ADDR;
-            break;
-    }
+  current_op_type = ts_operation;
 
-    err_code = xUtil_TWI_Read( interface, slave_addr, reg, read_buf, read_len);
-    
-    if (err_code != NRF_SUCCESS) {
-        sensorIsBusy = false;
-        if (err_code == NRF_ERROR_BUSY) {
-            return tsys01_busy;
-        }
-        return tsys01_i2c_error;
-    }
+  switch (sensor) {
+  case valve_zone:
+    interface = i2c_interface_system;
+    slave_addr = TSYS01_ADDR_ALT;
+    break;
+  case amp_zone_0:
+    interface = i2c_interface_system;
+    slave_addr = TSYS01_ADDR;
+    break;
+  case amp_zone_1:
+    interface = i2c_interface_sensors;
+    slave_addr = TSYS01_ADDR_ALT;
+    break;
+  case amp_zone_2:
+    interface = i2c_interface_sensors;
+    slave_addr = TSYS01_ADDR;
+    break;
+  }
+
+  err_code = xUtil_TWI_Read(interface, slave_addr, reg, read_buf, read_len);
+
+  if (err_code != NRF_SUCCESS) {
     sensorIsBusy = false;
-    return tsys01_success;
-}
-
-tsys01_errors_t tsys01_startConversion(sensor_selection_t sensor)
-{
-    return tsys01_writeRegister(sensor, TSYS01_START_CONVERSION_COMMAND, tsys01_start_conversion_op);
-}
-
-tsys01_errors_t tsys01_getTemp(sensor_selection_t sensor, long double *temp_val)
-{
-    uint8_t buf[3];
-    tsys01_errors_t err_code = tsys01_readRegister(sensor, TSYS01_READ_ADC_COMMAND, tsys01_read_adc_op, buf, TSYS01_TEMP_DATA_LEN);
-    uint32_t adc24 = (buf[0] << 16) + (buf[1] << 8) + buf[2];
-    uint32_t adc16 = adc24/256.0;
-    long double temp_c = (-2) * calibration[sensor].k4 * pow(10, -21) * pow(adc16, 4) \
-                       + (4) * calibration[sensor].k3 * pow(10, -16) * pow(adc16, 3) \
-                       + (-2) * calibration[sensor].k2 * pow(10, -11) * pow(adc16, 2) \
-                       + (1) * calibration[sensor].k1 * pow(10, -6) * adc16 \
-                       + (-1.5) * calibration[sensor].k0 * pow(10, -2);
-    *temp_val = temp_c;
-    return err_code;
-    
-}
-
-tsys01_errors_t tsys01_getCalibrationValues(sensor_selection_t sensor)
-{
-    uint8_t temp[2];
-    tsys01_errors_t err_code = tsys01_readRegister(sensor, TSYS01_CAL_K0_REG, tsys01_cal, temp, TSYS01_CAL_DATA_LEN);
-    if(err_code == tsys01_i2c_error) {
-      //sensor not connected 
-      return err_code;
+    if (err_code == NRF_ERROR_BUSY) {
+      return tsys01_busy;
     }
-    calibration[sensor].k0 = (temp[0] << 8) + temp[1];
-    err_code = tsys01_readRegister(sensor, TSYS01_CAL_K1_REG, tsys01_cal, temp, TSYS01_CAL_DATA_LEN);
-    calibration[sensor].k1 = (temp[0] << 8) + temp[1];
-    err_code = tsys01_readRegister(sensor, TSYS01_CAL_K2_REG, tsys01_cal, temp, TSYS01_CAL_DATA_LEN);
-    calibration[sensor].k2 = (temp[0] << 8) + temp[1];
-    err_code = tsys01_readRegister(sensor, TSYS01_CAL_K3_REG, tsys01_cal, temp, TSYS01_CAL_DATA_LEN);
-    calibration[sensor].k3 = (temp[0] << 8) + temp[1];
-    err_code = tsys01_readRegister(sensor, TSYS01_CAL_K4_REG, tsys01_cal, temp, TSYS01_CAL_DATA_LEN);
-    calibration[sensor].k4 = (temp[0] << 8) + temp[1];
-    return err_code;
+    return tsys01_i2c_error;
+  }
+  sensorIsBusy = false;
+  return tsys01_success;
+}
 
+tsys01_errors_t tsys01_startConversion(sensor_selection_t sensor) {
+  return tsys01_writeRegister(sensor, TSYS01_START_CONVERSION_COMMAND, tsys01_start_conversion_op);
+}
+
+tsys01_errors_t tsys01_getTemp(sensor_selection_t sensor, long double *temp_val) {
+  uint8_t buf[3];
+  tsys01_errors_t err_code = tsys01_readRegister(sensor, TSYS01_READ_ADC_COMMAND, tsys01_read_adc_op, buf, TSYS01_TEMP_DATA_LEN);
+  uint32_t adc24 = (buf[0] << 16) + (buf[1] << 8) + buf[2];
+  uint32_t adc16 = adc24 / 256.0;
+  long double temp_c = (-2) * calibration[sensor].k4 * pow(10, -21) * pow(adc16, 4) + (4) * calibration[sensor].k3 * pow(10, -16) * pow(adc16, 3) + (-2) * calibration[sensor].k2 * pow(10, -11) * pow(adc16, 2) + (1) * calibration[sensor].k1 * pow(10, -6) * adc16 + (-1.5) * calibration[sensor].k0 * pow(10, -2);
+  *temp_val = temp_c;
+  return err_code;
+}
+
+tsys01_errors_t tsys01_getCalibrationValues(sensor_selection_t sensor) {
+  uint8_t temp[2];
+  tsys01_errors_t err_code = tsys01_readRegister(sensor, TSYS01_CAL_K0_REG, tsys01_cal, temp, TSYS01_CAL_DATA_LEN);
+  if (err_code == tsys01_i2c_error) {
+    //sensor not connected
+    return err_code;
+  }
+  calibration[sensor].k0 = (temp[0] << 8) + temp[1];
+  err_code = tsys01_readRegister(sensor, TSYS01_CAL_K1_REG, tsys01_cal, temp, TSYS01_CAL_DATA_LEN);
+  calibration[sensor].k1 = (temp[0] << 8) + temp[1];
+  err_code = tsys01_readRegister(sensor, TSYS01_CAL_K2_REG, tsys01_cal, temp, TSYS01_CAL_DATA_LEN);
+  calibration[sensor].k2 = (temp[0] << 8) + temp[1];
+  err_code = tsys01_readRegister(sensor, TSYS01_CAL_K3_REG, tsys01_cal, temp, TSYS01_CAL_DATA_LEN);
+  calibration[sensor].k3 = (temp[0] << 8) + temp[1];
+  err_code = tsys01_readRegister(sensor, TSYS01_CAL_K4_REG, tsys01_cal, temp, TSYS01_CAL_DATA_LEN);
+  calibration[sensor].k4 = (temp[0] << 8) + temp[1];
+  return err_code;
 }

@@ -1,8 +1,8 @@
 #include "pwm.h"
-#include "timers.h"
 #include "motor.h"
+#include "timers.h"
 
-#define USE_MOTOR  1 //TODO: Remove
+#define USE_MOTOR 1 //TODO: Remove
 
 APP_PWM_INSTANCE(PWM0, 0); // Create instance "PWM0" using TIMER0
 APP_PWM_INSTANCE(PWM2, 2); // Create instance "PWM2" using TIMER2
@@ -36,13 +36,13 @@ bool pwmEnabled = false;
 
 void init_pwms() {
   ret_code_t err;
-  
-    /* Create Configurations */
-  
+
+  /* Create Configurations */
+
   //SAMPLE_HEATER_PIN
 
 #if USE_MOTOR
-    /* 1 Channel PWM, 200Hz, Active High, Valve Zone Pin */
+  /* 1 Channel PWM, 200Hz, Active High, Valve Zone Pin */
   app_pwm_config_t pwm0_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, VALVE_ZONE_PIN, SAMPLE_HEATER_PIN);
   pwm0_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
   pwm0_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
@@ -51,7 +51,7 @@ void init_pwms() {
   pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
   pwm2_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
 #else
-    /* 1 Channel PWM, 200Hz, Active High, Valve Zone Pin */
+  /* 1 Channel PWM, 200Hz, Active High, Valve Zone Pin */
   app_pwm_config_t pwm0_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, VALVE_ZONE_PIN, AMP0_ZONE_PIN);
   pwm0_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
   pwm0_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
@@ -76,8 +76,7 @@ void init_pwms() {
 
 void updateDutyCycles(temperature_pwm_data_t pwmData) {
   PwmRxQueueMsg_t msg = {
-    .type = PWM_MSG_CALLBACK_EVENT
-  };
+      .type = PWM_MSG_CALLBACK_EVENT};
   BaseType_t xReturned;
 
   valve_duty = pwmData.valve_zone_pwm;
@@ -86,16 +85,16 @@ void updateDutyCycles(temperature_pwm_data_t pwmData) {
   amp2_duty = pwmData.amp2_zone_pwm;
 
   if (valve_duty > 0) {
-    valve_zone_active = true; 
+    valve_zone_active = true;
   }
-  if (amp0_duty > 0) { 
-    amp0_zone_active = true; 
+  if (amp0_duty > 0) {
+    amp0_zone_active = true;
   }
-  if (amp1_duty > 0) { 
-    amp1_zone_active = true; 
+  if (amp1_duty > 0) {
+    amp1_zone_active = true;
   }
-  if (amp2_duty > 0) { 
-    amp2_zone_active = true; 
+  if (amp2_duty > 0) {
+    amp2_zone_active = true;
   }
 
   xReturned = xQueueSend(pwmRxQueue, &msg, 0);
@@ -104,51 +103,45 @@ void updateDutyCycles(temperature_pwm_data_t pwmData) {
   }
 }
 
-
 #if USE_MOTOR
 // Updates the Motor PWM Duty Cycle
 void update_motor_duty(int duty) {
   motor_duty = duty;
-  if (motor_duty > 0) 
-    motor_active = true; 
-  else 
+  if (motor_duty > 0)
+    motor_active = true;
+  else
     motor_active = false;
 }
 #endif
 
-
-void pwm_task(void * pvParameters) {
+void pwm_task(void *pvParameters) {
   BaseType_t xReturned;
   usb_suspend_req_t sus_req;
   usb_suspend_acpt_t sus_acpt = {
-    .task = PWM,
-    .suspended = true
-  };
+      .task = PWM,
+      .suspended = true};
   usb_suspend_over_t sus_over = {
-    .task = PWM,
-    .over = true
-  };
+      .task = PWM,
+      .over = true};
 
   // Initalize the pwm channels
   init_pwms();
 
-  // Set Original Duty Cycles to 0
-  #ifdef SAMPLE_PREP_BOARD
+// Set Original Duty Cycles to 0
+#ifdef SAMPLE_PREP_BOARD
   app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 0);
-  app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  amp0_duty);
-  #else
+  app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL, amp0_duty);
+#else
   app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty);
-  app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  amp0_duty);
-  app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL,  amp2_duty);
-  #endif
+  app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL, amp0_duty);
+  app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, amp2_duty);
+#endif
 
-  #if USE_MOTOR
-  app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  amp1_duty);
-  #else
-  app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  amp1_duty);
-  #endif
-
-
+#if USE_MOTOR
+  app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, amp1_duty);
+#else
+  app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, amp1_duty);
+#endif
 
   PwmRxQueueMsg_t pwmMsg;
 
@@ -158,101 +151,101 @@ void pwm_task(void * pvParameters) {
     if (xReturned != pdPASS) {
       printf("Unable to Rx data to sensor queue\n");
     } else {
-      switch(pwmMsg.type) {
-        case PWM_MSG_UPDATE_DUTY: {
+      switch (pwmMsg.type) {
+      case PWM_MSG_UPDATE_DUTY: {
 
-          break;
-        }
-        case PWM_MSG_CALLBACK_EVENT: {
-          if (pwm0_ready_flag) {
-            if (valve_zone_active || amp0_zone_active) {
-              pwm0_ready_flag = false;
-            }
-
-            if (valve_duty > 0) {
-              app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty); 
-            } else if(valve_zone_active) {
-              valve_zone_active =  false;
-              app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 0);
-            }
-
-            if (amp0_duty > 0){
-              app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  amp0_duty);
-            } else if (amp0_zone_active) {
-              amp0_zone_active = false;
-              app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  0);
-            }
+        break;
+      }
+      case PWM_MSG_CALLBACK_EVENT: {
+        if (pwm0_ready_flag) {
+          if (valve_zone_active || amp0_zone_active) {
+            pwm0_ready_flag = false;
           }
 
-          // PWM2 Control
-              // PWM2 Control
-#if USE_MOTOR
-          if (pwm2_ready_flag) {
-            if (amp1_zone_active) {
-              pwm2_ready_flag = false;
-            }
+          if (valve_duty > 0) {
+            app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty);
+          } else if (valve_zone_active) {
+            valve_zone_active = false;
+            app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 0);
+          }
 
-           /* if (motor_duty > 0){
+          if (amp0_duty > 0) {
+            app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL, amp0_duty);
+          } else if (amp0_zone_active) {
+            amp0_zone_active = false;
+            app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL, 0);
+          }
+        }
+
+        // PWM2 Control
+        // PWM2 Control
+#if USE_MOTOR
+        if (pwm2_ready_flag) {
+          if (amp1_zone_active) {
+            pwm2_ready_flag = false;
+          }
+
+          /* if (motor_duty > 0){
               app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL,  motor_duty);
             } else if(amp1_zone_active) {
               app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL,  0);
               motor_active = false;
             }*/
 
-            if (amp1_duty > 0){
-              app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  amp1_duty);
-            } else if(amp1_zone_active) {
-              app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  0);
-              amp1_zone_active = false;
-            }
+          if (amp1_duty > 0) {
+            app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, amp1_duty);
+          } else if (amp1_zone_active) {
+            app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, 0);
+            amp1_zone_active = false;
           }
+        }
 #else
-          if (pwm2_ready_flag) {
-            if (amp1_zone_active || amp2_zone_active) {
-              pwm2_ready_flag = false;
-            }
-
-            if (amp1_duty > 0){
-              app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  amp1_duty);
-            } else if(amp1_zone_active) {
-              app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  0);
-              amp1_zone_active = false;
-            }
-            if (amp2_duty > 0) {
-              app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, amp2_duty);
-            } else if(amp2_zone_active)  {
-              amp2_zone_active = false;
-              app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, 0);
-            }
+        if (pwm2_ready_flag) {
+          if (amp1_zone_active || amp2_zone_active) {
+            pwm2_ready_flag = false;
           }
+
+          if (amp1_duty > 0) {
+            app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, amp1_duty);
+          } else if (amp1_zone_active) {
+            app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, 0);
+            amp1_zone_active = false;
+          }
+          if (amp2_duty > 0) {
+            app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, amp2_duty);
+          } else if (amp2_zone_active) {
+            amp2_zone_active = false;
+            app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, 0);
+          }
+        }
 #endif
-          break;
-        }
+        break;
+      }
 
-        case PWM_MSG_DISABLE: {
-          app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 0);
-          app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL,  0);
-          app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL,  0);
-          app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, 0);
-          vTaskDelay(pdMS_TO_TICKS(100));
-          if(pwmEnabled) {
-            app_pwm_disable(&PWM0);
-            app_pwm_disable(&PWM2);
-            pwmEnabled = false;
-          }
-          break;
+      case PWM_MSG_DISABLE: {
+        app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 0);
+        app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL, 0);
+        app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, 0);
+        app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, 0);
+        vTaskDelay(pdMS_TO_TICKS(100));
+        if (pwmEnabled) {
+          app_pwm_disable(&PWM0);
+          app_pwm_disable(&PWM2);
+          pwmEnabled = false;
         }
+        break;
+      }
 
-        case PWM_MSG_ENABLE: {
-          if(!pwmEnabled) {
-            app_pwm_enable(&PWM0);
-            app_pwm_enable(&PWM2);
-            pwmEnabled = true;
-          }
-          break;
+      case PWM_MSG_ENABLE: {
+        if (!pwmEnabled) {
+          app_pwm_enable(&PWM0);
+          app_pwm_enable(&PWM2);
+          pwmEnabled = true;
         }
+        break;
+      }
 
-        default:
+      default:
         break;
       }
     }

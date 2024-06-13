@@ -12,16 +12,14 @@ calendar_time_t time = {
     .day = 0,
     .week_day = 0,
     .month = 0,
-    .year = 0
-  };
+    .year = 0};
 
 const BatteryRxQueueMsg_t batt_req = {
-  .type = BATTERY_SOC_REQUEST,
-  .sendTo = BATTERY_MSG_SOC_LOG
-};
+    .type = BATTERY_SOC_REQUEST,
+    .sendTo = BATTERY_MSG_SOC_LOG};
 
 // Puts log file name in char pointer
-void getLogFileName(const char * _logFileName) {
+void getLogFileName(const char *_logFileName) {
   if (!(calendar_get_time(&time))) {
     printf("LOG_TASK: Unable to get time for log file name!\n");
     sprintf(_logFileName, "unknown.csv");
@@ -30,7 +28,7 @@ void getLogFileName(const char * _logFileName) {
   sprintf(_logFileName, "sample_%d-%d-%d_%d%d.csv", time.month, time.day, time.year, time.hour, time.minute);
 }
 
-void logger_task(void * pvParameters) {
+void logger_task(void *pvParameters) {
   BaseType_t xReturned;
   main_state_t main_state = MAIN_STANDBY;
   log_data_message_t log_message;
@@ -76,8 +74,7 @@ void logger_task(void * pvParameters) {
       res = sd_card_create_log_file(logFileName);
       if (res == FR_EXIST) {
         printf("LOG_TASK: Warning! Log file with name already exist, will be overwritting that file.\n");
-      }
-      else if (res != FR_OK) {
+      } else if (res != FR_OK) {
         printf("LOG_TASK: Unable to create log file for current sample preperation.\n");
       }
     }
@@ -100,12 +97,12 @@ void logger_task(void * pvParameters) {
       if (xReturned != pdPASS) {
         printf("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.\n");
       }
-      // Wait for response 
+      // Wait for response
       xReturned = xQueueReceive(logger_recvBattPercentQueue, &battery_percent, portMAX_DELAY);
       if (xReturned != pdPASS) {
         printf("LOG_TASK: Unable to get battery percentage from battery_requestPercentQueue.\n");
       }
-      
+
       while (!new_temp && !run_stopped) {
 
         // Wait for a log data message (either temperature data or event data)
@@ -113,63 +110,60 @@ void logger_task(void * pvParameters) {
         if (xReturned != pdPASS) {
           printf("LOG_TASK: Unable to get log message from logger_logMessageQueue.\n");
         }
-         
+
         // Get current time
         if (!(calendar_get_time(&time))) {
           printf("LOG_TASK: Unable to retreive time!");
         }
 
         // Setup Log Message for UART and File based on log message type
-         if (log_message.data_type == TEMPERATURE_DATA) {
+        if (log_message.data_type == TEMPERATURE_DATA) {
           // Set new temp to true
           new_temp = true;
           // Format: Time,ValveTemp,ValvePWM,Amp0Temp,Amp0PWM,Amp1Temp,Amp1PWM,Amp2Temp,Amp2PWM,Batt,Event
-          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d, \n", 
-                                    time.hour, 
-                                    time.minute, 
-                                    time.second, 
-                                    log_message.temperature_data.amp2_zone_temp,
-                                    log_message.temperature_data.amp0_zone_pwm,
-                                    log_message.temperature_data.motorSpeed,
-                                    log_message.temperature_data.amp1_zone_pwm,
-                                    battery_percent);
+          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d, \n",
+              time.hour,
+              time.minute,
+              time.second,
+              log_message.temperature_data.amp2_zone_temp,
+              log_message.temperature_data.amp0_zone_pwm,
+              log_message.temperature_data.motorSpeed,
+              log_message.temperature_data.amp1_zone_pwm,
+              battery_percent);
           last_temp_message = log_message;
-        }
-        else if (log_message.data_type == EVENT_DATA) {
-          
+        } else if (log_message.data_type == EVENT_DATA) {
+
           // Format: Time,ValveTemp,ValvePWM,Amp0Temp,Amp0PWM,Amp1Temp,Amp1PWM,Amp2Temp,Amp2PWM,Batt,Event
-          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n", 
-                                    time.hour, 
-                                    time.minute, 
-                                    time.second, 
-                                    last_temp_message.temperature_data.amp2_zone_temp,
-                                    last_temp_message.temperature_data.amp0_zone_pwm,
-                                    last_temp_message.temperature_data.motorSpeed,
-                                    last_temp_message.temperature_data.amp1_zone_pwm,
-                                    battery_percent, 
-                                    log_message.event_data.message);
-          if (log_message.event_data.event == SAMPLE_VALV_ENDED || 
-              log_message.event_data.event == SAMPLE_INTERRUPTED || 
-              log_message.event_data.event == SAMPLE_TEMPS_NOT_STABALIZED || 
+          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n",
+              time.hour,
+              time.minute,
+              time.second,
+              last_temp_message.temperature_data.amp2_zone_temp,
+              last_temp_message.temperature_data.amp0_zone_pwm,
+              last_temp_message.temperature_data.motorSpeed,
+              last_temp_message.temperature_data.amp1_zone_pwm,
+              battery_percent,
+              log_message.event_data.message);
+          if (log_message.event_data.event == SAMPLE_VALV_ENDED ||
+              log_message.event_data.event == SAMPLE_INTERRUPTED ||
+              log_message.event_data.event == SAMPLE_TEMPS_NOT_STABALIZED ||
               log_message.event_data.event == SAMPLE_RECOVERY_BATT ||
-              log_message.event_data.event == SAMPLE_OVER_TEMP) 
-          {
+              log_message.event_data.event == SAMPLE_OVER_TEMP) {
             run_stopped = true;
           }
         }
-        
-        // Check UART Only 
+
+        // Check UART Only
         if (!uart_only) {
           // Write to sample log file
           FRESULT res = sd_card_write_log_line(logFileName, logFileLine, logFileLineSize);
           if (res != FR_OK) {
             printf("LOG_TASK: Unable to write last log line!\n");
-          }
-          else {
+          } else {
             printf("LOG_TASK: Wrote line to log\n");
           }
         }
-      } 
+      }
     }
-   }
- }
+  }
+}
