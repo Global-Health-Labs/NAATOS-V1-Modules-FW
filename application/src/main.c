@@ -318,7 +318,7 @@ void main_task(void *pvParameters) {
   if (!use_default_configuration_parameters) {
     alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((config.alert_timeout_time_m) * 1000.0));
   } else {
-    alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((DEFAULT_ALERT_TIMEOUT_S)*1000.0));
+    alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((DEFAULT_ALERT_TIMEOUT_S) * 1000.0));
   }
 
   create_tasks();
@@ -358,7 +358,7 @@ void main_task(void *pvParameters) {
         if (!use_default_configuration_parameters) {
           alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((config.alert_timeout_time_m) * 1000.0));
         } else {
-          alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((DEFAULT_ALERT_TIMEOUT_S)*1000.0));
+          alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS((DEFAULT_ALERT_TIMEOUT_S) * 1000.0));
         }
         if (!error_during_run) {
           updateLedState(LED_WAKEUP, true);
@@ -520,7 +520,7 @@ void main_task(void *pvParameters) {
       // Get the start time and end time
       start_time = xTaskGetTickCount();
       if (use_default_configuration_parameters) {
-        end_time = pdMS_TO_TICKS((DEFAULT_AMPLIFICATION_ZONE_ON_TIME)*1000);
+        end_time = pdMS_TO_TICKS((DEFAULT_AMPLIFICATION_ZONE_ON_TIME) * 1000);
       } else {
         end_time = pdMS_TO_TICKS((config.amplification_zone_run_time_m) * 1000);
       }
@@ -560,7 +560,7 @@ void main_task(void *pvParameters) {
         // Get Start Time and End Time
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
-          end_time = pdMS_TO_TICKS((DEFAULT_VALVE_ZONE_ON_TIME)*1000);
+          end_time = pdMS_TO_TICKS((DEFAULT_VALVE_ZONE_ON_TIME) * 1000);
         } else {
           end_time = pdMS_TO_TICKS((config.valve_zone_run_time_m) * 1000);
         }

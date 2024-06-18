@@ -284,8 +284,20 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
+  // Write Alert Timeout (minutes)
+  configBufferSize = sprintf(configBuffer, "alert_timeout_time_m:%0.2f\n", DEFAULT_ALERT_TIMEOUT_S);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
 
-  // Write Minimum Run Zone Temperature and Enable
+  configBufferSize = sprintf(configBuffer, "sample_valid_timeout_s:%0.2f\n", DEFAULT_VALID_TIMEOUT_S);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+    // Write Minimum Run Zone Temperature and Enable
   configBufferSize = sprintf(configBuffer, "min_run_zone_temp:%0.2f\n", DEFAULT_MIN_RUN_ZONE_TEMP);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
@@ -298,28 +310,21 @@ FRESULT check_for_config_file(void) {
     return res;
   }
 
-  // Write Alert Timeout (minutes)
-  configBufferSize = sprintf(configBuffer, "alert_timeout_time_s:%0.2f\n", DEFAULT_ALERT_TIMEOUT_S);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  configBufferSize = sprintf(configBuffer, "sample_valid_timeout_s:%0.2f\n", DEFAULT_VALID_TIMEOUT_S);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
 
 #ifndef SAMPLE_PREP_BOARD
-  // Write Amplification Zone Run Time
-  configBufferSize = sprintf(configBuffer, "amp_zone_run_time:%d\n", DEFAULT_AMPLIFICATION_ZONE_ON_TIME);
+  configBufferSize = sprintf(configBuffer, "min_wait_time_after_valve_s:%0.2f\n", DEFAULT_WAIT_TIME_AFTER_VALVE_S);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
   // Write Valve Zone Run Time
   configBufferSize = sprintf(configBuffer, "valve_zone_run_time:%d\n", DEFAULT_VALVE_ZONE_ON_TIME);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Amplification Zone Run Time
+  configBufferSize = sprintf(configBuffer, "amp_zone_run_time:%d\n", DEFAULT_AMPLIFICATION_ZONE_ON_TIME);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -541,6 +546,31 @@ FRESULT check_for_config_file(void) {
     return res;
   }
 #else
+
+  configBufferSize = sprintf(configBuffer, "cycle_1_run_time_m:%0.2f\n", );
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  configBufferSize = sprintf(configBuffer, "cycle_2_run_time_m:%0.2f\n", );
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  configBufferSize = sprintf(configBuffer, "ramp_to_temp_before_start_cycle_1:%0.2f\n", );
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  configBufferSize = sprintf(configBuffer, "ramp_to_temp_before_start_cycle_2:%0.2f\n", );
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
   // Write heater Zone Setpoint
   configBufferSize = sprintf(configBuffer, "heater_setpoint_1:%0.2f\n", DEFAULT_HEATER_SETPOINT);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
