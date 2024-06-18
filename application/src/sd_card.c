@@ -559,13 +559,13 @@ FRESULT check_for_config_file(void) {
     return res;
   }
 
-  configBufferSize = sprintf(configBuffer, "ramp_to_temp_before_start_cycle_1:%0.2f\n", DEFAULT_RAMP_TO_TEMP_BEFORE_START_1);
+  configBufferSize = sprintf(configBuffer, "ramp_to_temp_before_start_cycle_1:%s\n", DEFAULT_RAMP_TO_TEMP_BEFORE_START_1 ? "true" : "false");
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
 
-  configBufferSize = sprintf(configBuffer, "ramp_to_temp_before_start_cycle_2:%0.2f\n", DEFAULT_RAMP_TO_TEMP_BEFORE_START_2);
+  configBufferSize = sprintf(configBuffer, "ramp_to_temp_before_start_cycle_2:%s\n", DEFAULT_RAMP_TO_TEMP_BEFORE_START_2 ? "true" : "false");
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
