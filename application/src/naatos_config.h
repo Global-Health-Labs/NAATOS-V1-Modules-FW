@@ -54,6 +54,10 @@
 #define DEFAULT_RUN_HEATER_1 true
 #define DEFAULT_RUN_MOTOR_2 true
 #define DEFAULT_RUN_HEATER_2 false
+#define DEFAULT_CYCLE_1_RUNTIME 60.0
+#define DEFAULT_CYCLE_2_RUNTIME 60.0
+#define DEFAULT_RAMP_TO_TEMP_BEFORE_START_1 true
+#define DEFAULT_RAMP_TO_TEMP_BEFORE_START_2 false
 
 /* Device Debug Parameters */
 #define I2C_CONNECTED 1
