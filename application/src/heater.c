@@ -28,6 +28,8 @@ temperature_pwm_data_t outputPwmData = {
 
 pid_controller_t heater_pid_1;
 pid_controller_t heater_pid_2;
+pid_controller_t motor_pid_1;
+pid_controller_t motor_pid_2;
 
 pid_controller_t valve_pid;
 pid_controller_t amp0_pid;
@@ -146,6 +148,15 @@ void heater_reset_all_pids(void) {
   } else {
     pid_controller_init(&heater_pid_2, config.heater_setpoint_2, config.heater_kp_2, config.heater_ki_2, config.heater_kd_2);
   }
+
+  if (true /*use_default_configuration_parameters*/) {   // No config parameters yet
+    pid_controller_init(&motor_pid_1, MOTOR_SETPOINT, M_KP, M_KI, M_KD);
+  }
+
+  if (true /*use_default_configuration_parameters*/) {   // No config parameters yet
+    pid_controller_init(&motor_pid_2, MOTOR_SETPOINT, M_KP, M_KI, M_KD);
+  }
+
 }
 
 void sendWdtHeaterValid() {
@@ -225,8 +236,10 @@ void heater_task(void *pvParameters) {
         break;
       }
       case HEATER_MSG_TEMPERATURE_DATA:
-        heaterRxMessage.tempData.motorSpeed = heaterRxMessage.motorSpeed;
         handleSensorDataRx(heaterRxMessage.tempData);
+        break;
+      case HEATER_MSG_MOTOR_DATA:
+        handleMotorDataRx(heaterRxMessage.motorSpeed);
         break;
       case HEATER_MSG_USB_SUSPEND:
         // Handle USB suspend message
@@ -263,6 +276,39 @@ void heater_task(void *pvParameters) {
         break;
       }
     }
+  }
+}
+
+void handleMotorDataRx(int motor_speed) {
+  if (amplification_zone_running) {
+    temperature_pwm_data_t pwmData = {
+      .valve_zone_pwm = 0,
+      .amp0_zone_pwm = heater_pid_1.out,
+      .amp1_zone_pwm = 0,
+      .amp2_zone_pwm = 0
+    };
+
+    if (config.run_motor_1) {
+      pid_controller_compute(&motor_pid_1, motor_speed);
+      pwmData.amp1_zone_pwm = motor_pid_1.out;
+    } 
+
+    updateDutyCycles(pwmData);
+  }
+  else if (valve_zone_running) {
+    temperature_pwm_data_t pwmData = {
+      .valve_zone_pwm = 0,
+      .amp0_zone_pwm = heater_pid_1.out,
+      .amp1_zone_pwm = 0,
+      .amp2_zone_pwm = 0
+    };
+
+    if (config.run_motor_2) {
+      pid_controller_compute(&motor_pid_2, motor_speed);
+      pwmData.amp1_zone_pwm = motor_pid_2.out;
+    } 
+
+    updateDutyCycles(pwmData);
   }
 }
 
@@ -321,11 +367,6 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
         .amp0_zone_pwm = heater_pid_1.out,
         .amp1_zone_pwm = 0,
         .amp2_zone_pwm = 0};
-    if (!use_default_configuration_parameters && config.run_motor_1) {
-      pwmData.amp1_zone_pwm = config.motor_speed_pwm_1;
-    } else if (use_default_configuration_parameters && DEFAULT_RUN_MOTOR_1) {
-      pwmData.amp1_zone_pwm = DEFAULT_MOTOR_SPEED_PWM;
-    }
 
     // Update Amplification 2 PWM with PID output
     updateDutyCycles(pwmData);
@@ -387,11 +428,6 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
         .amp0_zone_pwm = heater_pid_2.out,
         .amp1_zone_pwm = 0,
         .amp2_zone_pwm = 0};
-    if (!use_default_configuration_parameters && config.run_motor_2) {
-      pwmData.amp1_zone_pwm = config.motor_speed_pwm_2;
-    } else if (use_default_configuration_parameters && DEFAULT_RUN_MOTOR_2) {
-      pwmData.amp1_zone_pwm = DEFAULT_MOTOR_SPEED_PWM;
-    }
 
 #else
     pid_controller_compute(&amp0_pid_2, temperature_data.amp0_zone_temp);

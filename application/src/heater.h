@@ -16,6 +16,12 @@
 #define AMP1_SETPOINT_2 67.0
 #define AMP2_SETPOINT_2 67.0
 
+#define MOTOR_SETPOINT  4000
+
+#define M_KP 1.0
+#define M_KI 0.0
+#define M_KD 0.0
+
 #define H_KP 2.0
 #define H_KI 0.010
 #define H_KD 0.0
@@ -54,3 +60,4 @@
 
 void heater_task(void *pvParameters);
 void sendWdtHeaterValid();
+void handleMotorDataRx(int motor_speed);
