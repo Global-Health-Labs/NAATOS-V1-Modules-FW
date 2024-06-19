@@ -543,6 +543,7 @@ void main_task(void *pvParameters) {
         error_during_run = true;
         break;
       }
+
       // Set LED1 to solid green
       if (last_state != main_state) {
         updateLedState(LED_RUN, true);
@@ -551,7 +552,7 @@ void main_task(void *pvParameters) {
       // Get the start time and end time
       start_time = xTaskGetTickCount();
       if (use_default_configuration_parameters) {
-        end_time = pdMS_TO_TICKS((DEFAULT_AMPLIFICATION_ZONE_ON_TIME)*1000);
+        end_time = pdMS_TO_TICKS((DEFAULT_AMPLIFICATION_ZONE_ON_TIME) * 1000);
       } else {
         end_time = pdMS_TO_TICKS((config.cycle_1_run_time_m) * 1000);
       }
@@ -600,9 +601,9 @@ void main_task(void *pvParameters) {
         // Get Start Time and End Time
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
-          end_time = pdMS_TO_TICKS((DEFAULT_VALVE_ZONE_ON_TIME)*1000);
+          end_time = pdMS_TO_TICKS(DEFAULT_VALVE_ZONE_ON_TIME * 1000);
         } else {
-          end_time = pdMS_TO_TICKS((config.cycle_2_run_time_m) * 1000);
+          end_time = pdMS_TO_TICKS(config.cycle_2_run_time_m * 1000);
         }
       } else {
         // Send Interrupt Event to logging task
