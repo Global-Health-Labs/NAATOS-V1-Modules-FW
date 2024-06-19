@@ -11,6 +11,7 @@ bool h_pwm_req = false;
 bool greater_than_max = false;
 bool heater_run = false;
 int wdtTimeout = 0;
+int last_motor_speed = 0;
 
 zone_run_req_t zone_req;
 
@@ -293,6 +294,9 @@ void handleMotorDataRx(int motor_speed) {
       pwmData.amp1_zone_pwm = motor_pid_1.out;
     } 
 
+    h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
+    last_motor_speed = motor_speed;
+
     updateDutyCycles(pwmData);
   }
   else if (valve_zone_running) {
@@ -307,6 +311,9 @@ void handleMotorDataRx(int motor_speed) {
       pid_controller_compute(&motor_pid_2, motor_speed);
       pwmData.amp1_zone_pwm = motor_pid_2.out;
     } 
+
+    h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
+    last_motor_speed = motor_speed;
 
     updateDutyCycles(pwmData);
   }
@@ -372,7 +379,7 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     updateDutyCycles(pwmData);
     h_pwm_data.valve_zone_pwm = pwmData.valve_zone_pwm;
     h_pwm_data.amp0_zone_pwm = pwmData.amp0_zone_pwm;
-    h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
+    //h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
     h_pwm_data.amp2_zone_pwm = pwmData.amp2_zone_pwm;
 
     if (config.heater_max_temp < temperature_data.amp2_zone_temp) {
@@ -455,7 +462,7 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
 #else
     h_pwm_data.valve_zone_pwm = pwmData.valve_zone_pwm;
     h_pwm_data.amp0_zone_pwm = pwmData.amp0_zone_pwm;
-    h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
+    //h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
     h_pwm_data.amp2_zone_pwm = pwmData.amp2_zone_pwm;
 #endif
 
@@ -510,7 +517,7 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     char buff[60];
     size = sprintf(buff, "Heater: Temp: %0.2f\tDuty: %0.2f\r\n", temperature_data.amp2_zone_temp, heater_pid_1.out);
     write_to_com(buff, size);
-    size = sprintf(buff, "Motor: Speed: %0.2f\tDuty: %0.2f\r\n", temperature_data.motorSpeed, h_pwm_data.amp1_zone_pwm);
+    size = sprintf(buff, "Motor: Speed: %d\tDuty: %0.2f\r\n", last_motor_speed, h_pwm_data.amp1_zone_pwm);
     write_to_com(buff, size);
   }
   if (valve_zone_running) {
@@ -518,7 +525,7 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     char buff[60];
     size = sprintf(buff, "Heater: Temp: %0.2f\tDuty: %0.2f\r\n", temperature_data.amp2_zone_temp, heater_pid_2.out);
     write_to_com(buff, size);
-    size = sprintf(buff, "Motor: Speed: %0.2f\tDuty: %0.2f\r\n", temperature_data.motorSpeed, h_pwm_data.amp1_zone_pwm);
+    size = sprintf(buff, "Motor: Speed: %d\tDuty: %0.2f\r\n", last_motor_speed, h_pwm_data.amp1_zone_pwm);
     write_to_com(buff, size);
   }
 #endif

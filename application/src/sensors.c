@@ -28,6 +28,8 @@ static uint32_t motor_speed_read_t1 = 0;
 static uint32_t motor_speed_read_t2;
 static bool skipped_last_call = false;
 static long double motor_speed = 0.0; //RPM
+static long double avg_speed[3] = {0,0,0};
+static long double moving_avg_speed = 0.0;
 #endif
 
 static tsys01_errors_t tsys01_err;
@@ -102,7 +104,7 @@ void startSensorTempTimer(void) {
 void startSensorMotorTimer(void) {
   TickType_t sampleRateTicks;
   
-  sampleRateTicks = pdMS_TO_TICKS(10); // 2 ms
+  sampleRateTicks = pdMS_TO_TICKS(50); // 2 ms
 
   if (xTimerChangePeriod(sensorMotorTimer, sampleRateTicks, 100) != pdPASS) {
     printf("Cannot change period of sensor timer. \n");
@@ -409,8 +411,14 @@ void sensorMotorCollection(void) {
   if (heaterRunning) {
 #if USE_MOTOR
     motorSpeed = readMotorSpeed();
+    avg_speed[2] = avg_speed[1];
+    avg_speed[1] = avg_speed[0];
+    avg_speed[0] = motorSpeed;
+
+    moving_avg_speed = (avg_speed[0] + avg_speed[1] + avg_speed[2]) / 3.0;
+
     heaterMsg.type = HEATER_MSG_MOTOR_DATA;
-    heaterMsg.motorSpeed = motorSpeed;
+    heaterMsg.motorSpeed = moving_avg_speed;
     xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
     if (xReturned != pdPASS) {
       printf("SENSORS_TASK: Unable to send temperature data in heaterRxQueue. Error: %d\n", xReturned);
