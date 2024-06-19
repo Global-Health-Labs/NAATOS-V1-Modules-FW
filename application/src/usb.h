@@ -73,7 +73,7 @@ static bool m_send_flag = 0;
 
 void usb_task(void *pvParameters);
 void composite_usb_task(void *pvParameters);
-
+void write_to_com(const char * msg, int len);
 void start_usb(bool cdc_acm, bool msc);
 void restart_usb_only_cdc_acm(void);
 void usb_suspend_conflicting_tasks(void);

@@ -470,12 +470,20 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
   }
 #else
   if (amplification_zone_running) {
-    printf("Heater: Temp: %0.2f\tDuty: %0.2f\n", temperature_data.amp2_zone_temp, heater_pid_1.out);
-    printf("Motor: Speed: %0.2f\tDuty: %0.2f\n", temperature_data.motorSpeed, h_pwm_data.amp1_zone_pwm);
+    int size;
+    char buff[60];
+    size = sprintf(buff, "Heater: Temp: %0.2f\tDuty: %0.2f\r\n", temperature_data.amp2_zone_temp, heater_pid_1.out);
+    write_to_com(buff, size);
+    size = sprintf(buff, "Motor: Speed: %0.2f\tDuty: %0.2f\r\n", temperature_data.motorSpeed, h_pwm_data.amp1_zone_pwm);
+    write_to_com(buff, size);
   }
   if (valve_zone_running) {
-    printf("Heater: Temp: %0.2f\tDuty: %0.2f\n", temperature_data.amp2_zone_temp, heater_pid_2.out);
-    printf("Motor: Speed: %0.2f\tDuty: %0.2f\n", temperature_data.motorSpeed, h_pwm_data.amp1_zone_pwm);
+    int size;
+    char buff[60];
+    size = sprintf(buff, "Heater: Temp: %0.2f\tDuty: %0.2f\r\n", temperature_data.amp2_zone_temp, heater_pid_2.out);
+    write_to_com(buff, size);
+    size = sprintf(buff, "Motor: Speed: %0.2f\tDuty: %0.2f\r\n", temperature_data.motorSpeed, h_pwm_data.amp1_zone_pwm);
+    write_to_com(buff, size);
   }
 #endif
 #endif

@@ -4,6 +4,7 @@
 #include "naatos_queues.h"
 #include "pid.h"
 #include "pwm.h"
+#include "usb.h"
 
 #define VALVE_SETPOINT 67.6
 #define AMP0_SETPOINT 67.0
