@@ -18,8 +18,8 @@
 
 #define MOTOR_SETPOINT  4000
 
-#define M_KP 0.002
-#define M_KI 0.0005
+#define M_KP 0.006
+#define M_KI 0.00005
 #define M_KD 0.002
 
 #define H_KP 2.0

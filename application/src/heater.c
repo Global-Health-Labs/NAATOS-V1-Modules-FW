@@ -291,7 +291,7 @@ void handleMotorDataRx(int motor_speed) {
 
     if (config.run_motor_1) {
       pid_controller_compute(&motor_pid_1, motor_speed);
-      pwmData.amp1_zone_pwm = motor_pid_1.out;
+      pwmData.amp1_zone_pwm = 71;//motor_pid_1.out;
     } 
 
     h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
@@ -309,7 +309,7 @@ void handleMotorDataRx(int motor_speed) {
 
     if (config.run_motor_2) {
       pid_controller_compute(&motor_pid_2, motor_speed);
-      pwmData.amp1_zone_pwm = motor_pid_2.out;
+      pwmData.amp1_zone_pwm = 71;//motor_pid_1.out;
     } 
 
     h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;

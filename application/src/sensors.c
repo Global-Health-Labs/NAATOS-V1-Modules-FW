@@ -104,7 +104,7 @@ void startSensorTempTimer(void) {
 void startSensorMotorTimer(void) {
   TickType_t sampleRateTicks;
   
-  sampleRateTicks = pdMS_TO_TICKS(50); // 2 ms
+  sampleRateTicks = pdMS_TO_TICKS(150); // 2 ms
 
   if (xTimerChangePeriod(sensorMotorTimer, sampleRateTicks, 100) != pdPASS) {
     printf("Cannot change period of sensor timer. \n");
