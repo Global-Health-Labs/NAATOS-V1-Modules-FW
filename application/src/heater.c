@@ -10,7 +10,10 @@ bool starting_run = true;
 bool h_pwm_req = false;
 bool greater_than_max = false;
 bool heater_run = false;
+bool rampToTemp = false;
 int wdtTimeout = 0;
+float heater1SetPoint = 0;
+float heater2SetPoint = 0;
 
 zone_run_req_t zone_req;
 
@@ -136,14 +139,18 @@ void handle_amplification_stopstart_heater(bool heating) {
 void heater_reset_all_pids(void) {
   // Create PID Controllers
   if (use_default_configuration_parameters) {
+    heater1SetPoint = DEFAULT_HEATER_SETPOINT;
     pid_controller_init(&heater_pid_1, DEFAULT_HEATER_SETPOINT, H_KP, H_KI, H_KD);
   } else {
+    heater1SetPoint = config.heater_setpoint_1;
     pid_controller_init(&heater_pid_1, config.heater_setpoint_1, config.heater_kp_1, config.heater_ki_1, config.heater_kd_1);
   }
 
   if (use_default_configuration_parameters) {
+    heater2SetPoint = DEFAULT_HEATER_SETPOINT;
     pid_controller_init(&heater_pid_2, DEFAULT_HEATER_SETPOINT, H_KP, H_KI, H_KD);
   } else {
+    heater2SetPoint = config.heater_setpoint_2;
     pid_controller_init(&heater_pid_2, config.heater_setpoint_2, config.heater_kp_2, config.heater_ki_2, config.heater_kd_2);
   }
 }
@@ -182,6 +189,7 @@ void heater_task(void *pvParameters) {
         // Set zones enabled
         if (heaterRxMessage.zoneSelect == AMPLIFICATION) {
           amplification_zone_running = heaterRxMessage.zoneEnabled;
+          rampToTemp = config.ramp_to_temp_before_start_cycle_1;
           if (!amplification_zone_running) { //AMP2 will be used in sample prep fro heating
             heater_pid_1.out = 0;
             temperature_pwm_data_t pwmData = {
@@ -204,6 +212,7 @@ void heater_task(void *pvParameters) {
           }
         } else if (heaterRxMessage.zoneSelect = VALVE) {
           valve_zone_running = heaterRxMessage.zoneEnabled;
+          rampToTemp = config.ramp_to_temp_before_start_cycle_2;
           if (!valve_zone_running) {
             heater_pid_2.out = 0;
             temperature_pwm_data_t pwmData = {
@@ -314,6 +323,13 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     // Update Amplification 2 PID loop with new temperatures
     if (config.run_heater_1) {
       pid_controller_compute(&heater_pid_1, temperature_data.amp2_zone_temp);
+      if(rampToTemp && (temperature_data.amp2_zone_temp >= heater1SetPoint)) {
+        rampToTemp = false;
+        xReturned = xQueueSend(main_setPointReached, &setPointReachedMsg, 0);
+        if (xReturned != pdPASS) {
+          printf("HEATER_TASK: Unable to send set point reached message.\n");
+        }
+      }
     }
 
     temperature_pwm_data_t pwmData = {
@@ -380,6 +396,13 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     // Update Amplification 2 PID loop with new temperatures
     if (config.run_heater_2) {
       pid_controller_compute(&heater_pid_2, temperature_data.amp2_zone_temp);
+      if(rampToTemp && (temperature_data.amp2_zone_temp >= heater2SetPoint)) {
+        rampToTemp = false;
+        xReturned = xQueueSend(main_setPointReached, &setPointReachedMsg, 0);
+        if (xReturned != pdPASS) {
+          printf("HEATER_TASK: Unable to send set point reached message.\n");
+        }
+      }
     }
 
     temperature_pwm_data_t pwmData = {

@@ -543,12 +543,32 @@ void main_task(void *pvParameters) {
         error_during_run = true;
         break;
       }
-
       // Set LED1 to solid green
       if (last_state != main_state) {
         updateLedState(LED_RUN, true);
         //set_led1_green_solid();
       }
+
+
+      if (config.ramp_to_temp_before_start_cycle_1) {
+          int waitForSetPointTicks = pdMS_TO_TICKS((config.ramp_to_temp_c1_timeout) * 1000);
+          xReturned = xQueueReceive(main_setPointReached, &setPointReached, waitForSetPointTicks);
+          if(xReturned == errQUEUE_EMPTY){
+            //timeout reached exit our run but first stop the heater
+            end_amplification_zone();
+            next_state = MAIN_STANDBY;
+          } else if (xReturned != pdPASS) {
+            printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
+          }
+      }
+
+      
+      //if wait till temp reached
+      //wait for tempReachedMessage or timeout temp reached
+      //if timed out fail the test
+      //if not timed out then continue
+      
+
       // Get the start time and end time
       start_time = xTaskGetTickCount();
       if (use_default_configuration_parameters) {
@@ -598,6 +618,19 @@ void main_task(void *pvParameters) {
       // Send valve zone start request
       if (!error_during_run) {
         begin_valve_zone();
+
+        if (config.ramp_to_temp_before_start_cycle_2) {
+            int waitForSetPointTicks = pdMS_TO_TICKS((config.ramp_to_temp_c2_timeout) * 1000);
+            xReturned = xQueueReceive(main_setPointReached, &setPointReached, waitForSetPointTicks);
+            if(xReturned == errQUEUE_EMPTY){
+              //timeout reached exit our run but first stop the heater
+              end_valve_zone();
+              next_state = MAIN_STANDBY;
+            } else if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
+            }
+        }
+
         // Get Start Time and End Time
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {

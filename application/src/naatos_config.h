@@ -97,7 +97,8 @@ typedef enum {
   SENSORS,
   USB,
   PWM,
-  COMPOSITE
+  COMPOSITE,
+  MOTOR
 } tasks_t;
 
 // Charging Enum
@@ -388,6 +389,28 @@ typedef struct {
   LEDEvent_e type;
   bool active;
 } LEDRxQueueMsg_t;
+
+/*
+typedef enum {
+  MAIN_MSG_BATTERY_PERCENT,
+  MAIN_MSG_BUTTON_EVENT,
+  MAIN_MSG_USB_STATUS,
+  MAIN_MSG_SWITCH_DATA,
+  MAIN_MSG_OVERTEMP_EVENT,
+  MAIN_MSG_WAKE_EVENT,
+  MAIN_MSG_HEATER_CONFIRM_EVENT,
+  MAIN_MSG_TIMER_EVENT
+} MainStateEvent_e;
+
+typedef struct {
+  int batteryPercent;
+  button_update_t buttonEvent;
+  usbRxMsgType_t usbMsg;
+  sensor_switches_t sensorSwitch;
+  bool overTempError;
+  bool wakeupEvent;
+} MainStateRxQueueMsg_t;
+*/
 
 // Task Handles
 extern xTaskHandle mainTaskHandle;
