@@ -185,13 +185,6 @@ void pwm_task(void *pvParameters) {
             pwm2_ready_flag = false;
           }
 
-          /* if (motor_duty > 0){
-              app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL,  motor_duty);
-            } else if(amp1_zone_active) {
-              app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL,  0);
-              motor_active = false;
-            }*/
-
           if (amp1_duty > 0) {
             app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, amp1_duty);
           } else if (amp1_zone_active) {

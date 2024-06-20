@@ -291,7 +291,7 @@ void handleMotorDataRx(int motor_speed) {
 
     if (config.run_motor_1) {
       pid_controller_compute(&motor_pid_1, motor_speed);
-      pwmData.amp1_zone_pwm = 71;//motor_pid_1.out;
+      pwmData.amp1_zone_pwm = motor_pid_1.out;
     } 
 
     h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
@@ -309,7 +309,7 @@ void handleMotorDataRx(int motor_speed) {
 
     if (config.run_motor_2) {
       pid_controller_compute(&motor_pid_2, motor_speed);
-      pwmData.amp1_zone_pwm = 71;//motor_pid_1.out;
+      pwmData.amp1_zone_pwm = motor_pid_2.out;
     } 
 
     h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
@@ -376,11 +376,12 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
         .amp2_zone_pwm = 0};
 
     // Update Amplification 2 PWM with PID output
-    updateDutyCycles(pwmData);
     h_pwm_data.valve_zone_pwm = pwmData.valve_zone_pwm;
     h_pwm_data.amp0_zone_pwm = pwmData.amp0_zone_pwm;
-    //h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
+    // Dont want Amp1, its from the motor task
     h_pwm_data.amp2_zone_pwm = pwmData.amp2_zone_pwm;
+
+    updateDutyCycles(h_pwm_data);
 
     if (config.heater_max_temp < temperature_data.amp2_zone_temp) {
       greater_than_max = true;
@@ -450,8 +451,6 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
 
 #endif
 
-    updateDutyCycles(pwmData);
-
 #ifndef SAMPLE_PREP_BOARD
     // Set the PWMs for the logger
     h_pwm_data.valve_zone_pwm = valve_pid.out;
@@ -464,6 +463,8 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     h_pwm_data.amp0_zone_pwm = pwmData.amp0_zone_pwm;
     //h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
     h_pwm_data.amp2_zone_pwm = pwmData.amp2_zone_pwm;
+
+    updateDutyCycles(h_pwm_data);
 #endif
 
 #ifdef SAMPLE_PREP_BOARD
