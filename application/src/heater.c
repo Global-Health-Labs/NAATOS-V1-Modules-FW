@@ -150,12 +150,16 @@ void heater_reset_all_pids(void) {
     pid_controller_init(&heater_pid_2, config.heater_setpoint_2, config.heater_kp_2, config.heater_ki_2, config.heater_kd_2);
   }
 
-  if (true /*use_default_configuration_parameters*/) {   // No config parameters yet
-    pid_controller_init(&motor_pid_1, MOTOR_SETPOINT, M_KP, M_KI, M_KD);
+  if (use_default_configuration_parameters) {   
+    pid_controller_init(&motor_pid_1, MOTOR_SETPOINT_1, M_KP, M_KI, M_KD);
+  } else {
+    pid_controller_init(&motor_pid_1, config.motor_setpoint_1, config.motor_kp_1, config.motor_ki_1, config.motor_kd_1);
   }
 
-  if (true /*use_default_configuration_parameters*/) {   // No config parameters yet
-    pid_controller_init(&motor_pid_2, MOTOR_SETPOINT, M_KP, M_KI, M_KD);
+  if (use_default_configuration_parameters) {   
+    pid_controller_init(&motor_pid_2, MOTOR_SETPOINT_2, M_KP, M_KI, M_KD);
+  } else {
+    pid_controller_init(&motor_pid_2, config.motor_setpoint_2, config.motor_kp_2, config.motor_ki_2, config.motor_kd_2);
   }
 
 }

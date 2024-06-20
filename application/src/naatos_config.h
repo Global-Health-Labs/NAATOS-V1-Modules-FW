@@ -476,8 +476,14 @@ typedef struct {
   float heater_kp_2;
   float heater_ki_2;
   float heater_kd_2;
-  uint16_t motor_speed_pwm_1;
-  uint16_t motor_speed_pwm_2;
+  float motor_kp_1;
+  float motor_ki_1;
+  float motor_kd_1;
+  uint16_t motor_setpoint_1;
+  float motor_kp_2;
+  float motor_ki_2;
+  float motor_kd_2;
+  uint16_t motor_setpoint_2;
   bool run_motor_1;
   bool run_heater_1;
   bool run_motor_2;
