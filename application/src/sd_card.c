@@ -571,13 +571,13 @@ FRESULT check_for_config_file(void) {
     return res;
   }
 
-  configBufferSize = sprintf(configBuffer, "ramp_to_temp_timeout_c1:%s\n", DEFAULT_RAMP_TO_TEMP_TIMEOUT);
+  configBufferSize = sprintf(configBuffer, "ramp_to_temp_timeout_c1:%0.2f\n", DEFAULT_RAMP_TO_TEMP_TIMEOUT);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
 
-  configBufferSize = sprintf(configBuffer, "ramp_to_temp_timeout_c2:%s\n", DEFAULT_RAMP_TO_TEMP_TIMEOUT);
+  configBufferSize = sprintf(configBuffer, "ramp_to_temp_timeout_c2:%0.2f\n", DEFAULT_RAMP_TO_TEMP_TIMEOUT);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
