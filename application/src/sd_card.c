@@ -637,14 +637,50 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
-  // Write Motor Speed 1
-  configBufferSize = sprintf(configBuffer, "motor_speed_pwm_1:%d\n", DEFAULT_MOTOR_SPEED_PWM);
+  // Write Motor 1 Kp
+  configBufferSize = sprintf(configBuffer, "motor_kp_1:%0.3f\n", M_KP);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
-  // Write Motor Speed 2
-  configBufferSize = sprintf(configBuffer, "motor_speed_pwm_2:%d\n", DEFAULT_MOTOR_SPEED_PWM);
+  // Write Motor 1 Ki
+  configBufferSize = sprintf(configBuffer, "motor_ki_1:%0.3f\n", M_KI);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Motor 1 Kd
+  configBufferSize = sprintf(configBuffer, "motor_kd_1:%0.3f\n", M_KD);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Motor Setpoint 1
+  configBufferSize = sprintf(configBuffer, "motor_setpoint_1:%d\n", MOTOR_SETPOINT_1);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+   // Write Motor 2 Kp
+  configBufferSize = sprintf(configBuffer, "motor_kp_2:%0.3f\n", M_KP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Motor 2 Ki
+  configBufferSize = sprintf(configBuffer, "motor_ki_2:%0.3f\n", M_KI);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Motor 2 Kd
+  configBufferSize = sprintf(configBuffer, "motor_kd_2:%0.3f\n", M_KD);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Motor Setpoint 1
+  configBufferSize = sprintf(configBuffer, "motor_setpoint_2:%d\n", MOTOR_SETPOINT_2);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -934,11 +970,29 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case HEATER_KD_2:
       parameters->heater_kd_2 = atof(val);
       break;
-    case MOTOR_SPEED_PWM_1:
-      parameters->motor_speed_pwm_1 = atoi(val);
+    case MOTOR_KP_1:
+      parameters->motor_kp_1 = atof(val);
       break;
-    case MOTOR_SPEED_PWM_2:
-      parameters->motor_speed_pwm_2 = atoi(val);
+    case MOTOR_KI_1:
+      parameters->motor_ki_1 = atof(val);
+      break;
+    case MOTOR_KD_1:
+      parameters->motor_kd_1 = atof(val);
+      break;
+    case _MOTOR_SETPOINT_1:
+      parameters->motor_setpoint_1 = atoi(val);
+      break;
+    case MOTOR_KP_2:
+      parameters->motor_kp_2 = atof(val);
+      break;
+    case MOTOR_KI_2:
+      parameters->motor_ki_2 = atof(val);
+      break;
+    case MOTOR_KD_2:
+      parameters->motor_kd_2 = atof(val);
+      break;
+    case _MOTOR_SETPOINT_2:
+      parameters->motor_setpoint_2 = atoi(val);
       break;
     case RUN_MOTOR_1:
       num = strcmp(val, "true");

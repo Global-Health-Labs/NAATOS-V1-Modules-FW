@@ -14,6 +14,7 @@ bool rampToTemp = false;
 int wdtTimeout = 0;
 float heater1SetPoint = 0;
 float heater2SetPoint = 0;
+int last_motor_speed = 0;
 
 zone_run_req_t zone_req;
 
@@ -31,6 +32,8 @@ temperature_pwm_data_t outputPwmData = {
 
 pid_controller_t heater_pid_1;
 pid_controller_t heater_pid_2;
+pid_controller_t motor_pid_1;
+pid_controller_t motor_pid_2;
 
 pid_controller_t valve_pid;
 pid_controller_t amp0_pid;
@@ -153,6 +156,19 @@ void heater_reset_all_pids(void) {
     heater2SetPoint = config.heater_setpoint_2;
     pid_controller_init(&heater_pid_2, config.heater_setpoint_2, config.heater_kp_2, config.heater_ki_2, config.heater_kd_2);
   }
+
+  if (use_default_configuration_parameters) {   
+    pid_controller_init(&motor_pid_1, MOTOR_SETPOINT_1, M_KP, M_KI, M_KD);
+  } else {
+    pid_controller_init(&motor_pid_1, config.motor_setpoint_1, config.motor_kp_1, config.motor_ki_1, config.motor_kd_1);
+  }
+
+  if (use_default_configuration_parameters) {   
+    pid_controller_init(&motor_pid_2, MOTOR_SETPOINT_2, M_KP, M_KI, M_KD);
+  } else {
+    pid_controller_init(&motor_pid_2, config.motor_setpoint_2, config.motor_kp_2, config.motor_ki_2, config.motor_kd_2);
+  }
+
 }
 
 void sendWdtHeaterValid() {
@@ -234,8 +250,10 @@ void heater_task(void *pvParameters) {
         break;
       }
       case HEATER_MSG_TEMPERATURE_DATA:
-        heaterRxMessage.tempData.motorSpeed = heaterRxMessage.motorSpeed;
         handleSensorDataRx(heaterRxMessage.tempData);
+        break;
+      case HEATER_MSG_MOTOR_DATA:
+        handleMotorDataRx(heaterRxMessage.motorSpeed);
         break;
       case HEATER_MSG_USB_SUSPEND:
         // Handle USB suspend message
@@ -272,6 +290,45 @@ void heater_task(void *pvParameters) {
         break;
       }
     }
+  }
+}
+
+void handleMotorDataRx(int motor_speed) {
+  if (amplification_zone_running) {
+    temperature_pwm_data_t pwmData = {
+      .valve_zone_pwm = 0,
+      .amp0_zone_pwm = heater_pid_1.out,
+      .amp1_zone_pwm = 0,
+      .amp2_zone_pwm = 0
+    };
+
+    if (config.run_motor_1) {
+      pid_controller_compute(&motor_pid_1, motor_speed);
+      pwmData.amp1_zone_pwm = motor_pid_1.out;
+    } 
+
+    h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
+    last_motor_speed = motor_speed;
+
+    updateDutyCycles(pwmData);
+  }
+  else if (valve_zone_running) {
+    temperature_pwm_data_t pwmData = {
+      .valve_zone_pwm = 0,
+      .amp0_zone_pwm = heater_pid_1.out,
+      .amp1_zone_pwm = 0,
+      .amp2_zone_pwm = 0
+    };
+
+    if (config.run_motor_2) {
+      pid_controller_compute(&motor_pid_2, motor_speed);
+      pwmData.amp1_zone_pwm = motor_pid_2.out;
+    } 
+
+    h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
+    last_motor_speed = motor_speed;
+
+    updateDutyCycles(pwmData);
   }
 }
 
@@ -337,18 +394,14 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
         .amp0_zone_pwm = heater_pid_1.out,
         .amp1_zone_pwm = 0,
         .amp2_zone_pwm = 0};
-    if (!use_default_configuration_parameters && config.run_motor_1) {
-      pwmData.amp1_zone_pwm = config.motor_speed_pwm_1;
-    } else if (use_default_configuration_parameters && DEFAULT_RUN_MOTOR_1) {
-      pwmData.amp1_zone_pwm = DEFAULT_MOTOR_SPEED_PWM;
-    }
 
     // Update Amplification 2 PWM with PID output
-    updateDutyCycles(pwmData);
     h_pwm_data.valve_zone_pwm = pwmData.valve_zone_pwm;
     h_pwm_data.amp0_zone_pwm = pwmData.amp0_zone_pwm;
-    h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
+    // Dont want Amp1, its from the motor task
     h_pwm_data.amp2_zone_pwm = pwmData.amp2_zone_pwm;
+
+    updateDutyCycles(h_pwm_data);
 
     if (config.heater_max_temp < temperature_data.amp2_zone_temp) {
       greater_than_max = true;
@@ -410,11 +463,6 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
         .amp0_zone_pwm = heater_pid_2.out,
         .amp1_zone_pwm = 0,
         .amp2_zone_pwm = 0};
-    if (!use_default_configuration_parameters && config.run_motor_2) {
-      pwmData.amp1_zone_pwm = config.motor_speed_pwm_2;
-    } else if (use_default_configuration_parameters && DEFAULT_RUN_MOTOR_2) {
-      pwmData.amp1_zone_pwm = DEFAULT_MOTOR_SPEED_PWM;
-    }
 
 #else
     pid_controller_compute(&amp0_pid_2, temperature_data.amp0_zone_temp);
@@ -430,8 +478,6 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
 
 #endif
 
-    updateDutyCycles(pwmData);
-
 #ifndef SAMPLE_PREP_BOARD
     // Set the PWMs for the logger
     h_pwm_data.valve_zone_pwm = valve_pid.out;
@@ -442,8 +488,10 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
 #else
     h_pwm_data.valve_zone_pwm = pwmData.valve_zone_pwm;
     h_pwm_data.amp0_zone_pwm = pwmData.amp0_zone_pwm;
-    h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
+    //h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
     h_pwm_data.amp2_zone_pwm = pwmData.amp2_zone_pwm;
+
+    updateDutyCycles(h_pwm_data);
 #endif
 
 #ifdef SAMPLE_PREP_BOARD
@@ -493,12 +541,20 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
   }
 #else
   if (amplification_zone_running) {
-    printf("Heater: Temp: %0.2f\tDuty: %0.2f\n", temperature_data.amp2_zone_temp, heater_pid_1.out);
-    printf("Motor: Speed: %0.2f\tDuty: %0.2f\n", temperature_data.motorSpeed, h_pwm_data.amp1_zone_pwm);
+    int size;
+    char buff[60];
+    size = sprintf(buff, "Heater: Temp: %0.2f\tDuty: %0.2f\r\n", temperature_data.amp2_zone_temp, heater_pid_1.out);
+    write_to_com(buff, size);
+    size = sprintf(buff, "Motor: Speed: %d\tDuty: %0.2f\r\n", last_motor_speed, h_pwm_data.amp1_zone_pwm);
+    write_to_com(buff, size);
   }
   if (valve_zone_running) {
-    printf("Heater: Temp: %0.2f\tDuty: %0.2f\n", temperature_data.amp2_zone_temp, heater_pid_2.out);
-    printf("Motor: Speed: %0.2f\tDuty: %0.2f\n", temperature_data.motorSpeed, h_pwm_data.amp1_zone_pwm);
+    int size;
+    char buff[60];
+    size = sprintf(buff, "Heater: Temp: %0.2f\tDuty: %0.2f\r\n", temperature_data.amp2_zone_temp, heater_pid_2.out);
+    write_to_com(buff, size);
+    size = sprintf(buff, "Motor: Speed: %d\tDuty: %0.2f\r\n", last_motor_speed, h_pwm_data.amp1_zone_pwm);
+    write_to_com(buff, size);
   }
 #endif
 #endif

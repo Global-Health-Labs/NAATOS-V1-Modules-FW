@@ -291,7 +291,8 @@ typedef enum {
   SENSOR_MSG_HEATER_STATE,
   SENSOR_MSG_USB_SUSPEND,
   SENSOR_MSG_PWM_RESPONSE,
-  SENSOR_MSG_TIMER_EVENT,
+  SENSOR_MSG_TIMER_TEMP_EVENT,
+  SENSOR_MSG_TIMER_MOTOR_EVENT,
   SENSOR_MSG_SLEEP,
   SENSOR_MSG_WAKEUP,
   CONFIG_UPDATED
@@ -345,6 +346,7 @@ typedef enum {
   HEATER_MSG_WAKE,
   HEATER_MSG_ZONE_STATE,
   HEATER_MSG_TEMPERATURE_DATA,
+  HEATER_MSG_MOTOR_DATA,
   HEATER_MSG_USB_SUSPEND,
   HEATER_MSG_SENSOR_CONFIRM,
   HEATER_MSG_PWM_REQUEST,
@@ -503,8 +505,14 @@ typedef struct {
   float heater_kp_2;
   float heater_ki_2;
   float heater_kd_2;
-  uint16_t motor_speed_pwm_1;
-  uint16_t motor_speed_pwm_2;
+  float motor_kp_1;
+  float motor_ki_1;
+  float motor_kd_1;
+  uint16_t motor_setpoint_1;
+  float motor_kp_2;
+  float motor_ki_2;
+  float motor_kd_2;
+  uint16_t motor_setpoint_2;
   bool run_motor_1;
   bool run_heater_1;
   bool run_motor_2;

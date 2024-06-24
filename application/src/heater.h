@@ -4,6 +4,7 @@
 #include "naatos_queues.h"
 #include "pid.h"
 #include "pwm.h"
+#include "usb.h"
 
 #define VALVE_SETPOINT 67.6
 #define AMP0_SETPOINT 67.0
@@ -14,6 +15,13 @@
 #define AMP0_SETPOINT_2 67.0
 #define AMP1_SETPOINT_2 67.0
 #define AMP2_SETPOINT_2 67.0
+
+#define MOTOR_SETPOINT_1  4000
+#define MOTOR_SETPOINT_2  4000
+
+#define M_KP 0.006
+#define M_KI 0.0005
+#define M_KD 0.002
 
 #define H_KP 2.0
 #define H_KI 0.010
@@ -53,3 +61,4 @@
 
 void heater_task(void *pvParameters);
 void sendWdtHeaterValid();
+void handleMotorDataRx(int motor_speed);

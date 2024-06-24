@@ -44,6 +44,7 @@ bool usb_initalized = false;
 bool restarting = false;
 bool needs_response = false;
 bool usb_conn_updated = false;
+bool com_port_open = false;
 
 // Timers
 TimerHandle_t usbTimer;
@@ -136,6 +137,15 @@ void respond_to_usb_change(void) {
   }
 }
 
+void write_to_com(const char * msg, int len) {
+  if (!usb_detected || !com_port_open)
+    return;
+
+  app_usbd_class_inst_t const *class_cdc_acm = app_usbd_cdc_acm_class_inst_get(&m_app_cdc_acm);
+
+  app_usbd_cdc_acm_write(class_cdc_acm, msg, len);
+}
+
 void cdc_acm_user_ev_handler(app_usbd_class_inst_t const *p_inst,
     app_usbd_cdc_acm_user_event_t event) {
   app_usbd_cdc_acm_t const *p_cdc_acm = app_usbd_cdc_acm_class_get(p_inst);
@@ -143,7 +153,7 @@ void cdc_acm_user_ev_handler(app_usbd_class_inst_t const *p_inst,
   switch (event) {
   case APP_USBD_CDC_ACM_USER_EVT_PORT_OPEN: {
     printf("COM port opened.\n");
-
+    com_port_open = true;
     //Setup first transfer
     ret_code_t ret = app_usbd_cdc_acm_read(&m_app_cdc_acm,
         m_rx_buffer,
@@ -152,6 +162,7 @@ void cdc_acm_user_ev_handler(app_usbd_class_inst_t const *p_inst,
     break;
   }
   case APP_USBD_CDC_ACM_USER_EVT_PORT_CLOSE:
+    com_port_open = false;
     break;
   case APP_USBD_CDC_ACM_USER_EVT_TX_DONE:
     break;
@@ -168,7 +179,6 @@ void cdc_acm_user_ev_handler(app_usbd_class_inst_t const *p_inst,
           m_rx_buffer,
           READ_SIZE);
     } while (ret == NRF_SUCCESS);
-
     break;
   }
   default:
