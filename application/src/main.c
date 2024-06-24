@@ -666,6 +666,17 @@ void main_task(void *pvParameters) {
           over_temp = true;
           break;
         }
+
+        buttonData.event = NONE;
+        if (xQueueReceive(button_mainStateQueue, &buttonData, 0) != pdPASS) {
+          printf("MAIN_TASK: Unable to receive buttonData from button_mainStateQueue queue.\n");
+        }
+
+        if(buttonData.event == ON_EVENT) {
+          updateLedState(LED_ABORT, true);
+          error_during_run = true;
+          break;
+        }
         // Get Switch data
         xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
         hal_triggered = switch_data.hal_triggered;
@@ -819,6 +830,18 @@ void main_task(void *pvParameters) {
           over_temp = true;
           break;
         }
+
+        buttonData.event = NONE;
+        if (xQueueReceive(button_mainStateQueue, &buttonData, 0) != pdPASS) {
+          printf("MAIN_TASK: Unable to receive buttonData from button_mainStateQueue queue.\n");
+        }
+
+        if(buttonData.event == ON_EVENT) {
+          updateLedState(LED_ABORT, true);
+          error_during_run = true;
+          break;
+        }
+
         // Get Switch Data
         xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
         hal_triggered = switch_data.hal_triggered;
