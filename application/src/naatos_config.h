@@ -58,6 +58,7 @@
 #define DEFAULT_CYCLE_2_RUNTIME 150.0
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_1 true
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_2 false
+#define DEFAULT_RAMP_TO_TEMP_TIMEOUT 600.0 // 10min 
 
 /* Device Debug Parameters */
 #define I2C_CONNECTED 1
@@ -77,6 +78,7 @@
 #define TEMPS_NOT_STABLE "Zone Temperatures are no below the minimum run temperature. Aborting run."
 #define RECOVERY_BATT "Battery Percentage lower than the recovery threshold. Charge Battery More."
 #define OVER_TEMP_MSG "A Zone went over its maximum temperature. Run stopped."
+#define SETPOINT_TIMEOUT_MSG "Setpoint was not reached and configured timeout was hit."
 
 #define USB_SUSPEND_TASKS_TIME 15000
 
@@ -134,7 +136,9 @@ typedef enum {
   SAMPLE_VALV_ENDED,
   SAMPLE_TEMPS_NOT_STABALIZED,
   SAMPLE_RECOVERY_BATT,
-  SAMPLE_OVER_TEMP
+  SAMPLE_OVER_TEMP,
+  SAMPLE_SETPOINT_REACHED,
+  SAMPLE_SETPOINT_TIMEOUT
   // Add more events here
 } event_t;
 
@@ -482,6 +486,8 @@ typedef struct {
   uint16_t cycle_2_run_time_m;
   bool ramp_to_temp_before_start_cycle_1;
   bool ramp_to_temp_before_start_cycle_2;
+  float ramp_to_temp_c1_timeout;
+  float ramp_to_temp_c2_timeout;
   uint16_t low_power_threshold;
   uint16_t recovery_power_thresh;
   float heater_setpoint_1;

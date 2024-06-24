@@ -324,11 +324,11 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     if (config.run_heater_1) {
       pid_controller_compute(&heater_pid_1, temperature_data.amp2_zone_temp);
       if(rampToTemp && (temperature_data.amp2_zone_temp >= heater1SetPoint)) {
-        rampToTemp = false;
-        xReturned = xQueueSend(main_setPointReached, &setPointReachedMsg, 0);
+        xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
         if (xReturned != pdPASS) {
           printf("HEATER_TASK: Unable to send set point reached message.\n");
         }
+        rampToTemp = false;
       }
     }
 
@@ -397,11 +397,11 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     if (config.run_heater_2) {
       pid_controller_compute(&heater_pid_2, temperature_data.amp2_zone_temp);
       if(rampToTemp && (temperature_data.amp2_zone_temp >= heater2SetPoint)) {
-        rampToTemp = false;
-        xReturned = xQueueSend(main_setPointReached, &setPointReachedMsg, 0);
+        xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
         if (xReturned != pdPASS) {
           printf("HEATER_TASK: Unable to send set point reached message.\n");
         }
+        rampToTemp = false;
       }
     }
 

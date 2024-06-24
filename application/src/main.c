@@ -78,6 +78,7 @@ xQueueHandle button_mainStateQueue;
 xQueueHandle main_usbConnRecvQueue;
 xQueueHandle main_usbChangedConfQueue;
 xQueueHandle main_wakeupTasksQueue;
+xQueueHandle main_setPointReached;
 
 // Zone Request Constants
 const HeaterRxQueueMsg_t run_amplification_zone = {
@@ -175,6 +176,15 @@ const log_data_message_t amplification_stop_log_msg = {
     .data_type = EVENT_DATA,
     .temperature_data = NULL,
     .event_data = amplification_stop_event};
+
+
+const log_event_t setpoint_timeout_event = {
+    .event = SAMPLE_SETPOINT_TIMEOUT,
+    .message = SETPOINT_TIMEOUT_MSG};
+const log_data_message_t setpoint_timeout_log_msg = {
+    .data_type = EVENT_DATA,
+    .temperature_data = NULL,
+    .event_data = setpoint_timeout_event};
 
 // USB Main State Update Constants
 const usb_message_t standby_update = {
@@ -549,14 +559,19 @@ void main_task(void *pvParameters) {
         //set_led1_green_solid();
       }
 
-
+      
       if (config.ramp_to_temp_before_start_cycle_1) {
+          bool setReachedRx = false;
           int waitForSetPointTicks = pdMS_TO_TICKS((config.ramp_to_temp_c1_timeout) * 1000);
-          xReturned = xQueueReceive(main_setPointReached, &setPointReached, waitForSetPointTicks);
+          xReturned = xQueueReceive(main_setPointReached, &setReachedRx, waitForSetPointTicks);
           if(xReturned == errQUEUE_EMPTY){
             //timeout reached exit our run but first stop the heater
             end_amplification_zone();
             next_state = MAIN_STANDBY;
+            xReturned = xQueueSend(logger_logMessageQueue, &setpoint_timeout_log_msg, 0);
+            if (xReturned != pdPASS) {
+              printf("MAIN_TASK: Unable to send setpoint timeout to logging task.\n");
+            }
           } else if (xReturned != pdPASS) {
             printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
           }
@@ -620,12 +635,17 @@ void main_task(void *pvParameters) {
         begin_valve_zone();
 
         if (config.ramp_to_temp_before_start_cycle_2) {
+            bool setReachedRx = false;
             int waitForSetPointTicks = pdMS_TO_TICKS((config.ramp_to_temp_c2_timeout) * 1000);
-            xReturned = xQueueReceive(main_setPointReached, &setPointReached, waitForSetPointTicks);
+            xReturned = xQueueReceive(main_setPointReached, &setReachedRx, waitForSetPointTicks);
             if(xReturned == errQUEUE_EMPTY){
               //timeout reached exit our run but first stop the heater
               end_valve_zone();
               next_state = MAIN_STANDBY;
+              xReturned = xQueueSend(logger_logMessageQueue, &setpoint_timeout_log_msg, 0);
+              if (xReturned != pdPASS) {
+                printf("MAIN_TASK: Unable to send setpoint timeout to logging task.\n");
+              }
             } else if (xReturned != pdPASS) {
               printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
             }
@@ -1231,31 +1251,40 @@ void create_queues() {
   main_batteryDataQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
   if (main_batteryDataQueue == NULL)
     printf("Unable to create main_batteryDataQueue queue\n");
+
   main_switchQueue = xQueueCreate(QUEUE_SIZE, sizeof(sensor_switches_t));
   if (main_switchQueue == NULL)
     printf("Unable to create main_switchQueue queue\n");
+
   main_mainStateRespQueue = xQueueCreate(4, sizeof(tasks_t));
   if (main_mainStateRespQueue == NULL)
     printf("Unable to create main_mainStateRespQueue queue\n");
+
   main_runRespQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (main_runRespQueue == NULL)
     printf("Unable to create main_runRespQueue queue\n");
+
   main_runErrorQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (main_runErrorQueue == NULL)
     printf("Unable to create main_mainStateRespQueue queue\n");
+
   main_runConfRespQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (main_runConfRespQueue == NULL)
     printf("Unable to create main_mainStateRespQueue queue\n");
+
   main_usbConnRecvQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (main_usbConnRecvQueue == NULL)
     printf("Unable to create main_usbConnRecvQueue queue\n");
-  main_usbChangedConfQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
-  if (main_usbChangedConfQueue == NULL)
-    printf("Unable to create main_usbChangedConfQueue queue\n");
-  main_wakeupTasksQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
-  if (main_wakeupTasksQueue == NULL)
-    printf("Unable to create main_wakeupTasksQueue queue\n");
 
+  main_usbChangedConfQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (main_usbChangedConfQueue == NULL) {
+    printf("Unable to create main_usbChangedConfQueue queue\n");
+  }
+
+  main_wakeupTasksQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (main_wakeupTasksQueue == NULL) {
+    printf("Unable to create main_wakeupTasksQueue queue\n");
+  }
   // Heater Task Queues
   heaterRxQueue = xQueueCreate(10, sizeof(HeaterRxQueueMsg_t));
   if (heaterRxQueue == NULL) {
@@ -1282,21 +1311,25 @@ void create_queues() {
 
   // USB Management Task Queues
   usbRxQueue = xQueueCreate(10, sizeof(usbRxMsgType_t));
-  if (usbRxQueue == NULL)
+  if (usbRxQueue == NULL) {
     printf("Unable to create usbRxQueue queue\n");
+  }
 
   // Composite USB Task Queues
   compositeRxQueue = xQueueCreate(10, sizeof(CompositeUSBRxQueueType_t));
-  if (compositeRxQueue == NULL)
+  if (compositeRxQueue == NULL) {
     printf("Unable to create compositeRxQueue queue\n");
+  }
 
   // Logger Task Queues
   logger_recvBattPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
   if (logger_recvBattPercentQueue == NULL)
     printf("Unable to create logger_recvBattPercentQueue queue\n");
+
   logger_logMessageQueue = xQueueCreate(2, sizeof(log_data_message_t));
   if (logger_logMessageQueue == NULL)
     printf("Unable to create logger_logMessageQueue queue\n");
+
   logger_mainStateChangeQueue = xQueueCreate(QUEUE_SIZE, sizeof(main_state_t));
   if (logger_mainStateChangeQueue == NULL)
     printf("Unable to create logger_mainStateChangeQueue queue\n");
@@ -1312,8 +1345,9 @@ void create_queues() {
     printf("Unable to create button_mainStateQueue queue\n");
 
   logger_mainStateContinueQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
-  if (logger_mainStateContinueQueue == NULL)
+  if (logger_mainStateContinueQueue == NULL) {
     printf("Unable to create logger_mainStateContinueQueue queue\n");
+  }
 
   // PWM Task Queues
   pwmRxQueue = xQueueCreate(10, sizeof(PwmRxQueueMsg_t));
@@ -1325,6 +1359,12 @@ void create_queues() {
   if (pwmRxQueue == NULL) {
     printf("Unable to create ledRxQueue queue\n");
   }
+
+  main_setPointReached = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  if (main_setPointReached == NULL) {
+    printf("Unable to create main_setPointReached queue\n");
+  }
+
 }
 
 // Stack Overflow detection.
