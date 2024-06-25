@@ -590,9 +590,6 @@ void main_task(void *pvParameters) {
 
           bool setReachedRx = false;
           xReturned = xQueueReceive(main_setPointReached, &setReachedRx, 0);
-          if (xReturned != pdPASS) {
-            printf("MAIN_TASK: Unable to receive setReachedRx from main_setPointReached queue.\n");
-          } 
 
           if(setReachedRx) {
             //TODO put setpoint reach message here
@@ -610,9 +607,7 @@ void main_task(void *pvParameters) {
           }
           
           buttonData.event = NONE;
-          if (xQueueReceive(button_mainStateQueue, &buttonData, 0) != pdPASS) {
-            printf("MAIN_TASK: Unable to receive buttonData from button_mainStateQueue queue.\n");
-          }
+          xQueueReceive(button_mainStateQueue, &buttonData, 0);
 
           if(buttonData.event == ON_EVENT) {
             updateLedState(LED_ABORT, true);
@@ -674,9 +669,7 @@ void main_task(void *pvParameters) {
         }
 
         buttonData.event = NONE;
-        if (xQueueReceive(button_mainStateQueue, &buttonData, 0) != pdPASS) {
-          printf("MAIN_TASK: Unable to receive buttonData from button_mainStateQueue queue.\n");
-        }
+        xQueueReceive(button_mainStateQueue, &buttonData, 0);
 
         if(buttonData.event == ON_EVENT) {
           updateLedState(LED_ABORT, true);
@@ -838,9 +831,7 @@ void main_task(void *pvParameters) {
         }
 
         buttonData.event = NONE;
-        if (xQueueReceive(button_mainStateQueue, &buttonData, 0) != pdPASS) {
-          printf("MAIN_TASK: Unable to receive buttonData from button_mainStateQueue queue.\n");
-        }
+        xQueueReceive(button_mainStateQueue, &buttonData, 0);
 
         if(buttonData.event == ON_EVENT) {
           updateLedState(LED_ABORT, true);
@@ -972,6 +963,7 @@ void main_task(void *pvParameters) {
       if (usb_needs_update) {
         // Switch ON and USB connected
         if (buttonData.event == ON_EVENT && usb_conn_status) {
+          buttonData.event = NONE;
           updateLedState(LED_USB_MSC_STARTING, false);
           next_state = MAIN_STANDBY;
           send_usb_change(USB_CDC_ACM);
@@ -979,6 +971,7 @@ void main_task(void *pvParameters) {
         }
         // Switch ON and USB not connected
         else if (buttonData.event == ON_EVENT && !usb_conn_status) {
+          buttonData.event = NONE;
           updateLedState(LED_USB_MSC_STARTING, false);
           next_state = MAIN_STANDBY;
           send_usb_change(USB_DISABLED);

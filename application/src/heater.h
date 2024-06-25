@@ -16,8 +16,8 @@
 #define AMP1_SETPOINT_2 67.0
 #define AMP2_SETPOINT_2 67.0
 
-#define MOTOR_SETPOINT_1  4000
-#define MOTOR_SETPOINT_2  4000
+#define MOTOR_SETPOINT_1  3900
+#define MOTOR_SETPOINT_2  3900
 
 #define M_KP 0.006
 #define M_KI 0.0005
