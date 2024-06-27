@@ -921,7 +921,7 @@ void main_task(void *pvParameters) {
         msg.type = SENSOR_MSG_SLEEP;
         xReturned = xQueueSend(sensorRxQueue, &msg, 0);
         if (xReturned != pdPASS) {
-          printf("Sensor: Unable to send timer update to sensorRxQueue queue.\n");
+          printf("Sensor: Unable to send timer update to sensorRxQueue queue from main.\n");
         }
         mainWatchDogKickCount = 0;
         sendWatchdogKickFromTask(MAIN, true);
@@ -1434,7 +1434,7 @@ void create_queues() {
   }
 
   // Sensor Task Queues
-  sensorRxQueue = xQueueCreate(10, sizeof(SensorRxQueueMsg_t));
+  sensorRxQueue = xQueueCreate(20, sizeof(SensorRxQueueMsg_t));
   if (sensorRxQueue == NULL) {
     printf("Unable to create sensorRxQueue queue\n");
   }
@@ -1544,7 +1544,7 @@ int main(void) {
   nrf_gpio_pin_clear(MOTOR_POWER_ENABLE);
 
 #ifdef SAMPLE_PREP_BOARD
-  vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k); // I2C
+  vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_100k); // I2C
 #else
   vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_400k);  // I2C
   vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k); // I2C

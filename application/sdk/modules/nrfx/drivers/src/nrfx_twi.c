@@ -490,6 +490,7 @@ static nrfx_err_t twi_tx_start_transfer(NRF_TWI_Type        * p_twi,
         {
             nrf_twi_disable(p_twi);
             nrf_twi_enable(p_twi);
+            printf("HW TIMEOUT IN I2C TX Start HIT\n");
             ret_code = NRFX_ERROR_INTERNAL;
         }
 
@@ -562,6 +563,7 @@ static nrfx_err_t twi_rx_start_transfer(NRF_TWI_Type        * p_twi,
         {
             nrf_twi_disable(p_twi);
             nrf_twi_enable(p_twi);
+            printf("HW TIMEOUT IN I2C RX Start HIT\n");
             ret_code = NRFX_ERROR_INTERNAL;
         }
     }
