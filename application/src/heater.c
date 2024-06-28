@@ -85,7 +85,8 @@ void handle_amplification_stopstart_heater(bool heating) {
     return;
 
   if(heating) {
-    nrf_gpio_pin_set(BOOST_CONTROL_ENABLE_PIN);;
+    nrf_gpio_pin_set(BOOST_CONTROL_ENABLE_PIN);
+    vTaskDelay(pdMS_TO_TICKS(100));
   } else {
     nrf_gpio_pin_clear(BOOST_CONTROL_ENABLE_PIN);
   }
