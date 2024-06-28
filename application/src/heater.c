@@ -84,6 +84,12 @@ void handle_amplification_stopstart_heater(bool heating) {
   if (valve_zone_running && !heating)
     return;
 
+  if(heating) {
+    nrf_gpio_pin_set(BOOST_CONTROL_ENABLE_PIN);;
+  } else {
+    nrf_gpio_pin_clear(BOOST_CONTROL_ENABLE_PIN);
+  }
+
   SensorRxQueueMsg_t msg;
   msg.type = SENSOR_MSG_HEATER_STATE;
   msg.heaterRunning = heating;

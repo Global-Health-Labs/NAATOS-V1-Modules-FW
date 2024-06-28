@@ -16,6 +16,7 @@ void checkButtonState(void);
 void button_init(void) {
   /* Setup Hal Sensor */
   nrf_gpio_cfg_input(BUTTON_INPUT_PIN, NRF_GPIO_PIN_NOPULL); // tied to 3.3v internally
+  nrf_gpio_cfg_input(BUTTON_INPUT_PIN_ALT, NRF_GPIO_PIN_NOPULL);
 }
 
 void sendButtonUpdate(button_update_t msg) {
@@ -89,7 +90,7 @@ int notify = 0;
 
 void buttonTask(void *pvParameters) {
   BaseType_t xReturned;
-  previousSwitchState = nrf_gpio_pin_read(BUTTON_INPUT_PIN);
+  previousSwitchState = nrf_gpio_pin_read(BUTTON_INPUT_PIN) || nrf_gpio_pin_read(BUTTON_INPUT_PIN_ALT);
 
   ButtonRxQueueMsg_t buttonRxMessage;
 
@@ -150,7 +151,7 @@ void buttonTask(void *pvParameters) {
 }
 
 void checkButtonState(void) {
-  bool switchState = nrf_gpio_pin_read(BUTTON_INPUT_PIN);
+  bool switchState = nrf_gpio_pin_read(BUTTON_INPUT_PIN) || nrf_gpio_pin_read(BUTTON_INPUT_PIN_ALT);
 
   // Check for switch rocking back and forth
   if (switchState != previousSwitchState) {

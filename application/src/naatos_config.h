@@ -28,6 +28,10 @@
 #define SPI_MISO_PIN 14  /* P0.14 */
 #define SPI_SD_SS_PIN 12 /* P0.12 */
 
+#define BOOST_CONTROL_ENABLE_PIN 21
+#define BUTTON_INPUT_PIN NRF_GPIO_PIN_MAP(1, 6)
+#define BUTTON_INPUT_PIN_ALT NRF_GPIO_PIN_MAP(1, 13)  // Used for recovering bad gpio pin defect
+
 /* Default Rates
  * These rates are only used when there is no configuration file seen in the 
    naatos_config.txt file on the sd card. When a new config files is created
