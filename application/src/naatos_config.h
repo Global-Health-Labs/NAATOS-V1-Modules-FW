@@ -30,7 +30,9 @@
 
 #define BOOST_CONTROL_ENABLE_PIN 21
 #define BUTTON_INPUT_PIN NRF_GPIO_PIN_MAP(1, 6)
-#define BUTTON_INPUT_PIN_ALT NRF_GPIO_PIN_MAP(1, 13)  // Used for recovering bad gpio pin defect
+#define BUTTON_INPUT_PIN_ALT NRF_GPIO_PIN_MAP(1, 14)  // Used for recovering bad gpio pin defect
+#define BUTTON_REWORK_DETECT_INPUT NRF_GPIO_PIN_MAP(1,12)
+#define BUTTON_REWORK_DETECT_OUTPUT NRF_GPIO_PIN_MAP(1,13)
 
 /* Default Rates
  * These rates are only used when there is no configuration file seen in the 

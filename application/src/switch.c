@@ -11,12 +11,26 @@ TimerHandle_t buttonTimer;
 bool skip_debounce = false;
 int skip_cnt = 0;
 
+int button_gpip_selected = BUTTON_INPUT_PIN;
+
 void checkButtonState(void);
 
 void button_init(void) {
+  // Detect if rework has been done to move button away from pin 1.6
+  nrf_gpio_cfg_input(BUTTON_REWORK_DETECT_INPUT, NRF_GPIO_PIN_PULLDOWN);
+  nrf_gpio_cfg_output(BUTTON_REWORK_DETECT_OUTPUT);
+  nrf_gpio_pin_set(BUTTON_REWORK_DETECT_OUTPUT);
+
+  if(nrf_gpio_pin_read(BUTTON_REWORK_DETECT_INPUT)){
+    nrf_gpio_pin_clear(BUTTON_REWORK_DETECT_OUTPUT);
+    nrf_gpio_cfg_input(BUTTON_REWORK_DETECT_INPUT, NRF_GPIO_PIN_NOPULL);
+    button_gpip_selected = BUTTON_INPUT_PIN_ALT;
+  } else {
+    button_gpip_selected = BUTTON_INPUT_PIN;
+  }
+
   /* Setup Hal Sensor */
-  nrf_gpio_cfg_input(BUTTON_INPUT_PIN, NRF_GPIO_PIN_NOPULL); // tied to 3.3v internally
-  nrf_gpio_cfg_input(BUTTON_INPUT_PIN_ALT, NRF_GPIO_PIN_NOPULL);
+  nrf_gpio_cfg_input(button_gpip_selected, NRF_GPIO_PIN_NOPULL); 
 }
 
 void sendButtonUpdate(button_update_t msg) {
@@ -90,7 +104,7 @@ int notify = 0;
 
 void buttonTask(void *pvParameters) {
   BaseType_t xReturned;
-  previousSwitchState = nrf_gpio_pin_read(BUTTON_INPUT_PIN) || nrf_gpio_pin_read(BUTTON_INPUT_PIN_ALT);
+  previousSwitchState = nrf_gpio_pin_read(button_gpip_selected);
 
   ButtonRxQueueMsg_t buttonRxMessage;
 
@@ -115,8 +129,8 @@ void buttonTask(void *pvParameters) {
         notify = 0;
 
         nrf_drv_gpiote_in_config_t config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
-        nrf_drv_gpiote_in_init(BUTTON_INPUT_PIN, &config, gpiote_event_handler);
-        nrf_drv_gpiote_in_event_enable(BUTTON_INPUT_PIN, true);
+        nrf_drv_gpiote_in_init(button_gpip_selected, &config, gpiote_event_handler);
+        nrf_drv_gpiote_in_event_enable(button_gpip_selected, true);
 
         //set button as a edge detect event and send that event over to main queue
         //if button is already true here then send event anyway
@@ -124,7 +138,7 @@ void buttonTask(void *pvParameters) {
         break;
 
       case BUTTON_MSG_WAKE:
-        nrf_drv_gpiote_in_event_disable(BUTTON_INPUT_PIN);
+        nrf_drv_gpiote_in_event_disable(button_gpip_selected);
         if (xTimerIsTimerActive(buttonTimer) == pdFALSE) {
           startButtonTimer();
         }
@@ -151,7 +165,7 @@ void buttonTask(void *pvParameters) {
 }
 
 void checkButtonState(void) {
-  bool switchState = nrf_gpio_pin_read(BUTTON_INPUT_PIN) || nrf_gpio_pin_read(BUTTON_INPUT_PIN_ALT);
+  bool switchState = nrf_gpio_pin_read(button_gpip_selected);
 
   // Check for switch rocking back and forth
   if (switchState != previousSwitchState) {
