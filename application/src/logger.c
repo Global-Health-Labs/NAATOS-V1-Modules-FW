@@ -161,6 +161,15 @@ void logger_task(void *pvParameters) {
             printf("LOG_TASK: Unable to write last log line!\n");
           } else {
             printf("LOG_TASK: Wrote line to log\n");
+
+            printf("Read back time  M: %d D: %d Y:%d h: %d m: %d s: %d\r\n",
+                time.month,
+                time.day,
+                time.year,
+                time.hour,
+                time.minute,
+                time.second
+            );
           }
         }
       }

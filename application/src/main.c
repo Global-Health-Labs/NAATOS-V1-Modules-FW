@@ -1566,6 +1566,9 @@ int main(void) {
     use_default_configuration_parameters = false;
   }
 
+  //Set the time
+  calendar_set_time_helper();
+
   // Create Queues
   create_queues();
 
