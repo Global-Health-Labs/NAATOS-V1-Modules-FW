@@ -189,9 +189,8 @@ void sensors_task(void *pvParameters) {
 
       case SENSOR_MSG_TIMER_EVENT: {
         sensorCollection();
+        break;
       }
-
-      break;
 
       case SENSOR_MSG_SLEEP:
         if (xTimerIsTimerActive(sensorTimer) == pdTRUE) {
@@ -271,14 +270,31 @@ void sensorCollection(void) {
   // Send temperature data to Log Data queue
   if (heaterRunning) {
 #if I2C_CONNECTED
+    bool readTempSuccess = false;
+    heaterMsg.readTempFailed = false;
     // I2C Read for Valve Zone
-    temperatures.valve_zone_temp = readTemp(valve_zone);
+    readTempSuccess = readTemp(valve_zone, &temperatures.valve_zone_temp);
+    if(!readTempSuccess) {
+      heaterMsg.readTempFailed = true;
+    }
+
     // I2C Read for Amplification Zone 0
-    temperatures.amp0_zone_temp = readTemp(amp_zone_0);
+    readTempSuccess = readTemp(amp_zone_0, &temperatures.amp0_zone_temp);
+    if(!readTempSuccess) {
+      heaterMsg.readTempFailed = true;
+    }
+
     // I2C Read for Amplification Zone 1
-    temperatures.amp1_zone_temp = readTemp(amp_zone_1);
+    readTempSuccess = readTemp(amp_zone_1, &temperatures.amp1_zone_temp);
+    if(!readTempSuccess) {
+      heaterMsg.readTempFailed = true;
+    }
+
     // I2C Read for Amplification Zone 2
-    temperatures.amp2_zone_temp = readTemp(amp_zone_2);
+    readTempSuccess = readTemp(amp_zone_2, &temperatures.amp2_zone_temp);
+    if(!readTempSuccess) {
+      heaterMsg.readTempFailed = true;
+    }
 
 #else
     // Set temps to their setpoints if i2c is not connected
@@ -316,19 +332,19 @@ void init_sensors_gpios(void) {
   nrf_gpio_pin_set(SENSORS_EN);
 
   nrf_gpio_cfg_output(NRF_GPIO_PIN_MAP(1, 3));
-  //nrf_gpio_pin_write(NRF_GPIO_PIN_MAP(1,3), 1);
   nrf_gpio_pin_set(NRF_GPIO_PIN_MAP(1, 3));
 }
 
-long double readTemp(sensor_selection_t sensor) {
+bool readTemp(sensor_selection_t sensor, float *temperature) {
   tsys01_errors_t tsys_err;
-  long double temperature;
 
   tsys01_startConversion(sensor);
   vTaskDelay(pdMS_TO_TICKS(12)); // 12ms conversion time
-  tsys_err = tsys01_getTemp(sensor, &temperature);
+  tsys_err = tsys01_getTemp(sensor, temperature);
   if (tsys_err != tsys01_success) {
     printf("HEATER_TASK: Unable to read temperature!\n");
+    return false;
   }
-  return temperature;
+
+  return true;
 }

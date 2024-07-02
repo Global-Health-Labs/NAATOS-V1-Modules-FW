@@ -34,6 +34,18 @@
 #define BUTTON_REWORK_DETECT_INPUT NRF_GPIO_PIN_MAP(1,12)
 #define BUTTON_REWORK_DETECT_OUTPUT NRF_GPIO_PIN_MAP(1,13)
 
+#define LED_HARDWARE_DRIVER_ENABLE_PIN NRF_GPIO_PIN_MAP(1, 3) //1.03
+
+#define VALVE_ZONE_PIN 20 // P0.20
+#define AMP0_ZONE_PIN 19  // P0.19
+#define AMP1_ZONE_PIN 34  // P1.03
+#define AMP2_ZONE_PIN 33  // P1.04
+
+#define SENSORS_EN 39
+
+#define HAL_INPUT_PIN 2
+#define OPTICAL_INPUT_PIN 3
+
 /* Default Rates
  * These rates are only used when there is no configuration file seen in the 
    naatos_config.txt file on the sd card. When a new config files is created
@@ -56,7 +68,6 @@
 
 /* Device Debug Parameters */
 #define I2C_CONNECTED 1
-#define GO_STRAIGHT_TO_RUNNING 0
 #define USE_CALENDAR_CHIP 1
 #define VERBOSE_PID 1
 
@@ -332,7 +343,8 @@ typedef enum {
   HEATER_MSG_SENSOR_CONFIRM,
   HEATER_MSG_PWM_REQUEST,
   HEATER_MSG_CONFIG_UPDATED,
-  HEATER_MSG_WDT_UPDATE
+  HEATER_MSG_WDT_UPDATE,
+  HEATER_MSG_TEMPERATURE_DATA_ERROR,
 } HeaterRxQueueType_t;
 
 typedef struct {
@@ -342,6 +354,7 @@ typedef struct {
   bool zoneEnabled;
   bool usbSuspend;
   bool heaterRunning;
+  bool readTempFailed;
 } HeaterRxQueueMsg_t;
 
 typedef enum {

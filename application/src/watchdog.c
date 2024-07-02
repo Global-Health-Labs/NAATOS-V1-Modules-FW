@@ -39,6 +39,9 @@ void wdtFeedTask(void *pvParameters) {
   (void)pvParameters;
   watchdog_time_update_t recv_req;
 
+  //bool sensorValid = false;
+  //int sensorTicks = 0;
+
   bool heaterValid = false;
   int heaterTicks = 0;
 
@@ -59,7 +62,6 @@ void wdtFeedTask(void *pvParameters) {
     while (xQueueReceive(watchdog_rxTimesQueue,
                &recv_req,
                (TickType_t)0) == pdPASS) {
-      /* *pxRxedPointer now points to xMessage. */
       // reset specific task counter to 0
       // if set to invalid then we dont have to compare times
 

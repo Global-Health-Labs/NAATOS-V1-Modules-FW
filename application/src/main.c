@@ -291,7 +291,7 @@ void read_sd_and_notify_tasks(void) {
 void main_task(void *pvParameters) {
   BaseType_t xReturned;
   uint8_t queue_size;
-  sensor_switches_t switch_data;
+  sensor_switches_t switch_data = {.hal_triggered = false, .optical_tiggered = false};
   int percent_recv;
   button_update_t buttonData = {.event = NONE};
   bool hal_triggered = false, optical_triggered = false;
@@ -368,10 +368,6 @@ void main_task(void *pvParameters) {
         }
       }
 
-      // Reset Run Switches
-      hal_triggered = false;
-      optical_triggered = false;
-
       // Check to see if alert timeout is over
       if (error_during_run && xTaskGetTickCount() >= (a_t_start + alert_timeout_ticks)) {
         updateLedState(LED_CLEAR_ALL_ERROR, true);
@@ -382,9 +378,6 @@ void main_task(void *pvParameters) {
         //set_led1_green_breathe();
         error_during_run = false;
       }
-
-      hal_triggered = false;
-      optical_triggered = false;
 
       // Request the battery percentage from the bettery task
       xReturned = xQueueSend(batteryRxQueue, &batt_req, 0);
@@ -473,11 +466,6 @@ void main_task(void *pvParameters) {
       }
 
       vTaskDelay(pdMS_TO_TICKS(100));
-      /* ***** Start Sample Preperation ***** */
-#if GO_STRAIGHT_TO_RUNNING
-      // Allow for other tasks to get ready to receive main state change
-      vTaskDelay(2000);
-#endif
       /* ***** Amplification Zone Run ***** */
       // Check to make sure we are above the recovery battery percentage
       if (config.recovery_power_thresh > percent_recv) {
@@ -515,7 +503,6 @@ void main_task(void *pvParameters) {
       // Set LED1 to solid green
       if (last_state != main_state) {
         updateLedState(LED_RUN, true);
-        //set_led1_green_solid();
       }
       // Get the start time and end time
       start_time = xTaskGetTickCount();
@@ -643,7 +630,7 @@ void main_task(void *pvParameters) {
       // Wait for the sample to be removed prior to going back to STANDBY state
       do {
         updateLedState(LED_COMPLETE, true);
-        xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
+        xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY); // TODO maybe restart sensor thread on timeout 
         hal_triggered = switch_data.hal_triggered;
         optical_triggered = switch_data.optical_tiggered;
         //TODO need to determine if test is invaluid due to being here too long
@@ -1260,11 +1247,13 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask,
     // Just waiting
   }
 
+  init_pwms();
+  
   // Full Peripheral Initalizations
   init_adc();                                                                            // ADC
   init_sensors_gpios(); 
+  // TODO print to consoles
   nrf_gpio_cfg_output(BOOST_CONTROL_ENABLE_PIN); 
-  //nrf_gpio_pin_set(BOOST_CONTROL_ENABLE_PIN);
   nrf_gpio_pin_clear(BOOST_CONTROL_ENABLE_PIN); // turn off boost for heaters
   vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_100k);  // I2C
   vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_100k); // I2C
@@ -1275,10 +1264,9 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask,
   init_sd_card();
   button_init();
   nrf_drv_gpiote_init();
-  //err_code = app_timer_init();
-  //APP_ERROR_CHECK(err_code);
-  //ret_code_t ret_code = nrf_pwr_mgmt_init();
-  //APP_ERROR_CHECK(ret_code);
+
+  //TODO if fail put this in infinite loop so we dont keep writing the log
+
 
   // Get the configuration parameters
   res = get_naatos_configuration_parameters(&config);
@@ -1288,9 +1276,6 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask,
   } else {
     use_default_configuration_parameters = false;
   }
-
-  // Uninitalize the SD card
-  //uninit_sd_card();
 
   // Create Queues
   create_queues();

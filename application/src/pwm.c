@@ -32,6 +32,16 @@ bool pwmEnabled = false;
 void init_pwms() {
   ret_code_t err;
 
+  nrf_gpio_cfg_output(VALVE_ZONE_PIN); 
+  nrf_gpio_cfg_output(AMP0_ZONE_PIN); 
+  nrf_gpio_cfg_output(AMP1_ZONE_PIN); 
+  nrf_gpio_cfg_output(AMP2_ZONE_PIN); 
+  nrf_gpio_pin_clear(AMP0_ZONE_PIN);
+  nrf_gpio_pin_clear(AMP1_ZONE_PIN);
+  nrf_gpio_pin_clear(AMP2_ZONE_PIN);
+  nrf_gpio_pin_clear(VALVE_ZONE_PIN);
+
+
   /* Create Configurations */
   /* 1 Channel PWM, 200Hz, Active High, Valve Zone Pin */
   app_pwm_config_t pwm0_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, VALVE_ZONE_PIN, AMP0_ZONE_PIN);
@@ -53,6 +63,13 @@ void init_pwms() {
   app_pwm_enable(&PWM0);
   app_pwm_enable(&PWM2);
   pwmEnabled = true;
+
+    // Set Original Duty Cycles to 0
+  app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty);
+  app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL, amp0_duty);
+  app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, amp1_duty);
+  app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, amp2_duty);
+
 }
 
 void updateDutyCycles(temperature_pwm_data_t pwmData) {
@@ -95,13 +112,7 @@ void pwm_task(void *pvParameters) {
       .over = true};
 
   // Initalize the pwm channels
-  init_pwms();
-
-  // Set Original Duty Cycles to 0
-  app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty);
-  app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL, amp0_duty);
-  app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, amp1_duty);
-  app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, amp2_duty);
+  //init_pwms();
 
   PwmRxQueueMsg_t pwmMsg;
 

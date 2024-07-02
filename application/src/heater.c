@@ -64,6 +64,10 @@ void handle_valve_stopstart_heater(bool heating) {
     printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
   }
 
+  if(!heating){
+    printf("Sent valve heater stop");
+  }
+
   PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_DISABLE};
 
   if (heating) {
@@ -85,8 +89,8 @@ void handle_amplification_stopstart_heater(bool heating) {
     return;
 
   if(heating) {
-    nrf_gpio_pin_set(BOOST_CONTROL_ENABLE_PIN);
-    vTaskDelay(pdMS_TO_TICKS(100));
+    //nrf_gpio_pin_set(BOOST_CONTROL_ENABLE_PIN);
+    //vTaskDelay(pdMS_TO_TICKS(400));
   } else {
     nrf_gpio_pin_clear(BOOST_CONTROL_ENABLE_PIN);
   }
@@ -200,6 +204,7 @@ void heater_task(void *pvParameters) {
             updateDutyCycles(pwmData);
 
             pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd); // TODO: Implement defaults
+            
             // Reinitalize PID Values
             pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
             pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
@@ -246,7 +251,15 @@ void heater_task(void *pvParameters) {
         break;
       }
       case HEATER_MSG_TEMPERATURE_DATA:
-        handleSensorDataRx(heaterRxMessage.tempData);
+
+        if(heaterRxMessage.readTempFailed) {
+          xReturned = xQueueSend(main_runErrorQueue, &greater_than_max, 0);
+          if (xReturned != pdPASS) {
+            printf("HEATER_TASK: Unable to send run error for greater than max temp to main_runErrorQueue.\n");
+          }
+        } else {
+          handleSensorDataRx(heaterRxMessage.tempData);
+        }
         break;
       case HEATER_MSG_USB_SUSPEND:
         // Handle USB suspend message
@@ -353,16 +366,16 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     h_pwm_data.amp1_zone_pwm = amp1_pid.out;
     h_pwm_data.amp2_zone_pwm = amp2_pid.out;
     // Ensure that the temperatures are not greater than the max temperatures allowed
-    if (config.amp0_max_temp < temperature_data.amp0_zone_temp) {
+    if ((config.amp0_max_temp < temperature_data.amp0_zone_temp) || temperature_data.amp0_zone_temp < 0 || temperature_data.amp0_zone_temp > 110) {
       greater_than_max = true;
     }
-    if (config.amp1_max_temp < temperature_data.amp1_zone_temp) {
+    if (config.amp1_max_temp < temperature_data.amp1_zone_temp || temperature_data.amp1_zone_temp < 0 || temperature_data.amp1_zone_temp > 110) {
       greater_than_max = true;
     }
-    if (config.amp2_max_temp < temperature_data.amp2_zone_temp) {
+    if (config.amp2_max_temp < temperature_data.amp2_zone_temp || temperature_data.amp2_zone_temp < 0 || temperature_data.amp2_zone_temp > 110) {
       greater_than_max = true;
     }
-    if (config.valve_max_temp < temperature_data.valve_zone_temp) {
+    if (config.valve_max_temp < temperature_data.valve_zone_temp || temperature_data.valve_zone_temp < 0 || temperature_data.valve_zone_temp > 110) {
       greater_than_max = true;
     }
   }
@@ -381,18 +394,18 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     updateDutyCycles(pwmData);
 
     // Set the PWMs for the logger
-    h_pwm_data.valve_zone_pwm = valve_pid.out;
+    h_pwm_data.valve_zone_pwm = valve_pid_2.out;
     // Ensure that the temperatures are not greater than the max temperatures allowed
-    if (config.valve_max_temp < temperature_data.valve_zone_temp) {
+    if ((config.amp0_max_temp < temperature_data.amp0_zone_temp) || temperature_data.amp0_zone_temp < 0 || temperature_data.amp0_zone_temp > 110) {
       greater_than_max = true;
     }
-    if (config.amp1_max_temp < temperature_data.amp1_zone_temp) {
+    if (config.amp1_max_temp < temperature_data.amp1_zone_temp || temperature_data.amp1_zone_temp < 0 || temperature_data.amp1_zone_temp > 110) {
       greater_than_max = true;
     }
-    if (config.amp2_max_temp < temperature_data.amp2_zone_temp) {
+    if (config.amp2_max_temp < temperature_data.amp2_zone_temp || temperature_data.amp2_zone_temp < 0 || temperature_data.amp2_zone_temp > 110) {
       greater_than_max = true;
     }
-    if (config.valve_max_temp < temperature_data.valve_zone_temp) {
+    if (config.valve_max_temp < temperature_data.valve_zone_temp || temperature_data.valve_zone_temp < 0 || temperature_data.valve_zone_temp > 110) {
       greater_than_max = true;
     }
   }
