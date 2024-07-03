@@ -142,18 +142,24 @@ bool calendar_set_time_helper(void) {
   calendar_time_t now2;
   
   //Debug to hardcode the time
-  now.second = 1;
-  now.minute = 43;
-  now.hour = 12;
-  now.day = 2;
-  now.week_day = 2;
-  now.month = 7;
-  now.year = 24;
+  //now.second = 1;
+  //now.minute = 43;
+  //now.hour = 12;
+  //now.day = 2;
+  //now.week_day = 2;
+  //now.month = 7;
+  //now.year = 24;
 
   //Loads time from config file
-  //now.second  =   config.hhmmss           % 100;
-  //now.minute  = ( config.hhmmss / 100)    % 100;
-  //now.hour    = ( config.hhmmss / 10000)  % 100;
+  now.second  =   config.hhmmss           % 100;
+  now.minute  = ( config.hhmmss / 100)    % 100;
+  now.hour    = ( config.hhmmss / 10000)  % 100;
+
+  now.year    =   config.mmddyy           % 100;
+  now.day     = ( config.mmddyy / 100)    % 100;
+  now.month   = ( config.mmddyy / 10000)  % 100;
+  
+  now.week_day  = 1; //Leaving the weekday/day of the week value hardcoded. This isn't reported in the log file. 
 
 
   //calendar_stop();
