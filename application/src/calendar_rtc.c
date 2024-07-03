@@ -118,10 +118,30 @@ bool calendar_start(void) {
 #endif
 }
 
+// Set RTC frequency to 32khz
+bool calendar_set_32k(void) {
+  uint8_t buff[2];
+   
+   buff[0] = PCF85_REG_CTRL1_ADDR;
+   buff[1] = 0x00;
+
+  ret_code_t ret;
+#if I2C_CONNECTED
+  ret = xUtil_TWI_Write_Single(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_CTRL2_ADDR, buff, 2);
+  if (ret)
+    return false;
+  return true;
+#else
+  // Always return false if i2c is not enabled
+  return false;
+#endif
+}
+
 bool calendar_set_time_helper(void) {
   calendar_time_t now;
   calendar_time_t now2;
   
+  //Debug to hardcode the time
   now.second = 1;
   now.minute = 43;
   now.hour = 12;
@@ -129,7 +149,14 @@ bool calendar_set_time_helper(void) {
   now.week_day = 2;
   now.month = 7;
   now.year = 24;
-  
+
+  //Loads time from config file
+  //now.second  =   config.hhmmss           % 100;
+  //now.minute  = ( config.hhmmss / 100)    % 100;
+  //now.hour    = ( config.hhmmss / 10000)  % 100;
+
+
+  //calendar_stop();
   calendar_set_time(&now);
 
   printf("Requested time  M: %d D: %d Y:%d h: %d m: %d s: %d\r\n",
@@ -141,6 +168,7 @@ bool calendar_set_time_helper(void) {
     now.second
   );
   
+  //calendar_start();
   calendar_get_time(&now2);
 
   printf("Read back time  M: %d D: %d Y:%d h: %d m: %d s: %d\r\n",

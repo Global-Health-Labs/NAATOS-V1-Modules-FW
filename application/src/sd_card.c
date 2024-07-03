@@ -1010,6 +1010,12 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       num = strcmp(val, "true");
       parameters->run_heater_2 = num ? false : true;
       break;
+    case MMDDYY:
+      parameters->mmddyy = atoi(val);
+      break;
+    case HHMMSS:
+      parameters->hhmmss= atoi(val);
+      break;
 #endif
 
     default:

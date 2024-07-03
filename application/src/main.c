@@ -264,7 +264,9 @@ naatos_config_parameters config = {
     .run_motor_1 = false,
     .run_heater_1 = false,
     .run_motor_2 = false,
-    .run_heater_2 = false};
+    .run_heater_2 = false,
+    .mmddyy = 0,
+    .hhmmss = 0};
 #endif
 bool use_default_configuration_parameters = false;
 
@@ -1568,6 +1570,7 @@ int main(void) {
 
   //Set the time
   calendar_set_time_helper();
+  //calendar_set_32k();
 
   // Create Queues
   create_queues();

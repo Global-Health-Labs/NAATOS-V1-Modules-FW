@@ -141,6 +141,8 @@ typedef enum {
   RUN_HEATER_1,
   RUN_MOTOR_2,
   RUN_HEATER_2,
+  MMDDYY,
+  HHMMSS,
   NUM_PARAMETERS
 } naatos_config_params_t;
 #endif

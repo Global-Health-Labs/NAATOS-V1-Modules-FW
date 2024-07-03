@@ -162,7 +162,7 @@ void logger_task(void *pvParameters) {
           } else {
             printf("LOG_TASK: Wrote line to log\n");
 
-            printf("Read back time  M: %d D: %d Y:%d h: %d m: %d s: %d\r\n",
+            printf("Read back time  M:%d D:%d Y:%d h:%d m:%d s:%d\r\n",
                 time.month,
                 time.day,
                 time.year,

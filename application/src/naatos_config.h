@@ -517,6 +517,8 @@ typedef struct {
   bool run_heater_1;
   bool run_motor_2;
   bool run_heater_2;
+  int mmddyy;
+  int hhmmss;
 } naatos_config_parameters;
 #endif
 
