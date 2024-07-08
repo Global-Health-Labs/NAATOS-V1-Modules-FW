@@ -236,7 +236,10 @@ naatos_config_parameters config = {
     .amp1_kd_2 = 0,
     .amp2_kp_2 = 0,
     .amp2_ki_2 = 0,
-    .amp2_kd_2 = 0};
+    .amp2_kd_2 = 0
+    .mmddyy = 0,
+    .hhmmss = 0,
+    .set_date_time = false};
 #else
 naatos_config_parameters config = {
     .logging_rate = 0,
@@ -266,7 +269,8 @@ naatos_config_parameters config = {
     .run_motor_2 = false,
     .run_heater_2 = false,
     .mmddyy = 0,
-    .hhmmss = 0};
+    .hhmmss = 0,
+    .set_date_time = false};
 #endif
 bool use_default_configuration_parameters = false;
 
@@ -1569,7 +1573,7 @@ int main(void) {
   }
 
   //Set the time
-  calendar_set_time_helper();
+  if(config.set_date_time) calendar_set_time_helper();
   //calendar_set_32k();
 
   // Create Queues

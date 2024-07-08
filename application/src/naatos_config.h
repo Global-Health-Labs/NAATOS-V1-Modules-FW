@@ -519,6 +519,7 @@ typedef struct {
   bool run_heater_2;
   int mmddyy;
   int hhmmss;
+  bool set_date_time;
 } naatos_config_parameters;
 #endif
 

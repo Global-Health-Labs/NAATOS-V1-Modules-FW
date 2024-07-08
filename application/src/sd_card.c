@@ -922,6 +922,16 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case AMP2_KD_2:
       parameters->amp2_kd_2 = atof(val);
       break;
+    case MMDDYY:
+      parameters->mmddyy = atoi(val);
+      break;
+    case HHMMSS:
+      parameters->hhmmss = atoi(val);
+      break;
+    case SET_DATE_TIME:
+      num = strcmp(val, "true");
+      parameters->set_date_time = num ? false : true;
+      break;
 #else
     case CYCLE_1_RUN_TIME:
       parameters->cycle_1_run_time_m = atoi(val);
@@ -1014,7 +1024,11 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       parameters->mmddyy = atoi(val);
       break;
     case HHMMSS:
-      parameters->hhmmss= atoi(val);
+      parameters->hhmmss = atoi(val);
+      break;
+    case SET_DATE_TIME:
+      num = strcmp(val, "true");
+      parameters->set_date_time = num ? false : true;
       break;
 #endif
 

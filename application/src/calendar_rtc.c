@@ -138,9 +138,11 @@ bool calendar_set_32k(void) {
 }
 
 bool calendar_set_time_helper(void) {
-  calendar_time_t now;
-  calendar_time_t now2;
-  
+  calendar_time_t now;  
+
+  //Check if the time should be set
+  calendar_get_time(&now);
+
   //Debug to hardcode the time
   //now.second = 1;
   //now.minute = 43;
@@ -175,15 +177,15 @@ bool calendar_set_time_helper(void) {
   );
   
   //calendar_start();
-  calendar_get_time(&now2);
+  calendar_get_time(&now);
 
   printf("Read back time  M: %d D: %d Y:%d h: %d m: %d s: %d\r\n",
-    now2.month,
-    now2.day,
-    now2.year,
-    now2.hour,
-    now2.minute,
-    now2.second
+    now.month,
+    now.day,
+    now.year,
+    now.hour,
+    now.minute,
+    now.second
   );
   
   return true;
