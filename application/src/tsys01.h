@@ -27,7 +27,8 @@ typedef enum {
   tsys01_success,
   tsys01_i2c_error,
   tsys01_busy,
-  tsys01_timeout
+  tsys01_timeout,
+  tsys01_out_of_range,
 } tsys01_errors_t;
 
 typedef enum {
@@ -66,7 +67,7 @@ typedef struct {
 typedef void (*tsys01_opDoneCallback_t)(tsys01_errors_t outcome, tsys01_callback_data_t *p_data);
 
 tsys01_errors_t tsys01_startConversion(sensor_selection_t sensor);
-tsys01_errors_t tsys01_getTemp(sensor_selection_t sensor, long double *temp_val);
+tsys01_errors_t tsys01_getTemp(sensor_selection_t sensor, float *temp_val);
 tsys01_errors_t tsys01_getCalibrationValues(sensor_selection_t sensor);
 
 #ifdef __cplusplus

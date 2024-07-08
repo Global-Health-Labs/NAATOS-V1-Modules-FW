@@ -11,18 +11,7 @@
 #include "queue.h"
 #include <stdbool.h>
 
-#define VALVE_ZONE_PIN 20 // P0.20
-#define AMP0_ZONE_PIN 19  // P0.19
-#define AMP1_ZONE_PIN 34  // P1.02
-#define AMP2_ZONE_PIN 33  // P1.01
-
-#define SAMPLE_HEATER_PIN 33 // P1.01
 #define SAMPLE_HEATER_CHANNEL 0
-
-//#define VALVE_ZONE_PIN  19
-//#define AMP0_ZONE_PIN   20
-//#define AMP1_ZONE_PIN   33
-//#define AMP2_ZONE_PIN   34
 
 #define VALVE_CHANNEL 0
 #define AMP0_CHANNEL 1

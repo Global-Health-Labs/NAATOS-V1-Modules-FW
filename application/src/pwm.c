@@ -72,6 +72,11 @@ void init_pwms() {
   app_pwm_enable(&PWM0);
   app_pwm_enable(&PWM2);
   pwmEnabled = true;
+
+  // Set Original Duty Cycles to 0
+  app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 0);
+  app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL, 0);
+  app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, 0);
 }
 
 void updateDutyCycles(temperature_pwm_data_t pwmData) {
@@ -123,9 +128,6 @@ void pwm_task(void *pvParameters) {
   usb_suspend_over_t sus_over = {
       .task = PWM,
       .over = true};
-
-  // Initalize the pwm channels
-  init_pwms();
 
 // Set Original Duty Cycles to 0
 #ifdef SAMPLE_PREP_BOARD

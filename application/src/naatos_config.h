@@ -30,6 +30,23 @@
 #define SPI_MISO_PIN 14  /* P0.14 */
 #define SPI_SD_SS_PIN 12 /* P0.12 */
 
+#define BOOST_CONTROL_ENABLE_PIN 21
+#define BUTTON_INPUT_PIN NRF_GPIO_PIN_MAP(1, 6)
+
+#define VALVE_ZONE_PIN 20 // P0.20
+#define AMP0_ZONE_PIN 19  // P0.19
+#define AMP1_ZONE_PIN 34  // P1.02
+#define AMP2_ZONE_PIN 33  // P1.01
+
+#define SAMPLE_HEATER_PIN 33 // P1.01
+
+#define SENSORS_EN 39
+
+#define HAL_INPUT_PIN 2
+#define OPTICAL_INPUT_PIN 3
+
+#define LED_HARDWARE_DRIVER_ENABLE_PIN NRF_GPIO_PIN_MAP(1, 2) //1.02
+
 /* Default Rates
  * These rates are only used when there is no configuration file seen in the 
    naatos_config.txt file on the sd card. When a new config files is created
@@ -351,7 +368,8 @@ typedef enum {
   HEATER_MSG_SENSOR_CONFIRM,
   HEATER_MSG_PWM_REQUEST,
   HEATER_MSG_CONFIG_UPDATED,
-  HEATER_MSG_WDT_UPDATE
+  HEATER_MSG_WDT_UPDATE,
+  HEATER_MSG_TEMPERATURE_DATA_ERROR,
 } HeaterRxQueueType_t;
 
 typedef struct {
@@ -362,6 +380,7 @@ typedef struct {
   bool usbSuspend;
   bool heaterRunning;
   double motorSpeed;
+  bool readTempFailed;
 } HeaterRxQueueMsg_t;
 
 typedef enum {

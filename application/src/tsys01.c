@@ -127,15 +127,23 @@ tsys01_errors_t tsys01_startConversion(sensor_selection_t sensor) {
   return tsys01_writeRegister(sensor, TSYS01_START_CONVERSION_COMMAND, tsys01_start_conversion_op);
 }
 
-tsys01_errors_t tsys01_getTemp(sensor_selection_t sensor, long double *temp_val) {
-  uint8_t buf[3];
+tsys01_errors_t tsys01_getTemp(sensor_selection_t sensor, float *temp_val) {
+  uint8_t buf[3] = {};
   tsys01_errors_t err_code = tsys01_readRegister(sensor, TSYS01_READ_ADC_COMMAND, tsys01_read_adc_op, buf, TSYS01_TEMP_DATA_LEN);
   uint32_t adc24 = (buf[0] << 16) + (buf[1] << 8) + buf[2];
   uint32_t adc16 = adc24 / 256.0;
-  long double temp_c = (-2) * calibration[sensor].k4 * pow(10, -21) * pow(adc16, 4) + (4) * calibration[sensor].k3 * pow(10, -16) * pow(adc16, 3) + (-2) * calibration[sensor].k2 * pow(10, -11) * pow(adc16, 2) + (1) * calibration[sensor].k1 * pow(10, -6) * adc16 + (-1.5) * calibration[sensor].k0 * pow(10, -2);
-  *temp_val = temp_c;
+  float temp_c = (float)((-2) * calibration[sensor].k4 * pow(10, -21) * pow(adc16, 4) + (4) * calibration[sensor].k3 * pow(10, -16) * pow(adc16, 3) + (-2) * calibration[sensor].k2 * pow(10, -11) * pow(adc16, 2) + (1) * calibration[sensor].k1 * pow(10, -6) * adc16 + (-1.5) * calibration[sensor].k0 * pow(10, -2));
+
+  if((temp_c  < 0) || (temp_c > 110)) {
+    //err_code = tsys01_out_of_range;
+    *temp_val = temp_c;
+  } else {
+    *temp_val = temp_c;
+  }
+  
   return err_code;
 }
+
 
 tsys01_errors_t tsys01_getCalibrationValues(sensor_selection_t sensor) {
   uint8_t temp[2];
