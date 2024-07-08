@@ -117,8 +117,10 @@ void handle_amplification_stopstart_heater(bool heating) {
 
   if (heating) {
     nrf_gpio_pin_set(MOTOR_POWER_ENABLE);
+    //nrf_gpio_pin_set(BOOST_CONTROL_ENABLE_PIN);
   } else {
     nrf_gpio_pin_clear(MOTOR_POWER_ENABLE);
+    //nrf_gpio_pin_clear(BOOST_CONTROL_ENABLE_PIN);
   }
 
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
@@ -250,7 +252,14 @@ void heater_task(void *pvParameters) {
         break;
       }
       case HEATER_MSG_TEMPERATURE_DATA:
-        handleSensorDataRx(heaterRxMessage.tempData);
+        if(heaterRxMessage.readTempFailed) {
+          xReturned = xQueueSend(main_runErrorQueue, &greater_than_max, 0);
+          if (xReturned != pdPASS) {
+            printf("HEATER_TASK: Unable to send run error for greater than max temp to main_runErrorQueue.\n");
+          }
+        } else {
+          handleSensorDataRx(heaterRxMessage.tempData);
+        }
         break;
       case HEATER_MSG_MOTOR_DATA:
         handleMotorDataRx(heaterRxMessage.motorSpeed);
@@ -403,7 +412,7 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
 
     updateDutyCycles(h_pwm_data);
 
-    if (config.heater_max_temp < temperature_data.amp2_zone_temp) {
+    if ((config.heater_max_temp < temperature_data.amp2_zone_temp) || temperature_data.amp2_zone_temp < 0 || temperature_data.amp2_zone_temp > 120) {
       greater_than_max = true;
     }
 #else
@@ -495,7 +504,7 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
 #endif
 
 #ifdef SAMPLE_PREP_BOARD
-    if (config.heater_max_temp < temperature_data.amp2_zone_temp) {
+    if ((config.heater_max_temp < temperature_data.amp2_zone_temp) || temperature_data.amp2_zone_temp < 0 || temperature_data.amp2_zone_temp > 120) {
       greater_than_max = true;
     }
 #else

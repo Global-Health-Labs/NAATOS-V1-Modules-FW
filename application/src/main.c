@@ -335,7 +335,7 @@ void read_sd_and_notify_tasks(void) {
 void main_task(void *pvParameters) {
   BaseType_t xReturned;
   uint8_t queue_size;
-  sensor_switches_t switch_data;
+  sensor_switches_t switch_data = {.optical_tiggered = false };
   int percent_recv;
   button_update_t buttonData = {.event = NONE};
   bool hal_triggered = false, optical_triggered = false;
@@ -407,10 +407,6 @@ void main_task(void *pvParameters) {
           updateLedState(LED_COMPLETE, false);
         }
       }
-
-      // Reset Run Switches
-      hal_triggered = false;
-      optical_triggered = false;
 
       // Check to see if alert timeout is over
       if (error_during_run && xTaskGetTickCount() >= (a_t_start + alert_timeout_ticks)) {
@@ -1539,6 +1535,10 @@ int main(void) {
   // Full Peripheral Initalizations
   init_adc();           // ADC
   init_sensors_gpios(); // Sensor GPIOs
+  init_pwms();
+
+  nrf_gpio_cfg_output(BOOST_CONTROL_ENABLE_PIN); 
+  nrf_gpio_pin_clear(BOOST_CONTROL_ENABLE_PIN); // turn off boost for heaters
 
   nrf_gpio_cfg_output(MOTOR_POWER_ENABLE);
   nrf_gpio_pin_clear(MOTOR_POWER_ENABLE);

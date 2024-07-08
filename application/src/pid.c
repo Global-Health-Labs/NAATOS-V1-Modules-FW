@@ -23,18 +23,22 @@ void pid_controller_compute(pid_controller_t *pid, float measurement) {
   float proportial = pid->k_p * error;
   // Compute Integral
   pid->intergrator += (pid->k_i * error);
-  if (pid->intergrator > pid->lim_max)
+  if (pid->intergrator > pid->lim_max) {
     pid->intergrator = pid->lim_max;
-  else if (pid->intergrator < pid->lim_min)
+  }
+  else if (pid->intergrator < pid->lim_min) {
     pid->intergrator = pid->lim_min;
+  }
   // Compute Differential on Input
   float d_input = measurement - pid->prevMesurement;
   // Compute PID Output
   float out = pid->k_p * error + pid->intergrator - pid->k_d * d_input;
-  if (out > pid->lim_max)
+  if (out > pid->lim_max) {
     out = pid->lim_max;
-  else if (out < pid->lim_min)
+  }
+  else if (out < pid->lim_min) {
     out = pid->lim_min;
+  }
   // Set output
   pid->out = out;
   // Keep Track of for Next Execution

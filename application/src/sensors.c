@@ -247,15 +247,15 @@ void sensors_task(void *pvParameters) {
 
       case SENSOR_MSG_TIMER_TEMP_EVENT: {
         sensorTempCollection();
+        break;
       }
-
-      break;
 
       case SENSOR_MSG_TIMER_MOTOR_EVENT: {
         sensorMotorCollection();
+        break;
       } 
-      break;
-      case SENSOR_MSG_SLEEP:
+
+      case SENSOR_MSG_SLEEP: {
         if (xTimerIsTimerActive(sensorTempTimer) == pdTRUE) {
           stopSensorTempTimer();
         }
@@ -265,6 +265,7 @@ void sensors_task(void *pvParameters) {
 
         //send to main queue that we are asleep
         break;
+      }
 
       case SENSOR_MSG_WAKEUP:
         if (xTimerIsTimerActive(sensorTempTimer) == pdFALSE) {
@@ -312,6 +313,8 @@ void updateSampleLogMax(void) {
 void sensorTempCollection(void) {
   BaseType_t xReturned;
   HeaterRxQueueMsg_t heaterMsg;
+  bool readTempSuccess = false;
+  heaterMsg.readTempFailed = false;
   bool prev;
 
   #ifndef SAMPLE_PREP_BOARD
@@ -343,7 +346,10 @@ void sensorTempCollection(void) {
 
   #if I2C_CONNECTED
   #ifdef SAMPLE_PREP_BOARD
-    temperatures.amp2_zone_temp = readTemp(amp_zone_2);
+    readTempSuccess = readTemp(amp_zone_2, &temperatures.amp2_zone_temp);
+    if(!readTempSuccess) {
+      heaterMsg.readTempFailed = true;
+    }
   #else
     // I2C Read for Valve Zone
     temperatures.valve_zone_temp = readTemp(valve_zone);
@@ -374,32 +380,35 @@ void sensorTempCollection(void) {
 
     if (heaterRunning) {
 
-#if I2C_CONNECTED
-    temperatures.amp2_zone_temp = readTemp(amp_zone_2);
-#else
-    // Set temps to their setpoints if i2c is not connected
-    temperatures.valve_zone_temp = 85;
-    temperatures.amp0_zone_temp = 65;
-    temperatures.amp1_zone_temp = 65;
-    temperatures.amp2_zone_temp = 65;
-    vTaskDelay(pdMS_TO_TICKS(12 * 4)); // Simulate 12ms delay for each reading
-#endif
-    heaterMsg.type = HEATER_MSG_TEMPERATURE_DATA;
-    heaterMsg.tempData = temperatures;
-
-    xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
-    if (xReturned != pdPASS) {
-      printf("SENSORS_TASK: Unable to send temperature data in heaterRxQueue. Error: %d\n", xReturned);
-    }
-    sample_log_index++;
-    if (sample_log_index >= sample_log_max) {
-      HeaterRxQueueMsg_t heaterPwmMsg = {.type = HEATER_MSG_PWM_REQUEST};
-      // Request PWM from heater
-      xReturned = xQueueSend(heaterRxQueue, &heaterPwmMsg, 0);
-      if (xReturned != pdPASS) {
-        printf("SENSOR_TASK: Unable to send PWM request to heaterRxQueue queue.\n");
+    #if I2C_CONNECTED
+      readTempSuccess = readTemp(amp_zone_2, &temperatures.amp2_zone_temp);
+      if(!readTempSuccess) {
+        heaterMsg.readTempFailed = true;
       }
-    }
+    #else
+      // Set temps to their setpoints if i2c is not connected
+      temperatures.valve_zone_temp = 85;
+      temperatures.amp0_zone_temp = 65;
+      temperatures.amp1_zone_temp = 65;
+      temperatures.amp2_zone_temp = 65;
+      vTaskDelay(pdMS_TO_TICKS(12 * 4)); // Simulate 12ms delay for each reading
+    #endif
+      heaterMsg.type = HEATER_MSG_TEMPERATURE_DATA;
+      heaterMsg.tempData = temperatures;
+
+      xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
+      if (xReturned != pdPASS) {
+        printf("SENSORS_TASK: Unable to send temperature data in heaterRxQueue. Error: %d\n", xReturned);
+      }
+      sample_log_index++;
+      if (sample_log_index >= sample_log_max) {
+        HeaterRxQueueMsg_t heaterPwmMsg = {.type = HEATER_MSG_PWM_REQUEST};
+        // Request PWM from heater
+        xReturned = xQueueSend(heaterRxQueue, &heaterPwmMsg, 0);
+        if (xReturned != pdPASS) {
+          printf("SENSOR_TASK: Unable to send PWM request to heaterRxQueue queue.\n");
+        }
+      }
   }
 
 }
@@ -442,10 +451,9 @@ void init_sensors_gpios(void) {
   nrf_gpio_pin_set(NRF_GPIO_PIN_MAP(1, 3));
 }
 
-long double readTemp(sensor_selection_t sensor) {
+bool readTemp(sensor_selection_t sensor, float *temperature) {
   int i2cRetry = 0;
   tsys01_errors_t tsys_err;
-  long double temperature = 0;
 
   tsys_err = tsys01_startConversion(sensor);
   if (tsys_err != tsys01_success) {
@@ -470,17 +478,17 @@ long double readTemp(sensor_selection_t sensor) {
 
 
   vTaskDelay(pdMS_TO_TICKS(12)); // 12ms conversion time
-  tsys_err = tsys01_getTemp(sensor, &temperature);
+  tsys_err = tsys01_getTemp(sensor, temperature);
   if (tsys_err != tsys01_success) {
     printf("HEATER_TASK: Unable to read temperature!\n");
   }
 
   if(tsys_err != tsys01_success) {
     while((i2cRetry++ < 4) && (tsys_err != tsys01_success)) {
-      tsys_err = tsys01_getTemp(sensor, &temperature);
-        if (tsys_err != tsys01_success) {
-          printf("HEATER_TASK: Unable to read temperature!\n");
-        }
+      tsys_err = tsys01_getTemp(sensor, temperature);
+      if (tsys_err != tsys01_success) {
+        printf("HEATER_TASK: Unable to read temperature!\n");
+      }
     }
   }
 
