@@ -44,6 +44,7 @@ double motorSpeed = 0;
 
 TimerHandle_t sensorTempTimer;
 TimerHandle_t sensorMotorTimer;
+TickType_t sampleRateTicks;
 
 bool heaterRunning = false;
 bool usb_suspend = false;
@@ -127,6 +128,27 @@ void stopSensorMotorTimer(void) {
   }
 }
 
+void samplePrepSensorTaskSetup(void) {
+  /* Get TSYS01 Calibration Values */
+  tsys01_err = tsys01_getCalibrationValues(amp_zone_2);
+  if (tsys01_err == tsys01_i2c_error) {
+    NVIC_SystemReset();
+    asm volatile("nop");
+  }
+  sensorTempTimer = xTimerCreate("SensorTempTimer", sampleRateTicks, pdTRUE, (void *)0, vSensorTempTimerCallback);
+  sensorMotorTimer = xTimerCreate("SensorMotorTimer", 2, pdTRUE, (void *)0, vSensorMotorTimerCallback);
+}
+
+
+void powerModuleSensorTaskSetup(void) {
+  tsys01_err = tsys01_getCalibrationValues(valve_zone);
+  tsys01_err = tsys01_getCalibrationValues(amp_zone_0);
+  tsys01_err = tsys01_getCalibrationValues(amp_zone_1);
+  tsys01_err = tsys01_getCalibrationValues(amp_zone_2);
+  sensorTempTimer = xTimerCreate("SensorTempTimer", sampleRateTicks, pdTRUE, (void *)0, vSensorTempTimerCallback);
+}
+
+
 void sensors_task(void *pvParameters) {
   BaseType_t xReturned;
   tasks_t sensor_task = SENSORS;
@@ -147,34 +169,19 @@ void sensors_task(void *pvParameters) {
     sample_log_max = (config.logging_rate / config.sample_rate);
   }
 
-  /* Get TSYS01 Calibration Values */
-#if I2C_CONNECTED
-#ifdef SAMPLE_PREP_BOARD
-  tsys01_err = tsys01_getCalibrationValues(amp_zone_2);
-  if (tsys01_err == tsys01_i2c_error) {
-    NVIC_SystemReset();
-    asm volatile("nop");
-  }
-#else
-  tsys01_err = tsys01_getCalibrationValues(valve_zone);
-  tsys01_err = tsys01_getCalibrationValues(amp_zone_0);
-  tsys01_err = tsys01_getCalibrationValues(amp_zone_1);
-  tsys01_err = tsys01_getCalibrationValues(amp_zone_2);
-#endif
-#endif
-
   SensorRxQueueMsg_t sensorRxMessage;
-
-  TickType_t sampleRateTicks;
 
   if (use_default_configuration_parameters) {
     sampleRateTicks = pdMS_TO_TICKS((DEFAULT_SAMPLE_RATE * 1000.0) - (12.0 * 4.0) + 1.0);
   } else {
     sampleRateTicks = pdMS_TO_TICKS((config.sample_rate * 1000.0) - (12.0 * 4.0) + 1.0);
   }
-  sensorTempTimer = xTimerCreate("SensorTempTimer", sampleRateTicks, pdTRUE, (void *)0, vSensorTempTimerCallback);
-  sensorMotorTimer = xTimerCreate("SensorMotorTimer", 2, pdTRUE, (void *)0, vSensorMotorTimerCallback);
 
+#ifdef SAMPLE_PREP_BOARD
+  samplePrepSensorTaskSetup();
+#else
+  powerModuleSensorTaskSetup();
+#endif
   //setup our message timer for sensor collection
   for (;;) {
     // one queue the rxs messages from other threads
@@ -207,7 +214,7 @@ void sensors_task(void *pvParameters) {
         break;
       }
 
-      case SENSOR_MSG_USB_SUSPEND:
+      case SENSOR_MSG_USB_SUSPEND: {
         // Send Suspend Accepted
         xReturned = xQueueSend(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0);
         if (xReturned != pdPASS) {
@@ -225,8 +232,9 @@ void sensors_task(void *pvParameters) {
         }
         usb_suspend = false;
         break;
+      }
 
-      case SENSOR_MSG_PWM_RESPONSE:
+      case SENSOR_MSG_PWM_RESPONSE: {
         // Update PWM in temerature data
         log_msg.temperature_data.amp0_zone_temp = temperatures.amp0_zone_temp;
         log_msg.temperature_data.amp1_zone_temp = temperatures.amp1_zone_temp;
@@ -244,9 +252,14 @@ void sensors_task(void *pvParameters) {
         }
         sample_log_index = 0;
         break;
+      }
 
       case SENSOR_MSG_TIMER_TEMP_EVENT: {
-        sensorTempCollection();
+ #ifdef SAMPLE_PREP_BOARD
+        runSamplePrepSensorCollection();
+ #else
+        runPowerModuleSensorCollection();
+ #endif
         break;
       }
 
@@ -256,49 +269,71 @@ void sensors_task(void *pvParameters) {
       } 
 
       case SENSOR_MSG_SLEEP: {
-        if (xTimerIsTimerActive(sensorTempTimer) == pdTRUE) {
-          stopSensorTempTimer();
-        }
-        if (xTimerIsTimerActive(sensorMotorTimer) == pdTRUE) {
-          stopSensorMotorTimer();
-        }
-
+        handleSensorSleep();
         //send to main queue that we are asleep
         break;
       }
 
-      case SENSOR_MSG_WAKEUP:
-        if (xTimerIsTimerActive(sensorTempTimer) == pdFALSE) {
-          startSensorTempTimer();
-        }
-        if (xTimerIsTimerActive(sensorMotorTimer) == pdFALSE) {
-          startSensorMotorTimer();
-        }
+      case SENSOR_MSG_WAKEUP:{
+        handleSensorWake();
         break;
-
-      case CONFIG_UPDATED:
-        if (xTimerIsTimerActive(sensorTempTimer) == pdTRUE) {
-          stopSensorTempTimer();
-        }
-        if (xTimerIsTimerActive(sensorMotorTimer) == pdTRUE) {
-          stopSensorMotorTimer();
-        }
-
-        updateSampleLogMax();
-
-        if (xTimerIsTimerActive(sensorTempTimer) == pdFALSE) {
-          startSensorTempTimer();
-        }
-        if (xTimerIsTimerActive(sensorMotorTimer) == pdFALSE) {
-          startSensorMotorTimer();
-        }
+      }
+ 
+      case CONFIG_UPDATED: {
+        handleConfigUpdated();
         break;
+      }
 
       default:
         break;
       }
     }
   }
+}
+
+void handleSensorSleep(void) {
+  if (xTimerIsTimerActive(sensorTempTimer) == pdTRUE) {
+    stopSensorTempTimer();
+  }
+#ifdef SAMPLE_PREP_BOARD
+  if (xTimerIsTimerActive(sensorMotorTimer) == pdTRUE) {
+    stopSensorMotorTimer();
+  }
+#endif
+
+}
+
+void handleSensorWake(void) {
+  if (xTimerIsTimerActive(sensorTempTimer) == pdFALSE) {
+    startSensorTempTimer();
+  }
+#ifdef SAMPLE_PREP_BOARD
+  if (xTimerIsTimerActive(sensorMotorTimer) == pdFALSE) {
+    startSensorMotorTimer();
+  }
+#endif
+
+}
+
+void handleConfigUpdated(void) {
+  if (xTimerIsTimerActive(sensorTempTimer) == pdTRUE) {
+    stopSensorTempTimer();
+  }
+#ifdef SAMPLE_PREP_BOARD
+  if (xTimerIsTimerActive(sensorMotorTimer) == pdTRUE) {
+    stopSensorMotorTimer();
+  }
+#endif
+  updateSampleLogMax();
+
+  if (xTimerIsTimerActive(sensorTempTimer) == pdFALSE) {
+    startSensorTempTimer();
+  }
+#ifdef SAMPLE_PREP_BOARD
+  if (xTimerIsTimerActive(sensorMotorTimer) == pdFALSE) {
+    startSensorMotorTimer();
+  }
+#endif
 }
 
 void updateSampleLogMax(void) {
@@ -310,16 +345,12 @@ void updateSampleLogMax(void) {
   }
 }
 
-void sensorTempCollection(void) {
+void runPowerModuleSensorCollection(void) {
   BaseType_t xReturned;
   HeaterRxQueueMsg_t heaterMsg;
-  bool readTempSuccess = false;
-  heaterMsg.readTempFailed = false;
-  bool prev;
 
-  #ifndef SAMPLE_PREP_BOARD
   // ADC Read for Optical Sensors
-  prev = switches.optical_tiggered;
+  bool prev = switches.optical_tiggered;
   switches.optical_tiggered = get_optical_triggered();
   if (prev != switches.optical_tiggered) {
     if (switches.optical_tiggered) {
@@ -328,7 +359,78 @@ void sensorTempCollection(void) {
       printf("Optical sensor no longer triggered!\n");
     }
   }
-#endif
+  // GPIO Read for Hall Sensor
+  prev = switches.hal_triggered;
+  if (nrf_gpio_pin_read(HAL_INPUT_PIN))
+    switches.hal_triggered = false;
+  else
+    switches.hal_triggered = true;
+  if (prev != switches.hal_triggered) {
+    if (switches.hal_triggered) {
+      printf("Hal sensor triggered!\n");
+    } else {
+      printf("Hal sensor no longer triggered!\n");
+    }
+  }
+
+  // Put Switch Data into queue
+  xReturned = xQueueSend(main_switchQueue, (void *)&switches, 0);
+  if (xReturned != pdPASS) {
+    printf("SENSORS_TASK: Unable to send switch data in main_switchQueue.\n");
+  }
+  // Send temperature data to Log Data queue
+  if (heaterRunning) {
+    bool readTempSuccess = false;
+    heaterMsg.readTempFailed = false;
+    // I2C Read for Valve Zone
+    readTempSuccess = readTemp(valve_zone, &temperatures.valve_zone_temp);
+    if(!readTempSuccess) {
+      heaterMsg.readTempFailed = true;
+    }
+
+    // I2C Read for Amplification Zone 0
+    readTempSuccess = readTemp(amp_zone_0, &temperatures.amp0_zone_temp);
+    if(!readTempSuccess) {
+      heaterMsg.readTempFailed = true;
+    }
+
+    // I2C Read for Amplification Zone 1
+    readTempSuccess = readTemp(amp_zone_1, &temperatures.amp1_zone_temp);
+    if(!readTempSuccess) {
+      heaterMsg.readTempFailed = true;
+    }
+
+    // I2C Read for Amplification Zone 2
+    readTempSuccess = readTemp(amp_zone_2, &temperatures.amp2_zone_temp);
+    if(!readTempSuccess) {
+      heaterMsg.readTempFailed = true;
+    }
+
+    heaterMsg.type = HEATER_MSG_TEMPERATURE_DATA;
+    heaterMsg.tempData = temperatures;
+
+    xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
+    if (xReturned != pdPASS) {
+      printf("SENSORS_TASK: Unable to send temperature data in heaterRxQueue. Error: %d\n", xReturned);
+    }
+    sample_log_index++;
+    if (sample_log_index >= sample_log_max) {
+      HeaterRxQueueMsg_t heaterPwmMsg = {.type = HEATER_MSG_PWM_REQUEST};
+      // Request PWM from heater
+      xReturned = xQueueSend(heaterRxQueue, &heaterPwmMsg, 0);
+      if (xReturned != pdPASS) {
+        printf("SENSOR_TASK: Unable to send PWM request to heaterRxQueue queue.\n");
+      }
+    }
+  }
+}
+
+void runSamplePrepSensorCollection(void) {
+    BaseType_t xReturned;
+  HeaterRxQueueMsg_t heaterMsg;
+  bool readTempSuccess = false;
+  heaterMsg.readTempFailed = false;
+  bool prev;
 
   // GPIO Read for Hall Sensor
   prev = switches.hal_triggered;
@@ -344,33 +446,10 @@ void sensorTempCollection(void) {
     }
   }
 
-  #if I2C_CONNECTED
-  #ifdef SAMPLE_PREP_BOARD
     readTempSuccess = readTemp(amp_zone_2, &temperatures.amp2_zone_temp);
     if(!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }
-  #else
-    // I2C Read for Valve Zone
-    temperatures.valve_zone_temp = readTemp(valve_zone);
-
-    // I2C Read for Amplification Zone 0
-    temperatures.amp0_zone_temp = readTemp(amp_zone_0);
-
-    // I2C Read for Amplification Zone 1
-    temperatures.amp1_zone_temp = readTemp(amp_zone_1);
-
-    // I2C Read for Amplification Zone 2
-    temperatures.amp2_zone_temp = readTemp(amp_zone_2);
-  #endif
-  #else
-    // Set temps to their setpoints if i2c is not connected
-    temperatures.valve_zone_temp = 85;
-    temperatures.amp0_zone_temp = 65;
-    temperatures.amp1_zone_temp = 65;
-    temperatures.amp2_zone_temp = 65;
-    vTaskDelay(pdMS_TO_TICKS(12 * 4)); // Simulate 12ms delay for each reading
-  #endif  
 
     // Put Switch Data into queue
     xReturned = xQueueSend(main_switchQueue, (void *)&switches, 0);
@@ -379,20 +458,11 @@ void sensorTempCollection(void) {
     }
 
     if (heaterRunning) {
-
-    #if I2C_CONNECTED
       readTempSuccess = readTemp(amp_zone_2, &temperatures.amp2_zone_temp);
       if(!readTempSuccess) {
         heaterMsg.readTempFailed = true;
       }
-    #else
-      // Set temps to their setpoints if i2c is not connected
-      temperatures.valve_zone_temp = 85;
-      temperatures.amp0_zone_temp = 65;
-      temperatures.amp1_zone_temp = 65;
-      temperatures.amp2_zone_temp = 65;
-      vTaskDelay(pdMS_TO_TICKS(12 * 4)); // Simulate 12ms delay for each reading
-    #endif
+
       heaterMsg.type = HEATER_MSG_TEMPERATURE_DATA;
       heaterMsg.tempData = temperatures;
 
@@ -410,7 +480,6 @@ void sensorTempCollection(void) {
         }
       }
   }
-
 }
 
 void sensorMotorCollection(void) {
@@ -439,16 +508,17 @@ void sensorMotorCollection(void) {
 void init_sensors_gpios(void) {
   /* Setup Hal Sensor */
   nrf_gpio_cfg_input(HAL_INPUT_PIN, NRF_GPIO_PIN_PULLDOWN);
-  nrf_gpio_cfg_output(NRF_GPIO_PIN_MAP(1, 7));
-  nrf_gpio_pin_write(NRF_GPIO_PIN_MAP(1, 7), 1);
   nrf_gpio_cfg_output(SENSORS_EN);
   nrf_gpio_pin_set(SENSORS_EN);
 
+  /*LED Driver Enable*/
+  nrf_gpio_cfg_output(LED_HARDWARE_DRIVER_ENABLE_PIN);
+  nrf_gpio_pin_set(LED_HARDWARE_DRIVER_ENABLE_PIN);
+
+#ifdef SAMPLE_PREP_BOARD
   /* Setup Motor Speed Sensor Input*/
   p_counter1 = motor_tach_init();
-
-  nrf_gpio_cfg_output(NRF_GPIO_PIN_MAP(1, 3));
-  nrf_gpio_pin_set(NRF_GPIO_PIN_MAP(1, 3));
+#endif
 }
 
 bool readTemp(sensor_selection_t sensor, float *temperature) {

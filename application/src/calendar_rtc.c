@@ -52,7 +52,7 @@ bool calendar_get_time(calendar_time_t *now) {
 bool calendar_set_time(calendar_time_t *now) {
   uint8_t buff[7];
   ret_code_t ret;
-#if I2C_CONNECTED
+
   buff[0] = calendar_encode(now->second);
   buff[1] = calendar_encode(now->minute);
   buff[2] = calendar_encode(now->hour);
@@ -66,23 +66,15 @@ bool calendar_set_time(calendar_time_t *now) {
     return false;
   }
   return true;
-#else
-  // Always return false if i2c is not enabled
-  return false;
-#endif
 }
 
 // Resets the calendar chip *** Will get rid of current date set
 bool calendar_reset(void) {
   uint8_t buff = 0x58;
   ret_code_t ret;
-#if I2C_CONNECTED
   ret = xUtil_TWI_Write(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
-  if (ret)
+  if (ret){
     return false;
+  }
   return true;
-#else
-  // Always return false if i2c is not enabled
-  return false;
-#endif
 }

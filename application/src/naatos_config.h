@@ -5,19 +5,17 @@
 #include "task.h"
 #include <stdint.h>
 
+/*Define this when building sample prep only otherwise comment out*/
 #define SAMPLE_PREP_BOARD
 
-#define NAATOS_FW_VERSON "V1.0.0"
+#define NAATOS_FW_VERSON "V1.3"
 
 #define pdTICKS_TO_MS(xTimeInTicks) ((TickType_t)(((uint64_t)(xTimeInTicks) * (uint64_t)1000U) / (uint64_t)configTICK_RATE_HZ))
 
 /* Battery Parameters */
 #define DEFAULT_LOW_POWER_THRESHOLD 20
 
-/* Heater Zones' Parameters */
-#define DEFAULT_AMPLIFICATION_ZONE_ON_TIME 120 // Seconds
-#define DEFAULT_VALVE_ZONE_ON_TIME 120         // Seconds
-
+/*------------COMMON PIN CONFIGS------------*/
 /* I2C Pins */
 #define I2C0_SDA_PIN 17
 #define I2C0_SCL_PIN 16
@@ -33,19 +31,38 @@
 #define BOOST_CONTROL_ENABLE_PIN 21
 #define BUTTON_INPUT_PIN NRF_GPIO_PIN_MAP(1, 6)
 
+
 #define VALVE_ZONE_PIN 20 // P0.20
 #define AMP0_ZONE_PIN 19  // P0.19
 #define AMP1_ZONE_PIN 34  // P1.02
-#define AMP2_ZONE_PIN 33  // P1.01
+#define AMP2_ZONE_PIN NRF_GPIO_PIN_MAP(1, 1)  // P1.01
 
-#define SAMPLE_HEATER_PIN 33 // P1.01
+#define SAMPLE_HEATER_PIN NRF_GPIO_PIN_MAP(1, 1) // P1.01
+#define SENSORS_EN NRF_GPIO_PIN_MAP(1, 7)
+#define LED_HARDWARE_DRIVER_ENABLE_PIN NRF_GPIO_PIN_MAP(1, 3) //1.03
 
-#define SENSORS_EN 39
+#define HAL_INPUT_PIN NRF_GPIO_PIN_MAP(0, 2)
 
-#define HAL_INPUT_PIN 2
+
+/*--------------Board Specific Pin Configs----------------*/
+#ifdef SAMPLE_PREP_BOARD
+
+/* Heater Zones' Parameters */
+#define DEFAULT_AMPLIFICATION_ZONE_ON_TIME 120 // Seconds
+#define DEFAULT_VALVE_ZONE_ON_TIME 120         // Seconds
+
+#else
+
 #define OPTICAL_INPUT_PIN 3
 
-#define LED_HARDWARE_DRIVER_ENABLE_PIN NRF_GPIO_PIN_MAP(1, 2) //1.02
+/* Heater Zones' Parameters */
+#define DEFAULT_AMPLIFICATION_ZONE_ON_TIME 2400 // 40min in seconds
+#define DEFAULT_VALVE_ZONE_ON_TIME 300          // 5min in seconds
+#define BUTTON_INPUT_PIN_ALT NRF_GPIO_PIN_MAP(1, 14)  // Used for recovering bad gpio pin defect
+#define BUTTON_REWORK_DETECT_INPUT NRF_GPIO_PIN_MAP(1,12)
+#define BUTTON_REWORK_DETECT_OUTPUT NRF_GPIO_PIN_MAP(1,13)
+
+#endif
 
 /* Default Rates
  * These rates are only used when there is no configuration file seen in the 
@@ -53,6 +70,7 @@
    these rates will be used in the system.
  * Rates are in seconds
 */
+#ifdef SAMPLE_PREP_BOARD
 #define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
 #define DEFAULT_LOGGING_RATE 1.000
 #define DEFAULT_VALVE_MAX_TEMP 115.0
@@ -76,9 +94,23 @@
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_1 true
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_2 false
 #define DEFAULT_RAMP_TO_TEMP_TIMEOUT 600.0 // 10min 
+#else
+#define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
+#define DEFAULT_LOGGING_RATE 5.000
+#define DEFAULT_WAIT_TIME_AFTER_VALVE_S 900.00 // 15 min
+#define DEFAULT_VALVE_MAX_TEMP 105.0
+#define DEFAULT_AMP0_MAX_TEMP 80.0
+#define DEFAULT_AMP1_MAX_TEMP 80.0
+#define DEFAULT_AMP2_MAX_TEMP 80.0
+#define DEFAULT_MIN_RUN_ZONE_TEMP 50.0
+#define DEFAULT_MIN_RUN_ZONE_TEMP_EN false
+#define DEFAULT_ALERT_TIMEOUT_S 10.0 // seconds
+#define DEFAULT_VALID_TIMEOUT_S 3600.0 // 1 hour
+#define DEFAULT_RECOVERY_THRES 40  // Percent
+#define OPTICAL_TRIG_THRES 800
+#endif
 
 /* Device Debug Parameters */
-#define I2C_CONNECTED 1
 #define USE_CALENDAR_CHIP 1
 #define VERBOSE_PID 1
 #define USE_MOTOR 1
@@ -469,6 +501,7 @@ typedef struct {
   float min_run_zone_temp;
   bool min_run_zone_temp_en;
   float alert_timeout_time_m;
+  float sample_valid_timeout_s;
   float valve_kp;
   float valve_ki;
   float valve_kd;
