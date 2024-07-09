@@ -79,25 +79,26 @@ ret_code_t xUtil_TWI_Read( i2c_interface_selection_t interface, uint8_t slave_ad
     static uint8_t reg_addr;
     reg_addr = start_addr;
 
-    if( length == 0 ) {	
-        err_code = NRF_ERROR_INVALID_LENGTH;
+    if (length == 0) {
+        return NRF_ERROR_INVALID_LENGTH;
+    }
 
-    } else if( xSemaphoreTake( m_i2c_semaphores[interface], portMAX_DELAY ) == pdPASS ) { // execute operation only if resuorce is free
-        nrf_drv_twi_enable( &m_i2c[interface] ); // enable I2C
-        err_code = nrf_drv_twi_tx( &m_i2c[interface], slave_addr, &reg_addr, 1, true );
-        if(err_code == 33281){
-          return err_code;
-        }
-        //APP_ERROR_CHECK( err_code );
-        err_code = nrf_drv_twi_rx( &m_i2c[interface], slave_addr, p_buff, length );
-        if(err_code == 33281){
-          return err_code;
-        }
-        //APP_ERROR_CHECK( err_code );
-        nrf_drv_twi_disable( &m_i2c[interface] );
-        xSemaphoreGive( m_i2c_semaphores[interface] ); // 'Give' the semaphore to unblock the blocked task.
+    if (xSemaphoreTake(m_i2c_semaphores[interface], 1000) != pdPASS) {
+        return NRF_ERROR_BUSY;
+    }
 
-    } else { err_code = NRF_ERROR_BUSY; }
+    nrf_drv_twi_enable(&m_i2c[interface]); // enable I2C
+
+    err_code = nrf_drv_twi_tx(&m_i2c[interface], slave_addr, &reg_addr, 1, true);
+    if (err_code != NRF_SUCCESS) {
+        nrf_drv_twi_disable(&m_i2c[interface]);
+        xSemaphoreGive(m_i2c_semaphores[interface]);
+        return err_code;
+    }
+
+    err_code = nrf_drv_twi_rx(&m_i2c[interface], slave_addr, p_buff, length);
+    nrf_drv_twi_disable(&m_i2c[interface]);
+    xSemaphoreGive(m_i2c_semaphores[interface]);
 
     return err_code;
 }
@@ -111,19 +112,26 @@ ret_code_t xUtil_TWI_Write( i2c_interface_selection_t interface, uint8_t slave_a
     static uint8_t reg_addr;
     reg_addr = start_addr;
 
-    if( length == 0 ) {					
-        err_code = NRF_ERROR_INVALID_LENGTH;
+    if (length == 0) {
+        return NRF_ERROR_INVALID_LENGTH;
+    }
 
-    } else if( xSemaphoreTake( m_i2c_semaphores[interface], portMAX_DELAY ) == pdPASS ) {	// execute operation only if resuorce is free
-        nrf_drv_twi_enable( &m_i2c[interface] );// enable I2C
-        err_code = nrf_drv_twi_tx( &m_i2c[interface], slave_addr, &reg_addr, 1, true );
-        //APP_ERROR_CHECK( err_code );
-        err_code = nrf_drv_twi_tx( &m_i2c[interface], slave_addr, p_buff, length, false );
-        //APP_ERROR_CHECK( err_code );
-        nrf_drv_twi_disable( &m_i2c[interface] );
-        xSemaphoreGive( m_i2c_semaphores[interface] );	// 'Give' the semaphore to unblock the blocked task.
+    if (xSemaphoreTake(m_i2c_semaphores[interface], 1000) != pdPASS) {
+        return NRF_ERROR_BUSY;
+    }
 
-    } else { err_code = NRF_ERROR_BUSY; }
+    nrf_drv_twi_enable(&m_i2c[interface]); // enable I2C
+
+    err_code = nrf_drv_twi_tx(&m_i2c[interface], slave_addr, &reg_addr, 1, true);
+    if (err_code != NRF_SUCCESS) {
+        nrf_drv_twi_disable(&m_i2c[interface]);
+        xSemaphoreGive(m_i2c_semaphores[interface]);
+        return err_code;
+    }
+
+    err_code = nrf_drv_twi_tx(&m_i2c[interface], slave_addr, p_buff, length, false);
+    nrf_drv_twi_disable(&m_i2c[interface]);
+    xSemaphoreGive(m_i2c_semaphores[interface]);
 
     return err_code;
 }
@@ -136,19 +144,19 @@ ret_code_t xUtil_TWI_Write_Single( i2c_interface_selection_t interface, uint8_t 
     static uint8_t reg_addr;
     reg_addr = start_addr;
 
-    if( length == 0 ) {					
-        err_code = NRF_ERROR_INVALID_LENGTH;
+    if (length == 0) {
+        return NRF_ERROR_INVALID_LENGTH;
+    }
 
-    } else if( xSemaphoreTake( m_i2c_semaphores[interface], portMAX_DELAY ) == pdPASS ) {	// execute operation only if resuorce is free
-        nrf_drv_twi_enable( &m_i2c[interface] );// enable I2C
-        //err_code = nrf_drv_twi_tx( &m_i2c[interface], slave_addr, &reg_addr, 1, true );
-        //APP_ERROR_CHECK( err_code );
-        err_code = nrf_drv_twi_tx( &m_i2c[interface], slave_addr, p_buff, length, false );
-        //APP_ERROR_CHECK( err_code );
-        nrf_drv_twi_disable( &m_i2c[interface] );
-        xSemaphoreGive( m_i2c_semaphores[interface] );	// 'Give' the semaphore to unblock the blocked task.
+    if (xSemaphoreTake(m_i2c_semaphores[interface], portMAX_DELAY) != pdPASS) {
+        return NRF_ERROR_BUSY;
+    }
 
-    } else { err_code = NRF_ERROR_BUSY; }
+    nrf_drv_twi_enable(&m_i2c[interface]); // enable I2C
+
+    err_code = nrf_drv_twi_tx(&m_i2c[interface], slave_addr, p_buff, length, false);
+    nrf_drv_twi_disable(&m_i2c[interface]);
+    xSemaphoreGive(m_i2c_semaphores[interface]);
 
     return err_code;
 }

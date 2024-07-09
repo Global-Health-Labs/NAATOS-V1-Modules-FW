@@ -116,7 +116,7 @@ static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t re
       return tsys01_busy;
     }
 
-   printf("I2C Read error hit 3\n");
+    printf("I2C Read error hit 3\n");
     return tsys01_i2c_error;
   }
   sensorIsBusy = false;
