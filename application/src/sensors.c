@@ -458,46 +458,14 @@ bool readTemp(sensor_selection_t sensor, float *temperature) {
   tsys_err = tsys01_startConversion(sensor);
   if (tsys_err != tsys01_success) {
     printf("HEATER_TASK: Unable to triggr temperature conversion!\n");
-  }
-
-  if(tsys_err != tsys01_success) {
-    while((i2cRetry++ < 4) && (tsys_err != tsys01_success)) {
-      tsys_err = tsys01_startConversion(sensor);
-      if (tsys_err != tsys01_success) {
-        printf("HEATER_TASK: Unable to triggr temperature conversion!\n");
-      }
+  } else {
+    vTaskDelay(pdMS_TO_TICKS(12)); // 12ms conversion time
+    tsys_err = tsys01_getTemp(sensor, temperature);
+    if (tsys_err != tsys01_success) {
+      printf("HEATER_TASK: Unable to read temperature! 1\n");
     }
   }
 
-  if(i2cRetry >= 4){
-    //TODO bail with error or possibly more robust recovery
-    printf("HEATER_TASK: Too many i2c retries for conversion!\n");
-  } else {
-    i2cRetry = 0;
-  }
-
-
-  vTaskDelay(pdMS_TO_TICKS(12)); // 12ms conversion time
-  tsys_err = tsys01_getTemp(sensor, temperature);
-  if (tsys_err != tsys01_success) {
-    printf("HEATER_TASK: Unable to read temperature!\n");
-  }
-
-  if(tsys_err != tsys01_success) {
-    while((i2cRetry++ < 4) && (tsys_err != tsys01_success)) {
-      tsys_err = tsys01_getTemp(sensor, temperature);
-      if (tsys_err != tsys01_success) {
-        printf("HEATER_TASK: Unable to read temperature!\n");
-      }
-    }
-  }
-
-  if(i2cRetry >= 4){
-    //TODO bail with error or possibly more robust recovery
-    printf("HEATER_TASK: Too many i2c retries for conversion!\n");
-  } else {
-    i2cRetry = 0;
-  }
   return temperature;
 }
 
