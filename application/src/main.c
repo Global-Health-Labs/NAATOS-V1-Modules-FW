@@ -222,7 +222,10 @@ naatos_config_parameters config = {
     .amp1_kd_2 = 0,
     .amp2_kp_2 = 0,
     .amp2_ki_2 = 0,
-    .amp2_kd_2 = 0};
+    .amp2_kd_2 = 0,
+    .mmddyy = 0,
+    .hhmmss = 0,
+    .set_date_time = false};
 bool use_default_configuration_parameters = false;
 
 // Function defs
@@ -1276,6 +1279,10 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask,
   } else {
     use_default_configuration_parameters = false;
   }
+  
+  //Set the time
+  if(config.set_date_time) calendar_set_time_helper();
+  //calendar_set_32k();
 
   // Create Queues
   create_queues();

@@ -451,6 +451,9 @@ typedef struct {
   float amp2_kp_2;
   float amp2_ki_2;
   float amp2_kd_2;
+  int mmddyy;
+  int hhmmss;
+  bool set_date_time;
 } naatos_config_parameters;
 #else
 typedef struct {

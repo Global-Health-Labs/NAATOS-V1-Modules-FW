@@ -102,6 +102,9 @@ typedef enum {
   AMP2_KP_2,
   AMP2_KI_2,
   AMP2_KD_2,
+  MMDDYY,
+  HHMMSS,
+  SET_DATE_TIME,
   NUM_PARAMETERS
 } naatos_config_params_t;
 #else
@@ -134,6 +137,9 @@ typedef enum {
   RUN_HEATER_1,
   RUN_MOTOR_2,
   RUN_HEATER_2,
+  MMDDYY,
+  HHMMSS,
+  SET_DATE_TIME,
   NUM_PARAMETERS
 } naatos_config_params_t;
 #endif
