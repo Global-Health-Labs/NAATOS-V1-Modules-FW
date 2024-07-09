@@ -158,7 +158,7 @@ ret_code_t xUtil_TWI_Write_Single( i2c_interface_selection_t interface, uint8_t 
         return NRF_ERROR_INVALID_LENGTH;
     }
 
-    if (xSemaphoreTake(m_i2c_semaphores[interface], portMAX_DELAY) != pdPASS) {
+    if (xSemaphoreTake(m_i2c_semaphores[interface], 1000) != pdPASS) {
         return NRF_ERROR_BUSY;
     }
 
