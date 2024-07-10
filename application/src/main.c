@@ -1573,7 +1573,10 @@ int main(void) {
   }
 
   //Set the time
-  if(config.set_date_time) calendar_set_time_helper();
+  if(config.set_date_time) {
+    calendar_set_time_helper();
+    sd_card_edit_config_var("set_time_date");
+  }
   //calendar_set_32k();
 
   // Create Queues

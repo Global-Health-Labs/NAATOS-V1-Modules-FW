@@ -166,6 +166,7 @@ FRESULT sd_card_create_log_file(const char *file_name);
 FRESULT sd_card_mount(void);
 FRESULT sd_card_unmount(void);
 FRESULT sd_card_write_log_line(const char *logName, const char *writeBuff, uint32_t writeBuffSize);
+FRESULT sd_card_edit_config_var(const char* var);
 FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters);
 
 #endif
