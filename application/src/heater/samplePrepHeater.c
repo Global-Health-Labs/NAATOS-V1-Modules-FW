@@ -2,13 +2,39 @@
 #include "../motor.h"
 #include "timers.h"
 
+void samplePrepResetHeaterPIDs(void) {
+  // Create PID Controllers
+  if (use_default_configuration_parameters) {
+    heater1SetPoint = DEFAULT_HEATER_SETPOINT;
+    pid_controller_init(&heater_pid_1, DEFAULT_HEATER_SETPOINT, H_KP, H_KI, H_KD);
+  } else {
+    heater1SetPoint = config.heater_setpoint_1;
+    pid_controller_init(&heater_pid_1, config.heater_setpoint_1, config.heater_kp_1, config.heater_ki_1, config.heater_kd_1);
+  }
+
+  if (use_default_configuration_parameters) {
+    heater2SetPoint = DEFAULT_HEATER_SETPOINT;
+    pid_controller_init(&heater_pid_2, DEFAULT_HEATER_SETPOINT, H_KP, H_KI, H_KD);
+  } else {
+    heater2SetPoint = config.heater_setpoint_2;
+    pid_controller_init(&heater_pid_2, config.heater_setpoint_2, config.heater_kp_2, config.heater_ki_2, config.heater_kd_2);
+  }
+
+  if (use_default_configuration_parameters) {   
+    pid_controller_init(&motor_pid_1, MOTOR_SETPOINT_1, M_KP, M_KI, M_KD);
+  } else {
+    pid_controller_init(&motor_pid_1, config.motor_setpoint_1, config.motor_kp_1, config.motor_ki_1, config.motor_kd_1);
+  }
+
+  if (use_default_configuration_parameters) {   
+    pid_controller_init(&motor_pid_2, MOTOR_SETPOINT_2, M_KP, M_KI, M_KD);
+  } else {
+    pid_controller_init(&motor_pid_2, config.motor_setpoint_2, config.motor_kp_2, config.motor_ki_2, config.motor_kd_2);
+  }
+}
 
 void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   BaseType_t xReturned;
-  if (wdtTimeout++ > (1 / config.sample_rate)) { // send out once a second
-    wdtTimeout = 0;
-    sendWdtHeaterValid(); // update watchdog
-  }
 
   // Ensure temperatures are below the minimum run zone temperature
   if (config.min_run_zone_temp_en) {
@@ -174,5 +200,53 @@ void handleSampleMotorDataRx(int motor_speed) {
     last_motor_speed = motor_speed;
 
     updateDutyCycles(pwmData);
+  }
+}
+
+void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
+  // Set zones enabled
+  if (heaterRxMessage.zoneSelect == AMPLIFICATION) {
+    amplification_zone_running = heaterRxMessage.zoneEnabled;
+    rampToTemp = config.ramp_to_temp_before_start_cycle_1;
+    if (!amplification_zone_running) { //AMP2 will be used in sample prep fro heating
+      heater_pid_1.out = 0;
+      temperature_pwm_data_t pwmData = {
+          .valve_zone_pwm = 0,
+          .amp0_zone_pwm = heater_pid_1.out,
+          .amp1_zone_pwm = 0,
+          .amp2_zone_pwm = 0};
+      updateDutyCycles(pwmData);
+
+      // Send stop heater to sensors task
+      heater_run = false;
+      starting_run = false;
+      handle_amplification_stopstart_heater(heater_run);
+    } else {
+      starting_run = true;
+      heater_run = true;
+      heater_reset_all_pids();
+      // Send starting heater to sensors task
+      handle_amplification_stopstart_heater(heater_run);
+    }
+  } else if (heaterRxMessage.zoneSelect = VALVE) {
+    valve_zone_running = heaterRxMessage.zoneEnabled;
+    rampToTemp = config.ramp_to_temp_before_start_cycle_2;
+    if (!valve_zone_running) {
+      heater_pid_2.out = 0;
+      temperature_pwm_data_t pwmData = {
+          .valve_zone_pwm = 0,
+          .amp0_zone_pwm = heater_pid_2.out,
+          .amp1_zone_pwm = 0,
+          .amp2_zone_pwm = 0};
+      updateDutyCycles(pwmData);
+
+      // Send stop heater to sensors task
+      heater_run = false;
+      handle_valve_stopstart_heater(heater_run);
+    } else {
+      heater_run = true;
+      heater_reset_all_pids();
+      handle_valve_stopstart_heater(heater_run);
+    }
   }
 }

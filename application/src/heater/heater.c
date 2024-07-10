@@ -59,12 +59,16 @@ pid_controller_t amp2_pid_2;
 
 HeaterInterface samplePrepHeater_I = {
   .handleHeaterSensorDataRx = &samplePrepHandleHeaterSensorDataRx,
-  .handleMotorDataRx = &handleSampleMotorDataRx
+  .handleMotorDataRx = &handleSampleMotorDataRx,
+  .handleHeaterZoneStateUpdate = &samplePrepHandleHeaterZoneStateUpdate,
+  .resetHeaterPIDs = &samplePrepResetHeaterPIDs
 };
 
 HeaterInterface powerModuleHeater_I = {
   .handleHeaterSensorDataRx = &powerModuleHandleHeaterSensorDataRx,
-  .handleMotorDataRx = handleSampleMotorDataRx
+  .handleMotorDataRx = handleSampleMotorDataRx,
+  //.handleHeaterZoneStateUpdate = &powerModuleHandleHeaterZoneStateUpdate,
+  //.resetHeaterPIDs = &powerModuleResetHeaterPIDs;
 };
 
 
@@ -216,7 +220,8 @@ void heater_task(void *pvParameters) {
   HeaterInterface *heaterInterface = &powerModuleHeater_I;
 #endif
 
-  heater_reset_all_pids();
+  //heater_reset_all_pids();
+  heaterInterface->resetHeaterPIDs();
 
   for (;;) {
     xReturned = xQueueReceive(heaterRxQueue, &heaterRxMessage, portMAX_DELAY);
@@ -285,6 +290,10 @@ void heater_task(void *pvParameters) {
             printf("HEATER_TASK: Unable to send run error for greater than max temp to main_runErrorQueue.\n");
           }
         } else {
+          if (wdtTimeout++ > (1 / config.sample_rate)) { // send out once a second
+            wdtTimeout = 0;
+            sendWdtHeaterValid(); // update watchdog
+          }
           heaterInterface->handleHeaterSensorDataRx(heaterRxMessage.tempData);
         }
         break;

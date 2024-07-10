@@ -19,3 +19,5 @@ extern HeaterInterface samplePrepHeater_I;
 
 void handleSampleMotorDataRx(int motor_speed);
 void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data);
+void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage);
+void samplePrepResetHeaterPIDs(void);
