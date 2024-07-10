@@ -65,6 +65,9 @@
 #define DEFAULT_VALID_TIMEOUT_S 3600.0 // 1 hour
 #define DEFAULT_RECOVERY_THRES 40  // Percent
 #define OPTICAL_TRIG_THRES 800
+#define DEFAULT_DATE 100124 // Oct. 1 2024
+#define DEFAULT_TIME 120000 // 12 pm
+#define DEFAULT_SET_TIME false
 
 /* Device Debug Parameters */
 #define I2C_CONNECTED 1
