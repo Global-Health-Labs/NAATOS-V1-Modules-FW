@@ -711,6 +711,24 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
+  // Write calendar date
+  configBufferSize = sprintf(configBuffer, "mmddyy:%d\n", DEFAULT_DATE);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write time of day
+  configBufferSize = sprintf(configBuffer, "hhmmss:%d\n", DEFAULT_TIME);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write set time flag
+  configBufferSize = sprintf(configBuffer, "set_time_date:%s\n", DEFAULT_SET_TIME ? "true" : "false");
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
 #endif
 
   // Close the file
@@ -1055,9 +1073,10 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
   return FR_OK;
 }
 
-// Edit a variable in the config file
-FRESULT sd_card_edit_config_var(const char* var) {
+// Sets the set_time_date variable to "false"
+FRESULT sd_card_reset_set_time_date(void) {
   FRESULT res;
+  const char* var = "set_time_date";
   UINT br, bw;      // File read/write count
   char buffer[1024]; // Buffer to hold file content
   char temp_buffer[1024]; // Temporary buffer for modified content
@@ -1099,7 +1118,11 @@ FRESULT sd_card_edit_config_var(const char* var) {
   char* line = strtok(buffer, "\n");
   char* temp_ptr = temp_buffer;
   while (line != NULL) {
-    if (strstr(line, var) == NULL) {
+    if (strstr(line, var) != NULL) {
+      //Specified var found in line. Rewrite line to have it set to false
+      temp_ptr += sprintf(temp_ptr, "%s\n", "set_time_date:false");
+    }
+    else {
       // If the var is not found in the line, copy the line to the temp buffer
       temp_ptr += sprintf(temp_ptr, "%s\n", line);
     }
