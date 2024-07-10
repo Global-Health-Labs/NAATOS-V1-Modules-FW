@@ -17,7 +17,7 @@ SDK Version: 17.1
 #include "battery.h"
 #include "bsp.h"
 #include "fuel.h"
-#include "heater.h"
+#include "heater/heater.h"
 #include "i2c_hal_freertos.h"
 #include "led.h"
 #include "logger.h"

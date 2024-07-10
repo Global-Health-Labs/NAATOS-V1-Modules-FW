@@ -134,8 +134,6 @@
       <file file_name="../src/battery.c" />
       <file file_name="../src/battery.h" />
       <file file_name="../src/composite_usb.h" />
-      <file file_name="../src/heater.c" />
-      <file file_name="../src/heater.h" />
       <file file_name="../src/logger.c" />
       <file file_name="../src/logger.h" />
       <file file_name="../src/sensors.h" />
@@ -179,6 +177,15 @@
       <file file_name="../src/motor.h">
         <configuration Name="Debug" build_exclude_from_build="No" />
       </file>
+      <folder Name="heater">
+        <file file_name="../src/heater/powerModuleHeater.c" />
+        <file file_name="../src/heater/powerModuleHeater.h" />
+        <file file_name="../src/heater/samplePrepHeater.c" />
+        <file file_name="../src/heater/samplePrepHeater.h" />
+        <file file_name="../src/heater/heater.c" />
+        <file file_name="../src/heater/heater.h" />
+        <file file_name="../src/heater/heaterInterface.h" />
+      </folder>
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../sdk/external/segger_rtt/SEGGER_RTT.c" />

@@ -18,7 +18,7 @@
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 
-#include "heater.h"
+#include "heater/heater.h"
 #include "naatos_config.h"
 
 #define LOGS_DIR "logs"

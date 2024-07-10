@@ -83,7 +83,9 @@
 #define DEFAULT_VALID_TIMEOUT_S 3600.0 // 1 hour
 #define DEFAULT_RECOVERY_THRES 20    // Percent
 #define OPTICAL_TRIG_THRES 800
-#define DEFAULT_HEATER_SETPOINT 95.0
+#define DEFAULT_HEATER_SETPOINT 95.0 // Sample prep only
+#define MOTOR_SETPOINT_1  3900
+#define MOTOR_SETPOINT_2  3900
 #define DEFAULT_MOTOR_SPEED_PWM 71
 #define DEFAULT_RUN_MOTOR_1 true
 #define DEFAULT_RUN_HEATER_1 true
@@ -98,6 +100,14 @@
 #define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
 #define DEFAULT_LOGGING_RATE 5.000
 #define DEFAULT_WAIT_TIME_AFTER_VALVE_S 900.00 // 15 min
+#define VALVE_SETPOINT 67.6
+#define AMP0_SETPOINT 67.2
+#define AMP1_SETPOINT 67.4
+#define AMP2_SETPOINT 68.5
+#define VALVE_SETPOINT_2 93.0
+#define AMP0_SETPOINT_2 67.0
+#define AMP1_SETPOINT_2 67.0
+#define AMP2_SETPOINT_2 67.0
 #define DEFAULT_VALVE_MAX_TEMP 105.0
 #define DEFAULT_AMP0_MAX_TEMP 80.0
 #define DEFAULT_AMP1_MAX_TEMP 80.0
@@ -203,12 +213,6 @@ typedef struct {
   bool hal_triggered;
   bool optical_tiggered;
 } sensor_switches_t;
-
-// Zone Request Struct
-typedef struct {
-  bool on;
-  zone_t zone;
-} zone_run_req_t;
 
 // Motor Speed Request Struct
 typedef struct {

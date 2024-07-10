@@ -1,32 +1,16 @@
 #pragma once
 
-#include "naatos_config.h"
-#include "naatos_queues.h"
-#include "pid.h"
-#include "pwm.h"
-#include "usb.h"
+#include "../naatos_config.h"
+#include "../naatos_queues.h"
+#include "../pid.h"
+#include "../pwm.h"
+#include "../usb.h"
+#include "samplePrepHeater.h"
+#include "powerModuleHeater.h"
+#include "heaterInterface.h"
 
-#define VALVE_SETPOINT 67.6
-#define AMP0_SETPOINT 67.0
-#define AMP1_SETPOINT 67.2
-#define AMP2_SETPOINT 68.5
 
-#define VALVE_SETPOINT_2 83.2
-#define AMP0_SETPOINT_2 67.0
-#define AMP1_SETPOINT_2 67.0
-#define AMP2_SETPOINT_2 67.0
-
-#define MOTOR_SETPOINT_1  3900
-#define MOTOR_SETPOINT_2  3900
-
-#define M_KP 0.006
-#define M_KI 0.0005
-#define M_KD 0.002
-
-#define H_KP 2.0
-#define H_KI 0.010
-#define H_KD 0.0
-
+//-------- Power Module Defualt PID Configs ----------
 #define V_KP 2.250
 #define V_KI 0.025
 #define V_KD 2.25
@@ -59,6 +43,14 @@
 #define A2_KI_2 0.025
 #define A2_KD_2 2.25
 
+
+// --------Common Functions--------
 void heater_task(void *pvParameters);
 void sendWdtHeaterValid();
-void handleMotorDataRx(int motor_speed);
+
+// --------Power Module Functions--------
+void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data);
+
+extern HeaterInterface powerModuleHeater_I;
+
+extern HeaterVariables heaterVariables;
