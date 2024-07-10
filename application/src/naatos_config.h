@@ -239,6 +239,7 @@ typedef struct {
   float amp0_zone_pwm;
   float amp1_zone_pwm;
   float amp2_zone_pwm;
+  float sample_prep_heater_pwm;
 } temperature_pwm_data_t;
 
 typedef enum {

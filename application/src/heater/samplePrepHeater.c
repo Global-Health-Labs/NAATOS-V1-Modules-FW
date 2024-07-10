@@ -1,5 +1,6 @@
 #include "samplePrepHeater.h"
 #include "../motor.h"
+#include "../usb.h"
 #include "timers.h"
 
 pid_controller_t heater_pid_1;
@@ -23,10 +24,11 @@ temperature_pwm_data_t h_pwm_data = {
     .valve_zone_pwm = 0,
     .amp0_zone_pwm = 0,
     .amp1_zone_pwm = 0,
-    .amp2_zone_pwm = 0
+    .amp2_zone_pwm = 0,
+    .sample_prep_heater_pwm = 0
 };
 
-void handle_valve_stopstart_heater(bool heating) {
+void handle_cycle2_stopstart_heater(bool heating) {
   BaseType_t xReturned;
 
   // Handle case where amplification zone is on already, dont want to send stop
@@ -72,7 +74,7 @@ void handle_valve_stopstart_heater(bool heating) {
   }
 }
 
-void handle_amplification_stopstart_heater(bool heating) {
+void handle_cycle1_stopstart_heater(bool heating) {
   BaseType_t xReturned;
 
   // Handle case where valve zone is on already, dont want to send stop
@@ -207,6 +209,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     temperature_pwm_data_t pwmData = {
         .valve_zone_pwm = 0,
         .amp0_zone_pwm = heater_pid_1.out,
+        .sample_prep_heater_pwm = heater_pid_1.out,
         .amp1_zone_pwm = 0,
         .amp2_zone_pwm = 0};
 
@@ -332,6 +335,7 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
       temperature_pwm_data_t pwmData = {
           .valve_zone_pwm = 0,
           .amp0_zone_pwm = heater_pid_1.out,
+          .sample_prep_heater_pwm = heater_pid_1.out,
           .amp1_zone_pwm = 0,
           .amp2_zone_pwm = 0};
       updateDutyCycles(pwmData);
@@ -339,13 +343,13 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
       // Send stop heater to sensors task
       heater_run = false;
       starting_run = false;
-      handle_amplification_stopstart_heater(heater_run);
+      handle_cycle1_stopstart_heater(heater_run);
     } else {
       starting_run = true;
       heater_run = true;
       samplePrepResetHeaterPIDs();
       // Send starting heater to sensors task
-      handle_amplification_stopstart_heater(heater_run);
+      handle_cycle1_stopstart_heater(heater_run);
     }
   } else if (heaterRxMessage.zoneSelect = VALVE) {
     valve_zone_running = heaterRxMessage.zoneEnabled;
@@ -355,17 +359,18 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
       temperature_pwm_data_t pwmData = {
           .valve_zone_pwm = 0,
           .amp0_zone_pwm = heater_pid_2.out,
+          .sample_prep_heater_pwm = heater_pid_2.out,
           .amp1_zone_pwm = 0,
           .amp2_zone_pwm = 0};
       updateDutyCycles(pwmData);
 
       // Send stop heater to sensors task
       heater_run = false;
-      handle_valve_stopstart_heater(heater_run);
+      handle_cycle2_stopstart_heater(heater_run);
     } else {
       heater_run = true;
       samplePrepResetHeaterPIDs();
-      handle_valve_stopstart_heater(heater_run);
+      handle_cycle2_stopstart_heater(heater_run);
     }
   }
 }

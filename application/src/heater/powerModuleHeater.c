@@ -15,14 +15,106 @@ temperature_pwm_data_t pm_h_pwm_data = {
     .valve_zone_pwm = 0,
     .amp0_zone_pwm = 0,
     .amp1_zone_pwm = 0,
-    .amp2_zone_pwm = 0};
+    .amp2_zone_pwm = 0,
+    .sample_prep_heater_pwm = 0};
 
-temperature_pwm_data_t outputPwmData = {
-    .valve_zone_pwm = 0,
-    .amp0_zone_pwm = 0,
-    .amp1_zone_pwm = 0,
-    .amp2_zone_pwm = 0};
+bool pm_greater_than_max = false;
+bool pm_heater_run = false;
 
+void handle_valve_stopstart_heater(bool heating) {
+#ifndef SAMPLE_PREP_BOARD
+  BaseType_t xReturned;
+
+  // Handle case where amplification zone is on already, dont want to send stop
+  if (amplification_zone_running && !heating)
+    return;
+
+  SensorRxQueueMsg_t msg;
+  msg.type = SENSOR_MSG_HEATER_STATE;
+  msg.heaterRunning = heating;
+
+  // Send the heater status
+  xReturned = xQueueSend(sensorRxQueue, &msg, 0);
+  if (xReturned != pdPASS) {
+    printf("HEATER_TASK: Unable to send heater state to sensorRxQueue.\n");
+  }
+
+  watchdog_time_update_t wdtUpdate = {
+      .taskName = HEATER,
+      .valid = false};
+  wdtUpdate.valid = heating;
+
+  xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
+  if (xReturned != pdPASS) {
+    printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+  }
+
+  if(!heating){
+    printf("Sent valve heater stop");
+  }
+
+  PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_DISABLE};
+
+  if (heating) {
+    pwmMsg.type = PWM_MSG_ENABLE;
+  }
+
+  // Respond to heater change
+  xReturned = xQueueSend(pwmRxQueue, &pwmMsg, 0);
+  if (xReturned != pdPASS) {
+    printf("heater: Unable to send stop to pwmRxQueue.\n");
+  }
+#endif
+}
+
+void handle_amplification_stopstart_heater(bool heating) {
+#ifndef SAMPLE_PREP_BOARD
+  BaseType_t xReturned;
+
+  // Handle case where valve zone is on already, dont want to send stop
+  if (valve_zone_running && !heating)
+    return;
+
+  if(heating) {
+    //nrf_gpio_pin_set(BOOST_CONTROL_ENABLE_PIN);
+    //vTaskDelay(pdMS_TO_TICKS(400));
+  } else {
+    nrf_gpio_pin_clear(BOOST_CONTROL_ENABLE_PIN);
+  }
+
+  SensorRxQueueMsg_t msg;
+  msg.type = SENSOR_MSG_HEATER_STATE;
+  msg.heaterRunning = heating;
+
+  // Send the heater status
+  xReturned = xQueueSend(sensorRxQueue, &msg, 0);
+  if (xReturned != pdPASS) {
+    printf("HEATER_TASK: Unable to send heater state to sensorRxQueue.\n");
+  }
+
+  watchdog_time_update_t wdtUpdate = {
+      .taskName = HEATER,
+      .valid = false};
+  wdtUpdate.valid = heating;
+
+  xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
+  if (xReturned != pdPASS) {
+    printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+  }
+
+  PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_DISABLE};
+
+  if (heating) {
+    pwmMsg.type = PWM_MSG_ENABLE;
+  }
+
+  // Respond to heater change
+  xReturned = xQueueSend(pwmRxQueue, &pwmMsg, 0);
+  if (xReturned != pdPASS) {
+    printf("heater: Unable to send stop to pwmRxQueue.\n");
+  }
+#endif
+}
 
 void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 #ifndef SAMPLE_PREP_BOARD
@@ -164,26 +256,109 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 }
 
 void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
+#ifndef SAMPLE_PREP_BOARD
+  // Set zones enabled
+  if (heaterRxMessage.zoneSelect == AMPLIFICATION) {
+    amplification_zone_running = heaterRxMessage.zoneEnabled;
+    if (!amplification_zone_running) {
+      amp0_pid.out = 0;
+      amp1_pid.out = 0;
+      amp2_pid.out = 0;
+      valve_pid.out = 0;
 
+      temperature_pwm_data_t pwmData = {
+          .valve_zone_pwm = valve_pid.out,
+          .amp0_zone_pwm = amp0_pid.out,
+          .amp1_zone_pwm = amp1_pid.out,
+          .amp2_zone_pwm = amp2_pid.out};
+      updateDutyCycles(pwmData);
 
+      pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd); // TODO: Implement defaults
+    
+      // Reinitalize PID Values
+      pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
+      pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
+      pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
+
+      // Send stop heater to sensors task
+      heater_run = false;
+      starting_run = false;
+      handle_amplification_stopstart_heater(heater_run);
+    } else {
+      starting_run = true;
+      heater_run = true;
+      heater_reset_all_pids();
+      // Send starting heater to sensors task
+      handle_amplification_stopstart_heater(heater_run);
+    }
+  } else if (heaterRxMessage.zoneSelect = VALVE) {
+    valve_zone_running = heaterRxMessage.zoneEnabled;
+    if (!valve_zone_running) {
+      valve_pid.out = 0;
+      amp0_pid.out = 0;
+      amp1_pid.out = 0;
+      amp2_pid.out = 0;
+      temperature_pwm_data_t pwmData = {
+          .valve_zone_pwm = valve_pid.out,
+          .amp0_zone_pwm = amp0_pid.out,
+          .amp1_zone_pwm = amp1_pid.out,
+          .amp2_zone_pwm = amp2_pid.out};
+      updateDutyCycles(pwmData);
+      // Reinitalize PID Values
+      pid_controller_init(&valve_pid_2, config.valve_setpoint_2, config.valve_kp_2, config.valve_ki_2, config.valve_kd_2);
+      pid_controller_init(&amp0_pid_2, config.amp0_setpoint_2, config.amp0_kp_2, config.amp0_ki_2, config.amp0_kd_2);
+      pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2);
+      pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2);
+      // Send stop heater to sensors task
+      heater_run = false;
+      handle_valve_stopstart_heater(heater_run);
+    } else {
+      heater_run = true;
+      heater_reset_all_pids();
+      handle_valve_stopstart_heater(heater_run);
+    }
+  }
+#endif
 }
 
 void powerModuleResetHeaterPIDs(void) {
+#ifndef SAMPLE_PREP_BOARD
+  // Create PID Controllers
+  if (use_default_configuration_parameters) {
+    pid_controller_init(&valve_pid, VALVE_SETPOINT, V_KP, V_KI, V_KD);
+    pid_controller_init(&amp0_pid, AMP0_SETPOINT, A0_KP, A0_KI, A0_KD);
+    pid_controller_init(&amp1_pid, AMP1_SETPOINT, A1_KP, A1_KI, A1_KD);
+    pid_controller_init(&amp2_pid, AMP1_SETPOINT, A2_KP, A2_KI, A2_KD);
+  } else {
+    pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);
+    pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
+    pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
+    pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
+  }
 
-
+  // Create PID Controllers
+  if (use_default_configuration_parameters) {
+    pid_controller_init(&valve_pid_2, VALVE_SETPOINT_2, V_KP_2, V_KI_2, V_KD_2);
+    pid_controller_init(&amp0_pid_2, AMP0_SETPOINT_2, A0_KP_2, A0_KI_2, A0_KD_2);
+    pid_controller_init(&amp1_pid_2, AMP1_SETPOINT_2, A1_KP_2, A1_KI_2, A1_KD_2);
+    pid_controller_init(&amp2_pid_2, AMP1_SETPOINT_2, A2_KP_2, A2_KI_2, A2_KD_2);
+  } else {
+    pid_controller_init(&valve_pid_2, config.valve_setpoint_2, config.valve_kp_2, config.valve_ki_2, config.valve_kd_2);
+    pid_controller_init(&amp0_pid_2, config.amp0_setpoint_2, config.amp0_kp_2, config.amp0_ki_2, config.amp0_kd_2);
+    pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2);
+    pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2);
+  }
+  #endif
 }
 
 temperature_pwm_data_t getPowerModulePwmData(void) {
-
-
+  return pm_h_pwm_data;
 }
 
 bool getPowerModuleOverTempStatus(void) {
-
-
+  return pm_greater_than_max;
 }
 
 bool getPowerModuleHeaterRunningStatus(void) {
-
-
+  return pm_heater_run;
 }
