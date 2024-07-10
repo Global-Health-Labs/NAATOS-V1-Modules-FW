@@ -2,6 +2,125 @@
 #include "../motor.h"
 #include "timers.h"
 
+pid_controller_t heater_pid_1;
+pid_controller_t heater_pid_2;
+pid_controller_t motor_pid_1;
+pid_controller_t motor_pid_2;
+
+float heater1SetPoint = 0;
+float heater2SetPoint = 0;
+
+bool amplification_zone_running = false;
+bool valve_zone_running = false;
+bool starting_run = true;
+bool h_pwm_req = false;
+bool greater_than_max = false;
+bool heater_run = false;
+bool rampToTemp = false;
+int last_motor_speed = 0;
+
+temperature_pwm_data_t h_pwm_data = {
+    .valve_zone_pwm = 0,
+    .amp0_zone_pwm = 0,
+    .amp1_zone_pwm = 0,
+    .amp2_zone_pwm = 0
+};
+
+void handle_valve_stopstart_heater(bool heating) {
+  BaseType_t xReturned;
+
+  // Handle case where amplification zone is on already, dont want to send stop
+  if (amplification_zone_running && !heating)
+    return;
+
+  SensorRxQueueMsg_t msg;
+  msg.type = SENSOR_MSG_HEATER_STATE;
+  msg.heaterRunning = heating;
+
+  // Send the heater status
+  xReturned = xQueueSend(sensorRxQueue, &msg, 0);
+  if (xReturned != pdPASS) {
+    printf("HEATER_TASK: Unable to send heater state to sensorRxQueue.\n");
+  }
+
+  watchdog_time_update_t wdtUpdate = {
+      .taskName = HEATER,
+      .valid = false};
+  wdtUpdate.valid = heating;
+
+  if (heating) {
+    nrf_gpio_pin_set(MOTOR_POWER_ENABLE);
+  } else {
+    nrf_gpio_pin_clear(MOTOR_POWER_ENABLE);
+  }
+
+  xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
+  if (xReturned != pdPASS) {
+    printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+  }
+
+  PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_DISABLE};
+
+  if (heating) {
+    pwmMsg.type = PWM_MSG_ENABLE;
+  }
+
+  // Respond to heater change
+  xReturned = xQueueSend(pwmRxQueue, &pwmMsg, 0);
+  if (xReturned != pdPASS) {
+    printf("heater: Unable to send stop to pwmRxQueue.\n");
+  }
+}
+
+void handle_amplification_stopstart_heater(bool heating) {
+  BaseType_t xReturned;
+
+  // Handle case where valve zone is on already, dont want to send stop
+  if (valve_zone_running && !heating)
+    return;
+
+  SensorRxQueueMsg_t msg;
+  msg.type = SENSOR_MSG_HEATER_STATE;
+  msg.heaterRunning = heating;
+
+  // Send the heater status
+  xReturned = xQueueSend(sensorRxQueue, &msg, 0);
+  if (xReturned != pdPASS) {
+    printf("HEATER_TASK: Unable to send heater state to sensorRxQueue.\n");
+  }
+
+  watchdog_time_update_t wdtUpdate = {
+      .taskName = HEATER,
+      .valid = false};
+  wdtUpdate.valid = heating;
+
+  if (heating) {
+    nrf_gpio_pin_set(MOTOR_POWER_ENABLE);
+    //nrf_gpio_pin_set(BOOST_CONTROL_ENABLE_PIN);
+  } else {
+    nrf_gpio_pin_clear(MOTOR_POWER_ENABLE);
+    //nrf_gpio_pin_clear(BOOST_CONTROL_ENABLE_PIN);
+  }
+
+  xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
+  if (xReturned != pdPASS) {
+    printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+  }
+
+  PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_DISABLE};
+
+  if (heating) {
+    pwmMsg.type = PWM_MSG_ENABLE;
+  }
+
+  // Respond to heater change
+  xReturned = xQueueSend(pwmRxQueue, &pwmMsg, 0);
+  if (xReturned != pdPASS) {
+    printf("heater: Unable to send stop to pwmRxQueue.\n");
+  }
+}
+
+
 void samplePrepResetHeaterPIDs(void) {
   // Create PID Controllers
   if (use_default_configuration_parameters) {
@@ -224,7 +343,7 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
     } else {
       starting_run = true;
       heater_run = true;
-      heater_reset_all_pids();
+      samplePrepResetHeaterPIDs();
       // Send starting heater to sensors task
       handle_amplification_stopstart_heater(heater_run);
     }
@@ -245,8 +364,20 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
       handle_valve_stopstart_heater(heater_run);
     } else {
       heater_run = true;
-      heater_reset_all_pids();
+      samplePrepResetHeaterPIDs();
       handle_valve_stopstart_heater(heater_run);
     }
   }
+}
+
+temperature_pwm_data_t getSamplePrepPwmData(void) {
+  return h_pwm_data;
+}
+
+bool getSamplePrepOverTempStatus(void) {
+  return greater_than_max;
+}
+
+bool getSamplePrepHeaterRunningStatus(void) {
+  return heater_run;
 }

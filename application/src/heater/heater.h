@@ -52,5 +52,3 @@ void sendWdtHeaterValid();
 void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data);
 
 extern HeaterInterface powerModuleHeater_I;
-
-extern HeaterVariables heaterVariables;
