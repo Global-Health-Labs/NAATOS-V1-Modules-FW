@@ -86,14 +86,23 @@ void wdtFeedTask(void *pvParameters) {
 #if NAATOS_ENABLE_WATCHDOG
     if (heaterValid) {
       heaterTicks++;
+      if(heaterTicks >= MAX_WDT_TASK_TIMEOUT-1){
+        printf("WATCHDOG: Heater Ticks reached max!\n");
+      }
     }
 
     if (batteryValid) {
       batteryTicks++;
+      if(batteryTicks >= MAX_WDT_TASK_TIMEOUT-1){
+        printf("WATCHDOG: Battery Ticks reached max!\n");
+      }
     }
 
     if (mainValid) {
       mainTicks++;
+      if(mainTicks >= MAX_WDT_TASK_TIMEOUT-1){
+        printf("WATCHDOG: Main Ticks reached max!\n");
+      }
     }
 
     if (heaterTicks < MAX_WDT_TASK_TIMEOUT && batteryTicks < MAX_WDT_TASK_TIMEOUT && mainTicks < MAX_WDT_TASK_TIMEOUT) {

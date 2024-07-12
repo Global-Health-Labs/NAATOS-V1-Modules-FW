@@ -477,6 +477,13 @@ double readMotorSpeed(void) {
 
   //Convert pulse count to rotational speed
   double motor_speed_rpm = (1000 * 60 * ((double)pulse_count / (double)delta_t)) / 9;
+
+  if(motor_speed_rpm < 0 || motor_speed_rpm > 8000) {
+    printf("Motor speed: %f\r\n", motor_speed_rpm);
+    printf("delta_t: %lu\r\n", delta_t);
+    printf("pulse_count: %lu\r\n", pulse_count);
+  }
+
   //printf("Motor speed: %f\r\n", motor_speed_rpm);
 
   //Clear the counter, update variable for tracking elapsed time
