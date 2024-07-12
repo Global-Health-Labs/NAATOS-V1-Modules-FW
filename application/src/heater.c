@@ -505,6 +505,13 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
 
 #ifdef SAMPLE_PREP_BOARD
     if ((config.heater_max_temp < temperature_data.amp2_zone_temp) || temperature_data.amp2_zone_temp < 0 || temperature_data.amp2_zone_temp > 120) {
+      int size;
+      char buff[60];
+      size = sprintf(buff, "HEATER Overtemp: %.3f\n", temperature_data.amp2_zone_temp);
+
+      write_to_com(buff, size);
+      
+      printf("HEATER Overtemp: %.3f\n", temperature_data.amp2_zone_temp);
       greater_than_max = true;
     }
 #else
@@ -553,17 +560,17 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     int size;
     char buff[60];
     size = sprintf(buff, "Heater: Temp: %0.2f\tDuty: %0.2f\r\n", temperature_data.amp2_zone_temp, heater_pid_1.out);
-    write_to_com(buff, size);
+    //write_to_com(buff, size);
     size = sprintf(buff, "Motor: Speed: %d\tDuty: %0.2f\r\n", last_motor_speed, h_pwm_data.amp1_zone_pwm);
-    write_to_com(buff, size);
+    //write_to_com(buff, size);
   }
   if (valve_zone_running) {
     int size;
     char buff[60];
     size = sprintf(buff, "Heater: Temp: %0.2f\tDuty: %0.2f\r\n", temperature_data.amp2_zone_temp, heater_pid_2.out);
-    write_to_com(buff, size);
+    //write_to_com(buff, size);
     size = sprintf(buff, "Motor: Speed: %d\tDuty: %0.2f\r\n", last_motor_speed, h_pwm_data.amp1_zone_pwm);
-    write_to_com(buff, size);
+    //write_to_com(buff, size);
   }
 #endif
 #endif

@@ -9,6 +9,7 @@
 #include "nrf_gpio.h"
 #include "nrf_error.h"
 #include "sdk_errors.h"
+#include "usb.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -28,9 +29,17 @@ static nrf_drv_twi_config_t twi_configs[i2c_num_interfaces];
 void i2c_error_recovery(i2c_interface_selection_t interface) {
     nrf_drv_twi_disable(&m_i2c[interface]);
     nrf_drv_twi_uninit(&m_i2c[interface]);
+    nrf_gpio_pin_clear(SENSORS_EN);
+    vTaskDelay(pdMS_TO_TICKS(5));
+    nrf_gpio_pin_set(SENSORS_EN);
     vTaskDelay(pdMS_TO_TICKS(5));  // Short delay to ensure the bus is idle
     nrf_drv_twi_init(&m_i2c[interface], &twi_configs[interface], NULL, NULL);
+
+    int size;
+    char buff[60];
+    size = sprintf(buff, "I2C error recovery attempt on interface: %i\n", interface);
     printf("I2C error recovery attempt on interface: %i\n", interface);
+    write_to_com(buff, size);
 }
 
 /* INIT for TWI hardware for peripheral */
@@ -56,24 +65,31 @@ void vInit_TWI_Hardware(i2c_interface_selection_t interface, uint32_t sda_pin, u
             .interrupt_priority = APP_IRQ_PRIORITY_HIGH, // Interrupt priority.
             .clear_bus_init = false, // Clear bus during init.
             .hold_bus_uninit = false // Hold pull up state on gpio pins after uninit.
+          
     };
     twi_configs[interface] = twi_config;
 
     err_code = nrf_drv_twi_init( &m_i2c[interface], &twi_configs[interface], NULL, NULL );
+
+    
+
+
     //APP_ERROR_CHECK( err_code );
     //
     nrf_gpio_cfg( scl_pin, // pin_number
                     NRF_GPIO_PIN_DIR_INPUT, // Input.
                     NRF_GPIO_PIN_INPUT_CONNECT, // Connect input buffer.
                     NRF_GPIO_PIN_PULLUP, // Pin pull-up resistor disabled.
-                    NRF_GPIO_PIN_S0S1, // Standard '0', standard '1'.
+                    NRF_GPIO_PIN_H0H1, // Standard '0', standard '1'.
+                    //NRF_GPIO_PIN_S0S1,
                     NRF_GPIO_PIN_NOSENSE // Pin sense level disabled.
                   );
     nrf_gpio_cfg( sda_pin,	// pin_number
                     NRF_GPIO_PIN_DIR_INPUT, // Input.
                     NRF_GPIO_PIN_INPUT_CONNECT, // Connect input buffer.
                     NRF_GPIO_PIN_PULLUP, // Pin pull-up resistor disabled.
-                    NRF_GPIO_PIN_S0S1,	// Standard '0', standard '1'.
+                    NRF_GPIO_PIN_H0H1,	// Standard '0', standard '1'.
+                    //NRF_GPIO_PIN_S0S1,
                     NRF_GPIO_PIN_NOSENSE // Pin sense level disabled.
                   );
     // RTOS init

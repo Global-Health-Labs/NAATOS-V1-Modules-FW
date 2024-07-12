@@ -9,6 +9,8 @@
 
 #define NAATOS_FW_VERSON "V1.0.0"
 
+#define UART_PRINT_F_ENABLED
+
 #define pdTICKS_TO_MS(xTimeInTicks) ((TickType_t)(((uint64_t)(xTimeInTicks) * (uint64_t)1000U) / (uint64_t)configTICK_RATE_HZ))
 
 /* Battery Parameters */
@@ -40,7 +42,7 @@
 
 #define SAMPLE_HEATER_PIN 33 // P1.01
 
-#define SENSORS_EN 39
+#define SENSORS_EN NRF_GPIO_PIN_MAP(1, 7)
 
 #define HAL_INPUT_PIN 2
 #define OPTICAL_INPUT_PIN 3

@@ -2,6 +2,8 @@
 #include "motor.h"
 #include "nrf_drv_timer.h"
 #include "timers.h"
+#include <math.h>
+#include "usb.h"
 
 void sensorCollection(void);
 
@@ -172,6 +174,7 @@ void sensors_task(void *pvParameters) {
   } else {
     sampleRateTicks = pdMS_TO_TICKS((config.sample_rate * 1000.0) - (12.0 * 4.0) + 1.0);
   }
+
   sensorTempTimer = xTimerCreate("SensorTempTimer", sampleRateTicks, pdTRUE, (void *)0, vSensorTempTimerCallback);
   sensorMotorTimer = xTimerCreate("SensorMotorTimer", 2, pdTRUE, (void *)0, vSensorMotorTimerCallback);
 
@@ -475,8 +478,27 @@ double readMotorSpeed(void) {
   uint32_t delta_t = pdTICKS_TO_MS(motor_speed_read_t2 - motor_speed_read_t1);
   uint32_t pulse_count = (nrf_drv_timer_capture(p_counter1, NRF_TIMER_CC_CHANNEL0)) / 2; //Divide by two because counter increments for every rising AND falling edge
 
+
   //Convert pulse count to rotational speed
-  double motor_speed_rpm = (1000 * 60 * ((double)pulse_count / (double)delta_t)) / 9;
+  double motor_speed_rpm = 0.0;
+  if (delta_t != 0) {
+      motor_speed_rpm = (1000 * 60 * ((double)pulse_count / (double)delta_t)) / 9;
+  } else {
+      int size;
+      char buff[60];
+      size = sprintf(buff, "Error: delta_t is zero, unable to calculate motor speed\r\n");
+      write_to_com(buff, size);
+      printf("Error: delta_t is zero, unable to calculate motor speed\r\n");
+  }
+
+  // Check if motor_speed_rpm is NaN
+  if (isnan(motor_speed_rpm)) {
+      int size;
+      char buff[60];
+      size = sprintf(buff, "Motor speed is NaN\r\n");
+      write_to_com(buff, size);
+      printf("Motor speed is NaN\r\n");
+  }
 
   if(motor_speed_rpm < 0 || motor_speed_rpm > 8000) {
     printf("Motor speed: %f\r\n", motor_speed_rpm);

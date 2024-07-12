@@ -71,6 +71,10 @@ static char m_rx_buffer[READ_SIZE];
 static char m_tx_buffer[NRF_DRV_USBD_EPSIZE];
 static bool m_send_flag = 0;
 
+void setup_uart_semaphore(void);
+void naatosPrintf(const char * msg, int len);
+
+
 void usb_task(void *pvParameters);
 void composite_usb_task(void *pvParameters);
 void write_to_com(const char * msg, int len);
