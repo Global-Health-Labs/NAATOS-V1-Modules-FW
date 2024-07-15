@@ -29,9 +29,33 @@ static nrf_drv_twi_config_t twi_configs[i2c_num_interfaces];
 void i2c_error_recovery(i2c_interface_selection_t interface) {
     nrf_drv_twi_disable(&m_i2c[interface]);
     nrf_drv_twi_uninit(&m_i2c[interface]);
-    nrf_gpio_pin_clear(SENSORS_EN);
-    vTaskDelay(pdMS_TO_TICKS(5));
-    nrf_gpio_pin_set(SENSORS_EN);
+
+      nrf_gpio_cfg( twi_configs[interface].scl, // pin_number
+                  NRF_GPIO_PIN_DIR_OUTPUT, // Input.
+                  NRF_GPIO_PIN_INPUT_DISCONNECT, // Connect input buffer.
+                  NRF_GPIO_PIN_PULLUP, // Pin pull-up resistor disabled.
+                  NRF_GPIO_PIN_H0H1, // Standard '0', standard '1'.
+                  //NRF_GPIO_PIN_S0S1,
+                  NRF_GPIO_PIN_NOSENSE // Pin sense level disabled.
+                );
+
+    for(int i = 0; i < 9; i++) {
+      nrf_gpio_pin_clear(twi_configs[interface].scl);
+      vTaskDelay(pdMS_TO_TICKS(1));
+      nrf_gpio_pin_set(twi_configs[interface].scl);
+      vTaskDelay(pdMS_TO_TICKS(1));
+    }
+    //nrf_gpio_pin_clear(SENSORS_EN);
+    //vTaskDelay(pdMS_TO_TICKS(5));
+    //nrf_gpio_pin_set(SENSORS_EN);
+    nrf_gpio_cfg( twi_configs[interface].scl, // pin_number
+                NRF_GPIO_PIN_DIR_INPUT, // Input.
+                NRF_GPIO_PIN_INPUT_CONNECT, // Connect input buffer.
+                NRF_GPIO_PIN_PULLUP, // Pin pull-up resistor disabled.
+                NRF_GPIO_PIN_H0H1, // Standard '0', standard '1'.
+                //NRF_GPIO_PIN_S0S1,
+                NRF_GPIO_PIN_NOSENSE // Pin sense level disabled.
+              );
     vTaskDelay(pdMS_TO_TICKS(5));  // Short delay to ensure the bus is idle
     nrf_drv_twi_init(&m_i2c[interface], &twi_configs[interface], NULL, NULL);
 
