@@ -102,6 +102,9 @@ typedef enum {
   AMP2_KP_2,
   AMP2_KI_2,
   AMP2_KD_2,
+  MMDDYY,
+  HHMMSS,
+  SET_DATE_TIME,
   NUM_PARAMETERS
 } naatos_config_params_t;
 #else
@@ -141,6 +144,9 @@ typedef enum {
   RUN_HEATER_1,
   RUN_MOTOR_2,
   RUN_HEATER_2,
+  MMDDYY,
+  HHMMSS,
+  SET_DATE_TIME,
   NUM_PARAMETERS
 } naatos_config_params_t;
 #endif
@@ -160,6 +166,7 @@ FRESULT sd_card_create_log_file(const char *file_name);
 FRESULT sd_card_mount(void);
 FRESULT sd_card_unmount(void);
 FRESULT sd_card_write_log_line(const char *logName, const char *writeBuff, uint32_t writeBuffSize);
+FRESULT sd_card_reset_set_time_date(void);
 FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters);
 
 #endif

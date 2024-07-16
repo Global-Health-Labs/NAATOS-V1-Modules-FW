@@ -78,6 +78,9 @@
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_1 true
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_2 false
 #define DEFAULT_RAMP_TO_TEMP_TIMEOUT 600.0 // 10min 
+#define DEFAULT_DATE 100124 // Oct. 1 2024
+#define DEFAULT_TIME 120000 // 12 pm
+#define DEFAULT_SET_TIME false
 
 /* Device Debug Parameters */
 #define I2C_CONNECTED 1
@@ -538,6 +541,9 @@ typedef struct {
   bool run_heater_1;
   bool run_motor_2;
   bool run_heater_2;
+  int mmddyy;
+  int hhmmss;
+  bool set_date_time;
 } naatos_config_parameters;
 #endif
 
