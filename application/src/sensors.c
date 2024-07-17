@@ -336,15 +336,19 @@ void init_sensors_gpios(void) {
 }
 
 bool readTemp(sensor_selection_t sensor, float *temperature) {
+  int i2cRetry = 0;
   tsys01_errors_t tsys_err;
 
-  tsys01_startConversion(sensor);
-  vTaskDelay(pdMS_TO_TICKS(12)); // 12ms conversion time
-  tsys_err = tsys01_getTemp(sensor, temperature);
+   tsys_err = tsys01_startConversion(sensor);
   if (tsys_err != tsys01_success) {
-    printf("HEATER_TASK: Unable to read temperature!\n");
-    return false;
+    printf("HEATER_TASK: Unable to triggr temperature conversion!\n");
+  } else {
+    vTaskDelay(pdMS_TO_TICKS(12)); // 12ms conversion time
+    tsys_err = tsys01_getTemp(sensor, temperature);
+    if (tsys_err != tsys01_success) {
+      printf("HEATER_TASK: Unable to read temperature! 1\n");
+    }
   }
 
-  return true;
+  return temperature;
 }
