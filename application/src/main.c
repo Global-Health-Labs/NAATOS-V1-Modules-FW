@@ -406,6 +406,10 @@ void main_task(void *pvParameters) {
         } else {
           alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(DEFAULT_ALERT_TIMEOUT_S * 1000.0));
         }
+        if(config.set_date_time) {
+          calendar_set_time_helper();
+          sd_card_reset_set_time_date();
+        }
         if (!error_during_run) {
           updateLedState(LED_WAKEUP, true);
           updateLedState(LED_RUN, false);
@@ -1573,11 +1577,6 @@ int main(void) {
     use_default_configuration_parameters = false;
   }
 
-  //Set the time
-  if(config.set_date_time) {
-    calendar_set_time_helper();
-    sd_card_reset_set_time_date();
-  }
   //calendar_set_32k();
 
   // Create Queues

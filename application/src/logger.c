@@ -1,4 +1,7 @@
 #include "logger.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 xQueueHandle logger_recvBattPercentQueue;
 xQueueHandle logger_logMessageQueue;
@@ -25,7 +28,7 @@ void getLogFileName(const char *_logFileName) {
     sprintf(_logFileName, "unknown.csv");
   }
   // Get current Date and Time and update vars
-  sprintf(_logFileName, "sample_%d-%d-%d_%d%d.csv", time.month, time.day, time.year, time.hour, time.minute);
+  sprintf(_logFileName, "sample_%d-%d-%d_%d%d%d.csv", time.month, time.day, time.year, time.hour, time.minute, time.second);
 }
 
 void logger_task(void *pvParameters) {

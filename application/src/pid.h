@@ -7,7 +7,7 @@
 
 /* PID Controller Parameters */
 #define PID_LIM_MIN 1.0f // TODO: Change these to acutal min maxes
-#define PID_LIM_MAX 90.0f
+#define PID_LIM_MAX 80.0f
 
 typedef struct {
   /* Controller Gains */
