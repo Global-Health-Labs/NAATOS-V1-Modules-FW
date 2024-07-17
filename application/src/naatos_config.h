@@ -68,7 +68,7 @@
 #define DEFAULT_DATE 100124 // Oct. 1 2024
 #define DEFAULT_TIME 120000 // 12 pm
 #define DEFAULT_SET_TIME false
-#define DEFAULT_MAX_HEATER_PID 100
+#define DEFAULT_MAX_HEATER_PID 70
 
 /* Device Debug Parameters */
 #define I2C_CONNECTED 1
