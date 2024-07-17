@@ -773,13 +773,13 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       break;
 #ifndef SAMPLE_PREP_BOARD
     case VALVE_ZONE_RUN_TIME:
-      parameters->amplification_zone_run_time_m = atoi(val); // TODO: Figure out why this is backwards
+      parameters->valve_zone_run_time_m = atoi(val);
       break;
     case AMP_ZONE_RUN_TIME:
-      parameters->valve_zone_run_time_m = atoi(val); // TODO: Figure out why this is backwards
+      parameters->amplification_zone_run_time_m = atoi(val); 
       break;
     case MIN_WAIT_TIME_AFTER_VALVE:
-      parameters->min_wait_time_after_valve_s = atoi(val); // TODO: Figure out why this is backwards
+      parameters->min_wait_time_after_valve_s = atoi(val);
       break;
     case VALVE_SETPOINT_C:
       parameters->valve_setpoint = atof(val);
