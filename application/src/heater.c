@@ -132,7 +132,7 @@ void heater_reset_all_pids(void) {
   int pid_max = DEFAULT_MAX_HEATER_PID;
 
   if(!use_default_configuration_parameters){
-    if(config.max_heater_pid_pwm > 0 && config.max_heater_pid_pwm < DEFAULT_MAX_HEATER_PID) {
+    if(config.max_heater_pid_pwm > 0 && config.max_heater_pid_pwm <= DEFAULT_MAX_HEATER_PID) {
       pid_max = config.max_heater_pid_pwm;
     }
   }
