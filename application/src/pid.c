@@ -1,6 +1,6 @@
 #include "pid.h"
 
-void pid_controller_init(pid_controller_t *pid, float setpoint, float k_p, float k_i, float k_d) {
+void pid_controller_init(pid_controller_t *pid, float setpoint, float k_p, float k_i, float k_d, int pid_max) {
   // Clear controller variables
   pid->intergrator = 0.0f;
   pid->prevMesurement = 0.0f;
@@ -12,7 +12,7 @@ void pid_controller_init(pid_controller_t *pid, float setpoint, float k_p, float
   pid->k_i = k_i;
   pid->k_d = k_d;
   // Set from defines
-  pid->lim_max = PID_LIM_MAX;
+  pid->lim_max = pid_max;
   pid->lim_min = PID_LIM_MIN;
 }
 

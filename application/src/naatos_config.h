@@ -68,6 +68,7 @@
 #define DEFAULT_DATE 100124 // Oct. 1 2024
 #define DEFAULT_TIME 120000 // 12 pm
 #define DEFAULT_SET_TIME false
+#define DEFAULT_MAX_HEATER_PID 100
 
 /* Device Debug Parameters */
 #define I2C_CONNECTED 1
@@ -425,6 +426,7 @@ typedef struct {
   bool min_run_zone_temp_en;
   float alert_timeout_time_m;
   float sample_valid_timeout_s;
+  float max_heater_pid_pwm;
   float valve_kp;
   float valve_ki;
   float valve_kd;

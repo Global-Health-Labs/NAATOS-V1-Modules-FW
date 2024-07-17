@@ -310,6 +310,12 @@ FRESULT check_for_config_file(void) {
     return res;
   }
 
+  configBufferSize = sprintf(configBuffer, "max_heater_pwm:%d\n", DEFAULT_MAX_HEATER_PID);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
 
 #ifndef SAMPLE_PREP_BOARD
   configBufferSize = sprintf(configBuffer, "min_wait_time_after_valve_s:%0.2f\n", DEFAULT_WAIT_TIME_AFTER_VALVE_S);
@@ -770,6 +776,9 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       break;
     case SAMPLE_VALID_TIMEOUT:
       parameters->sample_valid_timeout_s = atof(val);
+      break;
+    case MAX_HEATER_PID_PWM:
+      parameters->max_heater_pid_pwm = atoi(val);
       break;
 #ifndef SAMPLE_PREP_BOARD
     case VALVE_ZONE_RUN_TIME:
