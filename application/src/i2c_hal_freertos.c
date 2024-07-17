@@ -33,7 +33,7 @@ void i2c_error_recovery(i2c_interface_selection_t interface) {
                   NRF_GPIO_PIN_DIR_OUTPUT, // Input.
                   NRF_GPIO_PIN_INPUT_DISCONNECT, // Connect input buffer.
                   NRF_GPIO_PIN_PULLUP, // Pin pull-up resistor disabled.
-                  NRF_GPIO_PIN_H0H1, // Standard '0', standard '1'.
+                  NRF_GPIO_PIN_H0D1, // Standard '0', standard '1'.
                   //NRF_GPIO_PIN_S0S1,
                   NRF_GPIO_PIN_NOSENSE // Pin sense level disabled.
                 );
@@ -51,7 +51,7 @@ void i2c_error_recovery(i2c_interface_selection_t interface) {
                 NRF_GPIO_PIN_DIR_INPUT, // Input.
                 NRF_GPIO_PIN_INPUT_CONNECT, // Connect input buffer.
                 NRF_GPIO_PIN_PULLUP, // Pin pull-up resistor disabled.
-                NRF_GPIO_PIN_H0H1, // Standard '0', standard '1'.
+                NRF_GPIO_PIN_H0D1, // Standard '0', standard '1'.
                 //NRF_GPIO_PIN_S0S1,
                 NRF_GPIO_PIN_NOSENSE // Pin sense level disabled.
               );
@@ -85,24 +85,26 @@ void vInit_TWI_Hardware(i2c_interface_selection_t interface, uint32_t sda_pin, u
             .clear_bus_init = false, // Clear bus during init.
             .hold_bus_uninit = false // Hold pull up state on gpio pins after uninit.
     };
+
     err_code = nrf_drv_twi_init( &m_i2c[interface], &twi_config, NULL, NULL );
     twi_configs[interface] = twi_config;
-    //APP_ERROR_CHECK( err_code );
-    //
+
     nrf_gpio_cfg( scl_pin, // pin_number
-                    NRF_GPIO_PIN_DIR_INPUT, // Input.
-                    NRF_GPIO_PIN_INPUT_CONNECT, // Connect input buffer.
-                    NRF_GPIO_PIN_PULLUP, // Pin pull-up resistor disabled.
-                    NRF_GPIO_PIN_S0S1, // Standard '0', standard '1'.
-                    NRF_GPIO_PIN_NOSENSE // Pin sense level disabled.
+                  NRF_GPIO_PIN_DIR_INPUT, // Input.
+                  NRF_GPIO_PIN_INPUT_CONNECT, // Connect input buffer.
+                  NRF_GPIO_PIN_PULLUP, // Pin pull-up resistor disabled.
+                  NRF_GPIO_PIN_H0D1, // Standard '0', standard '1'.
+                  NRF_GPIO_PIN_NOSENSE // Pin sense level disabled.
                   );
     nrf_gpio_cfg( sda_pin,	// pin_number
                     NRF_GPIO_PIN_DIR_INPUT, // Input.
                     NRF_GPIO_PIN_INPUT_CONNECT, // Connect input buffer.
                     NRF_GPIO_PIN_PULLUP, // Pin pull-up resistor disabled.
-                    NRF_GPIO_PIN_S0S1,	// Standard '0', standard '1'.
+                    NRF_GPIO_PIN_H0D1,	// Standard '0', standard '1'.
                     NRF_GPIO_PIN_NOSENSE // Pin sense level disabled.
                   );
+    //APP_ERROR_CHECK( err_code );
+    //
     // RTOS init
     m_i2c_semaphores[interface] = xSemaphoreCreateBinary();// Ensure the semaphore is created before it gets used.
     ASSERT( m_i2c_semaphores[interface] );          // LOCK HERE: the semaphore could not be created
