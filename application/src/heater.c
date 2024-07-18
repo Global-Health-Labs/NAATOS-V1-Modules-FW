@@ -85,14 +85,8 @@ void handle_amplification_stopstart_heater(bool heating) {
   BaseType_t xReturned;
 
   // Handle case where valve zone is on already, dont want to send stop
-  if (valve_zone_running && !heating)
+  if (valve_zone_running && !heating) {
     return;
-
-  if(heating) {
-    //nrf_gpio_pin_set(BOOST_CONTROL_ENABLE_PIN);
-    //vTaskDelay(pdMS_TO_TICKS(400));
-  } else {
-    nrf_gpio_pin_clear(BOOST_CONTROL_ENABLE_PIN);
   }
 
   SensorRxQueueMsg_t msg;
