@@ -60,6 +60,8 @@ void logger_task(void *pvParameters) {
     if (xReturned != pdPASS) {
       printf("LOG_TASK: Unable to receive state change from logger_mainStateChangeQueue.\n");
     }
+
+    printf("LOG_TASK:Passed send to main\n");
     // Respond to main state change
     xReturned = xQueueSend(main_mainStateRespQueue, &logger_task, 0);
     if (xReturned != pdPASS) {
@@ -70,6 +72,8 @@ void logger_task(void *pvParameters) {
     if (xReturned != pdPASS) {
       printf("USB: Unable to recevive continue to logger_mainStateContinueQueue queue.\n");
     }
+
+    printf("LOG_TASK:Passed continue\n");
 
     if (main_state == MAIN_RUNNING) {
       // Create Log File based on the UTC Time of the Sample preparation
@@ -168,17 +172,6 @@ void logger_task(void *pvParameters) {
           FRESULT res = sd_card_write_log_line(logFileName, logFileLine, logFileLineSize);
           if (res != FR_OK) {
             printf("LOG_TASK: Unable to write last log line!\n");
-          } else {
-            printf("LOG_TASK: Wrote line to log. ");
-
-            printf("Read back time  M:%d D:%d Y:%d h:%d m:%d s:%d\r\n",
-                time.month,
-                time.day,
-                time.year,
-                time.hour,
-                time.minute,
-                time.second
-            );
           }
         }
       }
