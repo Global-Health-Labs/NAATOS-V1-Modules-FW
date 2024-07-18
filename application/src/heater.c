@@ -568,17 +568,17 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     int size;
     char buff[60];
     size = sprintf(buff, "Heater: Temp: %0.2f\tDuty: %0.2f\r\n", temperature_data.amp2_zone_temp, heater_pid_1.out);
-    //write_to_com(buff, size);
+    write_to_com(buff, size);
     size = sprintf(buff, "Motor: Speed: %d\tDuty: %0.2f\r\n", last_motor_speed, h_pwm_data.amp1_zone_pwm);
-    //write_to_com(buff, size);
+    write_to_com(buff, size);
   }
   if (valve_zone_running) {
     int size;
     char buff[60];
     size = sprintf(buff, "Heater: Temp: %0.2f\tDuty: %0.2f\r\n", temperature_data.amp2_zone_temp, heater_pid_2.out);
-    //write_to_com(buff, size);
+    write_to_com(buff, size);
     size = sprintf(buff, "Motor: Speed: %d\tDuty: %0.2f\r\n", last_motor_speed, h_pwm_data.amp1_zone_pwm);
-    //write_to_com(buff, size);
+    write_to_com(buff, size);
   }
 #endif
 #endif
