@@ -7,18 +7,9 @@
 
 #define SAMPLE_PREP_BOARD
 
-#define NAATOS_FW_VERSON "V1.0.0"
-
 #define UART_PRINT_F_ENABLED
 
 #define pdTICKS_TO_MS(xTimeInTicks) ((TickType_t)(((uint64_t)(xTimeInTicks) * (uint64_t)1000U) / (uint64_t)configTICK_RATE_HZ))
-
-/* Battery Parameters */
-#define DEFAULT_LOW_POWER_THRESHOLD 20
-
-/* Heater Zones' Parameters */
-#define DEFAULT_AMPLIFICATION_ZONE_ON_TIME 120 // Seconds
-#define DEFAULT_VALVE_ZONE_ON_TIME 120         // Seconds
 
 /* I2C Pins */
 #define I2C0_SDA_PIN 17
@@ -55,6 +46,10 @@
    these rates will be used in the system.
  * Rates are in seconds
 */
+/* Battery Parameters */
+#define DEFAULT_LOW_POWER_THRESHOLD 20
+#define DEFAULT_AMPLIFICATION_ZONE_ON_TIME 120 // Seconds
+#define DEFAULT_VALVE_ZONE_ON_TIME 120         // Seconds
 #define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
 #define DEFAULT_LOGGING_RATE 1.000
 #define DEFAULT_VALVE_MAX_TEMP 115.0
