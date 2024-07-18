@@ -117,10 +117,10 @@ void handle_amplification_stopstart_heater(bool heating) {
 
   if (heating) {
     nrf_gpio_pin_set(MOTOR_POWER_ENABLE);
-    nrf_gpio_pin_set(BOOST_CONTROL_ENABLE_PIN);
+    //nrf_gpio_pin_set(BOOST_CONTROL_ENABLE_PIN);
   } else {
     nrf_gpio_pin_clear(MOTOR_POWER_ENABLE);
-    nrf_gpio_pin_clear(BOOST_CONTROL_ENABLE_PIN);
+    //nrf_gpio_pin_clear(BOOST_CONTROL_ENABLE_PIN);
   }
 
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
