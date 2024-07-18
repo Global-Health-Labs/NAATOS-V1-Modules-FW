@@ -24,7 +24,7 @@
 #define LOGS_DIR "logs"
 #define CONFIG_DIR "config"
 
-#define NAATOS_CONFIG_FILE "config.txt"
+#define NAATOS_CONFIG_FILE "config_v1.4.txt"
 
 #define CSV_HEADER "Time,ValveTemp,ValvePWM,Amp0Temp,Amp0PWM,Amp1Temp,Amp1PWM,Amp2Temp,Amp2PWM,Batt,Event\n"
 #define CSV_HEADER_SIZE 86
