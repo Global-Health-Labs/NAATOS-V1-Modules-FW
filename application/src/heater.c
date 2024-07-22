@@ -332,7 +332,7 @@ void handleMotorDataRx(int motor_speed) {
   else if (valve_zone_running) {
     temperature_pwm_data_t pwmData = {
       .valve_zone_pwm = 0,
-      .amp0_zone_pwm = heater_pid_1.out,
+      .amp0_zone_pwm = heater_pid_2.out,
       .amp1_zone_pwm = 0,
       .amp2_zone_pwm = 0
     };
@@ -409,7 +409,7 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     temperature_pwm_data_t pwmData = {
         .valve_zone_pwm = 0,
         .amp0_zone_pwm = heater_pid_1.out,
-        .amp1_zone_pwm = 0,
+        .amp1_zone_pwm = h_pwm_data.amp1_zone_pwm,
         .amp2_zone_pwm = 0};
 
     // Update Amplification 2 PWM with PID output
@@ -568,6 +568,7 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     int size;
     char buff[60];
     size = sprintf(buff, "Heater: Temp: %0.2f\tDuty: %0.2f\r\n", temperature_data.amp2_zone_temp, heater_pid_1.out);
+    printf(buff);
     write_to_com(buff, size);
     size = sprintf(buff, "Motor: Speed: %d\tDuty: %0.2f\r\n", last_motor_speed, h_pwm_data.amp1_zone_pwm);
     write_to_com(buff, size);
@@ -576,6 +577,7 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     int size;
     char buff[60];
     size = sprintf(buff, "Heater: Temp: %0.2f\tDuty: %0.2f\r\n", temperature_data.amp2_zone_temp, heater_pid_2.out);
+    printf(buff);  
     write_to_com(buff, size);
     size = sprintf(buff, "Motor: Speed: %d\tDuty: %0.2f\r\n", last_motor_speed, h_pwm_data.amp1_zone_pwm);
     write_to_com(buff, size);

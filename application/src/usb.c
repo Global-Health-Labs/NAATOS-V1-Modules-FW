@@ -591,6 +591,7 @@ void usb_task(void *pvParameters) {
         usbd_user_ev_handler(APP_USBD_EVT_POWER_REMOVED);
         app_usbd_disable();
         app_usbd_uninit();
+ 
         // Restart the USB
         start_usb(true, true);
         usbd_user_ev_handler(APP_USBD_EVT_POWER_DETECTED);

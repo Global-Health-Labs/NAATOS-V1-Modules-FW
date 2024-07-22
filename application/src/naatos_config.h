@@ -7,6 +7,11 @@
 
 #define SAMPLE_PREP_BOARD
 
+// For testing only. Do not enable both at the same time
+//#define DIRECT_TO_USB
+//#define DIRECT_TO_RUN
+////////////////////////////////////////////////////////
+
 #define UART_PRINT_F_ENABLED
 
 #define pdTICKS_TO_MS(xTimeInTicks) ((TickType_t)(((uint64_t)(xTimeInTicks) * (uint64_t)1000U) / (uint64_t)configTICK_RATE_HZ))
