@@ -587,7 +587,7 @@ void main_task(void *pvParameters) {
         //set_led1_green_solid();
       }
 
-      if (config.ramp_to_temp_before_start_cycle_1) {
+      if (config.ramp_to_temp_before_start_cycle_1 && config.run_heater_1) {
         // Get the start time and end time
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
@@ -724,77 +724,79 @@ void main_task(void *pvParameters) {
       if (!error_during_run) {
         begin_valve_zone();
 
-        if (config.ramp_to_temp_before_start_cycle_2) {
-          // Get the start time and end time
-          start_time = xTaskGetTickCount();
-          if (use_default_configuration_parameters) {
-            end_time = pdMS_TO_TICKS((DEFAULT_RAMP_TO_TEMP_TIMEOUT)*1000);
-          } else {
-            end_time = pdMS_TO_TICKS((config.ramp_to_temp_c2_timeout) * 1000);
-          }
-          // Get sensor switch data ensuring sample is still in position
-          do {
-            // Ensure we do not go overtemp
-            if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
-              xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
-              if (xReturned != pdPASS) {
-                printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
+        if (config.ramp_to_temp_before_start_cycle_2 && config.run_heater_2) {
+          if (!config.ramp_to_temp_before_start_cycle_1 || (config.heater_setpoint_1 != config.heater_setpoint_2)) {
+              // Get the start time and end time
+              start_time = xTaskGetTickCount();
+              if (use_default_configuration_parameters) {
+                end_time = pdMS_TO_TICKS((DEFAULT_RAMP_TO_TEMP_TIMEOUT)*1000);
+              } else {
+                end_time = pdMS_TO_TICKS((config.ramp_to_temp_c2_timeout) * 1000);
               }
-              updateLedState(LED_ABORT, true);
-              error_during_run = true;
-              over_temp = true;
-              break;
-            }
+              // Get sensor switch data ensuring sample is still in position
+              do {
+                // Ensure we do not go overtemp
+                if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
+                  xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
+                  if (xReturned != pdPASS) {
+                    printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
+                  }
+                  updateLedState(LED_ABORT, true);
+                  error_during_run = true;
+                  over_temp = true;
+                  break;
+                }
 
-            bool setReachedRx = false;
-            xReturned = xQueueReceive(main_setPointReached, &setReachedRx, 0);
+                bool setReachedRx = false;
+                xReturned = xQueueReceive(main_setPointReached, &setReachedRx, 0);
 
-            if (setReachedRx) {
-              //TODO put setpoint reach message here
-              break;
-            }
+                if (setReachedRx) {
+                  //TODO put setpoint reach message here
+                  break;
+                }
 
-            // Get Switch data
-            xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
-            hal_triggered = switch_data.hal_triggered;
+                // Get Switch data
+                xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
+                hal_triggered = switch_data.hal_triggered;
 
-            if (!hal_triggered) {
-              updateLedState(LED_ABORT, true);
-              error_during_run = true;
-              break;
-            }
+                if (!hal_triggered) {
+                  updateLedState(LED_ABORT, true);
+                  error_during_run = true;
+                  break;
+                }
 
-            buttonData.event = NONE;
-            xQueueReceive(button_mainStateQueue, &buttonData, 0);
+                buttonData.event = NONE;
+                xQueueReceive(button_mainStateQueue, &buttonData, 0);
 
-            if (buttonData.event == ON_EVENT) {
-              updateLedState(LED_ABORT, true);
-              error_during_run = true;
-              break;
-            }
+                if (buttonData.event == ON_EVENT) {
+                  updateLedState(LED_ABORT, true);
+                  error_during_run = true;
+                  break;
+                }
 
-          } while (pdTICKS_TO_MS(xTaskGetTickCount() - start_time) < end_time);
+              } while (pdTICKS_TO_MS(xTaskGetTickCount() - start_time) < end_time);
 
-          if (error_during_run) {
-            end_valve_zone();
-            // Send Interrupt Event to logging task
-            if (!hal_triggered) {
-              xReturned = xQueueSend(logger_logMessageQueue, &interrupt_hal_log_msg, 0);
-              if (xReturned != pdPASS) {
-                printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+              if (error_during_run) {
+                end_valve_zone();
+                // Send Interrupt Event to logging task
+                if (!hal_triggered) {
+                  xReturned = xQueueSend(logger_logMessageQueue, &interrupt_hal_log_msg, 0);
+                  if (xReturned != pdPASS) {
+                    printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
+                  }
+                } else if (over_temp) {
+                  xReturned = xQueueSend(logger_logMessageQueue, &over_temp_msg, 0);
+                  if (xReturned != pdPASS) {
+                    printf("MAIN_TASK: Unable to send sample over temp event to logging task.\n");
+                  }
+                }
+                //TODO put stop to amp zone and go to standby on error here
+                next_state = MAIN_STANDBY;
+                sendUpdatedMainTaskState(next_state);
+                vTaskDelay(100);
+                break;
               }
-            } else if (over_temp) {
-              xReturned = xQueueSend(logger_logMessageQueue, &over_temp_msg, 0);
-              if (xReturned != pdPASS) {
-                printf("MAIN_TASK: Unable to send sample over temp event to logging task.\n");
-              }
             }
-            //TODO put stop to amp zone and go to standby on error here
-            next_state = MAIN_STANDBY;
-            sendUpdatedMainTaskState(next_state);
-            vTaskDelay(100);
-            break;
-          }
         }
 
         // Get Start Time and End Time
