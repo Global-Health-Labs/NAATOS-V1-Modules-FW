@@ -409,7 +409,7 @@ void handleSensorDataRx(temperature_data_t temperature_data) {
     temperature_pwm_data_t pwmData = {
         .valve_zone_pwm = 0,
         .amp0_zone_pwm = heater_pid_1.out,
-        .amp1_zone_pwm = h_pwm_data.amp1_zone_pwm,
+        .amp1_zone_pwm = 0,
         .amp2_zone_pwm = 0};
 
     // Update Amplification 2 PWM with PID output
