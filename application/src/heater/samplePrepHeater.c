@@ -124,33 +124,40 @@ void handle_cycle1_stopstart_heater(bool heating) {
 
 
 void samplePrepResetHeaterPIDs(void) {
+  int pid_max = DEFAULT_MAX_HEATER_PID;
+
+  if(!use_default_configuration_parameters){
+    if(config.max_heater_pid_pwm > 0 && config.max_heater_pid_pwm <= DEFAULT_MAX_HEATER_PID) {
+      pid_max = config.max_heater_pid_pwm;
+    }
+  }
   // Create PID Controllers
   if (use_default_configuration_parameters) {
     heater1SetPoint = DEFAULT_HEATER_SETPOINT;
-    pid_controller_init(&heater_pid_1, DEFAULT_HEATER_SETPOINT, H_KP, H_KI, H_KD);
+    pid_controller_init(&heater_pid_1, DEFAULT_HEATER_SETPOINT, H_KP, H_KI, H_KD, pid_max);
   } else {
     heater1SetPoint = config.heater_setpoint_1;
-    pid_controller_init(&heater_pid_1, config.heater_setpoint_1, config.heater_kp_1, config.heater_ki_1, config.heater_kd_1);
+    pid_controller_init(&heater_pid_1, config.heater_setpoint_1, config.heater_kp_1, config.heater_ki_1, config.heater_kd_1, pid_max);
   }
 
   if (use_default_configuration_parameters) {
     heater2SetPoint = DEFAULT_HEATER_SETPOINT;
-    pid_controller_init(&heater_pid_2, DEFAULT_HEATER_SETPOINT, H_KP, H_KI, H_KD);
+    pid_controller_init(&heater_pid_2, DEFAULT_HEATER_SETPOINT, H_KP, H_KI, H_KD, pid_max);
   } else {
     heater2SetPoint = config.heater_setpoint_2;
-    pid_controller_init(&heater_pid_2, config.heater_setpoint_2, config.heater_kp_2, config.heater_ki_2, config.heater_kd_2);
+    pid_controller_init(&heater_pid_2, config.heater_setpoint_2, config.heater_kp_2, config.heater_ki_2, config.heater_kd_2, pid_max);
   }
 
   if (use_default_configuration_parameters) {   
-    pid_controller_init(&motor_pid_1, MOTOR_SETPOINT_1, M_KP, M_KI, M_KD);
+    pid_controller_init(&motor_pid_1, MOTOR_SETPOINT_1, M_KP, M_KI, M_KD, 150);
   } else {
-    pid_controller_init(&motor_pid_1, config.motor_setpoint_1, config.motor_kp_1, config.motor_ki_1, config.motor_kd_1);
+    pid_controller_init(&motor_pid_1, config.motor_setpoint_1, config.motor_kp_1, config.motor_ki_1, config.motor_kd_1, 150);
   }
 
   if (use_default_configuration_parameters) {   
-    pid_controller_init(&motor_pid_2, MOTOR_SETPOINT_2, M_KP, M_KI, M_KD);
+    pid_controller_init(&motor_pid_2, MOTOR_SETPOINT_2, M_KP, M_KI, M_KD, pid_max);
   } else {
-    pid_controller_init(&motor_pid_2, config.motor_setpoint_2, config.motor_kp_2, config.motor_ki_2, config.motor_kd_2);
+    pid_controller_init(&motor_pid_2, config.motor_setpoint_2, config.motor_kp_2, config.motor_ki_2, config.motor_kd_2, 150);
   }
 }
 

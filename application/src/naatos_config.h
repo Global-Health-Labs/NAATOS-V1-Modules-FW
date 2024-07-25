@@ -508,6 +508,7 @@ typedef struct {
   float amp1_max_temp;
   float amp2_max_temp;
   float min_run_zone_temp;
+  float max_heater_pid_pwm;
   bool min_run_zone_temp_en;
   float alert_timeout_time_m;
   float sample_valid_timeout_s;
@@ -563,6 +564,7 @@ typedef struct {
   bool min_run_zone_temp_en;
   float alert_timeout_time_s;
   float sample_valid_timeout_s;
+  float max_heater_pid_pwm;
   float heater_kp_1;
   float heater_ki_1;
   float heater_kd_1;
