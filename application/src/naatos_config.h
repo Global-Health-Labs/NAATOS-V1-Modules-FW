@@ -96,6 +96,10 @@
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_1 true
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_2 false
 #define DEFAULT_RAMP_TO_TEMP_TIMEOUT 600.0 // 10min 
+#define DEFAULT_DATE 100124 // Oct. 1 2024
+#define DEFAULT_TIME 120000 // 12 pm
+#define DEFAULT_SET_TIME false
+#define DEFAULT_MAX_HEATER_PID 70
 #else
 #define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
 #define DEFAULT_LOGGING_RATE 5.000
@@ -536,6 +540,9 @@ typedef struct {
   float amp2_kp_2;
   float amp2_ki_2;
   float amp2_kd_2;
+  int mmddyy;
+  int hhmmss;
+  bool set_date_time;
 } naatos_config_parameters;
 #else
 typedef struct {
@@ -574,6 +581,9 @@ typedef struct {
   bool run_heater_1;
   bool run_motor_2;
   bool run_heater_2;
+  int mmddyy;
+  int hhmmss;
+  bool set_date_time;
 } naatos_config_parameters;
 #endif
 

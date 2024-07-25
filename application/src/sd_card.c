@@ -546,7 +546,6 @@ FRESULT check_for_config_file(void) {
     return res;
   }
 #else
-
   configBufferSize = sprintf(configBuffer, "cycle_1_run_time_m:%0.2f\n", DEFAULT_CYCLE_1_RUNTIME);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
@@ -711,6 +710,25 @@ FRESULT check_for_config_file(void) {
   }
 #endif
 
+  //BOTH
+  // Write calendar date
+  configBufferSize = sprintf(configBuffer, "mmddyy:%d\n", DEFAULT_DATE);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write time of day
+  configBufferSize = sprintf(configBuffer, "hhmmss:%d\n", DEFAULT_TIME);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write set time flag
+  configBufferSize = sprintf(configBuffer, "set_time_date:%s\n", DEFAULT_SET_TIME ? "true" : "false");
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
   // Close the file
   res = f_close(&file);
   if (res != FR_OK) {
@@ -800,6 +818,16 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       break;
     case SAMPLE_VALID_TIMEOUT:
       parameters->sample_valid_timeout_s = atof(val);
+      break;
+    case MMDDYY:
+      parameters->mmddyy = atoi(val);
+      break;
+    case HHMMSS:
+      parameters->hhmmss = atoi(val);
+      break;
+    case SET_DATE_TIME:
+      num = strcmp(val, "true");
+      parameters->set_date_time = num ? false : true;
       break;
 #ifndef SAMPLE_PREP_BOARD
     case VALVE_ZONE_RUN_TIME:
@@ -1031,4 +1059,92 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
   }
 
   return FR_OK;
+}
+
+// Sets the set_time_date variable to "false"
+FRESULT sd_card_reset_set_time_date(void) {
+  FRESULT res;
+  const char* var = "set_time_date";
+  UINT br, bw;      // File read/write count
+  char buffer[1024]; // Buffer to hold file content
+  char temp_buffer[1024]; // Temporary buffer for modified content
+
+  // Re-Mount SD Card
+  res = sd_card_mount();
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Open root directory
+  res = f_opendir(&dir, "/");
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Change directory into configs
+  res = f_chdir(CONFIG_DIR);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Open naatos config file
+  res = f_open(&file, NAATOS_CONFIG_FILE, FA_READ | FA_WRITE);
+  if (res != FR_OK) {
+    // Return that it already exists
+    return res;
+  }
+
+  // Read contents into a buffer
+  res = f_read(&file, buffer, sizeof(buffer) - 1, &br);
+  if (res != FR_OK) {
+    return res;
+  }
+  
+  buffer[br] = '\0';
+
+  // Search buffer for specified var. Copy lines that do not contain the specified var into temp_buffer
+  char* line = strtok(buffer, "\n");
+  char* temp_ptr = temp_buffer;
+  while (line != NULL) {
+    if (strstr(line, var) != NULL) {
+      //Specified var found in line. Rewrite line to have it set to false
+      temp_ptr += sprintf(temp_ptr, "%s\n", "set_time_date:false");
+    }
+    else {
+      // If the var is not found in the line, copy the line to the temp buffer
+      temp_ptr += sprintf(temp_ptr, "%s\n", line);
+    }
+    line = strtok(NULL, "\n");
+  }
+
+  // Move file pointer back to the beginning
+  res = f_lseek(&file, 0);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Write the contents of temp_buffer back into the config file (with the specified var removed)
+  res = f_write(&file, temp_buffer, strlen(temp_buffer), &bw);
+  if (res != FR_OK || bw < strlen(temp_buffer)) {
+    return res;
+  }
+
+  // Truncate file to new size
+  res = f_truncate(&file);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Close the file
+  res = f_close(&file);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Change back directories
+  res = f_chdir("..");
+  if (res != FR_OK) {
+    return res;
+  }
+
 }
