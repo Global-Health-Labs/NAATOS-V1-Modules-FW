@@ -1,4 +1,8 @@
 #include "logger.h"
+#include "loggerInterface.h"
+#include "SamplePrepLogger.h"
+#include "PowerModuleLogger.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,6 +24,20 @@ calendar_time_t time = {
 const BatteryRxQueueMsg_t batt_req = {
     .type = BATTERY_SOC_REQUEST,
     .sendTo = BATTERY_MSG_SOC_LOG};
+
+
+LoggerInterface samplePrepLogger_I = {
+  .getLogFileName = &samplePrepGetLogFileName,
+  .constructSensorDataLogLine = &samplePrepConstructSensorDataLogLine,
+  .constructEventDataLogLine = &samplePrepConstructEventDataLogLine
+};
+
+LoggerInterface powerModuleLogger_I = {
+  .getLogFileName = &powerModuleGetLogFileName,
+  .constructSensorDataLogLine = &powerModuleConstructSensorDataLogLine,
+  .constructEventDataLogLine = &powerModuleConstructEventDataLogLine
+};
+
 
 // Puts log file name in char pointer
 void getLogFileName(const char *_logFileName) {
@@ -47,6 +65,12 @@ void logger_task(void *pvParameters) {
   tasks_t logger_task = LOGGER;
   bool cont;
   bool interrupted = true;
+
+  #ifdef SAMPLE_PREP_BOARD
+  LoggerInterface *loggerInterface = &samplePrepLogger_I;
+  #else
+  LoggerInterface *loggerInterface = &powerModuleLogger_I;
+  #endif
 
   // If logging rate is less than once a second, do UART only
   if (config.logging_rate < 1.0) {
