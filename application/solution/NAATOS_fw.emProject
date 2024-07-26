@@ -134,8 +134,6 @@
       <file file_name="../src/battery.c" />
       <file file_name="../src/battery.h" />
       <file file_name="../src/composite_usb.h" />
-      <file file_name="../src/logger.c" />
-      <file file_name="../src/logger.h" />
       <file file_name="../src/sensors.h" />
       <file file_name="../src/states.h" />
       <file file_name="../src/usb.c">
@@ -185,6 +183,15 @@
         <file file_name="../src/heater/heater.c" />
         <file file_name="../src/heater/heater.h" />
         <file file_name="../src/heater/heaterInterface.h" />
+      </folder>
+      <folder Name="logger">
+        <file file_name="../src/logger/logger.c" />
+        <file file_name="../src/logger/logger.h" />
+        <file file_name="../src/logger/loggerInterface.h" />
+        <file file_name="../src/logger/PowerModuleLogger.c" />
+        <file file_name="../src/logger/PowerModuleLogger.h" />
+        <file file_name="../src/logger/SamplePrepLogger.c" />
+        <file file_name="../src/logger/SamplePrepLogger.h" />
       </folder>
     </folder>
     <folder Name="nRF_Segger_RTT">

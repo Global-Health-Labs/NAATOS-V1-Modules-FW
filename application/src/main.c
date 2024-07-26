@@ -20,7 +20,7 @@ SDK Version: 17.1
 #include "heater/heater.h"
 #include "i2c_hal_freertos.h"
 #include "led.h"
-#include "logger.h"
+#include "logger/logger.h"
 #include "motor.h"
 #include "naatos_config.h"
 #include "naatos_queues.h"

@@ -2,29 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "logger/loggerInterface.h"
-#include "logger/SamplePrepLogger.h"
-#include "logger/PowerModuleLogger.h"
-
 
 xQueueHandle logger_recvBattPercentQueue;
 xQueueHandle logger_logMessageQueue;
 xQueueHandle logger_mainStateChangeQueue;
 xQueueHandle logger_mainStateContinueQueue;
-
-
-LoggerInterface samplePrepLogger_I = {
-  .getLogFileName = &samplePrepGetLogFileName,
-  .constructSensorDataLogLine = &samplePrepConstructSensorDataLogLine,
-  .constructEventDataLogLine = &samplePrepConstructEventDataLogLine
-};
-
-LoggerInterface powerModuleLogger_I = {
-  .getLogFileName = &powerModuleGetLogFileName,
-  .constructSensorDataLogLine = &powerModuleConstructSensorDataLogLine,
-  .constructEventDataLogLine = &powerModuleConstructEventDataLogLine
-};
-
 
 calendar_time_t time = {
     .second = 0,
