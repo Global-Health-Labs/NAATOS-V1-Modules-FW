@@ -1,4 +1,7 @@
 #include "logger.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 xQueueHandle logger_recvBattPercentQueue;
 xQueueHandle logger_logMessageQueue;
@@ -25,7 +28,7 @@ void getLogFileName(const char *_logFileName) {
     sprintf(_logFileName, "unknown.csv");
   }
   // Get current Date and Time and update vars
-  sprintf(_logFileName, "sample_%d-%d-%d_%d%d.csv", time.month, time.day, time.year, time.hour, time.minute);
+  sprintf(_logFileName, "sample_%d-%d-%d_%d%d%d.csv", time.month, time.day, time.year, time.hour, time.minute, time.second);
 }
 
 void logger_task(void *pvParameters) {
@@ -57,19 +60,23 @@ void logger_task(void *pvParameters) {
     if (xReturned != pdPASS) {
       printf("LOG_TASK: Unable to receive state change from logger_mainStateChangeQueue.\n");
     }
+
+    printf("LOG_TASK:Passed send to main\n");
     // Respond to main state change
     xReturned = xQueueSend(main_mainStateRespQueue, &logger_task, 0);
     if (xReturned != pdPASS) {
       printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
     }
-    // Wait for Coninute
+    // Wait for Continue
     xReturned = xQueueReceive(logger_mainStateContinueQueue, &cont, portMAX_DELAY);
     if (xReturned != pdPASS) {
       printf("USB: Unable to recevive continue to logger_mainStateContinueQueue queue.\n");
     }
 
+    printf("LOG_TASK:Passed continue\n");
+
     if (main_state == MAIN_RUNNING) {
-      // Create Log File based on the UTC Time of the Sample preperation
+      // Create Log File based on the UTC Time of the Sample preparation
       getLogFileName(logFileName);
       res = sd_card_create_log_file(logFileName);
       if (res == FR_EXIST) {
@@ -150,6 +157,12 @@ void logger_task(void *pvParameters) {
               log_message.event_data.event == SAMPLE_RECOVERY_BATT ||
               log_message.event_data.event == SAMPLE_OVER_TEMP) {
             run_stopped = true;
+
+            //Zero out the last_temp_message elements so that they all start at zero for the next log file
+            last_temp_message.temperature_data.amp2_zone_temp = 0;
+            last_temp_message.temperature_data.amp0_zone_pwm = 0;
+            last_temp_message.temperature_data.motorSpeed = 0;
+            last_temp_message.temperature_data.amp1_zone_pwm = 0;
           }
         }
 
@@ -159,8 +172,6 @@ void logger_task(void *pvParameters) {
           FRESULT res = sd_card_write_log_line(logFileName, logFileLine, logFileLineSize);
           if (res != FR_OK) {
             printf("LOG_TASK: Unable to write last log line!\n");
-          } else {
-            printf("LOG_TASK: Wrote line to log\n");
           }
         }
       }
