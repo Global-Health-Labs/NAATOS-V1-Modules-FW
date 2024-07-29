@@ -482,7 +482,7 @@ double readMotorSpeed(void) {
   //Convert pulse count to rotational speed
   double motor_speed_rpm = 0.0;
   if (delta_t != 0) {
-      motor_speed_rpm = (1000 * 60 * ((double)pulse_count / (double)delta_t)) / 9;
+      motor_speed_rpm = (1000 * 60 * ((double)pulse_count / (double)delta_t)) / 6;
   } else {
       int size;
       char buff[60];
