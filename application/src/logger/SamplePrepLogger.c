@@ -6,6 +6,7 @@ void samplePrepGetLogFileName(const char *_logFileName, calendar_time_t time) {
 }
 
 uint32_t samplePrepConstructSensorDataLogLine(char*logLineBuffer, calendar_time_t time, log_data_message_t log_message, int battery_percent) {
+  // Format: Time,,Batt,Event
   return sprintf(logLineBuffer, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d, \n",
                 time.hour,
                 time.minute,

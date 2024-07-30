@@ -102,6 +102,7 @@ void logger_task(void *pvParameters) {
     if (main_state == MAIN_RUNNING) {
       // Create Log File based on the UTC Time of the Sample preparation
       getLogFileName(logFileName);
+      //loggerInterface->getLogFileName(logFileName);
       res = sd_card_create_log_file(logFileName);
       if (res == FR_EXIST) {
         printf("LOG_TASK: Warning! Log file with name already exist, will be overwritting that file.\n");
@@ -151,36 +152,16 @@ void logger_task(void *pvParameters) {
         if (log_message.data_type == TEMPERATURE_DATA) {
           // Set new temp to true
           new_temp = true;
-          // Format: Time,ValveTemp,ValvePWM,Amp0Temp,Amp0PWM,Amp1Temp,Amp1PWM,Amp2Temp,Amp2PWM,Batt,Event
-          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d, \n",
-              time.hour,
-              time.minute,
-              time.second,
-              log_message.temperature_data.amp2_zone_temp,
-              log_message.temperature_data.amp0_zone_pwm,
-              log_message.temperature_data.motorSpeed,
-              log_message.temperature_data.amp1_zone_pwm,
-              battery_percent);
+          loggerInterface->constructSensorDataLogLine(logFileLine, time, log_message, battery_percent);
           last_temp_message = log_message;
         } else if (log_message.data_type == EVENT_DATA) {
-
-          // Format: Time,ValveTemp,ValvePWM,Amp0Temp,Amp0PWM,Amp1Temp,Amp1PWM,Amp2Temp,Amp2PWM,Batt,Event
-          logFileLineSize = sprintf(logFileLine, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n",
-              time.hour,
-              time.minute,
-              time.second,
-              last_temp_message.temperature_data.amp2_zone_temp,
-              last_temp_message.temperature_data.amp0_zone_pwm,
-              last_temp_message.temperature_data.motorSpeed,
-              last_temp_message.temperature_data.amp1_zone_pwm,
-              battery_percent,
-              log_message.event_data.message);
+          loggerInterface->constructEventDataLogLine(logFileLine, time, log_message, battery_percent);
           if (log_message.event_data.event == SAMPLE_VALV_ENDED ||
               log_message.event_data.event == SAMPLE_INTERRUPTED ||
               log_message.event_data.event == SAMPLE_TEMPS_NOT_STABALIZED ||
               log_message.event_data.event == SAMPLE_RECOVERY_BATT ||
               log_message.event_data.event == SAMPLE_OVER_TEMP) {
-            run_stopped = true;
+              run_stopped = true;
 
             //Zero out the last_temp_message elements so that they all start at zero for the next log file
             last_temp_message.temperature_data.amp2_zone_temp = 0;
