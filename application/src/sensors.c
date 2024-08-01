@@ -28,7 +28,6 @@ temperature_pwm_data_t pwm_data = {
 static const nrf_drv_timer_t *p_counter1;
 static uint32_t motor_speed_read_t1 = 0;
 static uint32_t motor_speed_read_t2;
-static bool skipped_last_call = false;
 static long double motor_speed = 0.0; //RPM
 static long double avg_speed[3] = {0,0,0};
 static long double moving_avg_speed = 0.0;
@@ -511,7 +510,6 @@ double readMotorSpeed(void) {
   //Clear the counter, update variable for tracking elapsed time
   nrf_drv_timer_clear(p_counter1);
   motor_speed_read_t1 = xTaskGetTickCount();
-  skipped_last_call = false;
 
   return motor_speed_rpm;
 }

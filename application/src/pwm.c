@@ -48,8 +48,14 @@ void init_pwms() {
   pwm0_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
   //1 Channel PWM, 10kHz, Active High, Motor Control Pin */
   app_pwm_config_t pwm2_cfg = APP_PWM_DEFAULT_CONFIG_2CH(100L, MOTOR_OUTPUT_PIN, MOTOR_OUTPUT_PIN2);
-  pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
-  pwm2_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
+  
+  //For using old motor
+  //pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
+  //pwm2_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
+
+  //For using new motor
+  pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_LOW;
+  pwm2_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_LOW;
 #else
   /* 1 Channel PWM, 200Hz, Active High, Valve Zone Pin */
   app_pwm_config_t pwm0_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, VALVE_ZONE_PIN, AMP0_ZONE_PIN);
