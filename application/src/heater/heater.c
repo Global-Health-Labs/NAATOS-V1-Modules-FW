@@ -53,7 +53,7 @@ void heater_task(void *pvParameters) {
 
   for (;;) {
     xReturned = xQueueReceive(heaterRxQueue, &heaterRxMessage, portMAX_DELAY);
-    if (xReturned != pdPASS) {
+     if (xReturned != pdPASS) {
       printf("Unable to Rx data to heater queue\n");
     } else {
       switch (heaterRxMessage.type) {

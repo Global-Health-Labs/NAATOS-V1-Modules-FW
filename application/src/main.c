@@ -27,7 +27,7 @@ SDK Version: 17.1
 #include "nordic_common.h"
 #include "nrf_drv_clock.h"
 #include "pid.h"
-#include "pwm.h"
+#include "../pwm/pwm.h"
 #include "sd_card.h"
 #include "sdk_errors.h"
 #include "sensors.h"
@@ -1422,11 +1422,11 @@ void create_queues() {
 
   main_runErrorQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (main_runErrorQueue == NULL)
-    printf("Unable to create main_mainStateRespQueue queue\n");
+    printf("Unable to create main_runErrorQueue queue\n");
 
   main_runConfRespQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (main_runConfRespQueue == NULL)
-    printf("Unable to create main_mainStateRespQueue queue\n");
+    printf("Unable to create main_runConfRespQueue queue\n");
 
   main_usbConnRecvQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (main_usbConnRecvQueue == NULL)

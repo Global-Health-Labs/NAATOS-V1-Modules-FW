@@ -127,7 +127,6 @@
 /* Device Debug Parameters */
 #define USE_CALENDAR_CHIP 1
 #define VERBOSE_PID 1
-#define USE_MOTOR 1
 
 /* Log Event Messages */
 #define START_EVENT_MSG "Sample Preperation Started."
@@ -151,7 +150,8 @@ typedef enum {
   MAIN_RUNNING,
   MAIN_FILE,
   MAIN_SLEEP,
-  MAIN_BOOTLOADER
+  MAIN_BOOTLOADER,
+  MAIN_ALERT
 } main_state_t;
 
 typedef enum {
@@ -456,7 +456,6 @@ typedef struct {
   bool active;
 } LEDRxQueueMsg_t;
 
-/*
 typedef enum {
   MAIN_MSG_BATTERY_PERCENT,
   MAIN_MSG_BUTTON_EVENT,
@@ -469,6 +468,7 @@ typedef enum {
 } MainStateEvent_e;
 
 typedef struct {
+  MainStateEvent_e type;
   int batteryPercent;
   button_update_t buttonEvent;
   usbRxMsgType_t usbMsg;
@@ -476,7 +476,7 @@ typedef struct {
   bool overTempError;
   bool wakeupEvent;
 } MainStateRxQueueMsg_t;
-*/
+
 
 // Task Handles
 extern xTaskHandle mainTaskHandle;

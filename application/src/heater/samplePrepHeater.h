@@ -2,7 +2,7 @@
 #include "../naatos_config.h"
 #include "../naatos_queues.h"
 #include "../pid.h"
-#include "../pwm.h"
+#include "../pwm/pwm.h"
 #include "heaterInterface.h"
 
 

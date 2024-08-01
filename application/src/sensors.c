@@ -22,7 +22,7 @@ temperature_pwm_data_t pwm_data = {
     .amp1_zone_pwm = 0,
     .amp2_zone_pwm = 0};
 
-#if USE_MOTOR
+
 static const nrf_drv_timer_t *p_counter1;
 static uint32_t motor_speed_read_t1 = 0;
 static uint32_t motor_speed_read_t2;
@@ -30,7 +30,7 @@ static bool skipped_last_call = false;
 static long double motor_speed = 0.0; //RPM
 static long double avg_speed[3] = {0,0,0};
 static long double moving_avg_speed = 0.0;
-#endif
+
 
 static tsys01_errors_t tsys01_err;
 
@@ -487,7 +487,6 @@ void sensorMotorCollection(void) {
   HeaterRxQueueMsg_t heaterMsg;
 
   if (heaterRunning) {
-#if USE_MOTOR
     motorSpeed = readMotorSpeed();
     avg_speed[2] = avg_speed[1];
     avg_speed[1] = avg_speed[0];
@@ -501,7 +500,6 @@ void sensorMotorCollection(void) {
     if (xReturned != pdPASS) {
       printf("SENSORS_TASK: Unable to send temperature data in heaterRxQueue. Error: %d\n", xReturned);
     }
-#endif
   }
 }
 

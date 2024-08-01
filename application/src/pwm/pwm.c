@@ -1,8 +1,7 @@
 #include "pwm.h"
-#include "motor.h"
+#include "../motor.h"
 #include "timers.h"
 
-#define USE_MOTOR 1 //TODO: Remove
 
 APP_PWM_INSTANCE(PWM0, 0); // Create instance "PWM0" using TIMER0
 APP_PWM_INSTANCE(PWM2, 2); // Create instance "PWM2" using TIMER2
@@ -39,9 +38,6 @@ void init_pwms() {
 
   /* Create Configurations */
 
-  //SAMPLE_HEATER_PIN
-
-#if USE_MOTOR
   /* 1 Channel PWM, 200Hz, Active High, Valve Zone Pin */
   app_pwm_config_t pwm0_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, VALVE_ZONE_PIN, SAMPLE_HEATER_PIN);
   pwm0_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
@@ -50,16 +46,7 @@ void init_pwms() {
   app_pwm_config_t pwm2_cfg = APP_PWM_DEFAULT_CONFIG_2CH(100L, MOTOR_OUTPUT_PIN, MOTOR_OUTPUT_PIN2);
   pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
   pwm2_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
-#else
-  /* 1 Channel PWM, 200Hz, Active High, Valve Zone Pin */
-  app_pwm_config_t pwm0_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, VALVE_ZONE_PIN, AMP0_ZONE_PIN);
-  pwm0_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
-  pwm0_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
-  //1 Channel PWM, 200Hz, Active High, Amplification Zone Pin */
-  app_pwm_config_t pwm2_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, AMP1_ZONE_PIN, AMP2_ZONE_PIN);
-  pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
-  pwm2_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
-#endif
+
 
   /* Initalize with configurations */
   /* Initalize PWM0 */
@@ -108,17 +95,6 @@ void updateDutyCycles(temperature_pwm_data_t pwmData) {
   }
 }
 
-#if USE_MOTOR
-// Updates the Motor PWM Duty Cycle
-void update_motor_duty(int duty) {
-  motor_duty = duty;
-  if (motor_duty > 0)
-    motor_active = true;
-  else
-    motor_active = false;
-}
-#endif
-
 void pwm_task(void *pvParameters) {
   BaseType_t xReturned;
   usb_suspend_req_t sus_req;
@@ -139,11 +115,9 @@ void pwm_task(void *pvParameters) {
   app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, amp2_duty);
 #endif
 
-#if USE_MOTOR
+  // for motor
   app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, amp1_duty);
-#else
-  app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, amp1_duty);
-#endif
+
 
   PwmRxQueueMsg_t pwmMsg;
 
@@ -179,9 +153,6 @@ void pwm_task(void *pvParameters) {
           }
         }
 
-        // PWM2 Control
-        // PWM2 Control
-#if USE_MOTOR
         if (pwm2_ready_flag) {
           if (amp1_zone_active) {
             pwm2_ready_flag = false;
@@ -194,26 +165,6 @@ void pwm_task(void *pvParameters) {
             amp1_zone_active = false;
           }
         }
-#else
-        if (pwm2_ready_flag) {
-          if (amp1_zone_active || amp2_zone_active) {
-            pwm2_ready_flag = false;
-          }
-
-          if (amp1_duty > 0) {
-            app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, amp1_duty);
-          } else if (amp1_zone_active) {
-            app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, 0);
-            amp1_zone_active = false;
-          }
-          if (amp2_duty > 0) {
-            app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, amp2_duty);
-          } else if (amp2_zone_active) {
-            amp2_zone_active = false;
-            app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, 0);
-          }
-        }
-#endif
         break;
       }
 
