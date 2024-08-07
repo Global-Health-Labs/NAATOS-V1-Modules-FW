@@ -197,6 +197,8 @@
       </folder>
       <file file_name="../src/cycle_state_fsm.c" />
       <file file_name="../src/cycle_state_fsm.h" />
+      <file file_name="../src/naatos_messages.h" />
+      <file file_name="../src/naatos_messages.c" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../sdk/external/segger_rtt/SEGGER_RTT.c" />

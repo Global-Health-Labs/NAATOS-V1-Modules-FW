@@ -1,4 +1,5 @@
 #include "cycle_state_fsm.h"
+#include "naatos_messages.h"
 
 cycle_state_t current_state = VALIDATE_INIT_CONDITIONS;
 cycle_state_t next_state = VALIDATE_INIT_CONDITIONS;
@@ -9,13 +10,39 @@ cycle_state_exit_t exitInfo;
 sensor_switches_t switch_data = {.optical_tiggered = false, .hal_triggered = false};
 button_update_t buttonData = {.event = NONE};
 
+uint32_t start_time = 0;
+uint32_t end_time = 0;
+uint32_t time_left = 0;
+int percent_recv;
+bool over_temp;
+
+BaseType_t xReturned;
+
+
 void run_cycle_state_machine() {
   last_state = current_state;
   current_state = next_state;
 
   switch(current_state) {
-    case VALIDATE_INIT_CONDITIONS:
+    case VALIDATE_INIT_CONDITIONS: {
+
       exitInfo = CYCLE_RUNNING;
+
+      // Request the battery percentage from the bettery task
+      xReturned = xQueueSend(batteryRxQueue, &batt_req, 0);
+      if (xReturned != pdPASS) {
+        printf("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.\n");
+      }
+
+      // Check for Battery Data in Battery Queue
+      if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(100)) == pdPASS) {
+        if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
+          exitInfo = CYCLE_ERROR_POWER_LOW;
+          next_state = EXIT_CYCLE;
+        }
+      }
+
+
       // Perform initialization condition checks
       if (config.recovery_power_thresh > percent_recv) {
         printf("MAIN_TASK: Unable to begin sample run, battery percent is less than the recovery threshold.\n");
@@ -28,7 +55,6 @@ void run_cycle_state_machine() {
         sendUpdatedMainTaskState(next_state);
         // Set error during run and wait alert timeout
         updateLedState(LED_DECLINE, true);
-        error_during_run = true;
         exitInfo = CYCLE_ERROR_POWER_LOW;
         next_state = EXIT_CYCLE;
         break;
@@ -38,6 +64,7 @@ void run_cycle_state_machine() {
       next_state = START_CYCLE_1;
 
       break;
+    }
 
     case START_CYCLE_1: {
       // Send start amplification message to heater queue
@@ -54,7 +81,6 @@ void run_cycle_state_machine() {
         sendUpdatedMainTaskState(next_state);
         // Set error during run and wait alert timeout
         updateLedState(LED_DECLINE, true);
-        error_during_run = true;
         exitInfo = CYCLE_ERROR_START_TEMP_TOO_HIGH;
         next_state = EXIT_CYCLE;
         break;
@@ -364,27 +390,27 @@ bool limitSwitchFreed(sensor_switches_t data) {
 }
 
 bool begin_cycle_1(void) {
-  BaseType_t xReturned;
+  BaseType_t xRet;
   bool start_run = false;
   // Send start zone request
 
-  xReturned = xQueueSend(heaterRxQueue, &run_amplification_zone, 0);
-  if (xReturned != pdPASS) {
+  xRet = xQueueSend(heaterRxQueue, &run_amplification_zone, 0);
+  if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send run amplification zone request.\n");
   }
   // Send Start Amplification Event to logging task
-  xReturned = xQueueSend(logger_logMessageQueue, &amplification_start_log_msg, 0);
-  if (xReturned != pdPASS) {
+  xRet = xQueueSend(logger_logMessageQueue, &amplification_start_log_msg, 0);
+  if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
   }
   // Wait for run confirmation response
-  xReturned = xQueueReceive(main_runConfRespQueue, &start_run, portMAX_DELAY);
-  if (xReturned != pdPASS) {
+  xRet = xQueueReceive(main_runConfRespQueue, &start_run, portMAX_DELAY);
+  if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
   }
   // Wait for run ok to start response
-  xReturned = xQueueReceive(main_runRespQueue, &start_run, portMAX_DELAY);
-  if (xReturned != pdPASS) {
+  xRet = xQueueReceive(main_runRespQueue, &start_run, portMAX_DELAY);
+  if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
   }
 
@@ -392,61 +418,61 @@ bool begin_cycle_1(void) {
 }
 
 void begin_cycle_2(void) {
-  BaseType_t xReturned;
+  BaseType_t xRet;
   bool heat_conf = false;
   // Send start valve message to heater queue
-  xReturned = xQueueSend(heaterRxQueue, &run_valve_zone, 0);
-  if (xReturned != pdPASS) {
+  xRet = xQueueSend(heaterRxQueue, &run_valve_zone, 0);
+  if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send run valve zone request.\n");
   }
   // Send Start Valve Event to logging task
-  xReturned = xQueueSend(logger_logMessageQueue, &valve_start_log_msg, 0);
-  if (xReturned != pdPASS) {
+  xRet = xQueueSend(logger_logMessageQueue, &valve_start_log_msg, 0);
+  if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send start valve zone event to logging task.\n");
   }
   // Wait for run confirmation response
-  xReturned = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
-  if (xReturned != pdPASS) {
+  xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
+  if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
   }
 }
 
-void end_amplification_zone(void) {
-  BaseType_t xReturned;
+void end_cycle_1(void) {
+  BaseType_t xRet;
   bool heat_conf = false;
   // Send stop amplification message to heater queue
-  xReturned = xQueueSend(heaterRxQueue, &stop_amplification_zone, 0);
-  if (xReturned != pdPASS) {
+  xRet = xQueueSend(heaterRxQueue, &stop_amplification_zone, 0);
+  if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send stop amplification zone request.\n");
   }
   // Send stop amplification Event to logging task
-  xReturned = xQueueSend(logger_logMessageQueue, &amplification_stop_log_msg, 0);
-  if (xReturned != pdPASS) {
+  xRet = xQueueSend(logger_logMessageQueue, &amplification_stop_log_msg, 0);
+  if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send stop amplification zone event to logging task.\n");
   }
   // Wait for run confirmation response
-  xReturned = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
-  if (xReturned != pdPASS) {
+  xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
+  if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
   }
 }
 
-void end_valve_zone(void) {
-  BaseType_t xReturned;
+void end_cycle_2(void) {
+  BaseType_t xRet;
   bool heat_conf = false;
   // Send valve zone stop request
-  xReturned = xQueueSend(heaterRxQueue, &stop_valve_zone, 0);
-  if (xReturned != pdPASS) {
+  xRet = xQueueSend(heaterRxQueue, &stop_valve_zone, 0);
+  if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send stop valve zone request.\n");
   }
   // Send stop valve Event to logging task
-  xReturned = xQueueSend(logger_logMessageQueue, &valve_stop_log_msg, 0);
-  if (xReturned != pdPASS) {
+  xRet = xQueueSend(logger_logMessageQueue, &valve_stop_log_msg, 0);
+  if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send stop valve zone event to logging task.\n");
   }
   // Wait for run confirmation response
-  xReturned = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
-  if (xReturned != pdPASS) {
+  xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
+  if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
   }
 }

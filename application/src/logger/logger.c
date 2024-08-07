@@ -2,6 +2,7 @@
 #include "loggerInterface.h"
 #include "SamplePrepLogger.h"
 #include "PowerModuleLogger.h"
+#include "../naatos_messages.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,10 +21,6 @@ calendar_time_t time = {
     .week_day = 0,
     .month = 0,
     .year = 0};
-
-const BatteryRxQueueMsg_t batt_req = {
-    .type = BATTERY_SOC_REQUEST,
-    .sendTo = BATTERY_MSG_SOC_LOG};
 
 
 LoggerInterface samplePrepLogger_I = {
@@ -48,6 +45,12 @@ void getLogFileName(const char *_logFileName) {
   // Get current Date and Time and update vars
   sprintf(_logFileName, "sample_%d-%d-%d_%d%d%d.csv", time.month, time.day, time.year, time.hour, time.minute, time.second);
 }
+
+/*
+ The logger should be reactionary. There should be a start/stop new log and the ability to log to an error log.
+
+
+*/
 
 void logger_task(void *pvParameters) {
   BaseType_t xReturned;

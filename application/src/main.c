@@ -24,10 +24,11 @@ SDK Version: 17.1
 #include "motor.h"
 #include "naatos_config.h"
 #include "naatos_queues.h"
+#include "naatos_messages.h"
 #include "nordic_common.h"
 #include "nrf_drv_clock.h"
 #include "pid.h"
-#include "../pwm/pwm.h""
+#include "../pwm/pwm.h"
 #include "sd_card.h"
 #include "sdk_errors.h"
 #include "sensors.h"
@@ -80,121 +81,6 @@ xQueueHandle main_usbChangedConfQueue;
 xQueueHandle main_wakeupTasksQueue;
 xQueueHandle main_setPointReached;
 
-// Zone Request Constants
-const HeaterRxQueueMsg_t run_amplification_zone = {
-    .type = HEATER_MSG_ZONE_STATE,
-    .zoneSelect = AMPLIFICATION,
-    .zoneEnabled = true};
-const HeaterRxQueueMsg_t run_valve_zone = {
-    .type = HEATER_MSG_ZONE_STATE,
-    .zoneSelect = VALVE,
-    .zoneEnabled = true};
-const HeaterRxQueueMsg_t stop_amplification_zone = {
-    .type = HEATER_MSG_ZONE_STATE,
-    .zoneSelect = AMPLIFICATION,
-    .zoneEnabled = false};
-const HeaterRxQueueMsg_t stop_valve_zone = {
-    .type = HEATER_MSG_ZONE_STATE,
-    .zoneSelect = VALVE,
-    .zoneEnabled = false};
-
-// Log Event Constants
-const log_event_t start_event = {
-    .event = SAMPLE_START,
-    .message = START_EVENT_MSG};
-const log_data_message_t start_log_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = start_event};
-const log_event_t stop_event = {
-    .event = SAMPLE_END,
-    .message = STOP_EVENT_MSG};
-const log_data_message_t stop_log_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = stop_event};
-const log_event_t interrupt_hal_event = {
-    .event = SAMPLE_INTERRUPTED,
-    .message = INTERRUPT_HAL_EVENT_MSG};
-const log_data_message_t interrupt_hal_log_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = interrupt_hal_event};
-const log_event_t temps_not_stabalized_event = {
-    .event = SAMPLE_TEMPS_NOT_STABALIZED,
-    .message = TEMPS_NOT_STABLE};
-const log_data_message_t temps_not_stablized_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = temps_not_stabalized_event};
-const log_event_t recovery_batt_event = {
-    .event = SAMPLE_RECOVERY_BATT,
-    .message = RECOVERY_BATT};
-const log_data_message_t recovery_batt_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = recovery_batt_event};
-const log_event_t over_temp_event = {
-    .event = SAMPLE_OVER_TEMP,
-    .message = OVER_TEMP_MSG};
-const log_data_message_t over_temp_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = over_temp_event};
-const log_event_t interrupt_opt_event = {
-    .event = SAMPLE_INTERRUPTED,
-    .message = INTERRUPT_OPT_EVENT_MSG};
-const log_data_message_t interrupt_opt_log_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = interrupt_opt_event};
-const log_event_t valve_start_event = {
-    .event = SAMPLE_VALV_STARTED,
-    .message = VALV_START_MSG};
-const log_data_message_t valve_start_log_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = valve_start_event};
-const log_event_t valve_stop_event = {
-    .event = SAMPLE_VALV_ENDED,
-    .message = VALV_STOP_MSG};
-const log_data_message_t valve_stop_log_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = valve_stop_event};
-const log_event_t amplification_start_event = {
-    .event = SAMPLE_AMP_STARTED,
-    .message = AMP_START_MSG};
-const log_data_message_t amplification_start_log_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = amplification_start_event};
-const log_event_t amplification_stop_event = {
-    .event = SAMPLE_AMP_ENDED,
-    .message = AMP_END_MSG};
-const log_data_message_t amplification_stop_log_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = amplification_stop_event};
-
-
-const log_event_t setpoint_timeout_event = {
-    .event = SAMPLE_SETPOINT_TIMEOUT,
-    .message = SETPOINT_TIMEOUT_MSG};
-const log_data_message_t setpoint_timeout_log_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = setpoint_timeout_event};
-
-// USB Main State Update Constants
-const usb_message_t standby_update = {
-    .message_type = MAIN_STATE_TYPE,
-    .current_state = MAIN_STANDBY,
-    .charge_state = NULL};
-const usb_message_t running_update = {
-    .message_type = MAIN_STATE_TYPE,
-    .current_state = MAIN_RUNNING,
-    .charge_state = NULL};
 
 // Configuration Parameters
 #ifndef SAMPLE_PREP_BOARD
@@ -1183,14 +1069,8 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
     printf("MAIN_TASK: Unable to send main state change to logger_mainStateChangeQueue.\n");
   }
 
-  // Send the state to the battery task
-  xReturned = xQueueSend(batteryRxQueue, &battMsg, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send main state change to batteryRxQueue.\n");
-  }
-
   /* Get responses from the states to ensure all configurations for the run or standby have been made */
-  while (!logger_resp || !batt_resp /*|| !usb_resp || !sensor_resp*/) {
+  while (!logger_resp /*|| !batt_resp*/ /*|| !usb_resp || !sensor_resp*/) {
     if (uxQueueMessagesWaiting(main_mainStateRespQueue) > 0) {
       xReturned = xQueueReceive(main_mainStateRespQueue, &task_recv, 0);
       if (xReturned != pdPASS) {
