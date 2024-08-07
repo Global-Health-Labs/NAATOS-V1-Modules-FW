@@ -185,11 +185,6 @@ typedef enum {
 } usb_message_type_t;
 
 typedef enum {
-  TEMPERATURE_DATA,
-  EVENT_DATA
-} log_data_type_t;
-
-typedef enum {
   SAMPLE_START,
   SAMPLE_END,
   SAMPLE_INTERRUPTED,
@@ -423,6 +418,20 @@ typedef struct {
   double motorSpeed;
   bool readTempFailed;
 } HeaterRxQueueMsg_t;
+
+typedef enum {
+  TEMPERATURE_DATA,
+  EVENT_DATA
+} log_data_type_t;
+
+typedef enum {
+  LOGGER_START_CYCLE_LOG,
+  LOGGER_STOP_CYCLE_LOG,
+  LOGGER_LOG_CYCLE_DATA,
+  LOGGER_LOG_CYCLE_EVENT,
+  LOGGER_LOG_DEBUG_EVENT
+} LoggerRxQueueType_t;
+
 
 typedef enum {
   PWM_MSG_UPDATE_DUTY,

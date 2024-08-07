@@ -1370,6 +1370,11 @@ void create_queues() {
   if (logger_mainStateChangeQueue == NULL)
     printf("Unable to create logger_mainStateChangeQueue queue\n");
 
+  loggerRxQueue = xQueueCreate(20, sizeof(main_state_t));
+  if (loggerRxQueue == NULL) {
+    printf("Unable to create loggerRxQueue queue\n");
+  }
+
   // Watchdog Task Queues
   watchdog_rxTimesQueue = xQueueCreate(WATCH_DOG_QUEUE_SIZE, sizeof(watchdog_time_update_t));
   if (watchdog_rxTimesQueue == NULL)

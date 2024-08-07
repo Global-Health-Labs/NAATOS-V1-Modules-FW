@@ -81,6 +81,9 @@ void logger_task(void *pvParameters) {
   }
 
   for (;;) {
+    //xReturned = xQueueReceive(loggerRxQueue, &loggerRxMessage, portMAX_DELAY);
+
+
     run_stopped = false;
     // Wait for running state from main task update (blocking)
     xReturned = xQueueReceive(logger_mainStateChangeQueue, &main_state, portMAX_DELAY);
