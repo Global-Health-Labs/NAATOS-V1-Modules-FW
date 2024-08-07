@@ -6,7 +6,8 @@ cycle_state_t last_state;
 
 cycle_state_exit_t exitInfo;
 
-
+sensor_switches_t switch_data = {.optical_tiggered = false, .hal_triggered = false};
+button_update_t buttonData = {.event = NONE};
 
 void run_cycle_state_machine() {
   last_state = current_state;
@@ -33,14 +34,14 @@ void run_cycle_state_machine() {
         break;
       } 
 
+      updateLedState(LED_RUN, true);
       next_state = START_CYCLE_1;
 
       break;
 
-    case START_CYCLE_1:
-      
-            // Send start amplification message to heater queue
-      if (!begin_amplification_zone()) {
+    case START_CYCLE_1: {
+      // Send start amplification message to heater queue
+      if (!begin_cycle_1()) {
         printf("MAIN_TASK: Unable to begin sample run, temperatures have not yet stabalized.\n");
         // Tell Log that temperature is not stabalized yet
         xReturned = xQueueSend(logger_logMessageQueue, &temps_not_stablized_msg, 0);
@@ -48,7 +49,7 @@ void run_cycle_state_machine() {
           printf("MAIN_TASK: Unable to send sample interruption event to logging task.\n");
         }
         // Stop amplification zone
-        end_amplification_zone();
+        end_cycle_1();
         next_state = MAIN_STANDBY;
         sendUpdatedMainTaskState(next_state);
         // Set error during run and wait alert timeout
@@ -61,42 +62,281 @@ void run_cycle_state_machine() {
 
       updateLedState(LED_RUN, true);
 
-      next_state = CYCLE_1_RAMP_TO_TEMP;
-      break;
-
-    case CYCLE_1_RAMP_TO_TEMP:
-      // Ramp to the required temperature for cycle 1
-      if (/* temperature reached */) {
+      if (config.ramp_to_temp_before_start_cycle_1 && config.run_heater_1) { 
+        start_time = xTaskGetTickCount();
+        if (use_default_configuration_parameters) {
+          end_time = pdMS_TO_TICKS((DEFAULT_RAMP_TO_TEMP_TIMEOUT) * 1000);
+        } else {
+          end_time = pdMS_TO_TICKS((config.ramp_to_temp_c1_timeout) * 1000);
+        }
+        next_state = CYCLE_1_RAMP_TO_TEMP;
+      } else {
         next_state = CYCLE_1_TIMER;
       }
       break;
+    }
 
-    case CYCLE_1_TIMER:
-      // Run the timer for cycle 1
-      if (/* timer finished */) {
-        next_state = START_CYCLE_2;
+    case CYCLE_1_RAMP_TO_TEMP: {
+      // Ramp to the required temperature for cycle 1
+      time_left = pdTICKS_TO_MS(xTaskGetTickCount() - start_time);
+
+      bool setReachedRx = false;
+      xReturned = xQueueReceive(main_setPointReached, &setReachedRx, 0);
+       
+      if (setReachedRx) {
+        //TODO put message here and event
+        next_state = CYCLE_1_TIMER;
+        break;
+      } else if (time_left > end_time) {
+        end_cycle_1();
+        //TODO stop zone and send error
+        exitInfo = CYCLE_ERROR_TIMEOUT_DURING_RAMP;
+        next_state = EXIT_CYCLE;
+        sendUpdatedMainTaskState(next_state);
+        break;
+      } else if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
+        end_cycle_1();
+        xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
+        }
+        exitInfo = CYCLE_ERROR_OVER_TEMP;
+        next_state = EXIT_CYCLE;
+        sendUpdatedMainTaskState(next_state);
+        break;
       }
-      break;
 
-    case START_CYCLE_2:
-      // Initialize cycle 2
-      // Perform actions to start cycle 2
-      next_state = CYCLE_2_RAMP_TO_TEMP;
-      break;
+      // Get Switch data
+      xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
 
-    case CYCLE_2_RAMP_TO_TEMP:
-      // Ramp to the required temperature for cycle 2
-      if (/* temperature reached */) {
+      if (limitSwitchFreed(switch_data)) {
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_SENSOR_BREAK;
+        next_state = EXIT_CYCLE;
+        break;
+      }
+
+      buttonData.event = NONE;
+      xQueueReceive(button_mainStateQueue, &buttonData, 0);
+      //TODO test also including off_event
+      if (buttonData.event == ON_EVENT /*|| buttonData.even == OFF_EVENT*/) {
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_BUTTON_EXIT;
+        next_state = EXIT_CYCLE;
+        break;
+      }
+
+      break;
+    }
+
+    case CYCLE_1_TIMER: {
+      if(last_state != current_state) {
+        start_time = xTaskGetTickCount();
+        if (use_default_configuration_parameters) {
+          end_time = pdMS_TO_TICKS((DEFAULT_AMPLIFICATION_ZONE_ON_TIME) * 1000);
+        } else {
+          end_time = pdMS_TO_TICKS((config.cycle_1_run_time_m) * 1000);
+        }
+      }
+
+      time_left = pdTICKS_TO_MS(xTaskGetTickCount() - start_time);
+
+      if (time_left >= end_time) {
+        next_state = START_CYCLE_2;
+        end_cycle_1();
+        break;
+      }
+
+      if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
+        end_cycle_1();
+        xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
+        }
+        exitInfo = CYCLE_ERROR_OVER_TEMP;
+        next_state = EXIT_CYCLE;
+        sendUpdatedMainTaskState(next_state);
+        break;
+      }
+
+      // Get Switch data
+      xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
+
+      if (limitSwitchFreed(switch_data)) {
+        end_cycle_1();
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_SENSOR_BREAK;
+        next_state = EXIT_CYCLE;
+        break;
+      }
+
+      buttonData.event = NONE;
+      xQueueReceive(button_mainStateQueue, &buttonData, 0);
+      //TODO test also including off_event
+      if (buttonData.event == ON_EVENT /*|| buttonData.even == OFF_EVENT*/) {
+        end_cycle_1();
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_BUTTON_EXIT;
+        next_state = EXIT_CYCLE;
+        break;
+      }
+
+      break;
+    }
+
+    case START_CYCLE_2: {
+      begin_cycle_2();
+      
+      if (config.ramp_to_temp_before_start_cycle_2 && config.run_heater_2) { 
+        if (!config.ramp_to_temp_before_start_cycle_1 || (config.heater_setpoint_1 != config.heater_setpoint_2)) {
+          next_state = CYCLE_2_RAMP_TO_TEMP;
+        }
+      } else {
         next_state = CYCLE_2_TIMER;
       }
+
+      break;
+    }
+
+    case CYCLE_2_RAMP_TO_TEMP:
+      // Ramp to the required temperature for cycle 1
+      time_left = pdTICKS_TO_MS(xTaskGetTickCount() - start_time);
+
+      bool setReachedRx = false;
+      xReturned = xQueueReceive(main_setPointReached, &setReachedRx, 0);
+       
+      if (setReachedRx) {
+        //TODO put message here and event
+        next_state = CYCLE_2_TIMER;
+        break;
+      } else if (time_left > end_time) {
+        end_cycle_2();
+        //TODO stop zone and send error
+        exitInfo = CYCLE_ERROR_TIMEOUT_DURING_RAMP;
+        next_state = EXIT_CYCLE;
+        sendUpdatedMainTaskState(next_state);
+        break;
+      } else if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
+        end_cycle_2();
+        xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
+        }
+        exitInfo = CYCLE_ERROR_OVER_TEMP;
+        next_state = EXIT_CYCLE;
+        sendUpdatedMainTaskState(next_state);
+        break;
+      }
+
+      // Get Switch data
+      xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
+
+      if (limitSwitchFreed(switch_data)) {
+        end_cycle_2();
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_SENSOR_BREAK;
+        next_state = EXIT_CYCLE;
+        break;
+      }
+
+      buttonData.event = NONE;
+      xQueueReceive(button_mainStateQueue, &buttonData, 0);
+      //TODO test also including off_event
+      if (buttonData.event == ON_EVENT /*|| buttonData.even == OFF_EVENT*/) {
+        end_cycle_2();
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_BUTTON_EXIT;
+        next_state = EXIT_CYCLE;
+        break;
+      }
+
       break;
 
-    case CYCLE_2_TIMER:
-      // Run the timer for cycle 2
-      if (/* timer finished */) {
+    case CYCLE_2_TIMER: {
+      if(last_state != current_state) {
+        start_time = xTaskGetTickCount();
+        if (use_default_configuration_parameters) {
+          end_time = pdMS_TO_TICKS((DEFAULT_VALVE_ZONE_ON_TIME) * 1000);
+        } else {
+          end_time = pdMS_TO_TICKS((config.cycle_2_run_time_m) * 1000);
+        }
+      }
+
+      if (time_left >= end_time) {
+        next_state = CYCLE_SAMPLE_VALID_HOLD;
+        end_cycle_2();
+        break;
+      }
+
+      if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
+        end_cycle_2();
+        xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
+        }
+        exitInfo = CYCLE_ERROR_OVER_TEMP;
         next_state = EXIT_CYCLE;
+        sendUpdatedMainTaskState(next_state);
+        break;
+      }
+
+      // Get Switch data
+      xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
+
+      if (limitSwitchFreed(switch_data)) {
+        end_cycle_2();
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_SENSOR_BREAK;
+        next_state = EXIT_CYCLE;
+        break;
+      }
+
+      buttonData.event = NONE;
+      xQueueReceive(button_mainStateQueue, &buttonData, 0);
+      //TODO test also including off_event
+      if (buttonData.event == ON_EVENT /*|| buttonData.even == OFF_EVENT*/) {
+        end_cycle_2();
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_BUTTON_EXIT;
+        next_state = EXIT_CYCLE;
+        break;
       }
       break;
+    }
+
+    case CYCLE_COMPLETE_DELAY: {
+      if(last_state != current_state) {
+        updateLedState(LED_COMPLETE, true);
+        //TODO get config values for hold delay 
+      }
+
+      //TODO put in timeout for hold delay
+
+      next_state = CYCLE_SAMPLE_VALID_HOLD;
+      
+      break;
+    }
+
+    case CYCLE_SAMPLE_VALID_HOLD: {
+      if(last_state != current_state) {
+        updateLedState(LED_COMPLETE, true);
+        //TODO get config values for hold delay 
+      }
+
+      xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
+
+      if (limitSwitchFreed(switch_data)) {
+        exitInfo = CYCLE_COMPLETE;
+        next_state = EXIT_CYCLE;
+        break;
+      }
+
+      //TODO need to check a timeout here if past timeout then we error to sample invalid
+      
+      next_state = EXIT_CYCLE;
+
+      break;
+    }
 
     case EXIT_CYCLE:
       // Perform exit operations
@@ -108,5 +348,105 @@ void run_cycle_state_machine() {
       // Handle unexpected states
       next_state = EXIT_CYCLE;
       break;
+  }
+}
+
+
+bool limitSwitchFreed(sensor_switches_t data) {
+  bool returnValue = false;
+
+#ifdef SAMPLE_PREP_BOARD
+  returnValue = !data.hal_triggered;
+#else
+  returnValue = !data.hal_triggered || !data.optical_tiggered;
+#endif
+
+}
+
+bool begin_cycle_1(void) {
+  BaseType_t xReturned;
+  bool start_run = false;
+  // Send start zone request
+
+  xReturned = xQueueSend(heaterRxQueue, &run_amplification_zone, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send run amplification zone request.\n");
+  }
+  // Send Start Amplification Event to logging task
+  xReturned = xQueueSend(logger_logMessageQueue, &amplification_start_log_msg, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
+  }
+  // Wait for run confirmation response
+  xReturned = xQueueReceive(main_runConfRespQueue, &start_run, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
+  }
+  // Wait for run ok to start response
+  xReturned = xQueueReceive(main_runRespQueue, &start_run, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
+  }
+
+  return start_run;
+}
+
+void begin_cycle_2(void) {
+  BaseType_t xReturned;
+  bool heat_conf = false;
+  // Send start valve message to heater queue
+  xReturned = xQueueSend(heaterRxQueue, &run_valve_zone, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send run valve zone request.\n");
+  }
+  // Send Start Valve Event to logging task
+  xReturned = xQueueSend(logger_logMessageQueue, &valve_start_log_msg, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send start valve zone event to logging task.\n");
+  }
+  // Wait for run confirmation response
+  xReturned = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
+  }
+}
+
+void end_amplification_zone(void) {
+  BaseType_t xReturned;
+  bool heat_conf = false;
+  // Send stop amplification message to heater queue
+  xReturned = xQueueSend(heaterRxQueue, &stop_amplification_zone, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send stop amplification zone request.\n");
+  }
+  // Send stop amplification Event to logging task
+  xReturned = xQueueSend(logger_logMessageQueue, &amplification_stop_log_msg, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send stop amplification zone event to logging task.\n");
+  }
+  // Wait for run confirmation response
+  xReturned = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
+  }
+}
+
+void end_valve_zone(void) {
+  BaseType_t xReturned;
+  bool heat_conf = false;
+  // Send valve zone stop request
+  xReturned = xQueueSend(heaterRxQueue, &stop_valve_zone, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send stop valve zone request.\n");
+  }
+  // Send stop valve Event to logging task
+  xReturned = xQueueSend(logger_logMessageQueue, &valve_stop_log_msg, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send stop valve zone event to logging task.\n");
+  }
+  // Wait for run confirmation response
+  xReturned = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
   }
 }

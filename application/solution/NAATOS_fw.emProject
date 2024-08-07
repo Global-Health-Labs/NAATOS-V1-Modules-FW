@@ -144,8 +144,6 @@
       <file file_name="../src/naatos_config.h" />
       <file file_name="../src/pid.c" />
       <file file_name="../src/pid.h" />
-      <file file_name="../src/pwm.c" />
-      <file file_name="../src/pwm.h" />
       <file file_name="../src/adc.c" />
       <file file_name="../src/adc.h" />
       <file file_name="../src/i2c_hal_freertos.c" />
@@ -193,6 +191,12 @@
         <file file_name="../src/logger/SamplePrepLogger.c" />
         <file file_name="../src/logger/SamplePrepLogger.h" />
       </folder>
+      <folder Name="pwm">
+        <file file_name="../src/pwm/pwm.c" />
+        <file file_name="../src/pwm/pwm.h" />
+      </folder>
+      <file file_name="../src/cycle_state_fsm.c" />
+      <file file_name="../src/cycle_state_fsm.h" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../sdk/external/segger_rtt/SEGGER_RTT.c" />

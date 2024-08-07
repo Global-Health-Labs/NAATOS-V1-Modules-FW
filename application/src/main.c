@@ -27,7 +27,7 @@ SDK Version: 17.1
 #include "nordic_common.h"
 #include "nrf_drv_clock.h"
 #include "pid.h"
-#include "../pwm/pwm.h"
+#include "../pwm/pwm.h""
 #include "sd_card.h"
 #include "sdk_errors.h"
 #include "sensors.h"
