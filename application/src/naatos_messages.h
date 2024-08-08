@@ -31,6 +31,8 @@ extern const log_event_t amplification_start_event;
 extern const log_data_message_t amplification_start_log_msg;
 extern const log_event_t amplification_stop_event;
 extern const log_data_message_t amplification_stop_log_msg;
+extern const log_data_message_t ramp_to_temp_complete_log_msg;
+extern const log_data_message_t ramp_to_temp_timeout_log_msg;
 
 extern const log_event_t setpoint_timeout_event;
 extern const log_data_message_t setpoint_timeout_log_msg;

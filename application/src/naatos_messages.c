@@ -99,6 +99,22 @@ const log_data_message_t amplification_stop_log_msg = {
     .temperature_data = NULL,
     .event_data = amplification_stop_event};
 
+const log_event_t ramp_to_temp_complete_event = {
+    .event = SAMPLE_RAMP_TO_TEMP_REACHED,
+    .message = SAMPLE_RAMP_TO_TEMP_REACHED_MSG};
+const log_data_message_t ramp_to_temp_complete_log_msg = {
+    .data_type = EVENT_DATA,
+    .temperature_data = NULL,
+    .event_data = ramp_to_temp_complete_event};
+
+const log_event_t ramp_to_temp_timeout_event = {
+    .event = SAMPLE_RAMP_TO_TEMP_TIMEOUT,
+    .message = SAMPLE_RAMP_TO_TEMP_TIMEOUT_MSG};
+const log_data_message_t ramp_to_temp_timeout_log_msg = {
+    .data_type = EVENT_DATA,
+    .temperature_data = NULL,
+    .event_data = ramp_to_temp_timeout_event};
+
 
 const log_event_t setpoint_timeout_event = {
     .event = SAMPLE_SETPOINT_TIMEOUT,

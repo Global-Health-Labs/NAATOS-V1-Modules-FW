@@ -113,12 +113,18 @@ void run_cycle_state_machine() {
       xReturned = xQueueReceive(main_setPointReached, &setReachedRx, 0);
        
       if (setReachedRx) {
-        //TODO put message here and event
+        xReturned = xQueueSend(logger_logMessageQueue, &ramp_to_temp_complete_log_msg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send ramp_to_temp_complete_log_msg interruption event to logging task.\n");
+        }
         next_state = CYCLE_1_TIMER;
         break;
       } else if (time_left > end_time) {
         end_cycle_1();
-        //TODO stop zone and send error
+        xReturned = xQueueSend(logger_logMessageQueue, &ramp_to_temp_timeout_log_msg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send ramp_to_temp_timeout_log_msg interruption event to logging task.\n");
+        }
         exitInfo = CYCLE_ERROR_TIMEOUT_DURING_RAMP;
         next_state = EXIT_CYCLE;
         break;
@@ -232,12 +238,18 @@ void run_cycle_state_machine() {
       xReturned = xQueueReceive(main_setPointReached, &setReachedRx, 0);
        
       if (setReachedRx) {
-        //TODO put message here and event
+        xReturned = xQueueSend(logger_logMessageQueue, &ramp_to_temp_complete_log_msg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send ramp_to_temp_complete_log_msg interruption event to logging task.\n");
+        }
         next_state = CYCLE_2_TIMER;
         break;
       } else if (time_left > end_time) {
         end_cycle_2();
-        //TODO stop zone and send error
+        xReturned = xQueueSend(logger_logMessageQueue, &ramp_to_temp_timeout_log_msg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send ramp_to_temp_timeout_log_msg interruption event to logging task.\n");
+        }
         exitInfo = CYCLE_ERROR_TIMEOUT_DURING_RAMP;
         next_state = EXIT_CYCLE;
         break;

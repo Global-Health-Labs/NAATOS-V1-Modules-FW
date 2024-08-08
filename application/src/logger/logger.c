@@ -63,27 +63,16 @@ void getLogFileName(const char *_logFileName) {
   sprintf(_logFileName, "sample_%d-%d-%d_%d%d%d.csv", time.month, time.day, time.year, time.hour, time.minute, time.second);
 }
 
-/*
- The logger should be reactionary. There should be a start/stop new log and the ability to log to an error log.
-
-
-*/
 
 void logger_task(void *pvParameters) {
   BaseType_t xReturned;
-  main_state_t main_state = MAIN_STANDBY;
   log_data_message_t log_message;
   log_data_message_t last_temp_message;
-  bool new_temp = false;
   bool uart_only = false;
   char logFileName[50];
   char logFileLine[256];
   uint32_t logFileLineSize;
   FRESULT res;
-  bool run_stopped = false;
-  tasks_t logger_task = LOGGER;
-  bool cont;
-  bool interrupted = true;
 
   log_data_message_t rxLogMsg;
 
@@ -122,8 +111,6 @@ void logger_task(void *pvParameters) {
 
             int batteryPercent = getBatteryPercent();
 
-            // Set new temp to true
-            new_temp = true;
             loggerInterface->constructSensorDataLogLine(logFileLine, time, log_message, batteryPercent);
             last_temp_message = log_message;
 

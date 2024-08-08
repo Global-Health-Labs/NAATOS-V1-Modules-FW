@@ -141,6 +141,8 @@
 #define RECOVERY_BATT "Battery Percentage lower than the recovery threshold. Charge Battery More."
 #define OVER_TEMP_MSG "A Zone went over its maximum temperature. Run stopped."
 #define SETPOINT_TIMEOUT_MSG "Setpoint was not reached and configured timeout was hit."
+#define SAMPLE_RAMP_TO_TEMP_REACHED_MSG "Ramp to temp complete."
+#define SAMPLE_RAMP_TO_TEMP_TIMEOUT_MSG "Ramp to temp timed out. Stopping cycle."
 
 #define USB_SUSPEND_TASKS_TIME 15000
 
@@ -196,7 +198,9 @@ typedef enum {
   SAMPLE_RECOVERY_BATT,
   SAMPLE_OVER_TEMP,
   SAMPLE_SETPOINT_REACHED,
-  SAMPLE_SETPOINT_TIMEOUT
+  SAMPLE_SETPOINT_TIMEOUT,
+  SAMPLE_RAMP_TO_TEMP_REACHED,
+  SAMPLE_RAMP_TO_TEMP_TIMEOUT,
   // Add more events here
 } event_t;
 
