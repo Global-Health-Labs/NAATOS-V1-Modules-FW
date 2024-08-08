@@ -75,8 +75,9 @@ typedef enum {
   CYCLE_ERROR_UNKNOWN
 } cycle_state_exit_t;
 
+void reset_cycle_state_machine(void);
 
-void run_cycle_state_machine();
+cycle_state_exit_t run_cycle_state_machine(void);
 
 /* For sample prep this will start heating the sample and or spin the motor.
  * For power module this will start the amplification zone heating.
