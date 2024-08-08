@@ -155,7 +155,6 @@ naatos_config_parameters config = {
 bool use_default_configuration_parameters = false;
 
 // Function defs
-void sendUpdatedMainTaskState(main_state_t new_state);
 void sendWdtHeaterInvalid();
 bool begin_amplification_zone(void);
 void end_amplification_zone(void);
@@ -403,7 +402,6 @@ void main_task(void *pvParameters) {
       // Check if we can go to RUN state
       if (hal_triggered && buttonData.event == ON_EVENT && !error_during_run) {
         next_state = MAIN_RUNNING;
-        sendUpdatedMainTaskState(next_state);
         // Delay
         vTaskDelay(100);
       }
@@ -411,7 +409,6 @@ void main_task(void *pvParameters) {
       // Check if we can go to RUN state
       if (hal_triggered && optical_triggered && !error_during_run) {
         next_state = MAIN_RUNNING;
-        sendUpdatedMainTaskState(next_state);
         // Delay
         vTaskDelay(100);
       }
@@ -438,7 +435,6 @@ void main_task(void *pvParameters) {
           printf("MAIN_TASK: Unable to send recovery battery percentage event to logging task.\n");
         }
         next_state = MAIN_STANDBY;
-        sendUpdatedMainTaskState(next_state);
         // Set error during run and wait alert timeout
         updateLedState(LED_DECLINE, true);
         error_during_run = true;
@@ -456,7 +452,6 @@ void main_task(void *pvParameters) {
         // Stop amplification zone
         end_amplification_zone();
         next_state = MAIN_STANDBY;
-        sendUpdatedMainTaskState(next_state);
         // Set error during run and wait alert timeout
         updateLedState(LED_DECLINE, true);
         error_during_run = true;
@@ -535,7 +530,6 @@ void main_task(void *pvParameters) {
           }
           //TODO put stop to amp zone and go to standby on error here
           next_state = MAIN_STANDBY;
-          sendUpdatedMainTaskState(next_state);
           vTaskDelay(100);
           break;
         }
@@ -673,7 +667,6 @@ void main_task(void *pvParameters) {
                 }
                 //TODO put stop to amp zone and go to standby on error here
                 next_state = MAIN_STANDBY;
-                sendUpdatedMainTaskState(next_state);
                 vTaskDelay(100);
                 break;
               }
@@ -710,7 +703,6 @@ void main_task(void *pvParameters) {
           }
         }
         next_state = MAIN_STANDBY;
-        sendUpdatedMainTaskState(next_state);
         vTaskDelay(100);
         break;
       }
@@ -784,7 +776,6 @@ void main_task(void *pvParameters) {
           }
         }
         next_state = MAIN_STANDBY;
-        sendUpdatedMainTaskState(next_state);
         break;
       }
 
@@ -810,8 +801,6 @@ void main_task(void *pvParameters) {
       // Update current main state
 
       next_state = MAIN_STANDBY;
-      sendUpdatedMainTaskState(next_state);
-      //vTaskDelay(250);
       break;
 
     case MAIN_FILE:
@@ -1042,57 +1031,6 @@ void send_usb_change(usb_command_t cmd) {
     init_sd_card();
 
   printf("MAIN_TASK: USB state successfully changed.\n");
-}
-
-void sendUpdatedMainTaskState(main_state_t new_state) {
-  BaseType_t xReturned;
-  usb_message_t msg;
-  BatteryRxQueueMsg_t battMsg = {
-      .type = BATTERY_MSG_MAIN_STATE_CHANGE,
-      .mainState = new_state};
-
-  bool logger_resp = false, batt_resp = false, usb_resp = false, sensor_resp = false;
-  tasks_t task_recv;
-  bool main_state_cont = true;
-
-  // Get the update to send
-  if (new_state == MAIN_RUNNING)
-    msg = running_update;
-  else if (new_state == MAIN_STANDBY)
-    msg = standby_update;
-
-  printf("MAIN: Sending Main State Update Messages.\n");
-
-  /* Get responses from the states to ensure all configurations for the run or standby have been made */
-  while (!logger_resp /*|| !batt_resp*/ /*|| !usb_resp || !sensor_resp*/) {
-    if (uxQueueMessagesWaiting(main_mainStateRespQueue) > 0) {
-      xReturned = xQueueReceive(main_mainStateRespQueue, &task_recv, 0);
-      if (xReturned != pdPASS) {
-        printf("USB: Unable to receive main state update response from main_mainStateRespQueue\n");
-      }
-      switch (task_recv) {
-      case LOGGER:
-        logger_resp = true;
-        printf("MAIN: Logger Task has updated its main state.\n");
-        break;
-      case BATTERY:
-        batt_resp = true;
-        printf("MAIN: Battery Task has updated its main state.\n");
-        break;
-      case USB:
-        usb_resp = true;
-        printf("MAIN: USB Task has updated its main state.\n");
-        break;
-      default:
-        break;
-      }
-    } else {
-      vTaskDelay(50);
-    }
-  }
-
-  printf("MAIN: All tasks updated... sending continue requests.\n");
-
 }
 
 bool begin_amplification_zone(void) {
