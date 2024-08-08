@@ -1063,12 +1063,6 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
 
   printf("MAIN: Sending Main State Update Messages.\n");
 
-  // Send the state to the logger
-  xReturned = xQueueSend(logger_mainStateChangeQueue, &new_state, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send main state change to logger_mainStateChangeQueue.\n");
-  }
-
   /* Get responses from the states to ensure all configurations for the run or standby have been made */
   while (!logger_resp /*|| !batt_resp*/ /*|| !usb_resp || !sensor_resp*/) {
     if (uxQueueMessagesWaiting(main_mainStateRespQueue) > 0) {
@@ -1099,11 +1093,6 @@ void sendUpdatedMainTaskState(main_state_t new_state) {
 
   printf("MAIN: All tasks updated... sending continue requests.\n");
 
-  // Send Continues to Tasks that need it
-  xReturned = xQueueSend(logger_mainStateContinueQueue, &main_state_cont, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send main state continue to logger_mainStateContinueQueue.\n");
-  }
 }
 
 bool begin_amplification_zone(void) {
@@ -1366,15 +1355,6 @@ void create_queues() {
   if (logger_logMessageQueue == NULL)
     printf("Unable to create logger_logMessageQueue queue\n");
 
-  logger_mainStateChangeQueue = xQueueCreate(QUEUE_SIZE, sizeof(main_state_t));
-  if (logger_mainStateChangeQueue == NULL)
-    printf("Unable to create logger_mainStateChangeQueue queue\n");
-
-  loggerRxQueue = xQueueCreate(20, sizeof(main_state_t));
-  if (loggerRxQueue == NULL) {
-    printf("Unable to create loggerRxQueue queue\n");
-  }
-
   // Watchdog Task Queues
   watchdog_rxTimesQueue = xQueueCreate(WATCH_DOG_QUEUE_SIZE, sizeof(watchdog_time_update_t));
   if (watchdog_rxTimesQueue == NULL)
@@ -1384,11 +1364,6 @@ void create_queues() {
   button_mainStateQueue = xQueueCreate(QUEUE_SIZE, sizeof(button_update_t));
   if (button_mainStateQueue == NULL)
     printf("Unable to create button_mainStateQueue queue\n");
-
-  logger_mainStateContinueQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
-  if (logger_mainStateContinueQueue == NULL) {
-    printf("Unable to create logger_mainStateContinueQueue queue\n");
-  }
 
   // PWM Task Queues
   pwmRxQueue = xQueueCreate(10, sizeof(PwmRxQueueMsg_t));

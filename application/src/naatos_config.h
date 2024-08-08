@@ -254,18 +254,6 @@ typedef struct {
   charge_state_t charge_state;
 } usb_message_t;
 
-typedef struct {
-  event_t event;
-  char *message;
-} log_event_t;
-
-// Log Message
-typedef struct {
-  log_data_type_t data_type;
-  temperature_data_t temperature_data;
-  log_event_t event_data;
-} log_data_message_t;
-
 // Battery Request with task to send to
 typedef struct {
   tasks_t task_req;
@@ -419,18 +407,24 @@ typedef struct {
   bool readTempFailed;
 } HeaterRxQueueMsg_t;
 
-typedef enum {
-  TEMPERATURE_DATA,
-  EVENT_DATA
-} log_data_type_t;
+typedef struct {
+  event_t event;
+  char *message;
+} log_event_t;
 
 typedef enum {
   LOGGER_START_CYCLE_LOG,
-  LOGGER_STOP_CYCLE_LOG,
-  LOGGER_LOG_CYCLE_DATA,
-  LOGGER_LOG_CYCLE_EVENT,
+  TEMPERATURE_DATA,
+  EVENT_DATA,
   LOGGER_LOG_DEBUG_EVENT
-} LoggerRxQueueType_t;
+} log_data_type_t;
+
+// Log Message
+typedef struct {
+  log_data_type_t data_type;
+  temperature_data_t temperature_data;
+  log_event_t event_data;
+} log_data_message_t;
 
 
 typedef enum {

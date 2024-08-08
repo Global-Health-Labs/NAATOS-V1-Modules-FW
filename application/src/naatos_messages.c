@@ -21,6 +21,9 @@ const HeaterRxQueueMsg_t stop_valve_zone = {
 const log_event_t start_event = {
     .event = SAMPLE_START,
     .message = START_EVENT_MSG};
+const log_data_message_t new_log_msg = {
+  .data_type = LOGGER_START_CYCLE_LOG
+};
 const log_data_message_t start_log_msg = {
     .data_type = EVENT_DATA,
     .temperature_data = NULL,

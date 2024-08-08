@@ -26,6 +26,11 @@ void run_cycle_state_machine() {
   switch(current_state) {
     case VALIDATE_INIT_CONDITIONS: {
 
+      xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 0);
+      if (xReturned != pdPASS) {
+        printf("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
+      }
+
       exitInfo = CYCLE_RUNNING;
 
       // Request the battery percentage from the bettery task
@@ -52,7 +57,6 @@ void run_cycle_state_machine() {
           printf("MAIN_TASK: Unable to send recovery battery percentage event to logging task.\n");
         }
         next_state = MAIN_STANDBY;
-        sendUpdatedMainTaskState(next_state);
         // Set error during run and wait alert timeout
         updateLedState(LED_DECLINE, true);
         exitInfo = CYCLE_ERROR_POWER_LOW;
@@ -78,7 +82,6 @@ void run_cycle_state_machine() {
         // Stop amplification zone
         end_cycle_1();
         next_state = MAIN_STANDBY;
-        sendUpdatedMainTaskState(next_state);
         // Set error during run and wait alert timeout
         updateLedState(LED_DECLINE, true);
         exitInfo = CYCLE_ERROR_START_TEMP_TOO_HIGH;
@@ -118,7 +121,6 @@ void run_cycle_state_machine() {
         //TODO stop zone and send error
         exitInfo = CYCLE_ERROR_TIMEOUT_DURING_RAMP;
         next_state = EXIT_CYCLE;
-        sendUpdatedMainTaskState(next_state);
         break;
       } else if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
         end_cycle_1();
@@ -128,7 +130,6 @@ void run_cycle_state_machine() {
         }
         exitInfo = CYCLE_ERROR_OVER_TEMP;
         next_state = EXIT_CYCLE;
-        sendUpdatedMainTaskState(next_state);
         break;
       }
 
@@ -181,7 +182,6 @@ void run_cycle_state_machine() {
         }
         exitInfo = CYCLE_ERROR_OVER_TEMP;
         next_state = EXIT_CYCLE;
-        sendUpdatedMainTaskState(next_state);
         break;
       }
 
@@ -240,7 +240,6 @@ void run_cycle_state_machine() {
         //TODO stop zone and send error
         exitInfo = CYCLE_ERROR_TIMEOUT_DURING_RAMP;
         next_state = EXIT_CYCLE;
-        sendUpdatedMainTaskState(next_state);
         break;
       } else if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
         end_cycle_2();
@@ -250,7 +249,6 @@ void run_cycle_state_machine() {
         }
         exitInfo = CYCLE_ERROR_OVER_TEMP;
         next_state = EXIT_CYCLE;
-        sendUpdatedMainTaskState(next_state);
         break;
       }
 
@@ -302,7 +300,6 @@ void run_cycle_state_machine() {
         }
         exitInfo = CYCLE_ERROR_OVER_TEMP;
         next_state = EXIT_CYCLE;
-        sendUpdatedMainTaskState(next_state);
         break;
       }
 

@@ -8,6 +8,7 @@ extern const HeaterRxQueueMsg_t stop_amplification_zone;
 extern const HeaterRxQueueMsg_t stop_valve_zone;
 
 // Log Event Constants
+extern const log_data_message_t new_log_msg; // starts a new log file
 extern const log_event_t start_event;
 extern const log_data_message_t start_log_msg;
 extern const log_event_t stop_event;
