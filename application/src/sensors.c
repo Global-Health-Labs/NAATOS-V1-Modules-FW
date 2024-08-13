@@ -428,10 +428,11 @@ void runSamplePrepSensorCollection(void) {
 
   // GPIO Read for Hall Sensor
   prev = switches.hal_triggered;
-  if (nrf_gpio_pin_read(HAL_INPUT_PIN))
+  if (nrf_gpio_pin_read(HAL_INPUT_PIN)) {
     switches.hal_triggered = false;
-  else
+  } else {
     switches.hal_triggered = true;
+  }
   if (prev != switches.hal_triggered) {
     if (switches.hal_triggered) {
       printf("Hal sensor triggered!\n");

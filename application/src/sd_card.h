@@ -26,9 +26,13 @@
 
 #define NAATOS_CONFIG_FILE "config_v2.0.txt"
 
+#ifdef SAMPLE_PREP_BOARD
 #define CSV_HEADER "Time,HeaterTemp,HeaterPWM,MotorSpeed,MotorPWM,Battery,Event\n"
 #define CSV_HEADER_SIZE 61
-
+#else 
+#define CSV_HEADER "Time,ValveTemp,ValvePWM,Amp0Temp,Amp0PWM,Amp1Temp,Amp1PWM,Amp2Temp,Amp2PWM,Batt,Event\n"
+#define CSV_HEADER_SIZE 86
+#endif
 /**
  * @brief  QSPI block device definition
  */
@@ -173,5 +177,8 @@ FRESULT sd_card_unmount(void);
 FRESULT sd_card_write_log_line(const char *logName, const char *writeBuff, uint32_t writeBuffSize);
 FRESULT sd_card_reset_set_time_date(void);
 FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters);
+
+double parse_double(const char *str, double default_value);
+int parse_int(const char *str, int default_value);
 
 #endif

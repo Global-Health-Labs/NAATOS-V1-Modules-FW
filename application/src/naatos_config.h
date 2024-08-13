@@ -8,7 +8,7 @@
 /*Define this when building sample prep only otherwise comment out*/
 #define SAMPLE_PREP_BOARD
 
-#define NAATOS_FW_VERSON "V1.3"
+#define NAATOS_FW_VERSON "V2.0"
 
 #define pdTICKS_TO_MS(xTimeInTicks) ((TickType_t)(((uint64_t)(xTimeInTicks) * (uint64_t)1000U) / (uint64_t)configTICK_RATE_HZ))
 
@@ -71,10 +71,7 @@
 #ifdef SAMPLE_PREP_BOARD
 #define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
 #define DEFAULT_LOGGING_RATE 1.000
-#define DEFAULT_VALVE_MAX_TEMP 115.0
-#define DEFAULT_AMP0_MAX_TEMP 115.0
-#define DEFAULT_AMP1_MAX_TEMP 115.0
-#define DEFAULT_AMP2_MAX_TEMP 115.0
+#define DEFAULT_MAX_TEMP 115.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP 75.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP_EN false
 #define DEFAULT_ALERT_TIMEOUT_S 3.0    // Seconds
