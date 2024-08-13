@@ -437,6 +437,8 @@ void main_task(void *pvParameters) {
           printf("MAIN_TASK: Alert Timeout - %dms\n", pdTICKS_TO_MS(alert_timeout_ticks));
       }
 
+      xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY); // TODO do we do  anything with this?
+
       if (xTaskGetTickCount() >= (a_t_start + alert_timeout_ticks)) {
         updateLedState(LED_CLEAR_ALL_ERROR, true);
         updateLedState(LED_WAKEUP, true);

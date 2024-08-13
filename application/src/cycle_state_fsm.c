@@ -375,8 +375,28 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       time_left = pdTICKS_TO_MS(xTaskGetTickCount() - start_time);
 
-       if (time_left >= end_time) {
+      if (time_left >= end_time) {
         next_state = CYCLE_SAMPLE_VALID_HOLD;
+      }
+
+      // Get Switch data
+      xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
+
+      if (limitSwitchFreed(switch_data)) {
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_SENSOR_BREAK;
+        next_state = EXIT_CYCLE;
+        break;
+      }
+
+      buttonData.event = NONE;
+      xQueueReceive(button_mainStateQueue, &buttonData, 0);
+      //TODO test also including off_event
+      if (buttonData.event == ON_EVENT /*|| buttonData.even == OFF_EVENT*/) {
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_BUTTON_EXIT;
+        next_state = EXIT_CYCLE;
+        break;
       }
       
       break;
@@ -400,6 +420,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         next_state = EXIT_CYCLE;
         break;
       }
+
+      buttonData.event = NONE;
+      xQueueReceive(button_mainStateQueue, &buttonData, 0);
 
       time_left = pdTICKS_TO_MS(xTaskGetTickCount() - start_time);
 
