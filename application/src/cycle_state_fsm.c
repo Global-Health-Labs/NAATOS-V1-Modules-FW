@@ -123,7 +123,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         }
         next_state = CYCLE_1_TIMER;
         break;
-      } else if (time_left > end_time) {
+      } else if (time_left >= end_time) {
         end_cycle_1();
         xReturned = xQueueSend(logger_logMessageQueue, &ramp_to_temp_timeout_log_msg, 0);
         if (xReturned != pdPASS) {
@@ -258,7 +258,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         }
         next_state = CYCLE_2_TIMER;
         break;
-      } else if (time_left > end_time) {
+      } else if (time_left >= end_time) {
         end_cycle_2();
         xReturned = xQueueSend(logger_logMessageQueue, &ramp_to_temp_timeout_log_msg, 0);
         if (xReturned != pdPASS) {
@@ -316,6 +316,8 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         }
       }
 
+      time_left = pdTICKS_TO_MS(xTaskGetTickCount() - start_time);
+
       if (time_left >= end_time) {
         next_state = CYCLE_COMPLETE_DELAY;
         end_cycle_2();
@@ -371,6 +373,8 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         }
       }
 
+      time_left = pdTICKS_TO_MS(xTaskGetTickCount() - start_time);
+
        if (time_left >= end_time) {
         next_state = CYCLE_SAMPLE_VALID_HOLD;
       }
@@ -397,6 +401,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         break;
       }
 
+      time_left = pdTICKS_TO_MS(xTaskGetTickCount() - start_time);
 
       if (time_left >= end_time) {
         exitInfo = CYCLE_SAMPLE_INVALIDATED;
