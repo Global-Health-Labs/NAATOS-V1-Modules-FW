@@ -298,7 +298,7 @@ FRESULT check_for_config_file(void) {
     return res;
   }
 
-    // Write Minimum Run Zone Temperature and Enable
+  // Write Minimum Run Zone Temperature and Enable
   configBufferSize = sprintf(configBuffer, "min_run_zone_temp:%0.2f\n", DEFAULT_MIN_RUN_ZONE_TEMP);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
@@ -322,8 +322,6 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
-
-
 
 #ifndef SAMPLE_PREP_BOARD
   configBufferSize = sprintf(configBuffer, "min_wait_time_after_valve_s:%0.2f\n", DEFAULT_WAIT_TIME_AFTER_VALVE_S);
@@ -674,7 +672,7 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
-   // Write Motor 2 Kp
+  // Write Motor 2 Kp
   configBufferSize = sprintf(configBuffer, "motor_kp_2:%0.3f\n", M_KP);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
@@ -836,7 +834,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case SAMPLE_COMPLETE_DELAY:
       parameters->sample_complete_delay_s = atoi(val);
       break;
-    break;
+      break;
     case MAX_HEATER_PID_PWM:
       parameters->max_heater_pid_pwm = atoi(val);
       break;
@@ -855,7 +853,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       parameters->valve_zone_run_time_m = atoi(val);
       break;
     case AMP_ZONE_RUN_TIME:
-      parameters->amplification_zone_run_time_m = atoi(val); 
+      parameters->amplification_zone_run_time_m = atoi(val);
       break;
     case MIN_WAIT_TIME_AFTER_VALVE:
       parameters->min_wait_time_after_valve_s = atoi(val);
@@ -1082,13 +1080,12 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
   return FR_OK;
 }
 
-
 // Sets the set_time_date variable to "false"
 FRESULT sd_card_reset_set_time_date(void) {
   FRESULT res;
-  const char* var = "set_time_date";
-  UINT br, bw;      // File read/write count
-  char buffer[1024]; // Buffer to hold file content
+  const char *var = "set_time_date";
+  UINT br, bw;            // File read/write count
+  char buffer[1024];      // Buffer to hold file content
   char temp_buffer[1024]; // Temporary buffer for modified content
 
   // Re-Mount SD Card
@@ -1121,18 +1118,17 @@ FRESULT sd_card_reset_set_time_date(void) {
   if (res != FR_OK) {
     return res;
   }
-  
+
   buffer[br] = '\0';
 
   // Search buffer for specified var. Copy lines that do not contain the specified var into temp_buffer
-  char* line = strtok(buffer, "\n");
-  char* temp_ptr = temp_buffer;
+  char *line = strtok(buffer, "\n");
+  char *temp_ptr = temp_buffer;
   while (line != NULL) {
     if (strstr(line, var) != NULL) {
       //Specified var found in line. Rewrite line to have it set to false
       temp_ptr += sprintf(temp_ptr, "%s\n", "set_time_date:false");
-    }
-    else {
+    } else {
       // If the var is not found in the line, copy the line to the temp buffer
       temp_ptr += sprintf(temp_ptr, "%s\n", line);
     }
@@ -1168,5 +1164,4 @@ FRESULT sd_card_reset_set_time_date(void) {
   if (res != FR_OK) {
     return res;
   }
-
 }

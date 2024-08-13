@@ -38,7 +38,6 @@
 #define A2_KI_2 0.025
 #define A2_KD_2 2.25
 
-
 extern HeaterInterface powerModuleHeater_I;
 
 void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data);

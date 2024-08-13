@@ -22,15 +22,13 @@ temperature_pwm_data_t pwm_data = {
     .amp1_zone_pwm = 0,
     .amp2_zone_pwm = 0};
 
-
 static const nrf_drv_timer_t *p_counter1;
 static uint32_t motor_speed_read_t1 = 0;
 static uint32_t motor_speed_read_t2;
 static bool skipped_last_call = false;
 static long double motor_speed = 0.0; //RPM
-static long double avg_speed[3] = {0,0,0};
+static long double avg_speed[3] = {0, 0, 0};
 static long double moving_avg_speed = 0.0;
-
 
 static tsys01_errors_t tsys01_err;
 
@@ -96,7 +94,7 @@ void startSensorTempTimer(void) {
   if (xTimerChangePeriod(sensorTempTimer, sampleRateTicks, 100) != pdPASS) {
     printf("Cannot change period of sensor timer. \n");
   }
-  
+
   if (xTimerStart(sensorTempTimer, 0) != pdPASS) {
     printf("Failed to start sensor timer. \n");
   }
@@ -104,13 +102,13 @@ void startSensorTempTimer(void) {
 
 void startSensorMotorTimer(void) {
   TickType_t sampleRateTicks;
-  
+
   sampleRateTicks = pdMS_TO_TICKS(50);
 
   if (xTimerChangePeriod(sensorMotorTimer, sampleRateTicks, 100) != pdPASS) {
     printf("Cannot change period of sensor timer. \n");
   }
-  
+
   if (xTimerStart(sensorMotorTimer, 0) != pdPASS) {
     printf("Failed to start sensor timer. \n");
   }
@@ -139,7 +137,6 @@ void samplePrepSensorTaskSetup(void) {
   sensorMotorTimer = xTimerCreate("SensorMotorTimer", 2, pdTRUE, (void *)0, vSensorMotorTimerCallback);
 }
 
-
 void powerModuleSensorTaskSetup(void) {
   tsys01_err = tsys01_getCalibrationValues(valve_zone);
   tsys01_err = tsys01_getCalibrationValues(amp_zone_0);
@@ -147,7 +144,6 @@ void powerModuleSensorTaskSetup(void) {
   tsys01_err = tsys01_getCalibrationValues(amp_zone_2);
   sensorTempTimer = xTimerCreate("SensorTempTimer", sampleRateTicks, pdTRUE, (void *)0, vSensorTempTimerCallback);
 }
-
 
 void sensors_task(void *pvParameters) {
   BaseType_t xReturned;
@@ -255,18 +251,18 @@ void sensors_task(void *pvParameters) {
       }
 
       case SENSOR_MSG_TIMER_TEMP_EVENT: {
- #ifdef SAMPLE_PREP_BOARD
+#ifdef SAMPLE_PREP_BOARD
         runSamplePrepSensorCollection();
- #else
+#else
         runPowerModuleSensorCollection();
- #endif
+#endif
         break;
       }
 
       case SENSOR_MSG_TIMER_MOTOR_EVENT: {
         sensorMotorCollection();
         break;
-      } 
+      }
 
       case SENSOR_MSG_SLEEP: {
         handleSensorSleep();
@@ -274,11 +270,11 @@ void sensors_task(void *pvParameters) {
         break;
       }
 
-      case SENSOR_MSG_WAKEUP:{
+      case SENSOR_MSG_WAKEUP: {
         handleSensorWake();
         break;
       }
- 
+
       case CONFIG_UPDATED: {
         handleConfigUpdated();
         break;
@@ -300,7 +296,6 @@ void handleSensorSleep(void) {
     stopSensorMotorTimer();
   }
 #endif
-
 }
 
 void handleSensorWake(void) {
@@ -312,7 +307,6 @@ void handleSensorWake(void) {
     startSensorMotorTimer();
   }
 #endif
-
 }
 
 void handleConfigUpdated(void) {
@@ -384,25 +378,25 @@ void runPowerModuleSensorCollection(void) {
     heaterMsg.readTempFailed = false;
     // I2C Read for Valve Zone
     readTempSuccess = readTemp(valve_zone, &temperatures.valve_zone_temp);
-    if(!readTempSuccess) {
+    if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }
 
     // I2C Read for Amplification Zone 0
     readTempSuccess = readTemp(amp_zone_0, &temperatures.amp0_zone_temp);
-    if(!readTempSuccess) {
+    if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }
 
     // I2C Read for Amplification Zone 1
     readTempSuccess = readTemp(amp_zone_1, &temperatures.amp1_zone_temp);
-    if(!readTempSuccess) {
+    if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }
 
     // I2C Read for Amplification Zone 2
     readTempSuccess = readTemp(amp_zone_2, &temperatures.amp2_zone_temp);
-    if(!readTempSuccess) {
+    if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }
 
@@ -426,7 +420,7 @@ void runPowerModuleSensorCollection(void) {
 }
 
 void runSamplePrepSensorCollection(void) {
-    BaseType_t xReturned;
+  BaseType_t xReturned;
   HeaterRxQueueMsg_t heaterMsg;
   bool readTempSuccess = false;
   heaterMsg.readTempFailed = false;
@@ -446,39 +440,39 @@ void runSamplePrepSensorCollection(void) {
     }
   }
 
+  readTempSuccess = readTemp(amp_zone_2, &temperatures.amp2_zone_temp);
+  if (!readTempSuccess) {
+    heaterMsg.readTempFailed = true;
+  }
+
+  // Put Switch Data into queue
+  xReturned = xQueueSend(main_switchQueue, (void *)&switches, 0);
+  if (xReturned != pdPASS) {
+    printf("SENSORS_TASK: Unable to send switch data in main_switchQueue.\n");
+  }
+
+  if (heaterRunning) {
     readTempSuccess = readTemp(amp_zone_2, &temperatures.amp2_zone_temp);
-    if(!readTempSuccess) {
+    if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }
 
-    // Put Switch Data into queue
-    xReturned = xQueueSend(main_switchQueue, (void *)&switches, 0);
+    heaterMsg.type = HEATER_MSG_TEMPERATURE_DATA;
+    heaterMsg.tempData = temperatures;
+
+    xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
     if (xReturned != pdPASS) {
-      printf("SENSORS_TASK: Unable to send switch data in main_switchQueue.\n");
+      printf("SENSORS_TASK: Unable to send temperature data in heaterRxQueue. Error: %d\n", xReturned);
     }
-
-    if (heaterRunning) {
-      readTempSuccess = readTemp(amp_zone_2, &temperatures.amp2_zone_temp);
-      if(!readTempSuccess) {
-        heaterMsg.readTempFailed = true;
-      }
-
-      heaterMsg.type = HEATER_MSG_TEMPERATURE_DATA;
-      heaterMsg.tempData = temperatures;
-
-      xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
+    sample_log_index++;
+    if (sample_log_index >= sample_log_max) {
+      HeaterRxQueueMsg_t heaterPwmMsg = {.type = HEATER_MSG_PWM_REQUEST};
+      // Request PWM from heater
+      xReturned = xQueueSend(heaterRxQueue, &heaterPwmMsg, 0);
       if (xReturned != pdPASS) {
-        printf("SENSORS_TASK: Unable to send temperature data in heaterRxQueue. Error: %d\n", xReturned);
+        printf("SENSOR_TASK: Unable to send PWM request to heaterRxQueue queue.\n");
       }
-      sample_log_index++;
-      if (sample_log_index >= sample_log_max) {
-        HeaterRxQueueMsg_t heaterPwmMsg = {.type = HEATER_MSG_PWM_REQUEST};
-        // Request PWM from heater
-        xReturned = xQueueSend(heaterRxQueue, &heaterPwmMsg, 0);
-        if (xReturned != pdPASS) {
-          printf("SENSOR_TASK: Unable to send PWM request to heaterRxQueue queue.\n");
-        }
-      }
+    }
   }
 }
 

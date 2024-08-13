@@ -31,18 +31,16 @@
 #define BOOST_CONTROL_ENABLE_PIN 21
 #define BUTTON_INPUT_PIN NRF_GPIO_PIN_MAP(1, 6)
 
-
-#define VALVE_ZONE_PIN 20 // P0.20
-#define AMP0_ZONE_PIN 19  // P0.19
-#define AMP1_ZONE_PIN 34  // P1.02
-#define AMP2_ZONE_PIN NRF_GPIO_PIN_MAP(1, 1)  // P1.01
+#define VALVE_ZONE_PIN 20                    // P0.20
+#define AMP0_ZONE_PIN 19                     // P0.19
+#define AMP1_ZONE_PIN 34                     // P1.02
+#define AMP2_ZONE_PIN NRF_GPIO_PIN_MAP(1, 1) // P1.01
 
 #define SAMPLE_HEATER_PIN NRF_GPIO_PIN_MAP(1, 1) // P1.01
 #define SENSORS_EN NRF_GPIO_PIN_MAP(1, 7)
 #define LED_HARDWARE_DRIVER_ENABLE_PIN NRF_GPIO_PIN_MAP(1, 3) //1.03
 
 #define HAL_INPUT_PIN NRF_GPIO_PIN_MAP(0, 2)
-
 
 /*--------------Board Specific Pin Configs----------------*/
 #ifdef SAMPLE_PREP_BOARD
@@ -56,11 +54,11 @@
 #define OPTICAL_INPUT_PIN 3
 
 /* Heater Zones' Parameters */
-#define DEFAULT_AMPLIFICATION_ZONE_ON_TIME 2400 // 40min in seconds
-#define DEFAULT_VALVE_ZONE_ON_TIME 300          // 5min in seconds
-#define BUTTON_INPUT_PIN_ALT NRF_GPIO_PIN_MAP(1, 14)  // Used for recovering bad gpio pin defect
-#define BUTTON_REWORK_DETECT_INPUT NRF_GPIO_PIN_MAP(1,12)
-#define BUTTON_REWORK_DETECT_OUTPUT NRF_GPIO_PIN_MAP(1,13)
+#define DEFAULT_AMPLIFICATION_ZONE_ON_TIME 2400      // 40min in seconds
+#define DEFAULT_VALVE_ZONE_ON_TIME 300               // 5min in seconds
+#define BUTTON_INPUT_PIN_ALT NRF_GPIO_PIN_MAP(1, 14) // Used for recovering bad gpio pin defect
+#define BUTTON_REWORK_DETECT_INPUT NRF_GPIO_PIN_MAP(1, 12)
+#define BUTTON_REWORK_DETECT_OUTPUT NRF_GPIO_PIN_MAP(1, 13)
 
 #endif
 
@@ -79,13 +77,13 @@
 #define DEFAULT_AMP2_MAX_TEMP 115.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP 75.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP_EN false
-#define DEFAULT_ALERT_TIMEOUT_S 3.0 // Seconds
+#define DEFAULT_ALERT_TIMEOUT_S 3.0    // Seconds
 #define DEFAULT_VALID_TIMEOUT_S 3600.0 // 1 hour
-#define DEFAULT_RECOVERY_THRES 20    // Percent
+#define DEFAULT_RECOVERY_THRES 20      // Percent
 #define OPTICAL_TRIG_THRES 800
 #define DEFAULT_HEATER_SETPOINT 95.0 // Sample prep only
-#define MOTOR_SETPOINT_1  3900
-#define MOTOR_SETPOINT_2  3900
+#define MOTOR_SETPOINT_1 3900
+#define MOTOR_SETPOINT_2 3900
 #define DEFAULT_MOTOR_SPEED_PWM 71
 #define DEFAULT_RUN_MOTOR_1 true
 #define DEFAULT_RUN_HEATER_1 true
@@ -95,9 +93,9 @@
 #define DEFAULT_CYCLE_2_RUNTIME 150.0
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_1 true
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_2 false
-#define DEFAULT_RAMP_TO_TEMP_TIMEOUT 600.0 // 10min 
-#define DEFAULT_DATE 100124 // Oct. 1 2024
-#define DEFAULT_TIME 120000 // 12 pm
+#define DEFAULT_RAMP_TO_TEMP_TIMEOUT 600.0 // 10min
+#define DEFAULT_DATE 100124                // Oct. 1 2024
+#define DEFAULT_TIME 120000                // 12 pm
 #define DEFAULT_SET_TIME false
 #define DEFAULT_MAX_HEATER_PID 70
 #else
@@ -118,9 +116,9 @@
 #define DEFAULT_AMP2_MAX_TEMP 80.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP 50.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP_EN false
-#define DEFAULT_ALERT_TIMEOUT_S 10.0 // seconds
+#define DEFAULT_ALERT_TIMEOUT_S 10.0   // seconds
 #define DEFAULT_VALID_TIMEOUT_S 3600.0 // 1 hour
-#define DEFAULT_RECOVERY_THRES 40  // Percent
+#define DEFAULT_RECOVERY_THRES 40      // Percent
 #define OPTICAL_TRIG_THRES 800
 #endif
 
@@ -432,7 +430,6 @@ typedef struct {
   log_event_t event_data;
 } log_data_message_t;
 
-
 typedef enum {
   PWM_MSG_UPDATE_DUTY,
   PWM_MSG_CALLBACK_EVENT,
@@ -485,7 +482,6 @@ typedef struct {
   bool overTempError;
   bool wakeupEvent;
 } MainStateRxQueueMsg_t;
-
 
 // Task Handles
 extern xTaskHandle mainTaskHandle;

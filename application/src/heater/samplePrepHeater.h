@@ -5,7 +5,6 @@
 #include "../pwm/pwm.h"
 #include "heaterInterface.h"
 
-
 //-------- Sample Prep Defualt PID Configs ----------
 #define M_KP 0.006
 #define M_KI 0.0005

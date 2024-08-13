@@ -22,8 +22,7 @@ const log_event_t start_event = {
     .event = SAMPLE_START,
     .message = START_EVENT_MSG};
 const log_data_message_t new_log_msg = {
-  .data_type = LOGGER_START_CYCLE_LOG
-};
+    .data_type = LOGGER_START_CYCLE_LOG};
 const log_data_message_t start_log_msg = {
     .data_type = EVENT_DATA,
     .temperature_data = NULL,
@@ -115,7 +114,6 @@ const log_data_message_t ramp_to_temp_timeout_log_msg = {
     .temperature_data = NULL,
     .event_data = ramp_to_temp_timeout_event};
 
-
 const log_event_t setpoint_timeout_event = {
     .event = SAMPLE_SETPOINT_TIMEOUT,
     .message = SETPOINT_TIMEOUT_MSG};
@@ -125,13 +123,12 @@ const log_data_message_t setpoint_timeout_log_msg = {
     .event_data = setpoint_timeout_event};
 
 const BatteryRxQueueMsg_t batt_req = {
-  .type = BATTERY_SOC_REQUEST,
-  .sendTo = BATTERY_MSG_SOC_MAIN};
+    .type = BATTERY_SOC_REQUEST,
+    .sendTo = BATTERY_MSG_SOC_MAIN};
 
 const BatteryRxQueueMsg_t batt_req_log = {
-.type = BATTERY_SOC_REQUEST,
-.sendTo = BATTERY_MSG_SOC_LOG};
-
+    .type = BATTERY_SOC_REQUEST,
+    .sendTo = BATTERY_MSG_SOC_LOG};
 
 // USB Main State Update Constants
 const usb_message_t standby_update = {

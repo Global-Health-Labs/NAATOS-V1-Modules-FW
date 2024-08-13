@@ -11,11 +11,13 @@ SDK Version: 17.1
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../pwm/pwm.h"
 #include "FreeRTOS.h"
 #include "adc.h"
 #include "app_error.h"
 #include "battery.h"
 #include "bsp.h"
+#include "cycle_state_fsm.h"
 #include "fuel.h"
 #include "heater/heater.h"
 #include "i2c_hal_freertos.h"
@@ -23,12 +25,11 @@ SDK Version: 17.1
 #include "logger/logger.h"
 #include "motor.h"
 #include "naatos_config.h"
-#include "naatos_queues.h"
 #include "naatos_messages.h"
+#include "naatos_queues.h"
 #include "nordic_common.h"
 #include "nrf_drv_clock.h"
 #include "pid.h"
-#include "../pwm/pwm.h"
 #include "sd_card.h"
 #include "sdk_errors.h"
 #include "sensors.h"
@@ -39,7 +40,6 @@ SDK Version: 17.1
 #include "timers.h"
 #include "usb.h"
 #include "watchdog.h"
-#include "cycle_state_fsm.h"
 
 #include "core_cm4.h"
 
@@ -82,7 +82,6 @@ xQueueHandle main_usbChangedConfQueue;
 xQueueHandle main_wakeupTasksQueue;
 xQueueHandle main_setPointReached;
 
-
 // Configuration Parameters
 #ifndef SAMPLE_PREP_BOARD
 naatos_config_parameters config = {
@@ -91,7 +90,7 @@ naatos_config_parameters config = {
     .amplification_zone_run_time_m = 0,
     .valve_zone_run_time_m = 0,
     .sample_valid_timeout_s = 0,
-    .sample_complete_delay_s =  0,
+    .sample_complete_delay_s = 0,
     .low_power_threshold = 0,
     .valve_setpoint = 0,
     .amp0_setpoint = 0,
@@ -288,10 +287,10 @@ void main_task(void *pvParameters) {
           sd_card_reset_set_time_date();
         }
 
-         updateLedState(LED_WAKEUP, true);
-          updateLedState(LED_RUN, false);
-          updateLedState(LED_STANDBY, true);
-          updateLedState(LED_COMPLETE, false);
+        updateLedState(LED_WAKEUP, true);
+        updateLedState(LED_RUN, false);
+        updateLedState(LED_STANDBY, true);
+        updateLedState(LED_COMPLETE, false);
       }
 
       hal_triggered = false;
@@ -413,12 +412,12 @@ void main_task(void *pvParameters) {
 
       cycle_state_exit_t cycle_exit_info = run_cycle_state_machine();
 
-      if(cycle_exit_info == CYCLE_COMPLETE) {
+      if (cycle_exit_info == CYCLE_COMPLETE) {
         next_state = MAIN_STANDBY;
         break;
       }
 
-      if(cycle_exit_info == CYCLE_RUNNING) {
+      if (cycle_exit_info == CYCLE_RUNNING) {
         next_state = MAIN_RUNNING;
       } else {
         next_state = MAIN_ALERT;
@@ -427,14 +426,14 @@ void main_task(void *pvParameters) {
       break;
     }
 
-    case MAIN_ALERT:{
-      if(last_state != main_state) {
-          updateLedState(LED_WAKEUP, true);
-          updateLedState(LED_RUN, false);
-          updateLedState(LED_STANDBY, true);
-          updateLedState(LED_COMPLETE, false);
-          a_t_start = xTaskGetTickCount();
-          printf("MAIN_TASK: Alert Timeout - %dms\n", pdTICKS_TO_MS(alert_timeout_ticks));
+    case MAIN_ALERT: {
+      if (last_state != main_state) {
+        updateLedState(LED_WAKEUP, true);
+        updateLedState(LED_RUN, false);
+        updateLedState(LED_STANDBY, true);
+        updateLedState(LED_COMPLETE, false);
+        a_t_start = xTaskGetTickCount();
+        printf("MAIN_TASK: Alert Timeout - %dms\n", pdTICKS_TO_MS(alert_timeout_ticks));
       }
 
       xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY); // TODO do we do  anything with this?
@@ -447,7 +446,7 @@ void main_task(void *pvParameters) {
         updateLedState(LED_COMPLETE, false);
         next_state = MAIN_STANDBY;
       }
-      
+
       break;
     }
 
@@ -650,7 +649,6 @@ void main_task(void *pvParameters) {
     }
   }
 }
-
 
 void send_usb_change(usb_command_t cmd) {
   BaseType_t xReturned;
@@ -966,7 +964,6 @@ void create_queues() {
   if (main_setPointReached == NULL) {
     printf("Unable to create main_setPointReached queue\n");
   }
-
 }
 
 // Stack Overflow detection.
@@ -1001,7 +998,7 @@ int main(void) {
   init_sensors_gpios(); // Sensor GPIOs
   init_pwms();
 
-  nrf_gpio_cfg_output(BOOST_CONTROL_ENABLE_PIN); 
+  nrf_gpio_cfg_output(BOOST_CONTROL_ENABLE_PIN);
   nrf_gpio_pin_clear(BOOST_CONTROL_ENABLE_PIN); // turn off boost for heaters
 
   nrf_gpio_cfg_output(MOTOR_POWER_ENABLE);
@@ -1010,8 +1007,8 @@ int main(void) {
 #ifdef SAMPLE_PREP_BOARD
   vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_100k); // I2C
 #else
-  vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_400k);  // I2C
-  vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_400k); // I2C
+  vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_100k);  // I2C
+  vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_100k); // I2C
 #endif
 #if ENABLE_LEDS
   led_driver_init();

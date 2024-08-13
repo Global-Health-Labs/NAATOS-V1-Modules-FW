@@ -135,7 +135,6 @@
       <file file_name="../src/battery.h" />
       <file file_name="../src/composite_usb.h" />
       <file file_name="../src/sensors.h" />
-      <file file_name="../src/states.h" />
       <file file_name="../src/usb.c">
         <configuration Name="Debug" build_exclude_from_build="No" />
       </file>

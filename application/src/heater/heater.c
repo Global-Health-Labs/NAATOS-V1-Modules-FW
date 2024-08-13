@@ -7,24 +7,22 @@ xQueueHandle heaterRxQueue;
 int wdtTimeout = 0;
 
 HeaterInterface samplePrepHeater_I = {
-  .handleHeaterSensorDataRx = &samplePrepHandleHeaterSensorDataRx,
-  .handleMotorDataRx = &handleSampleMotorDataRx,
-  .handleHeaterZoneStateUpdate = &samplePrepHandleHeaterZoneStateUpdate,
-  .resetHeaterPIDs = &samplePrepResetHeaterPIDs,
-  .getPwmData = &getSamplePrepPwmData,
-  .getOverTempStatus = &getSamplePrepOverTempStatus,
-  .getHeaterRunningStatus = &getSamplePrepHeaterRunningStatus
-};
+    .handleHeaterSensorDataRx = &samplePrepHandleHeaterSensorDataRx,
+    .handleMotorDataRx = &handleSampleMotorDataRx,
+    .handleHeaterZoneStateUpdate = &samplePrepHandleHeaterZoneStateUpdate,
+    .resetHeaterPIDs = &samplePrepResetHeaterPIDs,
+    .getPwmData = &getSamplePrepPwmData,
+    .getOverTempStatus = &getSamplePrepOverTempStatus,
+    .getHeaterRunningStatus = &getSamplePrepHeaterRunningStatus};
 
 HeaterInterface powerModuleHeater_I = {
-  .handleHeaterSensorDataRx = &powerModuleHandleHeaterSensorDataRx,
-  .handleMotorDataRx = NULL,
-  .handleHeaterZoneStateUpdate = &powerModuleHandleHeaterZoneStateUpdate,
-  .resetHeaterPIDs = &powerModuleResetHeaterPIDs,
-  .getPwmData = &getPowerModulePwmData,
-  .getOverTempStatus = &getPowerModuleOverTempStatus,
-  .getHeaterRunningStatus = &getPowerModuleHeaterRunningStatus
-};
+    .handleHeaterSensorDataRx = &powerModuleHandleHeaterSensorDataRx,
+    .handleMotorDataRx = NULL,
+    .handleHeaterZoneStateUpdate = &powerModuleHandleHeaterZoneStateUpdate,
+    .resetHeaterPIDs = &powerModuleResetHeaterPIDs,
+    .getPwmData = &getPowerModulePwmData,
+    .getOverTempStatus = &getPowerModuleOverTempStatus,
+    .getHeaterRunningStatus = &getPowerModuleHeaterRunningStatus};
 
 void sendWdtHeaterValid() {
   BaseType_t xReturned;
@@ -53,7 +51,7 @@ void heater_task(void *pvParameters) {
 
   for (;;) {
     xReturned = xQueueReceive(heaterRxQueue, &heaterRxMessage, portMAX_DELAY);
-     if (xReturned != pdPASS) {
+    if (xReturned != pdPASS) {
       printf("Unable to Rx data to heater queue\n");
     } else {
       switch (heaterRxMessage.type) {
@@ -68,7 +66,7 @@ void heater_task(void *pvParameters) {
         break;
       }
       case HEATER_MSG_TEMPERATURE_DATA: {
-        if(heaterRxMessage.readTempFailed) {
+        if (heaterRxMessage.readTempFailed) {
           bool greaterThanMaxTemp = heaterInterface->getOverTempStatus();
           xReturned = xQueueSend(main_runErrorQueue, &greaterThanMaxTemp, 0);
           if (xReturned != pdPASS) {

@@ -134,16 +134,15 @@ tsys01_errors_t tsys01_getTemp(sensor_selection_t sensor, float *temp_val) {
   uint32_t adc16 = adc24 / 256.0;
   float temp_c = (float)((-2) * calibration[sensor].k4 * pow(10, -21) * pow(adc16, 4) + (4) * calibration[sensor].k3 * pow(10, -16) * pow(adc16, 3) + (-2) * calibration[sensor].k2 * pow(10, -11) * pow(adc16, 2) + (1) * calibration[sensor].k1 * pow(10, -6) * adc16 + (-1.5) * calibration[sensor].k0 * pow(10, -2));
 
-  if((temp_c  < 0) || (temp_c > 110)) {
+  if ((temp_c < 0) || (temp_c > 110)) {
     //err_code = tsys01_out_of_range;
     *temp_val = temp_c;
   } else {
     *temp_val = temp_c;
   }
-  
+
   return err_code;
 }
-
 
 tsys01_errors_t tsys01_getCalibrationValues(sensor_selection_t sensor) {
   uint8_t temp[2];

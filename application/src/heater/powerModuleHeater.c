@@ -49,7 +49,7 @@ void handle_valve_stopstart_heater(bool heating) {
     printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
   }
 
-  if(!heating){
+  if (!heating) {
     printf("Sent valve heater stop");
   }
 
@@ -75,7 +75,7 @@ void handle_amplification_stopstart_heater(bool heating) {
   if (valve_zone_running && !heating)
     return;
 
-  if(heating) {
+  if (heating) {
     //nrf_gpio_pin_set(BOOST_CONTROL_ENABLE_PIN);
     //vTaskDelay(pdMS_TO_TICKS(400));
   } else {
@@ -274,7 +274,7 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
       updateDutyCycles(pwmData);
 
       pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd); // TODO: Implement defaults
-    
+
       // Reinitalize PID Values
       pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
       pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
@@ -348,7 +348,7 @@ void powerModuleResetHeaterPIDs(void) {
     pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2);
     pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2);
   }
-  #endif
+#endif
 }
 
 temperature_pwm_data_t getPowerModulePwmData(void) {

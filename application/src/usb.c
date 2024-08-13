@@ -19,13 +19,8 @@ static bool m_usb_connected = false;
 
 // Queue Handles
 xQueueHandle usbRxQueue;
-
-//xQueueHandle usb_stateChangeQueue;
 xQueueHandle usb_recvUsbWaitAcceptQueue;
 xQueueHandle usb_usbWaitOverQueue;
-//xQueueHandle usb_mainStateContinueQueue;
-//xQueueHandle usb_connectionReqQueue;
-
 xQueueHandle compositeRxQueue;
 
 // Main Loop
@@ -137,7 +132,7 @@ void respond_to_usb_change(void) {
   }
 }
 
-void write_to_com(const char * msg, int len) {
+void write_to_com(const char *msg, int len) {
   if (!usb_detected || !com_port_open)
     return;
 

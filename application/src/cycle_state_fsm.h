@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../pwm/pwm.h"
 #include "FreeRTOS.h"
 #include "adc.h"
 #include "app_error.h"
@@ -20,7 +21,6 @@
 #include "nordic_common.h"
 #include "nrf_drv_clock.h"
 #include "pid.h"
-#include "../pwm/pwm.h"
 #include "sd_card.h"
 #include "sdk_errors.h"
 #include "sensors.h"
@@ -47,7 +47,6 @@
 #include "app_usbd_serial_num.h"
 #include "app_usbd_string_desc.h"
 #include "app_util.h"
-
 
 /* Main States */
 typedef enum {
@@ -92,5 +91,3 @@ void end_cycle_1(void);
 void end_cycle_2(void);
 
 bool limitSwitchFreed(sensor_switches_t data);
-
-

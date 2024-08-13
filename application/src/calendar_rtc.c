@@ -121,9 +121,9 @@ bool calendar_start(void) {
 // Set RTC frequency to 32khz
 bool calendar_set_32k(void) {
   uint8_t buff[2];
-   
-   buff[0] = PCF85_REG_CTRL1_ADDR;
-   buff[1] = 0x00;
+
+  buff[0] = PCF85_REG_CTRL1_ADDR;
+  buff[1] = 0x00;
 
   ret_code_t ret;
 #if I2C_CONNECTED
@@ -138,7 +138,7 @@ bool calendar_set_32k(void) {
 }
 
 bool calendar_set_time_helper(void) {
-  calendar_time_t now;  
+  calendar_time_t now;
 
   //Check if the time should be set
   calendar_get_time(&now);
@@ -153,40 +153,37 @@ bool calendar_set_time_helper(void) {
   //now.year = 24;
 
   //Loads time from config file
-  now.second  =   config.hhmmss           % 100;
-  now.minute  = ( config.hhmmss / 100)    % 100;
-  now.hour    = ( config.hhmmss / 10000)  % 100;
+  now.second = config.hhmmss % 100;
+  now.minute = (config.hhmmss / 100) % 100;
+  now.hour = (config.hhmmss / 10000) % 100;
 
-  now.year    =   config.mmddyy           % 100;
-  now.day     = ( config.mmddyy / 100)    % 100;
-  now.month   = ( config.mmddyy / 10000)  % 100;
-  
-  now.week_day  = 1; //Leaving the weekday/day of the week value hardcoded. This isn't reported in the log file. 
+  now.year = config.mmddyy % 100;
+  now.day = (config.mmddyy / 100) % 100;
+  now.month = (config.mmddyy / 10000) % 100;
 
+  now.week_day = 1; //Leaving the weekday/day of the week value hardcoded. This isn't reported in the log file.
 
   //calendar_stop();
   calendar_set_time(&now);
 
   printf("Requested time  M: %d D: %d Y:%d h: %d m: %d s: %d\r\n",
-    now.month,
-    now.day,
-    now.year,
-    now.hour,
-    now.minute,
-    now.second
-  );
-  
+      now.month,
+      now.day,
+      now.year,
+      now.hour,
+      now.minute,
+      now.second);
+
   //calendar_start();
   calendar_get_time(&now);
 
   printf("Read back time  M: %d D: %d Y:%d h: %d m: %d s: %d\r\n",
-    now.month,
-    now.day,
-    now.year,
-    now.hour,
-    now.minute,
-    now.second
-  );
-  
+      now.month,
+      now.day,
+      now.year,
+      now.hour,
+      now.minute,
+      now.second);
+
   return true;
 }

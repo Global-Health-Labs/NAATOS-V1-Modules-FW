@@ -2,7 +2,6 @@
 #include "../motor.h"
 #include "timers.h"
 
-
 APP_PWM_INSTANCE(PWM0, 0); // Create instance "PWM0" using TIMER0
 APP_PWM_INSTANCE(PWM2, 2); // Create instance "PWM2" using TIMER2
 
@@ -46,7 +45,6 @@ void init_pwms() {
   app_pwm_config_t pwm2_cfg = APP_PWM_DEFAULT_CONFIG_2CH(100L, MOTOR_OUTPUT_PIN, MOTOR_OUTPUT_PIN2);
   pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
   pwm2_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
-
 
   /* Initalize with configurations */
   /* Initalize PWM0 */
@@ -117,7 +115,6 @@ void pwm_task(void *pvParameters) {
 
   // for motor
   app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, amp1_duty);
-
 
   PwmRxQueueMsg_t pwmMsg;
 

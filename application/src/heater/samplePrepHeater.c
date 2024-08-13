@@ -25,8 +25,7 @@ temperature_pwm_data_t h_pwm_data = {
     .amp0_zone_pwm = 0,
     .amp1_zone_pwm = 0,
     .amp2_zone_pwm = 0,
-    .sample_prep_heater_pwm = 0
-};
+    .sample_prep_heater_pwm = 0};
 
 void handle_cycle2_stopstart_heater(bool heating) {
   BaseType_t xReturned;
@@ -122,12 +121,11 @@ void handle_cycle1_stopstart_heater(bool heating) {
   }
 }
 
-
 void samplePrepResetHeaterPIDs(void) {
   int pid_max = DEFAULT_MAX_HEATER_PID;
 
-  if(!use_default_configuration_parameters){
-    if(config.max_heater_pid_pwm > 0 && config.max_heater_pid_pwm <= DEFAULT_MAX_HEATER_PID) {
+  if (!use_default_configuration_parameters) {
+    if (config.max_heater_pid_pwm > 0 && config.max_heater_pid_pwm <= DEFAULT_MAX_HEATER_PID) {
       pid_max = config.max_heater_pid_pwm;
     }
   }
@@ -148,13 +146,13 @@ void samplePrepResetHeaterPIDs(void) {
     pid_controller_init(&heater_pid_2, config.heater_setpoint_2, config.heater_kp_2, config.heater_ki_2, config.heater_kd_2, pid_max);
   }
 
-  if (use_default_configuration_parameters) {   
+  if (use_default_configuration_parameters) {
     pid_controller_init(&motor_pid_1, MOTOR_SETPOINT_1, M_KP, M_KI, M_KD, 150);
   } else {
     pid_controller_init(&motor_pid_1, config.motor_setpoint_1, config.motor_kp_1, config.motor_ki_1, config.motor_kd_1, 150);
   }
 
-  if (use_default_configuration_parameters) {   
+  if (use_default_configuration_parameters) {
     pid_controller_init(&motor_pid_2, MOTOR_SETPOINT_2, M_KP, M_KI, M_KD, pid_max);
   } else {
     pid_controller_init(&motor_pid_2, config.motor_setpoint_2, config.motor_kp_2, config.motor_ki_2, config.motor_kd_2, 150);
@@ -204,7 +202,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     // Update Amplification 2 PID loop with new temperatures
     if (config.run_heater_1) {
       pid_controller_compute(&heater_pid_1, temperature_data.amp2_zone_temp);
-      if(rampToTemp && (temperature_data.amp2_zone_temp >= heater1SetPoint)) {
+      if (rampToTemp && (temperature_data.amp2_zone_temp >= heater1SetPoint)) {
         xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
         if (xReturned != pdPASS) {
           printf("HEATER_TASK: Unable to send set point reached message.\n");
@@ -236,7 +234,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     // Update Amplification 2 PID loop with new temperatures
     if (config.run_heater_2) {
       pid_controller_compute(&heater_pid_2, temperature_data.amp2_zone_temp);
-      if(rampToTemp && (temperature_data.amp2_zone_temp >= heater2SetPoint)) {
+      if (rampToTemp && (temperature_data.amp2_zone_temp >= heater2SetPoint)) {
         xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
         if (xReturned != pdPASS) {
           printf("HEATER_TASK: Unable to send set point reached message.\n");
@@ -290,40 +288,36 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     write_to_com(buff, size);
   }
 #endif
-
 }
 
 void handleSampleMotorDataRx(int motor_speed) {
   if (amplification_zone_running) {
     temperature_pwm_data_t pwmData = {
-      .valve_zone_pwm = 0,
-      .amp0_zone_pwm = heater_pid_1.out,
-      .amp1_zone_pwm = 0,
-      .amp2_zone_pwm = 0
-    };
+        .valve_zone_pwm = 0,
+        .amp0_zone_pwm = heater_pid_1.out,
+        .amp1_zone_pwm = 0,
+        .amp2_zone_pwm = 0};
 
     if (config.run_motor_1) {
       pid_controller_compute(&motor_pid_1, motor_speed);
       pwmData.amp1_zone_pwm = motor_pid_1.out;
-    } 
+    }
 
     h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
     last_motor_speed = motor_speed;
 
     updateDutyCycles(pwmData);
-  }
-  else if (valve_zone_running) {
+  } else if (valve_zone_running) {
     temperature_pwm_data_t pwmData = {
-      .valve_zone_pwm = 0,
-      .amp0_zone_pwm = heater_pid_2.out,
-      .amp1_zone_pwm = 0,
-      .amp2_zone_pwm = 0
-    };
+        .valve_zone_pwm = 0,
+        .amp0_zone_pwm = heater_pid_2.out,
+        .amp1_zone_pwm = 0,
+        .amp2_zone_pwm = 0};
 
     if (config.run_motor_2) {
       pid_controller_compute(&motor_pid_2, motor_speed);
       pwmData.amp1_zone_pwm = motor_pid_2.out;
-    } 
+    }
 
     h_pwm_data.amp1_zone_pwm = pwmData.amp1_zone_pwm;
     last_motor_speed = motor_speed;
