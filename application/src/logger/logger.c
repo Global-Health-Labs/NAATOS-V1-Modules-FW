@@ -37,7 +37,7 @@ int getBatteryPercent(void) {
   BaseType_t xReturned;
   int battery_percent = 0;
   // Request the battery percentage from the bettery task
-  xReturned = xQueueSend(batteryRxQueue, &batt_req, 0);
+  xReturned = xQueueSend(batteryRxQueue, &batt_req_log, 0);
   if (xReturned != pdPASS) {
     printf("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.\n");
   }
@@ -66,7 +66,6 @@ void getLogFileName(const char *_logFileName) {
 
 void logger_task(void *pvParameters) {
   BaseType_t xReturned;
-  log_data_message_t log_message;
   log_data_message_t last_temp_message;
   bool uart_only = false;
   char logFileName[50];
@@ -89,6 +88,7 @@ void logger_task(void *pvParameters) {
 
     switch (rxLogMsg.data_type) {
         case LOGGER_START_CYCLE_LOG: {
+          printf("LOG_TASK: Start Log Message.\n");
             if (config.logging_rate < 1.0) {
               uart_only = true;
             }
@@ -104,6 +104,7 @@ void logger_task(void *pvParameters) {
             break;
         }
         case TEMPERATURE_DATA: {
+          printf("LOG_TASK: Temperature Log Message.\n");
             // Get current time
             if (!(calendar_get_time(&time))) {
               printf("LOG_TASK: Unable to retreive time!");
@@ -111,8 +112,8 @@ void logger_task(void *pvParameters) {
 
             int batteryPercent = getBatteryPercent();
 
-            loggerInterface->constructSensorDataLogLine(logFileLine, time, log_message, batteryPercent);
-            last_temp_message = log_message;
+            logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, batteryPercent);
+            last_temp_message = rxLogMsg;
 
             // Check UART Only
             if (!uart_only) {
@@ -126,19 +127,24 @@ void logger_task(void *pvParameters) {
         }
 
         case EVENT_DATA: {
+          printf("LOG_TASK: Event Log Message.\n");
             // Get current time
             if (!(calendar_get_time(&time))) {
               printf("LOG_TASK: Unable to retreive time!");
             }
 
+             printf("LOG_TASK: Event Log Message 2.\n");
+
             int batteryPercent = getBatteryPercent();
 
-            loggerInterface->constructEventDataLogLine(logFileLine, time, log_message, batteryPercent);
-            if (log_message.event_data.event == SAMPLE_VALV_ENDED ||
-                log_message.event_data.event == SAMPLE_INTERRUPTED ||
-                log_message.event_data.event == SAMPLE_TEMPS_NOT_STABALIZED ||
-                log_message.event_data.event == SAMPLE_RECOVERY_BATT ||
-                log_message.event_data.event == SAMPLE_OVER_TEMP) {
+            printf("LOG_TASK: Event Log Message 3.\n");
+
+            logFileLineSize = loggerInterface->constructEventDataLogLine(logFileLine, time, last_temp_message, batteryPercent);
+            if (rxLogMsg.event_data.event == SAMPLE_VALV_ENDED ||
+                rxLogMsg.event_data.event == SAMPLE_INTERRUPTED ||
+                rxLogMsg.event_data.event == SAMPLE_TEMPS_NOT_STABALIZED ||
+                rxLogMsg.event_data.event == SAMPLE_RECOVERY_BATT ||
+                rxLogMsg.event_data.event == SAMPLE_OVER_TEMP) {
 
               //Zero out the last_temp_message elements so that they all start at zero for the next log file
               last_temp_message.temperature_data.amp2_zone_temp = 0;
@@ -146,6 +152,8 @@ void logger_task(void *pvParameters) {
               last_temp_message.temperature_data.motorSpeed = 0;
               last_temp_message.temperature_data.amp1_zone_pwm = 0;
             }
+
+            printf("LOG_TASK: Event Log Message 4.\n");
 
             // Check UART Only
             if (!uart_only) {
@@ -155,6 +163,8 @@ void logger_task(void *pvParameters) {
                 printf("LOG_TASK: Unable to write last log line!\n");
               }
             }
+
+            printf("LOG_TASK: Event Log Message 5.\n");
 
             break;
         }

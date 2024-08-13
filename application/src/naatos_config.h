@@ -124,6 +124,8 @@
 #define OPTICAL_TRIG_THRES 800
 #endif
 
+#define DEFAULT_CYCLES_COMPLETE_DELAY_S 10
+
 /* Device Debug Parameters */
 #define USE_CALENDAR_CHIP 1
 #define VERBOSE_PID 1
@@ -519,6 +521,7 @@ typedef struct {
   bool min_run_zone_temp_en;
   float alert_timeout_time_m;
   float sample_valid_timeout_s;
+  int sample_complete_delay_s;
   float valve_kp;
   float valve_ki;
   float valve_kd;
@@ -571,6 +574,7 @@ typedef struct {
   bool min_run_zone_temp_en;
   float alert_timeout_time_s;
   float sample_valid_timeout_s;
+  int sample_complete_delay_s;
   float max_heater_pid_pwm;
   float heater_kp_1;
   float heater_ki_1;

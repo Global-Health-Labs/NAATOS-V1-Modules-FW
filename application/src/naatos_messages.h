@@ -38,7 +38,7 @@ extern const log_event_t setpoint_timeout_event;
 extern const log_data_message_t setpoint_timeout_log_msg;
 
 extern const BatteryRxQueueMsg_t batt_req;
-
+extern const BatteryRxQueueMsg_t batt_req_log;
 
 // USB Main State Update Constants
 extern const usb_message_t standby_update;

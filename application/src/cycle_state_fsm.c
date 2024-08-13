@@ -14,7 +14,7 @@ uint32_t start_time = 0;
 uint32_t end_time = 0;
 uint32_t time_left = 0;
 int percent_recv;
-bool over_temp;
+bool over_temp = false;
 
 BaseType_t xReturned;
 
@@ -31,7 +31,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
   switch(current_state) {
     case VALIDATE_INIT_CONDITIONS: {
 
-      xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 0);
+      xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
       if (xReturned != pdPASS) {
         printf("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
       }
@@ -317,7 +317,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       }
 
       if (time_left >= end_time) {
-        next_state = CYCLE_SAMPLE_VALID_HOLD;
+        next_state = CYCLE_COMPLETE_DELAY;
         end_cycle_2();
         break;
       }
@@ -363,13 +363,17 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
     case CYCLE_COMPLETE_DELAY: {
       if(last_state != current_state) {
-        updateLedState(LED_COMPLETE, true);
-        //TODO get config values for hold delay 
+        start_time = xTaskGetTickCount();
+        if (use_default_configuration_parameters) {
+          end_time = pdMS_TO_TICKS((DEFAULT_CYCLES_COMPLETE_DELAY_S) * 1000);
+        } else {
+          end_time = pdMS_TO_TICKS((config.sample_complete_delay_s) * 1000);
+        }
       }
 
-      //TODO put in timeout for hold delay
-
-      next_state = CYCLE_SAMPLE_VALID_HOLD;
+       if (time_left >= end_time) {
+        next_state = CYCLE_SAMPLE_VALID_HOLD;
+      }
       
       break;
     }
@@ -377,7 +381,12 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     case CYCLE_SAMPLE_VALID_HOLD: {
       if(last_state != current_state) {
         updateLedState(LED_COMPLETE, true);
-        //TODO get config values for hold delay 
+        start_time = xTaskGetTickCount();
+        if (use_default_configuration_parameters) {
+          end_time = pdMS_TO_TICKS((DEFAULT_VALID_TIMEOUT_S) * 1000);
+        } else {
+          end_time = pdMS_TO_TICKS((config.sample_valid_timeout_s) * 1000);
+        }
       }
 
       xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
@@ -388,9 +397,11 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         break;
       }
 
-      //TODO need to check a timeout here if past timeout then we error to sample invalid
-      
-      next_state = EXIT_CYCLE;
+
+      if (time_left >= end_time) {
+        exitInfo = CYCLE_SAMPLE_INVALIDATED;
+        next_state = EXIT_CYCLE;
+      }
 
       break;
     }
@@ -474,12 +485,12 @@ void end_cycle_1(void) {
   BaseType_t xRet;
   bool heat_conf = false;
   // Send stop amplification message to heater queue
-  xRet = xQueueSend(heaterRxQueue, &stop_amplification_zone, 0);
+  xRet = xQueueSend(heaterRxQueue, &stop_amplification_zone, 50);
   if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send stop amplification zone request.\n");
   }
   // Send stop amplification Event to logging task
-  xRet = xQueueSend(logger_logMessageQueue, &amplification_stop_log_msg, 0);
+  xRet = xQueueSend(logger_logMessageQueue, &amplification_stop_log_msg, 50);
   if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send stop amplification zone event to logging task.\n");
   }

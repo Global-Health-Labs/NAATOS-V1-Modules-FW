@@ -91,6 +91,7 @@ naatos_config_parameters config = {
     .amplification_zone_run_time_m = 0,
     .valve_zone_run_time_m = 0,
     .sample_valid_timeout_s = 0,
+    .sample_complete_delay_s =  0,
     .low_power_threshold = 0,
     .valve_setpoint = 0,
     .amp0_setpoint = 0,
@@ -131,6 +132,7 @@ naatos_config_parameters config = {
     .cycle_1_run_time_m = 0,
     .cycle_2_run_time_m = 0,
     .sample_valid_timeout_s = 0,
+    .sample_complete_delay_s = 0,
     .low_power_threshold = 0,
     .heater_setpoint_1 = 0,
     .heater_setpoint_2 = 0,
@@ -855,7 +857,7 @@ void create_tasks() {
 */
 void create_queues() {
   // Main Task Queues
-  main_batteryDataQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
+  main_batteryDataQueue = xQueueCreate(5, sizeof(int));
   if (main_batteryDataQueue == NULL)
     printf("Unable to create main_batteryDataQueue queue\n");
 
@@ -933,7 +935,7 @@ void create_queues() {
   if (logger_recvBattPercentQueue == NULL)
     printf("Unable to create logger_recvBattPercentQueue queue\n");
 
-  logger_logMessageQueue = xQueueCreate(2, sizeof(log_data_message_t));
+  logger_logMessageQueue = xQueueCreate(10, sizeof(log_data_message_t));
   if (logger_logMessageQueue == NULL)
     printf("Unable to create logger_logMessageQueue queue\n");
 

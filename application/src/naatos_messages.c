@@ -128,6 +128,10 @@ const BatteryRxQueueMsg_t batt_req = {
   .type = BATTERY_SOC_REQUEST,
   .sendTo = BATTERY_MSG_SOC_MAIN};
 
+const BatteryRxQueueMsg_t batt_req_log = {
+.type = BATTERY_SOC_REQUEST,
+.sendTo = BATTERY_MSG_SOC_LOG};
+
 
 // USB Main State Update Constants
 const usb_message_t standby_update = {

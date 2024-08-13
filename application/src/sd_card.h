@@ -24,7 +24,7 @@
 #define LOGS_DIR "logs"
 #define CONFIG_DIR "config"
 
-#define NAATOS_CONFIG_FILE "config_v1.5.txt"
+#define NAATOS_CONFIG_FILE "config_v2.0.txt"
 
 #define CSV_HEADER "Time,HeaterTemp,HeaterPWM,MotorSpeed,MotorPWM,Battery,Event\n"
 #define CSV_HEADER_SIZE 61
@@ -62,6 +62,7 @@ typedef enum {
   MIN_RUN_ZONE_TEMP_C,
   MIN_RUN_ZONE_TEMP_EN,
   MAX_HEATER_PID_PWM,
+  SAMPLE_COMPLETE_DELAY,
 
   MIN_WAIT_TIME_AFTER_VALVE,
   VALVE_ZONE_RUN_TIME,
@@ -119,6 +120,7 @@ typedef enum {
   MIN_RUN_ZONE_TEMP_C,
   MIN_RUN_ZONE_TEMP_EN,
   MAX_HEATER_PID_PWM,
+  SAMPLE_COMPLETE_DELAY,
 
   CYCLE_1_RUN_TIME,
   CYCLE_2_RUN_TIME,

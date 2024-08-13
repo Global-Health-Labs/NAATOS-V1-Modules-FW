@@ -23,6 +23,7 @@ static diskio_blkdev_t drives[] = {DISKIO_BLOCKDEV_CONFIG(NRF_BLOCKDEV_BASE_ADDR
 // "private" functions
 FRESULT remount_goto_logs_dir(void);
 FRESULT check_for_config_file(void);
+FRESULT remount_goto_config_dir(void);
 
 // Initalize Function
 void init_sd_card(void) {
@@ -315,6 +316,13 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
+
+  configBufferSize = sprintf(configBuffer, "cycles_complete_delay:%d\n", DEFAULT_CYCLES_COMPLETE_DELAY_S);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
 
 
 #ifndef SAMPLE_PREP_BOARD
@@ -825,6 +833,10 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case SAMPLE_VALID_TIMEOUT:
       parameters->sample_valid_timeout_s = atof(val);
       break;
+    case SAMPLE_COMPLETE_DELAY:
+      parameters->sample_complete_delay_s = atoi(val);
+      break;
+    break;
     case MAX_HEATER_PID_PWM:
       parameters->max_heater_pid_pwm = atoi(val);
       break;
@@ -1069,6 +1081,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
 
   return FR_OK;
 }
+
 
 // Sets the set_time_date variable to "false"
 FRESULT sd_card_reset_set_time_date(void) {
