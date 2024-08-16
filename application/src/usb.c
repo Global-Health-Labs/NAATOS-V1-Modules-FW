@@ -12,6 +12,7 @@
 #include "nrf_drv_usbd.h"
 #include "sd_card.h"
 #include "timers.h"
+#include "semphr.h"
 
 /* ***** Variables ***** */
 // USB connection status
@@ -19,8 +20,10 @@ static bool m_usb_connected = false;
 
 // Queue Handles
 xQueueHandle usbRxQueue;
+
 xQueueHandle usb_recvUsbWaitAcceptQueue;
 xQueueHandle usb_usbWaitOverQueue;
+
 xQueueHandle compositeRxQueue;
 
 // Main Loop
@@ -132,13 +135,35 @@ void respond_to_usb_change(void) {
   }
 }
 
-void write_to_com(const char *msg, int len) {
+
+static SemaphoreHandle_t uartSemaphore;
+
+void setup_uart_semaphore(void) {
+    uartSemaphore = xSemaphoreCreateBinary();// Ensure the semaphore is created before it gets used.
+    ASSERT( uartSemaphore );          // LOCK HERE: the semaphore could not be created
+    xSemaphoreGive( uartSemaphore );  // 'Give' the peripheral protection semaphore
+}
+
+void naatosPrintf(const char * msg, int len) {
+#ifdef UART_PRINT_F_ENABLED
+  write_to_com(msg, len);
+#else
+  printf(msg);
+#endif
+}
+
+void write_to_com(const char * msg, int len) {
   if (!usb_detected || !com_port_open)
     return;
 
-  app_usbd_class_inst_t const *class_cdc_acm = app_usbd_cdc_acm_class_inst_get(&m_app_cdc_acm);
+  if (xSemaphoreTake(uartSemaphore, portMAX_DELAY) != pdPASS) {
+      return NRF_ERROR_BUSY;
+  }
 
+  app_usbd_class_inst_t const *class_cdc_acm = app_usbd_cdc_acm_class_inst_get(&m_app_cdc_acm);
   app_usbd_cdc_acm_write(class_cdc_acm, msg, len);
+
+  xSemaphoreGive(uartSemaphore);
 }
 
 void cdc_acm_user_ev_handler(app_usbd_class_inst_t const *p_inst,
@@ -234,6 +259,7 @@ void msc_user_ev_handler(app_usbd_class_inst_t const *p_inst,
   UNUSED_PARAMETER(p_inst);
   UNUSED_PARAMETER(event);
 }
+
 
 void usb_suspend_conflicting_tasks(void) {
   BaseType_t xReturned;
@@ -542,6 +568,7 @@ void usb_task(void *pvParameters) {
         usbd_user_ev_handler(APP_USBD_EVT_POWER_REMOVED);
         app_usbd_disable();
         app_usbd_uninit();
+ 
         // Restart the USB
         start_usb(true, true);
         usbd_user_ev_handler(APP_USBD_EVT_POWER_DETECTED);

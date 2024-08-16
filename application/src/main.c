@@ -1052,6 +1052,7 @@ int main(void) {
   init_sd_card();
   button_init();
   nrf_drv_gpiote_init();
+  setup_uart_semaphore();
 
   // Get the configuration parameters
   res = get_naatos_configuration_parameters(&config);
