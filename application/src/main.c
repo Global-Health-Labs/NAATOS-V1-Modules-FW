@@ -1024,7 +1024,6 @@ int main(void) {
 
   nrf_drv_clock_lfclk_request(NULL);
 
-
   while (!nrf_drv_clock_lfclk_is_running()) {
     // Just waiting
   }

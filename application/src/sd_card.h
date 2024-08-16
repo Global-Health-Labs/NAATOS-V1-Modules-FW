@@ -27,10 +27,10 @@
 #define NAATOS_CONFIG_FILE "config_v2.0a.txt"
 
 #ifdef SAMPLE_PREP_BOARD
-#define CSV_HEADER "Time,HeaterTemp,HeaterPWM,MotorSpeed,MotorPWM,Battery,Event\n"
+#define CSV_HEADER "Time,HeaterTemp,HeaterPWM,MotorSpeed,MotorPWM,Battery,Event\r\n"
 #define CSV_HEADER_SIZE 61
 #else 
-#define CSV_HEADER "Time,ValveTemp,ValvePWM,Amp0Temp,Amp0PWM,Amp1Temp,Amp1PWM,Amp2Temp,Amp2PWM,Batt,Event\n"
+#define CSV_HEADER "Time,ValveTemp,ValvePWM,Amp0Temp,Amp0PWM,Amp1Temp,Amp1PWM,Amp2Temp,Amp2PWM,Batt,Event\r\n"
 #define CSV_HEADER_SIZE 86
 #endif
 /**

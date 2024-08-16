@@ -108,7 +108,7 @@ void logger_task(void *pvParameters) {
 
       normalize_pwm_data(&rxLogMsg);
 
-      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, batteryPercent, false);
+      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, batteryPercent);
       last_temp_message = rxLogMsg;
 
       // Check UART Only
@@ -156,11 +156,14 @@ void logger_task(void *pvParameters) {
           printf("LOG_TASK: Unable to write last log line!\n");
         }
       }
+
+      write_to_com(logFileLine, logFileLineSize);
+
       break;
     }
     case UART_DATA: {
       normalize_pwm_data(&rxLogMsg);
-      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, 0, true);
+      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, 0);
       write_to_com(logFileLine, logFileLineSize);
       break;
     }
