@@ -7,7 +7,7 @@ void samplePrepGetLogFileName(const char *_logFileName, calendar_time_t time) {
 uint32_t samplePrepConstructSensorDataLogLine(char *logLineBuffer, calendar_time_t time, log_data_message_t log_message, int battery_percent, bool uart) {
   // Format: Time,,Batt,Event
   if(uart) {
-    return sprintf(logLineBuffer, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d, \r\n",
+    return sprintf(logLineBuffer, "%02d:%02d:%02d,%0.2f,%0.2f,%0.2f,%0.2f,%d, \r\n",
       time.hour,
       time.minute,
       time.second,
@@ -17,7 +17,7 @@ uint32_t samplePrepConstructSensorDataLogLine(char *logLineBuffer, calendar_time
       log_message.temperature_data.amp1_zone_pwm,
       battery_percent);
   } else {
-    return sprintf(logLineBuffer, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d, \n",
+    return sprintf(logLineBuffer, "%02d:%02d:%02d,%0.2f,%0.2f,%0.2f,%0.2f,%d, \n",
       time.hour,
       time.minute,
       time.second,
@@ -31,7 +31,7 @@ uint32_t samplePrepConstructSensorDataLogLine(char *logLineBuffer, calendar_time
 
 uint32_t samplePrepConstructEventDataLogLine(char *logLineBuffer, calendar_time_t time, log_data_message_t log_message, int battery_percent) {
   uint32_t ret = 0;
-  ret = sprintf(logLineBuffer, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n",
+  ret = sprintf(logLineBuffer, "%02d:%02d:%02d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n",
       time.hour,
       time.minute,
       time.second,
