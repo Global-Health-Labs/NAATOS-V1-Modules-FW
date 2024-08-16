@@ -3,7 +3,7 @@
 void powerModuleGetLogFileName(const char *_logFileName, calendar_time_t time) {
 }
 
-uint32_t powerModuleConstructSensorDataLogLine(char *logLineBuffer, calendar_time_t time, log_data_message_t log_message, int battery_percent) {
+uint32_t powerModuleConstructSensorDataLogLine(char *logLineBuffer, calendar_time_t time, log_data_message_t log_message, int battery_percent, bool uart) {
   return sprintf(logLineBuffer, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%d, \n",
       time.hour,
       time.minute,

@@ -4,9 +4,10 @@
 void samplePrepGetLogFileName(const char *_logFileName, calendar_time_t time) {
 }
 
-uint32_t samplePrepConstructSensorDataLogLine(char *logLineBuffer, calendar_time_t time, log_data_message_t log_message, int battery_percent) {
+uint32_t samplePrepConstructSensorDataLogLine(char *logLineBuffer, calendar_time_t time, log_data_message_t log_message, int battery_percent, bool uart) {
   // Format: Time,,Batt,Event
-  return sprintf(logLineBuffer, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d, \n",
+  if(uart) {
+    return sprintf(logLineBuffer, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d, \r\n",
       time.hour,
       time.minute,
       time.second,
@@ -15,6 +16,17 @@ uint32_t samplePrepConstructSensorDataLogLine(char *logLineBuffer, calendar_time
       log_message.temperature_data.motorSpeed,
       log_message.temperature_data.amp1_zone_pwm,
       battery_percent);
+  } else {
+    return sprintf(logLineBuffer, "%d:%d:%d,%0.2f,%0.2f,%0.2f,%0.2f,%d, \n",
+      time.hour,
+      time.minute,
+      time.second,
+      log_message.temperature_data.amp2_zone_temp,
+      log_message.temperature_data.amp0_zone_pwm,
+      log_message.temperature_data.motorSpeed,
+      log_message.temperature_data.amp1_zone_pwm,
+      battery_percent);
+  }
 }
 
 uint32_t samplePrepConstructEventDataLogLine(char *logLineBuffer, calendar_time_t time, log_data_message_t log_message, int battery_percent) {

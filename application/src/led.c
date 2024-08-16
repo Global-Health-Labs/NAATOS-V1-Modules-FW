@@ -200,8 +200,6 @@ void set_led2_blue_breathe(void) {
 
 void turn_off_led2(void) {
 #if ENABLE_LEDS
-  //led_driver_set_leds_off(LED1,  NULL);
-  //led_driver_set_leds_off(LED2,  NULL);
   led_driver_disable_channel(LED2, led1_current_color, NULL);
   led_driver_disable_channel(LED1, led1_current_color, NULL);
 

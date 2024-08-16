@@ -8,8 +8,6 @@
 /*Define this when building sample prep only otherwise comment out*/
 #define SAMPLE_PREP_BOARD
 
-#define NAATOS_FW_VERSON "V2.0"
-
 #define pdTICKS_TO_MS(xTimeInTicks) ((TickType_t)(((uint64_t)(xTimeInTicks) * (uint64_t)1000U) / (uint64_t)configTICK_RATE_HZ))
 
 /* Battery Parameters */
@@ -41,6 +39,7 @@
 #define LED_HARDWARE_DRIVER_ENABLE_PIN NRF_GPIO_PIN_MAP(1, 3) //1.03
 
 #define HAL_INPUT_PIN NRF_GPIO_PIN_MAP(0, 2)
+#define SD_POWER_ENABLE NRF_GPIO_PIN_MAP(1, 8)
 
 /*--------------Board Specific Pin Configs----------------*/
 #ifdef SAMPLE_PREP_BOARD
@@ -81,7 +80,6 @@
 #define DEFAULT_HEATER_SETPOINT 95.0 // Sample prep only
 #define MOTOR_SETPOINT_1 3900
 #define MOTOR_SETPOINT_2 3900
-#define DEFAULT_MOTOR_SPEED_PWM 71
 #define DEFAULT_RUN_MOTOR_1 true
 #define DEFAULT_RUN_HEATER_1 true
 #define DEFAULT_RUN_MOTOR_2 true
@@ -94,7 +92,11 @@
 #define DEFAULT_DATE 100124                // Oct. 1 2024
 #define DEFAULT_TIME 120000                // 12 pm
 #define DEFAULT_SET_TIME false
+#define DEFAULT_MOTOR_SPEED_PWM 71
 #define DEFAULT_MAX_HEATER_PID 70
+
+#define MAX_MOTOR_PID 150
+
 #else
 #define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
 #define DEFAULT_LOGGING_RATE 5.000
@@ -332,7 +334,6 @@ typedef struct {
 typedef enum {
   SENSOR_MSG_HEATER_STATE,
   SENSOR_MSG_USB_SUSPEND,
-  SENSOR_MSG_PWM_RESPONSE,
   SENSOR_MSG_TIMER_TEMP_EVENT,
   SENSOR_MSG_TIMER_MOTOR_EVENT,
   SENSOR_MSG_SLEEP,
@@ -350,7 +351,6 @@ typedef struct {
 // Battery messages
 
 typedef enum {
-  BATTERY_MSG_USB_SUSPEND,
   BATTERY_MSG_TIMER_EVENT,
   BATTERY_SOC_REQUEST,
   BATTERY_MSG_SLEEP,
@@ -391,7 +391,6 @@ typedef enum {
   HEATER_MSG_MOTOR_DATA,
   HEATER_MSG_USB_SUSPEND,
   HEATER_MSG_SENSOR_CONFIRM,
-  HEATER_MSG_PWM_REQUEST,
   HEATER_MSG_CONFIG_UPDATED,
   HEATER_MSG_WDT_UPDATE,
   HEATER_MSG_TEMPERATURE_DATA_ERROR,
@@ -417,6 +416,7 @@ typedef enum {
   LOGGER_START_CYCLE_LOG,
   TEMPERATURE_DATA,
   EVENT_DATA,
+  UART_DATA,
   LOGGER_LOG_DEBUG_EVENT
 } log_data_type_t;
 

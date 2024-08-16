@@ -24,7 +24,7 @@
 #define LOGS_DIR "logs"
 #define CONFIG_DIR "config"
 
-#define NAATOS_CONFIG_FILE "config_v2.0.txt"
+#define NAATOS_CONFIG_FILE "config_v2.0a.txt"
 
 #ifdef SAMPLE_PREP_BOARD
 #define CSV_HEADER "Time,HeaterTemp,HeaterPWM,MotorSpeed,MotorPWM,Battery,Event\n"

@@ -30,6 +30,8 @@ LoggerInterface powerModuleLogger_I = {
     .constructSensorDataLogLine = &powerModuleConstructSensorDataLogLine,
     .constructEventDataLogLine = &powerModuleConstructEventDataLogLine};
 
+void normalize_pwm_data(log_data_message_t *rxLogMsg);
+
 int getBatteryPercent(void) {
   BaseType_t xReturned;
   int battery_percent = 0;
@@ -65,6 +67,7 @@ void logger_task(void *pvParameters) {
   char logFileLine[256];
   uint32_t logFileLineSize;
   FRESULT res;
+  int batteryPercent = 0;
 
   log_data_message_t rxLogMsg;
 
@@ -99,9 +102,11 @@ void logger_task(void *pvParameters) {
         printf("LOG_TASK: Unable to retreive time!");
       }
 
-      int batteryPercent = getBatteryPercent();
+      batteryPercent = getBatteryPercent();
 
-      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, batteryPercent);
+      normalize_pwm_data(&rxLogMsg);
+
+      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, batteryPercent, false);
       last_temp_message = rxLogMsg;
 
       // Check UART Only
@@ -121,7 +126,11 @@ void logger_task(void *pvParameters) {
         printf("LOG_TASK: Unable to retreive time!");
       }
 
-      int batteryPercent = getBatteryPercent();
+      batteryPercent = getBatteryPercent();
+
+      normalize_pwm_data(&rxLogMsg);
+
+      last_temp_message.event_data = rxLogMsg.event_data;
 
       logFileLineSize = loggerInterface->constructEventDataLogLine(logFileLine, time, last_temp_message, batteryPercent);
       if (rxLogMsg.event_data.event == SAMPLE_VALV_ENDED ||
@@ -147,6 +156,12 @@ void logger_task(void *pvParameters) {
       }
       break;
     }
+    case UART_DATA: {
+      normalize_pwm_data(&rxLogMsg);
+      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, 0, true);
+      write_to_com(logFileLine, logFileLineSize);
+      break;
+    }
     case LOGGER_LOG_DEBUG_EVENT:
 
       break;
@@ -154,4 +169,22 @@ void logger_task(void *pvParameters) {
       break;
     }
   }
+}
+
+float normalize(float value, float min_old_range, float max_old_range, float min_new_range, float max_new_range) {
+  return ((value - min_old_range) / (max_old_range - min_old_range)) * (max_new_range - min_new_range) + min_new_range;
+}
+
+void normalize_pwm_data(log_data_message_t *rxLogMsg) {
+  //DEFAULT_MAX_HEATER_PID
+  //MAX_MOTOR_PID
+
+#ifdef SAMPLE_PREP_BOARD
+  rxLogMsg->temperature_data.amp0_zone_pwm = normalize(rxLogMsg->temperature_data.amp0_zone_pwm, 0, DEFAULT_MAX_HEATER_PID, 0.0, 100.0);
+  rxLogMsg->temperature_data.amp1_zone_pwm = normalize(rxLogMsg->temperature_data.amp1_zone_pwm, 0, MAX_MOTOR_PID, 0.0, 100.0);
+  rxLogMsg->temperature_data.amp2_zone_pwm = normalize(rxLogMsg->temperature_data.amp2_zone_pwm, 0, DEFAULT_MAX_HEATER_PID, 0.0, 100.0);
+  rxLogMsg->temperature_data.valve_zone_pwm = normalize(rxLogMsg->temperature_data.valve_zone_pwm, 0, DEFAULT_MAX_HEATER_PID, 0.0, 100.0);
+#else
+
+#endif
 }

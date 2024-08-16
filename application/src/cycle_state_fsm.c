@@ -400,7 +400,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
     break;
   }
-
+ 
   case CYCLE_SAMPLE_VALID_HOLD: {
     if (last_state != current_state) {
       updateLedState(LED_COMPLETE, true);
