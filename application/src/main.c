@@ -380,6 +380,10 @@ void main_task(void *pvParameters) {
           sendWdtMain(false);
           next_state = MAIN_SLEEP;
           send_usb_change(USB_DISABLED);
+        } else if (usb_conn_status) {
+          updateLedState(LED_CHARGING, true);
+        } else if (!usb_conn_status) {
+          updateLedState(LED_CHARGING, false);
         }
         usb_needs_update = false;
       }

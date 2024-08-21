@@ -91,3 +91,5 @@ void end_cycle_1(void);
 void end_cycle_2(void);
 
 bool limitSwitchFreed(sensor_switches_t data);
+
+void handle_exit_notifications(void);

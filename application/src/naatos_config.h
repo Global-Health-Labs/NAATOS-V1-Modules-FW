@@ -148,6 +148,9 @@
 #define SETPOINT_TIMEOUT_MSG "Setpoint was not reached and configured timeout was hit."
 #define SAMPLE_RAMP_TO_TEMP_REACHED_MSG "Ramp to temp complete."
 #define SAMPLE_RAMP_TO_TEMP_TIMEOUT_MSG "Ramp to temp timed out. Stopping cycle."
+#define SAMPLE_VALID_TIMEOUT_MSG "Sample is no longer valid due to timeout."
+#define UNKNOWN_ERROR_MESSAGE "An unknown error has occured."
+#define HALL_SENSOR_BRAKE_MSG "HALL sensor interrupted."
 
 #define USB_SUSPEND_TASKS_TIME 15000
 
@@ -195,6 +198,8 @@ typedef enum {
   SAMPLE_START,
   SAMPLE_END,
   SAMPLE_INTERRUPTED,
+  SAMPLE_BUTTON_CANCEL,
+  SAMPLE_HAL_CANCEL,
   SAMPLE_AMP_STARTED,
   SAMPLE_AMP_ENDED,
   SAMPLE_VALV_STARTED,
@@ -206,6 +211,8 @@ typedef enum {
   SAMPLE_SETPOINT_TIMEOUT,
   SAMPLE_RAMP_TO_TEMP_REACHED,
   SAMPLE_RAMP_TO_TEMP_TIMEOUT,
+  SAMPLE_INVALID_TIMEOUT,
+  SAMPLE_UNKNOWN
   // Add more events here
 } event_t;
 
@@ -462,6 +469,7 @@ typedef enum {
 
 typedef struct {
   LEDEvent_e type;
+  int chargeLevel;
   bool active;
 } LEDRxQueueMsg_t;
 
