@@ -100,6 +100,7 @@
 #define DEFAULT_SET_TIME false
 #define DEFAULT_MOTOR_SPEED_PWM 71
 #define DEFAULT_MAX_HEATER_PID 70
+#define DEFAULT_HAL_SENSOR_THRESHOLD  0.75f
 
 #define MAX_MOTOR_PID 150
 
@@ -601,6 +602,7 @@ typedef struct {
   bool run_heater_1;
   bool run_motor_2;
   bool run_heater_2;
+  float hal_sensor_thresh;
   int mmddyy;
   int hhmmss;
   bool set_date_time;

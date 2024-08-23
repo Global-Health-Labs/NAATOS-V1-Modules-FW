@@ -723,6 +723,12 @@ FRESULT check_for_config_file(void) {
 #endif
 
   //BOTH
+  // Write hal sensor voltage threshold
+  configBufferSize = sprintf(configBuffer, "hal_sensor_thresh:%0.2f\n", DEFAULT_HAL_SENSOR_THRESHOLD);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
   // Write calendar date
   configBufferSize = sprintf(configBuffer, "mmddyy:%d\n", DEFAULT_DATE);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
