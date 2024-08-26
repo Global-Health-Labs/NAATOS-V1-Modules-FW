@@ -538,7 +538,8 @@ double readMotorSpeed(void) {
   uint32_t pulse_count = (nrf_drv_timer_capture(p_counter1, NRF_TIMER_CC_CHANNEL0)) / 2; //Divide by two because counter increments for every rising AND falling edge
 
   //Convert pulse count to rotational speed
-  double motor_speed_rpm = (1000 * 60 * ((double)pulse_count / (double)delta_t)) / 9;
+  //double motor_speed_rpm = (1000 * 60 * ((double)pulse_count / (double)delta_t)) / 9; //Old motor
+  double motor_speed_rpm = (1000 * 60 * ((double)pulse_count / (double)delta_t)) / 6; //New motor
   //printf("Motor speed: %f\r\n", motor_speed_rpm);
 
   //Clear the counter, update variable for tracking elapsed time

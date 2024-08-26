@@ -34,7 +34,7 @@ void handle_cycle2_stopstart_heater(bool heating) {
   if (amplification_zone_running && !heating)
     return;
 
-  if(!heating) { //need to stop supply before stopping pwm
+  if (!heating) { //need to stop supply before stopping pwm
     nrf_gpio_pin_clear(MOTOR_POWER_ENABLE);
   }
 
@@ -55,7 +55,7 @@ void handle_cycle2_stopstart_heater(bool heating) {
 
   if (heating) {
     nrf_gpio_pin_set(MOTOR_POWER_ENABLE);
-  } 
+  }
 
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
   if (xReturned != pdPASS) {
@@ -82,7 +82,7 @@ void handle_cycle1_stopstart_heater(bool heating) {
   if (valve_zone_running && !heating)
     return;
 
-  if(!heating) { //need to stop supply before stopping pwm
+  if (!heating) { //need to stop supply before stopping pwm
     nrf_gpio_pin_clear(MOTOR_POWER_ENABLE);
   }
 
@@ -104,7 +104,7 @@ void handle_cycle1_stopstart_heater(bool heating) {
   if (heating) {
     nrf_gpio_pin_set(MOTOR_POWER_ENABLE);
     //nrf_gpio_pin_set(BOOST_CONTROL_ENABLE_PIN);
-  } 
+  }
 
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
   if (xReturned != pdPASS) {
@@ -342,8 +342,10 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
           .sample_prep_heater_pwm = heater_pid_1.out,
           .amp1_zone_pwm = 0,
           .amp2_zone_pwm = 0};
-      updateDutyCycles(pwmData);
 
+      nrf_gpio_pin_clear(MOTOR_POWER_ENABLE);
+      vTaskDelay(pdMS_TO_TICKS(200));
+      updateDutyCycles(pwmData);
       // Send stop heater to sensors task
       heater_run = false;
       starting_run = false;
