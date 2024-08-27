@@ -27,11 +27,11 @@ void reset_cycle_state_machine(void) {
 }
 
 cycle_state_exit_t run_cycle_state_machine(void) {
-  last_state = current_state;
-  current_state = next_state;
   runThrough = true;
   while (runThrough) {
     runThrough = false;
+    last_state = current_state;
+    current_state = next_state;
 
     switch (current_state) {
     case VALIDATE_INIT_CONDITIONS: {
@@ -428,6 +428,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     }
 
     case EXIT_CYCLE:
+      runThrough = false;
       // Perform exit operations
       // Cleanup or final actions
       handle_exit_notifications();
