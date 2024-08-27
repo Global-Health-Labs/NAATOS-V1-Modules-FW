@@ -14,9 +14,10 @@ button_update_t buttonData = {.event = NONE};
 uint32_t start_time = 0;
 uint32_t end_time = 0;
 uint32_t time_left = 0;
-int percent_recv;
+int percent_recv = 0;
 bool over_temp = false;
 volatile bool runThrough = true;
+float extraLogData = 0.0;
 
 BaseType_t xReturned;
 
@@ -53,21 +54,12 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(1000)) == pdPASS) {
         if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
+          updateLedState(LED_DECLINE, true);
           exitInfo = CYCLE_ERROR_POWER_LOW;
           runThrough = true;
           next_state = EXIT_CYCLE;
+          break;
         }
-      }
-
-      // Perform initialization condition checks
-      if (percent_recv < config.recovery_power_thresh) {
-        printf("MAIN_TASK: Unable to begin sample run, battery percent is less than the recovery threshold.\n");
-        // Set error during run and wait alert timeout
-        updateLedState(LED_DECLINE, true);
-        exitInfo = CYCLE_ERROR_POWER_LOW;
-        runThrough = true;
-        next_state = EXIT_CYCLE;
-        break;
       }
 
       updateLedState(LED_RUN, true);
@@ -458,12 +450,12 @@ void handle_exit_notifications(void) {
 
   switch (exitInfo) {
   case CYCLE_COMPLETE:
-
     break;
 
   case CYCLE_ERROR_POWER_LOW:
+    sprintf(exitString, "%s%d", RECOVERY_BATT, percent_recv);
     exit_event_info.event = SAMPLE_RECOVERY_BATT;
-    exit_event_info.message = RECOVERY_BATT;
+    exit_event_info.message = exitString;
     exit_log_message.event_data = exit_event_info;
     break;
 

@@ -143,7 +143,7 @@
 #define VALV_START_MSG "Cycle 2 Heating Started."
 #define VALV_STOP_MSG "Cycle 2 Heating Stopped."
 #define TEMPS_NOT_STABLE "Zone Temperatures are not below the minimum run temperature. Aborting run."
-#define RECOVERY_BATT "Battery Percentage lower than the recovery threshold. Charge Battery!"
+#define RECOVERY_BATT "Battery Percentage lower than the recovery threshold. Charge Battery!: "
 #define OVER_TEMP_MSG "A Zone went over its maximum temperature. Run stopped."
 #define SETPOINT_TIMEOUT_MSG "Setpoint was not reached and configured timeout was hit."
 #define SAMPLE_RAMP_TO_TEMP_REACHED_MSG "Ramp to temp complete."
@@ -493,6 +493,16 @@ typedef struct {
   bool overTempError;
   bool wakeupEvent;
 } MainStateRxQueueMsg_t;
+
+typedef enum {
+  ERR_TEMP_SENSOR_READ,
+  ERR_OVERTEMP_EVENT
+} MainStateErrorNotification_t;
+
+typedef struct {
+  MainStateErrorNotification_t errType;
+  temperature_data_t tempData;
+} MainStateErrorQueueMsg_t;
 
 // Task Handles
 extern xTaskHandle mainTaskHandle;
