@@ -8,7 +8,11 @@
 /*Define this when building sample prep only otherwise comment out*/
 #define SAMPLE_PREP_BOARD
 
-#define NAATOS_FW_VERSON "V1.3"
+/* Device Debug Parameters */
+#define I2C_CONNECTED 1
+#define USE_CALENDAR_CHIP 1
+#define VERBOSE_PID 1
+#define USE_MOTOR 1
 
 #define pdTICKS_TO_MS(xTimeInTicks) ((TickType_t)(((uint64_t)(xTimeInTicks) * (uint64_t)1000U) / (uint64_t)configTICK_RATE_HZ))
 
@@ -41,6 +45,7 @@
 #define LED_HARDWARE_DRIVER_ENABLE_PIN NRF_GPIO_PIN_MAP(1, 3) //1.03
 
 #define HAL_INPUT_PIN NRF_GPIO_PIN_MAP(0, 2)
+#define SD_POWER_ENABLE NRF_GPIO_PIN_MAP(1, 8)
 
 /*--------------Board Specific Pin Configs----------------*/
 #ifdef SAMPLE_PREP_BOARD
@@ -71,10 +76,7 @@
 #ifdef SAMPLE_PREP_BOARD
 #define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
 #define DEFAULT_LOGGING_RATE 1.000
-#define DEFAULT_VALVE_MAX_TEMP 115.0
-#define DEFAULT_AMP0_MAX_TEMP 115.0
-#define DEFAULT_AMP1_MAX_TEMP 115.0
-#define DEFAULT_AMP2_MAX_TEMP 115.0
+#define DEFAULT_MAX_TEMP 115.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP 75.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP_EN false
 #define DEFAULT_ALERT_TIMEOUT_S 3.0    // Seconds
@@ -84,7 +86,6 @@
 #define DEFAULT_HEATER_SETPOINT 95.0 // Sample prep only
 #define MOTOR_SETPOINT_1 3900
 #define MOTOR_SETPOINT_2 3900
-#define DEFAULT_MOTOR_SPEED_PWM 71
 #define DEFAULT_RUN_MOTOR_1 true
 #define DEFAULT_RUN_HEATER_1 true
 #define DEFAULT_RUN_MOTOR_2 true
@@ -97,7 +98,11 @@
 #define DEFAULT_DATE 100124                // Oct. 1 2024
 #define DEFAULT_TIME 120000                // 12 pm
 #define DEFAULT_SET_TIME false
+#define DEFAULT_MOTOR_SPEED_PWM 71
 #define DEFAULT_MAX_HEATER_PID 70
+
+#define MAX_MOTOR_PID 150
+
 #else
 #define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
 #define DEFAULT_LOGGING_RATE 5.000
@@ -133,16 +138,19 @@
 #define STOP_EVENT_MSG "Sample Preperation Completed."
 #define INTERRUPT_HAL_EVENT_MSG "Sample Preperation Interrupted. Cover Removed."
 #define INTERRUPT_OPT_EVENT_MSG "Sample Preperation Interrupted. Sample Removed."
-#define AMP_START_MSG "Amplification Zone Heating Started."
-#define AMP_END_MSG "Amplification Zone Heating Stopped."
-#define VALV_START_MSG "Valve Zone Heating Started."
-#define VALV_STOP_MSG "Valve Zone Heating Stopped."
-#define TEMPS_NOT_STABLE "Zone Temperatures are no below the minimum run temperature. Aborting run."
-#define RECOVERY_BATT "Battery Percentage lower than the recovery threshold. Charge Battery More."
+#define AMP_START_MSG "Cycle 1 Heating Started."
+#define AMP_END_MSG "Cycle 1 Heating Stopped."
+#define VALV_START_MSG "Cycle 2 Heating Started."
+#define VALV_STOP_MSG "Cycle 2 Heating Stopped."
+#define TEMPS_NOT_STABLE "Zone Temperatures are not below the minimum run temperature. Aborting run."
+#define RECOVERY_BATT "Battery Percentage lower than the recovery threshold. Charge Battery!"
 #define OVER_TEMP_MSG "A Zone went over its maximum temperature. Run stopped."
 #define SETPOINT_TIMEOUT_MSG "Setpoint was not reached and configured timeout was hit."
 #define SAMPLE_RAMP_TO_TEMP_REACHED_MSG "Ramp to temp complete."
 #define SAMPLE_RAMP_TO_TEMP_TIMEOUT_MSG "Ramp to temp timed out. Stopping cycle."
+#define SAMPLE_VALID_TIMEOUT_MSG "Sample is no longer valid due to timeout."
+#define UNKNOWN_ERROR_MESSAGE "An unknown error has occured."
+#define HALL_SENSOR_BRAKE_MSG "HALL sensor interrupted."
 
 #define USB_SUSPEND_TASKS_TIME 15000
 
@@ -190,6 +198,8 @@ typedef enum {
   SAMPLE_START,
   SAMPLE_END,
   SAMPLE_INTERRUPTED,
+  SAMPLE_BUTTON_CANCEL,
+  SAMPLE_HAL_CANCEL,
   SAMPLE_AMP_STARTED,
   SAMPLE_AMP_ENDED,
   SAMPLE_VALV_STARTED,
@@ -201,6 +211,8 @@ typedef enum {
   SAMPLE_SETPOINT_TIMEOUT,
   SAMPLE_RAMP_TO_TEMP_REACHED,
   SAMPLE_RAMP_TO_TEMP_TIMEOUT,
+  SAMPLE_INVALID_TIMEOUT,
+  SAMPLE_UNKNOWN
   // Add more events here
 } event_t;
 
@@ -335,7 +347,6 @@ typedef struct {
 typedef enum {
   SENSOR_MSG_HEATER_STATE,
   SENSOR_MSG_USB_SUSPEND,
-  SENSOR_MSG_PWM_RESPONSE,
   SENSOR_MSG_TIMER_TEMP_EVENT,
   SENSOR_MSG_TIMER_MOTOR_EVENT,
   SENSOR_MSG_SLEEP,
@@ -353,7 +364,6 @@ typedef struct {
 // Battery messages
 
 typedef enum {
-  BATTERY_MSG_USB_SUSPEND,
   BATTERY_MSG_TIMER_EVENT,
   BATTERY_SOC_REQUEST,
   BATTERY_MSG_SLEEP,
@@ -394,7 +404,6 @@ typedef enum {
   HEATER_MSG_MOTOR_DATA,
   HEATER_MSG_USB_SUSPEND,
   HEATER_MSG_SENSOR_CONFIRM,
-  HEATER_MSG_PWM_REQUEST,
   HEATER_MSG_CONFIG_UPDATED,
   HEATER_MSG_WDT_UPDATE,
   HEATER_MSG_TEMPERATURE_DATA_ERROR,
@@ -420,6 +429,7 @@ typedef enum {
   LOGGER_START_CYCLE_LOG,
   TEMPERATURE_DATA,
   EVENT_DATA,
+  UART_DATA,
   LOGGER_LOG_DEBUG_EVENT
 } log_data_type_t;
 
@@ -459,6 +469,7 @@ typedef enum {
 
 typedef struct {
   LEDEvent_e type;
+  int chargeLevel;
   bool active;
 } LEDRxQueueMsg_t;
 

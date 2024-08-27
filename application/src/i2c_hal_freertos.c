@@ -45,9 +45,7 @@ void i2c_error_recovery(i2c_interface_selection_t interface) {
     nrf_gpio_pin_set(twi_configs[interface].scl);
     vTaskDelay(pdMS_TO_TICKS(1));
   }
-  //nrf_gpio_pin_clear(SENSORS_EN);
-  //vTaskDelay(pdMS_TO_TICKS(5));
-  //nrf_gpio_pin_set(SENSORS_EN);
+
   nrf_gpio_cfg(twi_configs[interface].scl, // pin_number
       NRF_GPIO_PIN_DIR_INPUT,              // Input.
       NRF_GPIO_PIN_INPUT_CONNECT,          // Connect input buffer.

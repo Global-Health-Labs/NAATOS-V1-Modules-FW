@@ -1,4 +1,6 @@
 #include "calendar_rtc.h"
+#include "ff.h"
+#include "time.h"
 
 // Decode retreived info
 uint8_t calendar_decode(uint8_t reading) {
@@ -8,6 +10,37 @@ uint8_t calendar_decode(uint8_t reading) {
 // Encode retreived info
 uint8_t calendar_encode(uint8_t reading) {
   return ((reading / 10) << 4) | (reading % 10);
+}
+
+DWORD get_fattime(void) {
+  calendar_time_t now = {
+      .second = 0,
+      .minute = 0,
+      .hour = 0,
+      .day = 0,
+      .week_day = 0,
+      .month = 0,
+      .year = 0};
+
+  if (calendar_get_time(&now)) {
+    // Assume the 'year' is offset from 2000, e.g., 24 for 2024
+    DWORD fattime = ((DWORD)(now.year + 20) << 25) // Year since 1980 (20 + 20 = 2024)
+                    | ((DWORD)now.month << 21)     // Month (1–12)
+                    | ((DWORD)now.day << 16)       // Day (1–31)
+                    | ((DWORD)now.hour << 11)      // Hour (0–23)
+                    | ((DWORD)now.minute << 5)     // Minute (0–59)
+                    | ((DWORD)now.second >> 1);    // Second (0–59, in 2-second resolution)
+
+    return fattime;
+  } else {
+    // Return a default timestamp if unable to get the time
+    return ((DWORD)(24 + 20) << 25) // Default year: 2024
+           | ((DWORD)1 << 21)       // Default month: January
+           | ((DWORD)1 << 16)       // Default day: 1st
+           | ((DWORD)0 << 11)       // Default hour: 00:00
+           | ((DWORD)0 << 5)        // Default minute: 00
+           | ((DWORD)0 >> 1);       // Default second: 00
+  }
 }
 
 // Get the current time on the calendar chip

@@ -7,6 +7,8 @@ xQueueHandle ledRxQueue;
 
 static LEDFlags_t ledFlags;
 
+int powerLevel = 100;
+
 void handleLedState(LEDRxQueueMsg_t ledMsg);
 
 void led_task(void *pvParameters) {
@@ -29,6 +31,7 @@ void handleLedState(LEDRxQueueMsg_t ledMsg) {
     ledFlags.wakeupCondition = ledMsg.active;
     break;
   case LED_CHARGING:
+    powerLevel = ledMsg.chargeLevel;
     ledFlags.batteryCharging = ledMsg.active;
     break;
   case LED_STANDBY:
@@ -68,7 +71,7 @@ void handleLedState(LEDRxQueueMsg_t ledMsg) {
     enable_led_driver(false);
   } else {
     enable_led_driver(true);
-    turn_off_led2();
+    turn_off_led_channels();
     if (ledFlags.testDecline) {
       set_led1_red_slow_blink();
       set_led2_red_slow_blink();
@@ -82,17 +85,18 @@ void handleLedState(LEDRxQueueMsg_t ledMsg) {
       set_led1_green_breathe();
       //if battery charging
       if (ledFlags.batteryCharging) {
-        set_led2_blue_breathe();
+        //set_led2_blue_breathe();
       } else {
-        //turn_off_led2();
+        //turn_off_led2_blue_animation();
       }
     } else if (ledFlags.runCondition) {
       set_led1_green_solid();
       //if battery charging
       if (ledFlags.batteryCharging) {
-        set_led2_blue_breathe();
+        //set_led2_blue_breathe();
       } else {
-        //turn_off_led2();
+        //turn_off_led2_blue_animation();
+       // led_driver_disable_channel(LED2, led1_current_color, NULL);
       }
     } else if (ledFlags.usbMscStarting) {
       set_led1_blue_breathe();
@@ -198,10 +202,12 @@ void set_led2_blue_breathe(void) {
 #endif
 }
 
-void turn_off_led2(void) {
+void turn_off_led2_blue_animation(void) {
+  led_driver_disable_animation(LED2, blue, NULL);
+}
+
+void turn_off_led_channels(void) {
 #if ENABLE_LEDS
-  //led_driver_set_leds_off(LED1,  NULL);
-  //led_driver_set_leds_off(LED2,  NULL);
   led_driver_disable_channel(LED2, led1_current_color, NULL);
   led_driver_disable_channel(LED1, led1_current_color, NULL);
 

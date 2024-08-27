@@ -158,6 +158,7 @@ bool use_default_configuration_parameters = false;
 
 // Function defs
 void sendWdtHeaterInvalid();
+void sendWdtMain(bool valid);
 bool begin_amplification_zone(void);
 void end_amplification_zone(void);
 void begin_valve_zone(void);
@@ -252,6 +253,10 @@ void main_task(void *pvParameters) {
     alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(DEFAULT_ALERT_TIMEOUT_S * 1000.0));
   }
 
+  uint32_t main_wdt_start_time = 0;
+  uint32_t main_wdt_end_time = pdMS_TO_TICKS(1000);
+  uint32_t main_wdt_time_left = 0;
+
   create_tasks();
 
   // Main State Loop
@@ -291,6 +296,8 @@ void main_task(void *pvParameters) {
         updateLedState(LED_RUN, false);
         updateLedState(LED_STANDBY, true);
         updateLedState(LED_COMPLETE, false);
+        sendWdtMain(true);
+        start_time = xTaskGetTickCount();
       }
 
       hal_triggered = false;
@@ -335,6 +342,7 @@ void main_task(void *pvParameters) {
       }
 
       if (buttonData.event == BOOTLOADER_EVENT) {
+        sendWdtMain(false);
         next_state = MAIN_BOOTLOADER;
         break;
       }
@@ -360,6 +368,7 @@ void main_task(void *pvParameters) {
         // Switch OFF and USB connected
         if (buttonData.event == OFF_EVENT && usb_conn_status) {
           next_state = MAIN_FILE;
+          sendWdtMain(false);
           updateLedState(LED_RUN, false);
           updateLedState(LED_STANDBY, false);
           updateLedState(LED_USB_MSC_STARTING, true);
@@ -368,8 +377,13 @@ void main_task(void *pvParameters) {
         }
         // Switch off and USB not connected
         else if (buttonData.event == OFF_EVENT && !usb_conn_status) {
+          sendWdtMain(false);
           next_state = MAIN_SLEEP;
           send_usb_change(USB_DISABLED);
+        } else if (usb_conn_status) {
+          updateLedState(LED_CHARGING, true);
+        } else if (!usb_conn_status) {
+          updateLedState(LED_CHARGING, false);
         }
         usb_needs_update = false;
       }
@@ -400,6 +414,15 @@ void main_task(void *pvParameters) {
       }
 #endif
       buttonData.event = NONE;
+
+      main_wdt_time_left = pdTICKS_TO_MS(xTaskGetTickCount() - main_wdt_start_time);
+
+      if (main_wdt_time_left >= main_wdt_end_time) {
+        sendWdtMain(true);
+        main_wdt_start_time = xTaskGetTickCount();
+        main_wdt_time_left = 0;
+      }
+
       break;
 
     // In Running State (Will block task for the duration of the test)
@@ -408,6 +431,14 @@ void main_task(void *pvParameters) {
         reset_cycle_state_machine();
         updateLedState(LED_STANDBY, false);
         updateLedState(LED_RUN, true);
+      }
+
+      main_wdt_time_left = pdTICKS_TO_MS(xTaskGetTickCount() - main_wdt_start_time);
+
+      if (main_wdt_time_left >= main_wdt_end_time) {
+        sendWdtMain(true);
+        main_wdt_start_time = xTaskGetTickCount();
+        main_wdt_time_left = 0;
       }
 
       cycle_state_exit_t cycle_exit_info = run_cycle_state_machine();
@@ -434,6 +465,14 @@ void main_task(void *pvParameters) {
         updateLedState(LED_COMPLETE, false);
         a_t_start = xTaskGetTickCount();
         printf("MAIN_TASK: Alert Timeout - %dms\n", pdTICKS_TO_MS(alert_timeout_ticks));
+      }
+
+      main_wdt_time_left = pdTICKS_TO_MS(xTaskGetTickCount() - main_wdt_start_time);
+
+      if (main_wdt_time_left >= main_wdt_end_time) {
+        sendWdtMain(true);
+        main_wdt_start_time = xTaskGetTickCount();
+        main_wdt_time_left = 0;
       }
 
       xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY); // TODO do we do  anything with this?
@@ -1017,6 +1056,7 @@ int main(void) {
   init_sd_card();
   button_init();
   nrf_drv_gpiote_init();
+  setup_uart_semaphore();
 
   // Get the configuration parameters
   res = get_naatos_configuration_parameters(&config);
@@ -1047,6 +1087,18 @@ void sendWdtHeaterInvalid() {
   watchdog_time_update_t wdtUpdate = {
       .taskName = HEATER,
       .valid = false};
+
+  xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
+  if (xReturned != pdPASS) {
+    printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+  }
+}
+
+void sendWdtMain(bool valid) {
+  BaseType_t xReturned;
+  watchdog_time_update_t wdtUpdate = {};
+  wdtUpdate.taskName = MAIN;
+  wdtUpdate.valid = valid;
 
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
   if (xReturned != pdPASS) {

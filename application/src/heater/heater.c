@@ -98,18 +98,6 @@ void heater_task(void *pvParameters) {
         }
         break;
       }
-      case HEATER_MSG_PWM_REQUEST: {
-        SensorRxQueueMsg_t msg;
-        msg.type = SENSOR_MSG_PWM_RESPONSE;
-        msg.pwmData = heaterInterface->getPwmData();
-
-        // Send back the pwm data
-        xReturned = xQueueSend(sensorRxQueue, &msg, 0);
-        if (xReturned != pdPASS) {
-          printf("HEATER_TASK: unable to send pwm data to sensorRxQueue queue.\n");
-        }
-        break;
-      }
 
       case HEATER_MSG_CONFIG_UPDATED:
         // Handle config updated message

@@ -301,22 +301,74 @@ led_driver_errors_t led_driver_set_channel_animation_breathing(led_driver_led_se
   uint8_t t13_update_addr = 0x1A + led_selection;
   uint8_t t13_update_value = 0b00110010;
   uint8_t t13_write_buf[2] = {t13_update_addr, t13_update_value};
-  led_driver_writeRegister(t13_write_buf, 1, write_reg, NULL);
+  err_code = led_driver_writeRegister(t13_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) {
+    return err_code;
+  }
 
   // Extend off time for breathing
   uint8_t t4_update_addr = 0x1D + led_selection * 3 + color;
   uint8_t t4_update_value = 0x04;
   uint8_t t4_write_buf[2] = {t4_update_addr, t4_update_value};
-  led_driver_writeRegister(t4_write_buf, 1, write_reg, NULL);
-
+  err_code = led_driver_writeRegister(t4_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) {
+    return err_code;
+  }
   // time update reg
   uint8_t time_update_write_buf[2] = {LED_DRIVER_TIME_UPDATE_REG, 0x00};
-  led_driver_writeRegister(time_update_write_buf, 1, write_reg, NULL);
-
+  err_code = led_driver_writeRegister(time_update_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) {
+    return err_code;
+  }
   // ramp mode reg turn holds off
   led_ramp_mode_reg_val &= ~(1 << led_selection + 4);
   uint8_t ramp_write_buf[2] = {LED_DRIVER_RAMP_MODE_REG, led_ramp_mode_reg_val};
-  led_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
+  err_code = led_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) {
+    return err_code;
+  }
+
+  return led_driver_success;
+}
+
+led_driver_errors_t led_driver_disable_animation(led_driver_led_selection led_selection, led_color color, led_driver_opDoneCallback_t cb) {
+    led_driver_errors_t err_code;
+
+    // Step 1: Disable any possible animations in timing registers
+    uint8_t t13_update_addr = 0x1A + led_selection;
+    uint8_t t13_update_value = 0x00;  // Disable rise/fall times
+    uint8_t t13_write_buf[2] = {t13_update_addr, t13_update_value};
+    err_code = led_driver_writeRegister(t13_write_buf, 1, write_reg, NULL);
+    if (err_code != led_driver_success) return err_code;
+
+    uint8_t t4_update_addr = 0x1D + led_selection * 3 + color;
+    uint8_t t4_update_value = 0x00;  // Clear any custom off time
+    uint8_t t4_write_buf[2] = {t4_update_addr, t4_update_value};
+    err_code = led_driver_writeRegister(t4_write_buf, 1, write_reg, NULL);
+    if (err_code != led_driver_success) return err_code;
+
+    // Apply time update
+    uint8_t time_update_write_buf[2] = {LED_DRIVER_TIME_UPDATE_REG, 0x00};
+    err_code = led_driver_writeRegister(time_update_write_buf, 1, write_reg, NULL);
+    if (err_code != led_driver_success) return err_code;
+
+    // Step 2: Reset PWM and clear any animation modes
+    uint8_t pwm_update_addr = 0x0A + led_selection * 3 + color;  // Direct PWM control
+    uint8_t pwm_update_value = 0x00;  // Set PWM to 0 (or 0xFF for steady on)
+    uint8_t pwm_write_buf[2] = {pwm_update_addr, pwm_update_value};
+    err_code = led_driver_writeRegister(pwm_write_buf, 1, write_reg, NULL);
+    if (err_code != led_driver_success) return err_code;
+
+    // Step 3: Disable ramp mode
+    led_ramp_mode_reg_val &= ~(1 << (led_selection + 4));
+    uint8_t ramp_write_buf[2] = {LED_DRIVER_RAMP_MODE_REG, led_ramp_mode_reg_val};
+    err_code = led_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
+    if (err_code != led_driver_success) return err_code;
+
+
+
+
+  return led_driver_success;
 }
 
 led_driver_errors_t led_driver_set_channel_animation_flash_fast(led_driver_led_selection led_selection, led_color color, bool enable, led_driver_opDoneCallback_t cb) {

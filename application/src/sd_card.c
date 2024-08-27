@@ -606,7 +606,7 @@ FRESULT check_for_config_file(void) {
     return res;
   }
   // Write Heater Max Temperature
-  configBufferSize = sprintf(configBuffer, "heater_max_temp:%0.2f\n", DEFAULT_VALVE_MAX_TEMP);
+  configBufferSize = sprintf(configBuffer, "heater_max_temp:%0.2f\n", DEFAULT_MAX_TEMP);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -810,39 +810,39 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       }
       break;
     case LOGGING_RATE:
-      parameters->logging_rate = atof(val);
+      parameters->logging_rate = parse_double(val, DEFAULT_LOGGING_RATE);
       break;
     case LOW_POWER_THRESHOLD:
-      parameters->low_power_threshold = atoi(val);
+      parameters->low_power_threshold = parse_int(val, DEFAULT_LOW_POWER_THRESHOLD);
       break;
     case RECOVERY_POWER_THRESHOLD:
-      parameters->recovery_power_thresh = atoi(val);
+      parameters->recovery_power_thresh = parse_int(val, DEFAULT_RECOVERY_THRES);
       break;
     case MIN_RUN_ZONE_TEMP_C:
-      parameters->min_run_zone_temp = atof(val);
+      parameters->min_run_zone_temp = parse_double(val, DEFAULT_MIN_RUN_ZONE_TEMP);
       break;
     case MIN_RUN_ZONE_TEMP_EN:
       num = strcmp(val, "true");
       parameters->min_run_zone_temp_en = num ? false : true;
       break;
     case ALERT_TIMEOUT_TIME:
-      parameters->alert_timeout_time_s = atof(val);
+      parameters->alert_timeout_time_s = parse_double(val, DEFAULT_ALERT_TIMEOUT_S);
       break;
     case SAMPLE_VALID_TIMEOUT:
-      parameters->sample_valid_timeout_s = atof(val);
+      parameters->sample_valid_timeout_s = parse_double(val, DEFAULT_VALID_TIMEOUT_S);
       break;
     case SAMPLE_COMPLETE_DELAY:
-      parameters->sample_complete_delay_s = atoi(val);
+      parameters->sample_complete_delay_s = parse_int(val, DEFAULT_CYCLES_COMPLETE_DELAY_S);
       break;
       break;
     case MAX_HEATER_PID_PWM:
-      parameters->max_heater_pid_pwm = atoi(val);
+      parameters->max_heater_pid_pwm = parse_int(val, DEFAULT_MAX_HEATER_PID);
       break;
     case MMDDYY:
-      parameters->mmddyy = atoi(val);
+      parameters->mmddyy = parse_int(val, DEFAULT_DATE);
       break;
     case HHMMSS:
-      parameters->hhmmss = atoi(val);
+      parameters->hhmmss = parse_int(val, DEFAULT_TIME);
       break;
     case SET_DATE_TIME:
       num = strcmp(val, "true");
@@ -971,10 +971,10 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       break;
 #else
     case CYCLE_1_RUN_TIME:
-      parameters->cycle_1_run_time_m = atoi(val);
+      parameters->cycle_1_run_time_m = parse_int(val, DEFAULT_CYCLE_1_RUNTIME);
       break;
     case CYCLE_2_RUN_TIME:
-      parameters->cycle_2_run_time_m = atoi(val);
+      parameters->cycle_2_run_time_m = parse_int(val, DEFAULT_CYCLE_2_RUNTIME);
       break;
     case RAMP_TO_TEMP_BEFORE_CYCLE_1_START:
       num = strcmp(val, "true");
@@ -985,61 +985,61 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       parameters->ramp_to_temp_before_start_cycle_2 = num ? false : true;
       break;
     case RAMP_TO_TEMP_C1_TIMEOUT:
-      parameters->ramp_to_temp_c1_timeout = atof(val);
+      parameters->ramp_to_temp_c1_timeout = parse_double(val, DEFAULT_RAMP_TO_TEMP_TIMEOUT);
       break;
     case RAMP_TO_TEMP_C2_TIMEOUT:
-      parameters->ramp_to_temp_c2_timeout = atof(val);
+      parameters->ramp_to_temp_c2_timeout = parse_double(val, DEFAULT_RAMP_TO_TEMP_TIMEOUT);
       break;
     case HEATER_SETPOINT_1_C:
-      parameters->heater_setpoint_1 = atof(val);
+      parameters->heater_setpoint_1 = parse_double(val, DEFAULT_HEATER_SETPOINT);
       break;
     case HEATER_SETPOINT_2_C:
-      parameters->heater_setpoint_2 = atof(val);
+      parameters->heater_setpoint_2 = parse_double(val, DEFAULT_HEATER_SETPOINT);
       break;
     case HEATER_MAX_TEMP_C:
-      parameters->heater_max_temp = atof(val);
+      parameters->heater_max_temp = parse_double(val, DEFAULT_MAX_TEMP);
       break;
     case HEATER_KP_1:
-      parameters->heater_kp_1 = atof(val);
+      parameters->heater_kp_1 = parse_double(val, H_KP);
       break;
     case HEATER_KI_1:
-      parameters->heater_ki_1 = atof(val);
+      parameters->heater_ki_1 = parse_double(val, H_KI);
       break;
     case HEATER_KD_1:
-      parameters->heater_kd_1 = atof(val);
+      parameters->heater_kd_1 = parse_double(val, H_KD);
       break;
     case HEATER_KP_2:
-      parameters->heater_kp_2 = atof(val);
+      parameters->heater_kp_2 = parse_double(val, H_KP);
       break;
     case HEATER_KI_2:
-      parameters->heater_ki_2 = atof(val);
+      parameters->heater_ki_2 = parse_double(val, H_KI);
       break;
     case HEATER_KD_2:
-      parameters->heater_kd_2 = atof(val);
+      parameters->heater_kd_2 = parse_double(val, H_KD);
       break;
     case MOTOR_KP_1:
-      parameters->motor_kp_1 = atof(val);
+      parameters->motor_kp_1 = parse_double(val, M_KP);
       break;
     case MOTOR_KI_1:
-      parameters->motor_ki_1 = atof(val);
+      parameters->motor_ki_1 = parse_double(val, M_KI);
       break;
     case MOTOR_KD_1:
-      parameters->motor_kd_1 = atof(val);
+      parameters->motor_kd_1 = parse_double(val, M_KD);
       break;
     case _MOTOR_SETPOINT_1:
-      parameters->motor_setpoint_1 = atoi(val);
+      parameters->motor_setpoint_1 = parse_int(val, MOTOR_SETPOINT_1);
       break;
     case MOTOR_KP_2:
-      parameters->motor_kp_2 = atof(val);
+      parameters->motor_kp_2 = parse_double(val, M_KP);
       break;
     case MOTOR_KI_2:
-      parameters->motor_ki_2 = atof(val);
+      parameters->motor_ki_2 = parse_double(val, M_KI);
       break;
     case MOTOR_KD_2:
-      parameters->motor_kd_2 = atof(val);
+      parameters->motor_kd_2 = parse_double(val, M_KD);
       break;
     case _MOTOR_SETPOINT_2:
-      parameters->motor_setpoint_2 = atoi(val);
+      parameters->motor_setpoint_2 = parse_int(val, MOTOR_SETPOINT_2);
       break;
     case RUN_MOTOR_1:
       num = strcmp(val, "true");
@@ -1164,4 +1164,30 @@ FRESULT sd_card_reset_set_time_date(void) {
   if (res != FR_OK) {
     return res;
   }
+}
+
+double parse_double(const char *str, double default_value) {
+  char *endptr;
+  double value = strtod(str, &endptr);
+
+  // Check if the entire string was consumed and a valid number was parsed
+  if (endptr == str) {
+    // No valid conversion was performed
+    return default_value;
+  }
+
+  return value;
+}
+
+int parse_int(const char *str, int default_value) {
+  char *endptr;
+  int value = strtol(str, &endptr, 10); // Base 10 for decimal
+
+  // Check if the entire string was consumed and a valid number was parsed
+  if (endptr == str) {
+    // No valid conversion was performed
+    return default_value;
+  }
+
+  return value;
 }
