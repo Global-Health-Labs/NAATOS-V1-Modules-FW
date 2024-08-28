@@ -576,8 +576,8 @@ typedef struct {
 typedef struct {
   float sample_rate;
   float logging_rate;
-  uint16_t cycle_1_run_time_m;
-  uint16_t cycle_2_run_time_m;
+  float cycle_1_run_time_m;
+  float cycle_2_run_time_m;
   bool ramp_to_temp_before_start_cycle_1;
   bool ramp_to_temp_before_start_cycle_2;
   float ramp_to_temp_c1_timeout;
