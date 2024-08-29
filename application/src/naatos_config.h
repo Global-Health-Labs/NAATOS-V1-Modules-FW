@@ -151,6 +151,7 @@
 #define SAMPLE_VALID_TIMEOUT_MSG "Sample is no longer valid due to timeout."
 #define UNKNOWN_ERROR_MESSAGE "An unknown error has occured."
 #define HALL_SENSOR_BRAKE_MSG "HALL sensor interrupted."
+#define SAMPLE_I2C_READ_ERROR_MSG "I2C sensor read error"
 
 #define USB_SUSPEND_TASKS_TIME 15000
 
@@ -212,6 +213,7 @@ typedef enum {
   SAMPLE_RAMP_TO_TEMP_REACHED,
   SAMPLE_RAMP_TO_TEMP_TIMEOUT,
   SAMPLE_INVALID_TIMEOUT,
+  SAMPLE_I2C_READ_ERROR,
   SAMPLE_UNKNOWN
   // Add more events here
 } event_t;
@@ -501,7 +503,7 @@ typedef enum {
 
 typedef struct {
   MainStateErrorNotification_t errType;
-  temperature_data_t tempData;
+  temperature_data_t overTempData;
 } MainStateErrorQueueMsg_t;
 
 // Task Handles

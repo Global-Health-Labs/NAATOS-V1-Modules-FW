@@ -23,3 +23,4 @@ void samplePrepResetHeaterPIDs(void);
 temperature_pwm_data_t getSamplePrepPwmData(void);
 bool getSamplePrepOverTempStatus(void);
 bool getSamplePrepHeaterRunningStatus(void);
+temperature_data_t getSamplePrepOverTempData(void);

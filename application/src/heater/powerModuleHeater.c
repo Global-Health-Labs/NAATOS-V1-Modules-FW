@@ -21,6 +21,8 @@ temperature_pwm_data_t pm_h_pwm_data = {
 bool pm_greater_than_max = false;
 bool pm_heater_run = false;
 
+temperature_data_t pm_local_temp_data;
+
 void handle_valve_stopstart_heater(bool heating) {
 #ifndef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
@@ -119,6 +121,7 @@ void handle_amplification_stopstart_heater(bool heating) {
 void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 #ifndef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
+  pm_local_temp_data = temperature_data;
   if (wdtTimeout++ > (1 / config.sample_rate)) { // send out once a second
     wdtTimeout = 0;
     sendWdtHeaterValid(); // update watchdog
@@ -357,6 +360,10 @@ temperature_pwm_data_t getPowerModulePwmData(void) {
 
 bool getPowerModuleOverTempStatus(void) {
   return pm_greater_than_max;
+}
+
+temperature_data_t getPowerModuleOverTempData(void) {
+  return pm_local_temp_data;
 }
 
 bool getPowerModuleHeaterRunningStatus(void) {

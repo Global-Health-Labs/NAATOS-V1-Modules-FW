@@ -15,9 +15,12 @@ uint32_t start_time = 0;
 uint32_t end_time = 0;
 uint32_t time_left = 0;
 int percent_recv = 0;
-bool over_temp = false;
+
+MainStateErrorQueueMsg_t main_err_msg;
 volatile bool runThrough = true;
 float extraLogData = 0.0;
+
+temperature_data_t over_temp_data;
 
 BaseType_t xReturned;
 
@@ -122,13 +125,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         break;
       } else if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
         end_cycle_1();
-        xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
-        if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
-        }
-        exitInfo = CYCLE_ERROR_OVER_TEMP;
-        runThrough = true;
-        next_state = EXIT_CYCLE;
+        next_state = handleMainErrorMessage();
         break;
       }
 
@@ -179,13 +176,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
         end_cycle_1();
-        xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
-        if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
-        }
-        exitInfo = CYCLE_ERROR_OVER_TEMP;
-        runThrough = true;
-        next_state = EXIT_CYCLE;
+        next_state = handleMainErrorMessage();
         break;
       }
 
@@ -252,13 +243,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         break;
       } else if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
         end_cycle_2();
-        xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
-        if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
-        }
-        exitInfo = CYCLE_ERROR_OVER_TEMP;
-        runThrough = true;
-        next_state = EXIT_CYCLE;
+        next_state = handleMainErrorMessage();
         break;
       }
 
@@ -308,13 +293,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
         end_cycle_2();
-        xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
-        if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
-        }
-        exitInfo = CYCLE_ERROR_OVER_TEMP;
-        runThrough = true;
-        next_state = EXIT_CYCLE;
+        next_state = handleMainErrorMessage();
         break;
       }
 
@@ -472,14 +451,16 @@ void handle_exit_notifications(void) {
     break;
 
   case CYCLE_ERROR_OVER_TEMP:
+    sprintf(exitString, "%s: %d", SAMPLE_OVER_TEMP, over_temp_data.amp0_zone_temp);
     exit_event_info.event = SAMPLE_OVER_TEMP;
-    exit_event_info.message = OVER_TEMP_MSG;
+    exit_event_info.message = exitString;
     exit_log_message.event_data = exit_event_info;
     break;
 
   case CYCLE_ERROR_START_TEMP_TOO_HIGH:
+    sprintf(exitString, "%s: %d", TEMPS_NOT_STABLE, over_temp_data.amp0_zone_temp);
     exit_event_info.event = SAMPLE_TEMPS_NOT_STABALIZED;
-    exit_event_info.message = TEMPS_NOT_STABLE;
+    exit_event_info.message = exitString;
     exit_log_message.event_data = exit_event_info;
     break;
 
@@ -492,6 +473,12 @@ void handle_exit_notifications(void) {
   case CYCLE_SAMPLE_INVALIDATED:
     exit_event_info.event = SAMPLE_INVALID_TIMEOUT;
     exit_event_info.message = SAMPLE_VALID_TIMEOUT_MSG;
+    exit_log_message.event_data = exit_event_info;
+    break;
+
+  case CYCLE_ERROR_I2C_FAIL:
+    exit_event_info.event = SAMPLE_I2C_READ_ERROR;
+    exit_event_info.message = SAMPLE_I2C_READ_ERROR_MSG;
     exit_log_message.event_data = exit_event_info;
     break;
 
@@ -608,4 +595,21 @@ void end_cycle_2(void) {
   if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
   }
+}
+
+cycle_state_t handleMainErrorMessage() {
+    xReturned = xQueueReceive(main_runErrorQueue, &main_err_msg, 0);
+    if (xReturned != pdPASS) {
+      printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
+    }
+
+    if(main_err_msg.errType == ERR_TEMP_SENSOR_READ) {
+      exitInfo = CYCLE_ERROR_I2C_FAIL;
+    } else if (main_err_msg.errType == ERR_OVERTEMP_EVENT) {
+      over_temp_data = main_err_msg.overTempData;
+      exitInfo = CYCLE_ERROR_OVER_TEMP;
+    }
+
+    runThrough = true;
+    return EXIT_CYCLE;
 }

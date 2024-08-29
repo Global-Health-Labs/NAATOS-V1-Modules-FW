@@ -8,5 +8,6 @@ typedef struct {
   void (*resetHeaterPIDs)(void);
   temperature_pwm_data_t (*getPwmData)(void);
   bool (*getOverTempStatus)(void);
+  temperature_data_t (*getOverTempData)(void);
   bool (*getHeaterRunningStatus)(void);
 } HeaterInterface;

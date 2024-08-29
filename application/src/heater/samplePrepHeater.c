@@ -20,6 +20,8 @@ bool heater_run = false;
 bool rampToTemp = false;
 int last_motor_speed = 0;
 
+temperature_data_t local_temp_data;
+
 uint32_t samp_log_index = 0;
 uint32_t samp_log_max = 0;
 
@@ -186,7 +188,7 @@ void samplePrepResetHeaterPIDs(void) {
 
 void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   BaseType_t xReturned;
-
+  local_temp_data = temperature_data;
   // Ensure temperatures are below the minimum run zone temperature
   if (config.min_run_zone_temp_en) {
     if (starting_run &&
@@ -416,6 +418,10 @@ temperature_pwm_data_t getSamplePrepPwmData(void) {
 
 bool getSamplePrepOverTempStatus(void) {
   return greater_than_max;
+}
+
+temperature_data_t getSamplePrepOverTempData(void) {
+  return local_temp_data;
 }
 
 bool getSamplePrepHeaterRunningStatus(void) {
