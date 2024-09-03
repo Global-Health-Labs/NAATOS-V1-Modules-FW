@@ -95,9 +95,6 @@
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_1 true
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_2 false
 #define DEFAULT_RAMP_TO_TEMP_TIMEOUT 600.0 // 10min
-#define DEFAULT_DATE 100124                // Oct. 1 2024
-#define DEFAULT_TIME 120000                // 12 pm
-#define DEFAULT_SET_TIME false
 #define DEFAULT_MOTOR_SPEED_PWM 71
 #define DEFAULT_MAX_HEATER_PID 70
 
@@ -121,11 +118,16 @@
 #define DEFAULT_AMP2_MAX_TEMP 80.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP 50.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP_EN false
-#define DEFAULT_ALERT_TIMEOUT_S 10.0   // seconds
+#define DEFAULT_ALERT_TIMEOUT_S 3.0   // seconds
 #define DEFAULT_VALID_TIMEOUT_S 3600.0 // 1 hour
 #define DEFAULT_RECOVERY_THRES 40      // Percent
 #define OPTICAL_TRIG_THRES 800
+#define DEFAULT_MAX_HEATER_PID 150
 #endif
+
+#define DEFAULT_DATE 100124                // Oct. 1 2024
+#define DEFAULT_TIME 120000                // 12 pm
+#define DEFAULT_SET_TIME false
 
 #define DEFAULT_CYCLES_COMPLETE_DELAY_S 10
 
