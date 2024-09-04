@@ -312,9 +312,8 @@ void main_task(void *pvParameters) {
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(100)) == pdPASS) {
         if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
-          /*next_state = MAIN_SLEEP;
-             sendUpdatedMainTaskState(next_state);
-             break;*/
+             next_state = MAIN_SLEEP;
+             break;
         }
       }
 
@@ -630,6 +629,12 @@ void main_task(void *pvParameters) {
       xReturned = xQueueReceive(main_wakeupTasksQueue, &wake_up, portMAX_DELAY);
       if (xReturned != pdPASS) {
         printf("MAIN_TASK: Unable to receive tasks wakeup from main_wakeupTasksQueue. \n");
+      }
+
+      // Dont wake up if the battery percentage is still too low
+      if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
+           next_state = MAIN_SLEEP;
+           break;
       }
 
       printf("Waking up...\n");

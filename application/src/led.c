@@ -85,18 +85,17 @@ void handleLedState(LEDRxQueueMsg_t ledMsg) {
       set_led1_green_breathe();
       //if battery charging
       if (ledFlags.batteryCharging) {
-        //set_led2_blue_breathe();
+        set_led2_blue_breathe();
       } else {
-        //turn_off_led2_blue_animation();
+        turn_off_led2_blue_animation();
       }
     } else if (ledFlags.runCondition) {
       set_led1_green_solid();
       //if battery charging
       if (ledFlags.batteryCharging) {
-        //set_led2_blue_breathe();
+        set_led2_blue_breathe();
       } else {
-        //turn_off_led2_blue_animation();
-       // led_driver_disable_channel(LED2, led1_current_color, NULL);
+        turn_off_led2_blue_animation();
       }
     } else if (ledFlags.usbMscStarting) {
       set_led1_blue_breathe();
@@ -178,6 +177,9 @@ void set_led2_red_fast_blink(void) {
 void set_led2_green_solid(void) {
 #if ENABLE_LEDS
   led_driver_disable_channel(LED2, led1_current_color, NULL);
+  led_driver_disable_channel(LED2, red, NULL);
+  led_driver_disable_channel(LED2, green, NULL);
+  led_driver_disable_channel(LED2, blue, NULL);
   led_driver_enable_channel(LED2, green, NULL);
   led_driver_set_channel_animation_solid(LED2, green, true, NULL);
   led2_current_color = green;
@@ -203,7 +205,13 @@ void set_led2_blue_breathe(void) {
 }
 
 void turn_off_led2_blue_animation(void) {
-  led_driver_disable_animation(LED2, blue, NULL);
+#if ENABLE_LEDS
+  led_driver_disable_channel(LED2, led2_current_color, NULL);
+  led_driver_disable_channel(LED2, red, NULL);
+  led_driver_disable_channel(LED2, green, NULL);
+  led_driver_disable_channel(LED2, blue, NULL);
+  //led_driver_set_channel_animation_solid(LED2, green, true, NULL);
+#endif
 }
 
 void turn_off_led_channels(void) {
