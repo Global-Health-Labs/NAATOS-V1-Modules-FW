@@ -51,8 +51,8 @@
 #ifdef SAMPLE_PREP_BOARD
 
 /* Heater Zones' Parameters */
-#define DEFAULT_AMPLIFICATION_ZONE_ON_TIME 120 // Seconds
-#define DEFAULT_VALVE_ZONE_ON_TIME 120         // Seconds
+#define DEFAULT_CYCLE_ONE_ZONE_ON_TIME 120    // Seconds
+#define DEFAULT_CYCLE_TWO_ZONE_ON_TIME 120    // Seconds
 
 #else
 

@@ -43,7 +43,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
       if (xReturned != pdPASS) {
-        printf("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
+        printf("MAIN_TASK: Unable to send start cycle event to logging task.\n");
       }
 
       exitInfo = CYCLE_RUNNING;
@@ -72,11 +72,11 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     }
 
     case START_CYCLE_1: {
-      // Send start amplification message to heater queue
+      // Send start cycle 1 message to heater queue
       if (!begin_cycle_1()) {
         printf("MAIN_TASK: Unable to begin sample run, temperatures have not yet stabalized.\n");
 
-        // Stop amplification zone
+        // Stop cycle one
         end_cycle_1();
         next_state = MAIN_STANDBY;
         // Set error during run and wait alert timeout
@@ -160,7 +160,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (last_state != current_state) {
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
-          end_time = pdMS_TO_TICKS((DEFAULT_AMPLIFICATION_ZONE_ON_TIME)*1000);
+          end_time = pdMS_TO_TICKS((DEFAULT_CYCLE_ONE_ZONE_ON_TIME)*1000);
         } else {
           end_time = pdMS_TO_TICKS((config.cycle_1_run_time_m) * 1000);
         }
@@ -277,7 +277,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (last_state != current_state) {
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
-          end_time = pdMS_TO_TICKS((DEFAULT_VALVE_ZONE_ON_TIME)*1000);
+          end_time = pdMS_TO_TICKS((DEFAULT_CYCLE_TWO_ZONE_ON_TIME)*1000);
         } else {
           end_time = pdMS_TO_TICKS((config.cycle_2_run_time_m) * 1000);
         }
@@ -514,7 +514,7 @@ bool begin_cycle_1(void) {
   bool start_run = false;
   // Send start zone request
 
-  xRet = xQueueSend(heaterRxQueue, &run_amplification_zone, 0);
+  xRet = xQueueSend(heaterRxQueue, &run_cycle_two_zone_heating, 0);
   if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send run amplification zone request.\n");
   }
@@ -541,7 +541,7 @@ void begin_cycle_2(void) {
   BaseType_t xRet;
   bool heat_conf = false;
   // Send start valve message to heater queue
-  xRet = xQueueSend(heaterRxQueue, &run_valve_zone, 0);
+  xRet = xQueueSend(heaterRxQueue, &run_cycle_two_zone_heating, 0);
   if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send run valve zone request.\n");
   }
@@ -561,7 +561,7 @@ void end_cycle_1(void) {
   BaseType_t xRet;
   bool heat_conf = false;
   // Send stop amplification message to heater queue
-  xRet = xQueueSend(heaterRxQueue, &stop_amplification_zone, 50);
+  xRet = xQueueSend(heaterRxQueue, &stop_cycle_one_zone_heating, 50);
   if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send stop amplification zone request.\n");
   }
@@ -581,7 +581,7 @@ void end_cycle_2(void) {
   BaseType_t xRet;
   bool heat_conf = false;
   // Send valve zone stop request
-  xRet = xQueueSend(heaterRxQueue, &stop_valve_zone, 0);
+  xRet = xQueueSend(heaterRxQueue, &stop_cycle_two_zone_heating, 0);
   if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send stop valve zone request.\n");
   }

@@ -2,10 +2,10 @@
 #include "naatos_config.h"
 
 // Zone Request Constants
-extern const HeaterRxQueueMsg_t run_amplification_zone;
-extern const HeaterRxQueueMsg_t run_valve_zone;
-extern const HeaterRxQueueMsg_t stop_amplification_zone;
-extern const HeaterRxQueueMsg_t stop_valve_zone;
+extern const HeaterRxQueueMsg_t run_cycle_one_zone_heating;
+extern const HeaterRxQueueMsg_t run_cycle_two_zone_heating;
+extern const HeaterRxQueueMsg_t stop_cycle_one_zone_heating;
+extern const HeaterRxQueueMsg_t stop_cycle_two_zone_heating;
 
 // Log Event Constants
 extern const log_data_message_t new_log_msg; // starts a new log file
