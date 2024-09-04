@@ -1068,6 +1068,25 @@ int main(void) {
   if (res != FR_OK) {
     printf("Warning: configuration file was not able to be read. Using default configuration parameters.");
     use_default_configuration_parameters = true;
+    // Report that the confirguation file cannot be read to a log if sd card is ok
+    if (sd_card_inited) {
+      log_event_t exit_event_info = {
+        .event = SAMPLE_CANT_READ_CONFIG,
+        .message = "Configuration file was not able to be read. Using default configuration parameters."};
+      log_data_message_t exit_log_message = {
+        .data_type = EVENT_DATA,
+        .temperature_data = NULL,
+        .event_data = exit_event_info};
+
+      xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
+      if (xReturned != pdPASS) {
+        printf("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
+      }
+      xReturned = xQueueSend(logger_logMessageQueue, &exit_log_message, 0);
+      if (xReturned != pdPASS) {
+        printf("MAIN_TASK: Unable to send recovery battery percentage event to logging task.\n");
+      }
+   }
   } else {
     use_default_configuration_parameters = false;
   }

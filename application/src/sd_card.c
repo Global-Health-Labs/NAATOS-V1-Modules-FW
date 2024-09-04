@@ -54,6 +54,7 @@ void init_sd_card(void) {
   }
   if (disk_state) {
     printf("SD Card initialization failed.\n");
+    return;
   }
 
   // Get SD Card Specifications
