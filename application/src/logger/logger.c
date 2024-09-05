@@ -32,9 +32,10 @@ LoggerInterface powerModuleLogger_I = {
 
 void normalize_pwm_data(log_data_message_t *rxLogMsg);
 
+int battery_percent = 0;
+
 int getBatteryPercent(void) {
   BaseType_t xReturned;
-  int battery_percent = 0;
   // Request the battery percentage from the bettery task
   xReturned = xQueueSend(batteryRxQueue, &batt_req_log, 0);
   if (xReturned != pdPASS) {
@@ -163,7 +164,7 @@ void logger_task(void *pvParameters) {
     }
     case UART_DATA: {
       normalize_pwm_data(&rxLogMsg);
-      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, 0);
+      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, battery_percent);
       write_to_com(logFileLine, logFileLineSize);
       break;
     }
