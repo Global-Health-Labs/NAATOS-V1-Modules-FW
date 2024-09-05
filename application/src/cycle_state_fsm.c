@@ -37,9 +37,6 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     last_state = current_state;
     current_state = next_state;
 
-    last_state = current_state;
-    current_state = next_state;
-
     switch (current_state) {
     case VALIDATE_INIT_CONDITIONS: {
 
@@ -94,9 +91,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (config.ramp_to_temp_before_start_cycle_1 && config.run_heater_1) {
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
-          end_time = pdMS_TO_TICKS((DEFAULT_RAMP_TO_TEMP_TIMEOUT)*1000);
+          end_time = (DEFAULT_RAMP_TO_TEMP_TIMEOUT)*configTICK_RATE_HZ;
         } else {
-          end_time = pdMS_TO_TICKS((config.ramp_to_temp_c1_timeout) * 1000);
+          end_time = (config.ramp_to_temp_c1_timeout) * configTICK_RATE_HZ;
         }
         next_state = CYCLE_1_RAMP_TO_TEMP;
       } else {
@@ -107,7 +104,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
     case CYCLE_1_RAMP_TO_TEMP: {
       // Ramp to the required temperature for cycle 1
-      time_left = pdTICKS_TO_MS(xTaskGetTickCount() - start_time);
+      time_left = xTaskGetTickCount() - start_time;
 
       bool setReachedRx = false;
       xReturned = xQueueReceive(main_setPointReached, &setReachedRx, 0);
@@ -162,13 +159,13 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (last_state != current_state) {
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
-          end_time = pdMS_TO_TICKS((DEFAULT_AMPLIFICATION_ZONE_ON_TIME)*1000);
+          end_time = (DEFAULT_AMPLIFICATION_ZONE_ON_TIME)*configTICK_RATE_HZ;
         } else {
-          end_time = pdMS_TO_TICKS((config.cycle_1_run_time_m) * 1000);
+          end_time = (config.cycle_1_run_time_m) * configTICK_RATE_HZ;
         }
       }
 
-      time_left = pdTICKS_TO_MS(xTaskGetTickCount() - start_time);
+      time_left = xTaskGetTickCount() - start_time;
 
       if (time_left >= end_time) {
         next_state = START_CYCLE_2;
@@ -225,7 +222,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
     case CYCLE_2_RAMP_TO_TEMP:
       // Ramp to the required temperature for cycle 1
-      time_left = pdTICKS_TO_MS(xTaskGetTickCount() - start_time);
+      time_left = (xTaskGetTickCount() - start_time);
 
       bool setReachedRx = false;
       xReturned = xQueueReceive(main_setPointReached, &setReachedRx, 0);
@@ -279,13 +276,13 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (last_state != current_state) {
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
-          end_time = pdMS_TO_TICKS((DEFAULT_VALVE_ZONE_ON_TIME)*1000);
+          end_time = ((DEFAULT_VALVE_ZONE_ON_TIME)*configTICK_RATE_HZ);
         } else {
-          end_time = pdMS_TO_TICKS((config.cycle_2_run_time_m) * 1000);
+          end_time = ((config.cycle_2_run_time_m) * configTICK_RATE_HZ);
         }
       }
 
-      time_left = pdTICKS_TO_MS(xTaskGetTickCount() - start_time);
+      time_left = (xTaskGetTickCount() - start_time);
 
       if (time_left >= end_time) {
         next_state = CYCLE_COMPLETE_DELAY;
@@ -329,13 +326,13 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (last_state != current_state) {
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
-          end_time = pdMS_TO_TICKS((DEFAULT_CYCLES_COMPLETE_DELAY_S)*1000);
+          end_time = ((DEFAULT_CYCLES_COMPLETE_DELAY_S)*1000);
         } else {
-          end_time = pdMS_TO_TICKS((config.sample_complete_delay_s) * 1000);
+          end_time = ((config.sample_complete_delay_s) * 1000);
         }
       }
 
-      time_left = pdTICKS_TO_MS(xTaskGetTickCount() - start_time);
+      time_left = (xTaskGetTickCount() - start_time);
 
       if (time_left >= end_time) {
         next_state = CYCLE_SAMPLE_VALID_HOLD;
@@ -371,9 +368,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         updateLedState(LED_COMPLETE, true);
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
-          end_time = pdMS_TO_TICKS((DEFAULT_VALID_TIMEOUT_S)*1000);
+          end_time = ((DEFAULT_VALID_TIMEOUT_S)*1000);
         } else {
-          end_time = pdMS_TO_TICKS((config.sample_valid_timeout_s) * 1000);
+          end_time = ((config.sample_valid_timeout_s) * 1000);
         }
       }
 
@@ -389,7 +386,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       buttonData.event = NONE;
       xQueueReceive(button_mainStateQueue, &buttonData, 0);
 
-      time_left = pdTICKS_TO_MS(xTaskGetTickCount() - start_time);
+      time_left = (xTaskGetTickCount() - start_time);
 
       if (time_left >= end_time) {
         updateLedState(LED_ABORT, true);
