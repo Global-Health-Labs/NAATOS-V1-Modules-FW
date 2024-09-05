@@ -95,9 +95,6 @@
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_1 true
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_2 false
 #define DEFAULT_RAMP_TO_TEMP_TIMEOUT 600.0 // 10min
-#define DEFAULT_DATE 100124                // Oct. 1 2024
-#define DEFAULT_TIME 120000                // 12 pm
-#define DEFAULT_SET_TIME false
 #define DEFAULT_MOTOR_SPEED_PWM 71
 #define DEFAULT_MAX_HEATER_PID 70
 
@@ -121,11 +118,16 @@
 #define DEFAULT_AMP2_MAX_TEMP 80.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP 50.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP_EN false
-#define DEFAULT_ALERT_TIMEOUT_S 10.0   // seconds
+#define DEFAULT_ALERT_TIMEOUT_S 3.0   // seconds
 #define DEFAULT_VALID_TIMEOUT_S 3600.0 // 1 hour
 #define DEFAULT_RECOVERY_THRES 40      // Percent
 #define OPTICAL_TRIG_THRES 800
+#define DEFAULT_MAX_HEATER_PID 150
 #endif
+
+#define DEFAULT_DATE 100124                // Oct. 1 2024
+#define DEFAULT_TIME 120000                // 12 pm
+#define DEFAULT_SET_TIME false
 
 #define DEFAULT_CYCLES_COMPLETE_DELAY_S 10
 
@@ -143,7 +145,7 @@
 #define VALV_START_MSG "Cycle 2 Heating Started."
 #define VALV_STOP_MSG "Cycle 2 Heating Stopped."
 #define TEMPS_NOT_STABLE "Zone Temperatures are not below the minimum run temperature. Aborting run."
-#define RECOVERY_BATT "Battery Percentage lower than the recovery threshold. Charge Battery!"
+#define RECOVERY_BATT "Battery Percentage lower than the recovery threshold. Charge Battery!: "
 #define OVER_TEMP_MSG "A Zone went over its maximum temperature. Run stopped."
 #define SETPOINT_TIMEOUT_MSG "Setpoint was not reached and configured timeout was hit."
 #define SAMPLE_RAMP_TO_TEMP_REACHED_MSG "Ramp to temp complete."
@@ -151,6 +153,7 @@
 #define SAMPLE_VALID_TIMEOUT_MSG "Sample is no longer valid due to timeout."
 #define UNKNOWN_ERROR_MESSAGE "An unknown error has occured."
 #define HALL_SENSOR_BRAKE_MSG "HALL sensor interrupted."
+#define SAMPLE_I2C_READ_ERROR_MSG "I2C sensor read error"
 
 #define USB_SUSPEND_TASKS_TIME 15000
 
@@ -212,6 +215,7 @@ typedef enum {
   SAMPLE_RAMP_TO_TEMP_REACHED,
   SAMPLE_RAMP_TO_TEMP_TIMEOUT,
   SAMPLE_INVALID_TIMEOUT,
+  SAMPLE_I2C_READ_ERROR,
   SAMPLE_UNKNOWN
   // Add more events here
 } event_t;
@@ -493,6 +497,16 @@ typedef struct {
   bool overTempError;
   bool wakeupEvent;
 } MainStateRxQueueMsg_t;
+
+typedef enum {
+  ERR_TEMP_SENSOR_READ,
+  ERR_OVERTEMP_EVENT
+} MainStateErrorNotification_t;
+
+typedef struct {
+  MainStateErrorNotification_t errType;
+  temperature_data_t overTempData;
+} MainStateErrorQueueMsg_t;
 
 // Task Handles
 extern xTaskHandle mainTaskHandle;

@@ -21,11 +21,16 @@ temperature_pwm_data_t pm_h_pwm_data = {
 bool pm_greater_than_max = false;
 bool pm_heater_run = false;
 
+bool amplification_zone_running = false;
+bool valve_zone_running = false;
+bool starting_run = true;
+
+temperature_data_t pm_local_temp_data;
+
 void handle_valve_stopstart_heater(bool heating) {
 #ifndef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
 
-  // Handle case where amplification zone is on already, dont want to send stop
   if (amplification_zone_running && !heating)
     return;
 
@@ -119,10 +124,7 @@ void handle_amplification_stopstart_heater(bool heating) {
 void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 #ifndef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
-  if (wdtTimeout++ > (1 / config.sample_rate)) { // send out once a second
-    wdtTimeout = 0;
-    sendWdtHeaterValid(); // update watchdog
-  }
+  pm_local_temp_data = temperature_data;
 
   // Ensure temperatures are below the minimum run zone temperature
   if (config.min_run_zone_temp_en) {
@@ -178,23 +180,23 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
     updateDutyCycles(pwmData);
 
-    h_pwm_data.valve_zone_pwm = valve_pid.out;
+    pm_h_pwm_data.valve_zone_pwm = valve_pid.out;
     // Set the PWMs for the logger
-    h_pwm_data.amp0_zone_pwm = amp0_pid.out;
-    h_pwm_data.amp1_zone_pwm = amp1_pid.out;
-    h_pwm_data.amp2_zone_pwm = amp2_pid.out;
+    pm_h_pwm_data.amp0_zone_pwm = amp0_pid.out;
+    pm_h_pwm_data.amp1_zone_pwm = amp1_pid.out;
+    pm_h_pwm_data.amp2_zone_pwm = amp2_pid.out;
     // Ensure that the temperatures are not greater than the max temperatures allowed
     if ((config.amp0_max_temp < temperature_data.amp0_zone_temp) || temperature_data.amp0_zone_temp < 0 || temperature_data.amp0_zone_temp > 110) {
-      greater_than_max = true;
+      pm_greater_than_max = true;
     }
     if (config.amp1_max_temp < temperature_data.amp1_zone_temp || temperature_data.amp1_zone_temp < 0 || temperature_data.amp1_zone_temp > 110) {
-      greater_than_max = true;
+      pm_greater_than_max = true;
     }
     if (config.amp2_max_temp < temperature_data.amp2_zone_temp || temperature_data.amp2_zone_temp < 0 || temperature_data.amp2_zone_temp > 110) {
-      greater_than_max = true;
+      pm_greater_than_max = true;
     }
     if (config.valve_max_temp < temperature_data.valve_zone_temp || temperature_data.valve_zone_temp < 0 || temperature_data.valve_zone_temp > 110) {
-      greater_than_max = true;
+      pm_greater_than_max = true;
     }
   }
   if (valve_zone_running) {
@@ -212,30 +214,30 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     updateDutyCycles(pwmData);
 
     // Set the PWMs for the logger
-    h_pwm_data.valve_zone_pwm = valve_pid_2.out;
+    pm_h_pwm_data.valve_zone_pwm = valve_pid_2.out;
     // Ensure that the temperatures are not greater than the max temperatures allowed
     if ((config.amp0_max_temp < temperature_data.amp0_zone_temp) || temperature_data.amp0_zone_temp < 0 || temperature_data.amp0_zone_temp > 110) {
-      greater_than_max = true;
+      pm_greater_than_max = true;
     }
     if (config.amp1_max_temp < temperature_data.amp1_zone_temp || temperature_data.amp1_zone_temp < 0 || temperature_data.amp1_zone_temp > 110) {
-      greater_than_max = true;
+      pm_greater_than_max = true;
     }
     if (config.amp2_max_temp < temperature_data.amp2_zone_temp || temperature_data.amp2_zone_temp < 0 || temperature_data.amp2_zone_temp > 110) {
-      greater_than_max = true;
+      pm_greater_than_max = true;
     }
     if (config.valve_max_temp < temperature_data.valve_zone_temp || temperature_data.valve_zone_temp < 0 || temperature_data.valve_zone_temp > 110) {
-      greater_than_max = true;
+      pm_greater_than_max = true;
     }
   }
 
   // Handle being greater than the maximum temperature
-  if (greater_than_max) {
+  if (pm_greater_than_max) {
     // Send alert message to main task
-    xReturned = xQueueSend(main_runErrorQueue, &greater_than_max, 0);
+    xReturned = xQueueSend(main_runErrorQueue, &pm_greater_than_max, 0);
     if (xReturned != pdPASS) {
       printf("HEATER_TASK: Unable to send run error for greater than max temp to main_runErrorQueue.\n");
     }
-    greater_than_max = false;
+    pm_greater_than_max = false;
   }
 
 #if VERBOSE_PID
@@ -257,6 +259,13 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
 void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
 #ifndef SAMPLE_PREP_BOARD
+  int pid_max = DEFAULT_MAX_HEATER_PID;
+
+  if (!use_default_configuration_parameters) {
+    if (config.max_heater_pid_pwm > 0 && config.max_heater_pid_pwm <= DEFAULT_MAX_HEATER_PID) {
+      pid_max = config.max_heater_pid_pwm;
+    }
+  }
   // Set zones enabled
   if (heaterRxMessage.zoneSelect == AMPLIFICATION) {
     amplification_zone_running = heaterRxMessage.zoneEnabled;
@@ -273,23 +282,23 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
           .amp2_zone_pwm = amp2_pid.out};
       updateDutyCycles(pwmData);
 
-      pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd); // TODO: Implement defaults
+      pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd, pid_max); // TODO: Implement defaults
 
       // Reinitalize PID Values
-      pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
-      pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
-      pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
+      pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd, pid_max);
+      pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd, pid_max);
+      pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd, pid_max);
 
       // Send stop heater to sensors task
-      heater_run = false;
+      pm_heater_run = false;
       starting_run = false;
-      handle_amplification_stopstart_heater(heater_run);
+      handle_amplification_stopstart_heater(pm_heater_run);
     } else {
       starting_run = true;
-      heater_run = true;
+      pm_heater_run = true;
       heater_reset_all_pids();
       // Send starting heater to sensors task
-      handle_amplification_stopstart_heater(heater_run);
+      handle_amplification_stopstart_heater(pm_heater_run);
     }
   } else if (heaterRxMessage.zoneSelect = VALVE) {
     valve_zone_running = heaterRxMessage.zoneEnabled;
@@ -305,17 +314,17 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
           .amp2_zone_pwm = amp2_pid.out};
       updateDutyCycles(pwmData);
       // Reinitalize PID Values
-      pid_controller_init(&valve_pid_2, config.valve_setpoint_2, config.valve_kp_2, config.valve_ki_2, config.valve_kd_2);
-      pid_controller_init(&amp0_pid_2, config.amp0_setpoint_2, config.amp0_kp_2, config.amp0_ki_2, config.amp0_kd_2);
-      pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2);
-      pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2);
+      pid_controller_init(&valve_pid_2, config.valve_setpoint_2, config.valve_kp_2, config.valve_ki_2, config.valve_kd_2, pid_max);
+      pid_controller_init(&amp0_pid_2, config.amp0_setpoint_2, config.amp0_kp_2, config.amp0_ki_2, config.amp0_kd_2, pid_max);
+      pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2, pid_max);
+      pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2, pid_max);
       // Send stop heater to sensors task
-      heater_run = false;
-      handle_valve_stopstart_heater(heater_run);
+      pm_heater_run = false;
+      handle_valve_stopstart_heater(pm_heater_run);
     } else {
-      heater_run = true;
+      pm_heater_run = true;
       heater_reset_all_pids();
-      handle_valve_stopstart_heater(heater_run);
+      handle_valve_stopstart_heater(pm_heater_run);
     }
   }
 #endif
@@ -323,30 +332,37 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
 
 void powerModuleResetHeaterPIDs(void) {
 #ifndef SAMPLE_PREP_BOARD
+  int pid_max = DEFAULT_MAX_HEATER_PID;
+
+  if (!use_default_configuration_parameters) {
+    if (config.max_heater_pid_pwm > 0 && config.max_heater_pid_pwm <= DEFAULT_MAX_HEATER_PID) {
+      pid_max = config.max_heater_pid_pwm;
+    }
+  }
   // Create PID Controllers
   if (use_default_configuration_parameters) {
-    pid_controller_init(&valve_pid, VALVE_SETPOINT, V_KP, V_KI, V_KD);
-    pid_controller_init(&amp0_pid, AMP0_SETPOINT, A0_KP, A0_KI, A0_KD);
-    pid_controller_init(&amp1_pid, AMP1_SETPOINT, A1_KP, A1_KI, A1_KD);
-    pid_controller_init(&amp2_pid, AMP1_SETPOINT, A2_KP, A2_KI, A2_KD);
+    pid_controller_init(&valve_pid, VALVE_SETPOINT, V_KP, V_KI, V_KD, pid_max);
+    pid_controller_init(&amp0_pid, AMP0_SETPOINT, A0_KP, A0_KI, A0_KD, pid_max);
+    pid_controller_init(&amp1_pid, AMP1_SETPOINT, A1_KP, A1_KI, A1_KD, pid_max);
+    pid_controller_init(&amp2_pid, AMP1_SETPOINT, A2_KP, A2_KI, A2_KD, pid_max);
   } else {
-    pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd);
-    pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd);
-    pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd);
-    pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd);
+    pid_controller_init(&valve_pid, config.valve_setpoint, config.valve_kp, config.valve_ki, config.valve_kd, pid_max);
+    pid_controller_init(&amp0_pid, config.amp0_setpoint, config.amp0_kp, config.amp0_ki, config.amp0_kd, pid_max);
+    pid_controller_init(&amp1_pid, config.amp1_setpoint, config.amp1_kp, config.amp1_ki, config.amp1_kd, pid_max);
+    pid_controller_init(&amp2_pid, config.amp2_setpoint, config.amp2_kp, config.amp2_ki, config.amp2_kd, pid_max);
   }
 
   // Create PID Controllers
   if (use_default_configuration_parameters) {
-    pid_controller_init(&valve_pid_2, VALVE_SETPOINT_2, V_KP_2, V_KI_2, V_KD_2);
-    pid_controller_init(&amp0_pid_2, AMP0_SETPOINT_2, A0_KP_2, A0_KI_2, A0_KD_2);
-    pid_controller_init(&amp1_pid_2, AMP1_SETPOINT_2, A1_KP_2, A1_KI_2, A1_KD_2);
-    pid_controller_init(&amp2_pid_2, AMP1_SETPOINT_2, A2_KP_2, A2_KI_2, A2_KD_2);
+    pid_controller_init(&valve_pid_2, VALVE_SETPOINT_2, V_KP_2, V_KI_2, V_KD_2, pid_max);
+    pid_controller_init(&amp0_pid_2, AMP0_SETPOINT_2, A0_KP_2, A0_KI_2, A0_KD_2, pid_max);
+    pid_controller_init(&amp1_pid_2, AMP1_SETPOINT_2, A1_KP_2, A1_KI_2, A1_KD_2, pid_max);
+    pid_controller_init(&amp2_pid_2, AMP1_SETPOINT_2, A2_KP_2, A2_KI_2, A2_KD_2, pid_max);
   } else {
-    pid_controller_init(&valve_pid_2, config.valve_setpoint_2, config.valve_kp_2, config.valve_ki_2, config.valve_kd_2);
-    pid_controller_init(&amp0_pid_2, config.amp0_setpoint_2, config.amp0_kp_2, config.amp0_ki_2, config.amp0_kd_2);
-    pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2);
-    pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2);
+    pid_controller_init(&valve_pid_2, config.valve_setpoint_2, config.valve_kp_2, config.valve_ki_2, config.valve_kd_2, pid_max);
+    pid_controller_init(&amp0_pid_2, config.amp0_setpoint_2, config.amp0_kp_2, config.amp0_ki_2, config.amp0_kd_2, pid_max);
+    pid_controller_init(&amp1_pid_2, config.amp1_setpoint_2, config.amp1_kp_2, config.amp1_ki_2, config.amp1_kd_2, pid_max);
+    pid_controller_init(&amp2_pid_2, config.amp2_setpoint_2, config.amp2_kp_2, config.amp2_ki_2, config.amp2_kd_2, pid_max);
   }
 #endif
 }
@@ -357,6 +373,10 @@ temperature_pwm_data_t getPowerModulePwmData(void) {
 
 bool getPowerModuleOverTempStatus(void) {
   return pm_greater_than_max;
+}
+
+temperature_data_t getPowerModuleOverTempData(void) {
+  return pm_local_temp_data;
 }
 
 bool getPowerModuleHeaterRunningStatus(void) {
