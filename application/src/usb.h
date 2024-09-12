@@ -5,7 +5,7 @@
 #include "naatos_config.h"
 #include "naatos_queues.h"
 #include "queue.h"
-#include "sd_card.h"
+#include "storage/sd_card.h"
 #include "states.h"
 #include "task.h"
 

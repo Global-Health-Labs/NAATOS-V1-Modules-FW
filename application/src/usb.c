@@ -10,7 +10,7 @@
 #include "naatos_config.h"
 #include "nrf_drv_power.h"
 #include "nrf_drv_usbd.h"
-#include "sd_card.h"
+#include "storage/sd_card.h"
 #include "timers.h"
 #include "semphr.h"
 

@@ -21,7 +21,7 @@
 #include "nordic_common.h"
 #include "nrf_drv_clock.h"
 #include "pid.h"
-#include "sd_card.h"
+#include "storage/sd_card.h"
 #include "sdk_errors.h"
 #include "sensors.h"
 #include "spi.h"

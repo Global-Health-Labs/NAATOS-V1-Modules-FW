@@ -152,8 +152,6 @@
       <file file_name="../src/watchdog.h" />
       <file file_name="../src/spi.c" />
       <file file_name="../src/spi.h" />
-      <file file_name="../src/sd_card.c" />
-      <file file_name="../src/sd_card.h" />
       <file file_name="../src/calendar_rtc.c" />
       <file file_name="../src/calendar_rtc.h" />
       <file file_name="../src/is31fl3196.c" />
@@ -198,6 +196,12 @@
       <file file_name="../src/cycle_state_fsm.h" />
       <file file_name="../src/naatos_messages.h" />
       <file file_name="../src/naatos_messages.c" />
+      <folder Name="storage">
+        <file file_name="../src/storage/nor_flash.c" />
+        <file file_name="../src/storage/nor_flash.h" />
+        <file file_name="../src/storage/sd_card.c" />
+        <file file_name="../src/storage/sd_card.h" />
+      </folder>
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../sdk/external/segger_rtt/SEGGER_RTT.c" />
