@@ -312,8 +312,8 @@ void main_task(void *pvParameters) {
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(100)) == pdPASS) {
         if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
-             next_state = MAIN_SLEEP;
-             break;
+             //next_state = MAIN_SLEEP;
+             //break;
         }
       }
 

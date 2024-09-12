@@ -335,10 +335,7 @@ void runPowerModuleSensorCollection(void) {
   }
   // GPIO Read for Hall Sensor
   prev = switches.hal_triggered;
-  if (nrf_gpio_pin_read(HAL_INPUT_PIN))
-    switches.hal_triggered = false;
-  else
-    switches.hal_triggered = true;
+  switches.hal_triggered = get_hal_triggered();
   if (prev != switches.hal_triggered) {
     if (switches.hal_triggered) {
       printf("Hal sensor triggered!\n");
