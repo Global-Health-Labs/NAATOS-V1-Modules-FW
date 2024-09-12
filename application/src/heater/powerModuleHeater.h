@@ -47,3 +47,4 @@ void powerModuleResetHeaterPIDs(void);
 temperature_pwm_data_t getPowerModulePwmData(void);
 bool getPowerModuleOverTempStatus(void);
 bool getPowerModuleHeaterRunningStatus(void);
+temperature_data_t getPowerModuleOverTempData(void);

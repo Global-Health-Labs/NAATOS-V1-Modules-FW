@@ -312,9 +312,8 @@ void main_task(void *pvParameters) {
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(100)) == pdPASS) {
         if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
-          /*next_state = MAIN_SLEEP;
-             sendUpdatedMainTaskState(next_state);
-             break;*/
+             next_state = MAIN_SLEEP;
+             break;
         }
       }
 
@@ -632,6 +631,12 @@ void main_task(void *pvParameters) {
         printf("MAIN_TASK: Unable to receive tasks wakeup from main_wakeupTasksQueue. \n");
       }
 
+      // Dont wake up if the battery percentage is still too low
+      if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
+           next_state = MAIN_SLEEP;
+           break;
+      }
+
       printf("Waking up...\n");
 
       nrf_gpio_pin_set(SENSORS_EN);
@@ -718,93 +723,6 @@ void send_usb_change(usb_command_t cmd) {
   printf("MAIN_TASK: USB state successfully changed.\n");
 }
 
-bool begin_amplification_zone(void) {
-  BaseType_t xReturned;
-  bool start_run = false;
-  // Send start zone request
-
-  xReturned = xQueueSend(heaterRxQueue, &run_amplification_zone, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send run amplification zone request.\n");
-  }
-  // Send Start Amplification Event to logging task
-  xReturned = xQueueSend(logger_logMessageQueue, &amplification_start_log_msg, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
-  }
-  // Wait for run confirmation response
-  xReturned = xQueueReceive(main_runConfRespQueue, &start_run, portMAX_DELAY);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
-  }
-  // Wait for run ok to start response
-  xReturned = xQueueReceive(main_runRespQueue, &start_run, portMAX_DELAY);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
-  }
-
-  return start_run;
-}
-
-void begin_valve_zone(void) {
-  BaseType_t xReturned;
-  bool heat_conf = false;
-  // Send start valve message to heater queue
-  xReturned = xQueueSend(heaterRxQueue, &run_valve_zone, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send run valve zone request.\n");
-  }
-  // Send Start Valve Event to logging task
-  xReturned = xQueueSend(logger_logMessageQueue, &valve_start_log_msg, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send start valve zone event to logging task.\n");
-  }
-  // Wait for run confirmation response
-  xReturned = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
-  }
-}
-
-void end_amplification_zone(void) {
-  BaseType_t xReturned;
-  bool heat_conf = false;
-  // Send stop amplification message to heater queue
-  xReturned = xQueueSend(heaterRxQueue, &stop_amplification_zone, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send stop amplification zone request.\n");
-  }
-  // Send stop amplification Event to logging task
-  xReturned = xQueueSend(logger_logMessageQueue, &amplification_stop_log_msg, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send stop amplification zone event to logging task.\n");
-  }
-  // Wait for run confirmation response
-  xReturned = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
-  }
-}
-
-void end_valve_zone(void) {
-  BaseType_t xReturned;
-  bool heat_conf = false;
-  // Send valve zone stop request
-  xReturned = xQueueSend(heaterRxQueue, &stop_valve_zone, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send stop valve zone request.\n");
-  }
-  // Send stop valve Event to logging task
-  xReturned = xQueueSend(logger_logMessageQueue, &valve_stop_log_msg, 0);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send stop valve zone event to logging task.\n");
-  }
-  // Wait for run confirmation response
-  xReturned = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
-  if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
-  }
-}
 
 /*********************************************************************
 *
@@ -912,7 +830,7 @@ void create_queues() {
   if (main_runRespQueue == NULL)
     printf("Unable to create main_runRespQueue queue\n");
 
-  main_runErrorQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  main_runErrorQueue = xQueueCreate(QUEUE_SIZE, sizeof(MainStateErrorQueueMsg_t));
   if (main_runErrorQueue == NULL)
     printf("Unable to create main_runErrorQueue queue\n");
 
@@ -1063,6 +981,25 @@ int main(void) {
   if (res != FR_OK) {
     printf("Warning: configuration file was not able to be read. Using default configuration parameters.");
     use_default_configuration_parameters = true;
+    // Report that the confirguation file cannot be read to a log if sd card is ok
+    if (sd_card_inited) {
+      log_event_t exit_event_info = {
+        .event = SAMPLE_CANT_READ_CONFIG,
+        .message = "Configuration file was not able to be read. Using default configuration parameters."};
+      log_data_message_t exit_log_message = {
+        .data_type = EVENT_DATA,
+        .temperature_data = NULL,
+        .event_data = exit_event_info};
+
+      xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
+      if (xReturned != pdPASS) {
+        printf("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
+      }
+      xReturned = xQueueSend(logger_logMessageQueue, &exit_log_message, 0);
+      if (xReturned != pdPASS) {
+        printf("MAIN_TASK: Unable to send recovery battery percentage event to logging task.\n");
+      }
+   }
   } else {
     use_default_configuration_parameters = false;
   }

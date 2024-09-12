@@ -72,6 +72,7 @@ typedef enum {
   CYCLE_ERROR_START_TEMP_TOO_HIGH,
   CYCLE_ERROR_TIMEOUT_DURING_RAMP,
   CYCLE_SAMPLE_INVALIDATED,
+  CYCLE_ERROR_I2C_FAIL,
   CYCLE_ERROR_UNKNOWN
 } cycle_state_exit_t;
 
@@ -93,3 +94,5 @@ void end_cycle_2(void);
 bool limitSwitchFreed(sensor_switches_t data);
 
 void handle_exit_notifications(void);
+
+cycle_state_t handleMainErrorMessage();

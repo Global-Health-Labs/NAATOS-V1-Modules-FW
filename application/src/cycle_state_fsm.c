@@ -14,9 +14,13 @@ button_update_t buttonData = {.event = NONE};
 uint32_t start_time = 0;
 uint32_t end_time = 0;
 uint32_t time_left = 0;
-int percent_recv;
-bool over_temp = false;
+int percent_recv = 0;
+
+MainStateErrorQueueMsg_t main_err_msg;
 volatile bool runThrough = true;
+float extraLogData = 0.0;
+
+temperature_data_t over_temp_data;
 
 BaseType_t xReturned;
 
@@ -27,18 +31,19 @@ void reset_cycle_state_machine(void) {
 }
 
 cycle_state_exit_t run_cycle_state_machine(void) {
-  last_state = current_state;
-  current_state = next_state;
   runThrough = true;
   while (runThrough) {
     runThrough = false;
+
+    last_state = current_state;
+    current_state = next_state;
 
     switch (current_state) {
     case VALIDATE_INIT_CONDITIONS: {
 
       xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
       if (xReturned != pdPASS) {
-        printf("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
+        printf("MAIN_TASK: Unable to send start cycle event to logging task.\n");
       }
 
       exitInfo = CYCLE_RUNNING;
@@ -52,21 +57,12 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(1000)) == pdPASS) {
         if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
+          updateLedState(LED_DECLINE, true);
           exitInfo = CYCLE_ERROR_POWER_LOW;
           runThrough = true;
           next_state = EXIT_CYCLE;
+          break;
         }
-      }
-
-      // Perform initialization condition checks
-      if (percent_recv < config.recovery_power_thresh) {
-        printf("MAIN_TASK: Unable to begin sample run, battery percent is less than the recovery threshold.\n");
-        // Set error during run and wait alert timeout
-        updateLedState(LED_DECLINE, true);
-        exitInfo = CYCLE_ERROR_POWER_LOW;
-        runThrough = true;
-        next_state = EXIT_CYCLE;
-        break;
       }
 
       updateLedState(LED_RUN, true);
@@ -76,11 +72,11 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     }
 
     case START_CYCLE_1: {
-      // Send start amplification message to heater queue
+      // Send start cycle 1 message to heater queue
       if (!begin_cycle_1()) {
         printf("MAIN_TASK: Unable to begin sample run, temperatures have not yet stabalized.\n");
 
-        // Stop amplification zone
+        // Stop cycle one
         end_cycle_1();
         next_state = MAIN_STANDBY;
         // Set error during run and wait alert timeout
@@ -129,13 +125,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         break;
       } else if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
         end_cycle_1();
-        xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
-        if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
-        }
-        exitInfo = CYCLE_ERROR_OVER_TEMP;
-        runThrough = true;
-        next_state = EXIT_CYCLE;
+        next_state = handleMainErrorMessage();
         break;
       }
 
@@ -170,7 +160,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (last_state != current_state) {
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
-          end_time = pdMS_TO_TICKS((DEFAULT_AMPLIFICATION_ZONE_ON_TIME)*1000);
+          end_time = pdMS_TO_TICKS((DEFAULT_CYCLE_ONE_ZONE_ON_TIME)*1000);
         } else {
           end_time = pdMS_TO_TICKS((config.cycle_1_run_time_m) * 1000);
         }
@@ -186,13 +176,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
         end_cycle_1();
-        xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
-        if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
-        }
-        exitInfo = CYCLE_ERROR_OVER_TEMP;
-        runThrough = true;
-        next_state = EXIT_CYCLE;
+        next_state = handleMainErrorMessage();
         break;
       }
 
@@ -259,13 +243,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         break;
       } else if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
         end_cycle_2();
-        xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
-        if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
-        }
-        exitInfo = CYCLE_ERROR_OVER_TEMP;
-        runThrough = true;
-        next_state = EXIT_CYCLE;
+        next_state = handleMainErrorMessage();
         break;
       }
 
@@ -299,7 +277,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (last_state != current_state) {
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
-          end_time = pdMS_TO_TICKS((DEFAULT_VALVE_ZONE_ON_TIME)*1000);
+          end_time = pdMS_TO_TICKS((DEFAULT_CYCLE_TWO_ZONE_ON_TIME)*1000);
         } else {
           end_time = pdMS_TO_TICKS((config.cycle_2_run_time_m) * 1000);
         }
@@ -315,13 +293,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
         end_cycle_2();
-        xReturned = xQueueReceive(main_runErrorQueue, &over_temp, 0);
-        if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
-        }
-        exitInfo = CYCLE_ERROR_OVER_TEMP;
-        runThrough = true;
-        next_state = EXIT_CYCLE;
+        next_state = handleMainErrorMessage();
         break;
       }
 
@@ -428,6 +400,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     }
 
     case EXIT_CYCLE:
+      runThrough = false;
       // Perform exit operations
       // Cleanup or final actions
       handle_exit_notifications();
@@ -456,12 +429,12 @@ void handle_exit_notifications(void) {
 
   switch (exitInfo) {
   case CYCLE_COMPLETE:
-
     break;
 
   case CYCLE_ERROR_POWER_LOW:
+    sprintf(exitString, "%s%d", RECOVERY_BATT, percent_recv);
     exit_event_info.event = SAMPLE_RECOVERY_BATT;
-    exit_event_info.message = RECOVERY_BATT;
+    exit_event_info.message = exitString;
     exit_log_message.event_data = exit_event_info;
     break;
 
@@ -478,14 +451,16 @@ void handle_exit_notifications(void) {
     break;
 
   case CYCLE_ERROR_OVER_TEMP:
+    sprintf(exitString, "%s: %d", SAMPLE_OVER_TEMP, over_temp_data.amp0_zone_temp);
     exit_event_info.event = SAMPLE_OVER_TEMP;
-    exit_event_info.message = OVER_TEMP_MSG;
+    exit_event_info.message = exitString;
     exit_log_message.event_data = exit_event_info;
     break;
 
   case CYCLE_ERROR_START_TEMP_TOO_HIGH:
+    sprintf(exitString, "%s: %d", TEMPS_NOT_STABLE, over_temp_data.amp0_zone_temp);
     exit_event_info.event = SAMPLE_TEMPS_NOT_STABALIZED;
-    exit_event_info.message = TEMPS_NOT_STABLE;
+    exit_event_info.message = exitString;
     exit_log_message.event_data = exit_event_info;
     break;
 
@@ -498,6 +473,12 @@ void handle_exit_notifications(void) {
   case CYCLE_SAMPLE_INVALIDATED:
     exit_event_info.event = SAMPLE_INVALID_TIMEOUT;
     exit_event_info.message = SAMPLE_VALID_TIMEOUT_MSG;
+    exit_log_message.event_data = exit_event_info;
+    break;
+
+  case CYCLE_ERROR_I2C_FAIL:
+    exit_event_info.event = SAMPLE_I2C_READ_ERROR;
+    exit_event_info.message = SAMPLE_I2C_READ_ERROR_MSG;
     exit_log_message.event_data = exit_event_info;
     break;
 
@@ -533,7 +514,7 @@ bool begin_cycle_1(void) {
   bool start_run = false;
   // Send start zone request
 
-  xRet = xQueueSend(heaterRxQueue, &run_amplification_zone, 0);
+  xRet = xQueueSend(heaterRxQueue, &run_cycle_two_zone_heating, 0);
   if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send run amplification zone request.\n");
   }
@@ -560,7 +541,7 @@ void begin_cycle_2(void) {
   BaseType_t xRet;
   bool heat_conf = false;
   // Send start valve message to heater queue
-  xRet = xQueueSend(heaterRxQueue, &run_valve_zone, 0);
+  xRet = xQueueSend(heaterRxQueue, &run_cycle_two_zone_heating, 0);
   if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send run valve zone request.\n");
   }
@@ -580,7 +561,7 @@ void end_cycle_1(void) {
   BaseType_t xRet;
   bool heat_conf = false;
   // Send stop amplification message to heater queue
-  xRet = xQueueSend(heaterRxQueue, &stop_amplification_zone, 50);
+  xRet = xQueueSend(heaterRxQueue, &stop_cycle_one_zone_heating, 50);
   if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send stop amplification zone request.\n");
   }
@@ -600,7 +581,7 @@ void end_cycle_2(void) {
   BaseType_t xRet;
   bool heat_conf = false;
   // Send valve zone stop request
-  xRet = xQueueSend(heaterRxQueue, &stop_valve_zone, 0);
+  xRet = xQueueSend(heaterRxQueue, &stop_cycle_two_zone_heating, 0);
   if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send stop valve zone request.\n");
   }
@@ -614,4 +595,21 @@ void end_cycle_2(void) {
   if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
   }
+}
+
+cycle_state_t handleMainErrorMessage() {
+    xReturned = xQueueReceive(main_runErrorQueue, &main_err_msg, 0);
+    if (xReturned != pdPASS) {
+      printf("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
+    }
+
+    if(main_err_msg.errType == ERR_TEMP_SENSOR_READ) {
+      exitInfo = CYCLE_ERROR_I2C_FAIL;
+    } else if (main_err_msg.errType == ERR_OVERTEMP_EVENT) {
+      over_temp_data = main_err_msg.overTempData;
+      exitInfo = CYCLE_ERROR_OVER_TEMP;
+    }
+
+    runThrough = true;
+    return EXIT_CYCLE;
 }

@@ -13,7 +13,8 @@ HeaterInterface samplePrepHeater_I = {
     .resetHeaterPIDs = &samplePrepResetHeaterPIDs,
     .getPwmData = &getSamplePrepPwmData,
     .getOverTempStatus = &getSamplePrepOverTempStatus,
-    .getHeaterRunningStatus = &getSamplePrepHeaterRunningStatus};
+    .getHeaterRunningStatus = &getSamplePrepHeaterRunningStatus,
+    .getOverTempData = &getSamplePrepOverTempData};
 
 HeaterInterface powerModuleHeater_I = {
     .handleHeaterSensorDataRx = &powerModuleHandleHeaterSensorDataRx,
@@ -22,7 +23,8 @@ HeaterInterface powerModuleHeater_I = {
     .resetHeaterPIDs = &powerModuleResetHeaterPIDs,
     .getPwmData = &getPowerModulePwmData,
     .getOverTempStatus = &getPowerModuleOverTempStatus,
-    .getHeaterRunningStatus = &getPowerModuleHeaterRunningStatus};
+    .getHeaterRunningStatus = &getPowerModuleHeaterRunningStatus,
+    .getOverTempData = &getPowerModuleOverTempData};
 
 void sendWdtHeaterValid() {
   BaseType_t xReturned;
@@ -67,7 +69,16 @@ void heater_task(void *pvParameters) {
       }
       case HEATER_MSG_TEMPERATURE_DATA: {
         if (heaterRxMessage.readTempFailed) {
+          MainStateErrorQueueMsg_t main_err_msg;
           bool greaterThanMaxTemp = heaterInterface->getOverTempStatus();
+          
+          if(greaterThanMaxTemp) {
+            main_err_msg.errType = ERR_OVERTEMP_EVENT;
+            main_err_msg.overTempData = heaterInterface->getOverTempData();
+          } else { // I2c read error
+            main_err_msg.errType = ERR_TEMP_SENSOR_READ;
+          }
+
           xReturned = xQueueSend(main_runErrorQueue, &greaterThanMaxTemp, 0);
           if (xReturned != pdPASS) {
             printf("HEATER_TASK: Unable to send run error for greater than max temp to main_runErrorQueue.\n");

@@ -13,12 +13,14 @@ float heater2SetPoint = 0;
 
 bool heater_cycle1_running = false;
 bool heater_cycle2_running = false;
-bool starting_run = true;
+bool starting_sample_prep_run = true;
 bool h_pwm_req = false;
 bool greater_than_max = false;
 bool heater_run = false;
 bool rampToTemp = false;
 int last_motor_speed = 0;
+
+temperature_data_t local_temp_data;
 
 uint32_t samp_log_index = 0;
 uint32_t samp_log_max = 0;
@@ -147,6 +149,7 @@ void handle_cycle1_stopstart_heater(bool heating) {
 }
 
 void samplePrepResetHeaterPIDs(void) {
+#ifdef SAMPLE_PREP_BOARD
   int pid_max = DEFAULT_MAX_HEATER_PID;
 
   if (!use_default_configuration_parameters) {
@@ -182,44 +185,46 @@ void samplePrepResetHeaterPIDs(void) {
   } else {
     pid_controller_init(&motor_pid_2, config.motor_setpoint_2, config.motor_kp_2, config.motor_ki_2, config.motor_kd_2, MAX_MOTOR_PID);
   }
+  #endif
 }
 
 void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
+#ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
-
+  local_temp_data = temperature_data;
   // Ensure temperatures are below the minimum run zone temperature
   if (config.min_run_zone_temp_en) {
-    if (starting_run &&
+    if (starting_sample_prep_run &&
         (temperature_data.valve_zone_temp > config.min_run_zone_temp || // TODO: Implement defaults
             temperature_data.amp0_zone_temp > config.min_run_zone_temp ||
             temperature_data.amp1_zone_temp > config.min_run_zone_temp ||
             temperature_data.amp2_zone_temp > config.min_run_zone_temp)) {
-      starting_run = false;
+      starting_sample_prep_run = false;
       // Send cannot start
-      xReturned = xQueueSend(main_runRespQueue, &starting_run, 0);
+      xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
       if (xReturned != pdPASS) {
         printf("HEATER_TASK: Unable to send cannot start run response.\n");
       }
       return;
-    } else if (starting_run &&
+    } else if (starting_sample_prep_run &&
                (temperature_data.valve_zone_temp <= config.min_run_zone_temp && // TODO: Implement defaults
                    temperature_data.amp0_zone_temp <= config.min_run_zone_temp &&
                    temperature_data.amp1_zone_temp <= config.min_run_zone_temp &&
                    temperature_data.amp2_zone_temp <= config.min_run_zone_temp)) {
       // Send can start
-      xReturned = xQueueSend(main_runRespQueue, &starting_run, 0);
+      xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
       if (xReturned != pdPASS) {
         printf("HEATER_TASK: Unable to send cannot start run response.\n");
       }
-      starting_run = false;
+      starting_sample_prep_run = false;
     }
-  } else if (!config.min_run_zone_temp_en && starting_run) {
+  } else if (!config.min_run_zone_temp_en && starting_sample_prep_run) {
     // Send can start
-    xReturned = xQueueSend(main_runRespQueue, &starting_run, 0);
+    xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
     if (xReturned != pdPASS) {
       printf("HEATER_TASK: Unable to send cannot start run response.\n");
     }
-    starting_run = false;
+    starting_sample_prep_run = false;
   }
 
   // Update PID and PWM
@@ -322,9 +327,11 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
       printf("SENSORS_TASK: Unable to send log message to logger_logMessageQueue.\n");
     }
   }
+  #endif
 }
 
 void handleSampleMotorDataRx(int motor_speed) {
+#ifdef SAMPLE_PREP_BOARD
   if (heater_cycle1_running) {
     temperature_pwm_data_t pwmData = {
         .valve_zone_pwm = 0,
@@ -358,9 +365,11 @@ void handleSampleMotorDataRx(int motor_speed) {
 
     updateDutyCycles(pwmData);
   }
+  #endif
 }
 
 void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
+#ifdef SAMPLE_PREP_BOARD
   // Set zones enabled
   if (heaterRxMessage.zoneSelect == AMPLIFICATION) {
     heater_cycle1_running = heaterRxMessage.zoneEnabled;
@@ -377,10 +386,10 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
 
       // Send stop heater to sensors task
       heater_run = false;
-      starting_run = false;
+      starting_sample_prep_run = false;
       handle_cycle1_stopstart_heater(heater_run);
     } else {
-      starting_run = true;
+      starting_sample_prep_run = true;
       heater_run = true;
       samplePrepResetHeaterPIDs();
       // Send starting heater to sensors task
@@ -408,6 +417,7 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
       handle_cycle2_stopstart_heater(heater_run);
     }
   }
+  #endif
 }
 
 temperature_pwm_data_t getSamplePrepPwmData(void) {
@@ -416,6 +426,10 @@ temperature_pwm_data_t getSamplePrepPwmData(void) {
 
 bool getSamplePrepOverTempStatus(void) {
   return greater_than_max;
+}
+
+temperature_data_t getSamplePrepOverTempData(void) {
+  return local_temp_data;
 }
 
 bool getSamplePrepHeaterRunningStatus(void) {

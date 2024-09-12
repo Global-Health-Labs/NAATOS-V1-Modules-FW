@@ -1,18 +1,18 @@
 #include "naatos_messages.h"
 // Zone Request Constants
-const HeaterRxQueueMsg_t run_amplification_zone = {
+const HeaterRxQueueMsg_t run_cycle_one_zone_heating = {
     .type = HEATER_MSG_ZONE_STATE,
     .zoneSelect = AMPLIFICATION,
     .zoneEnabled = true};
-const HeaterRxQueueMsg_t run_valve_zone = {
+const HeaterRxQueueMsg_t run_cycle_two_zone_heating = {
     .type = HEATER_MSG_ZONE_STATE,
     .zoneSelect = VALVE,
     .zoneEnabled = true};
-const HeaterRxQueueMsg_t stop_amplification_zone = {
+const HeaterRxQueueMsg_t stop_cycle_one_zone_heating = {
     .type = HEATER_MSG_ZONE_STATE,
     .zoneSelect = AMPLIFICATION,
     .zoneEnabled = false};
-const HeaterRxQueueMsg_t stop_valve_zone = {
+const HeaterRxQueueMsg_t stop_cycle_zone_heating = {
     .type = HEATER_MSG_ZONE_STATE,
     .zoneSelect = VALVE,
     .zoneEnabled = false};
