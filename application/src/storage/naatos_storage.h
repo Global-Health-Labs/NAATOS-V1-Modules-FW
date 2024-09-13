@@ -1,25 +1,20 @@
-#ifndef SD_CARD_H
-#define SD_CARD_H
+#pragma once
 
-#include <string.h>
+/* This file will contain the shared storage elements between the SD card
+ * and the nor flash. It can also be used to set which interface should be
+ * used for storage.
+*/
 
-#include "bsp.h"
-#include "diskio_blkdev.h"
-#include "ff.h"
-#include "nrf.h"
+#include "sd_card.h"
+#include "nor_flash.h"
+#include "../naatos_config.h"
 
-#include "nrf_block_dev.h"
-#include "nrf_block_dev_empty.h"
-#include "nrf_block_dev_qspi.h"
-#include "nrf_block_dev_ram.h"
-#include "nrf_block_dev_sdc.h"
+#define USE_SD_CARD     0
+#define USE_NOR_FLASH   1
 
-#include "nrf_log.h"
-#include "nrf_log_ctrl.h"
-#include "nrf_log_default_backends.h"
-
-#include "heater/heater.h"
-#include "naatos_config.h"
+#if (!USE_SD_CARD && !USE_NOR_FLASH)
+#warning One storage peripheral must be used!
+#endif
 
 #define LOGS_DIR "logs"
 #define CONFIG_DIR "config"
@@ -34,16 +29,15 @@
 #define CSV_HEADER_SIZE 86
 #endif
 
-/* SDC block device definition */
-NRF_BLOCK_DEV_SDC_DEFINE(
-    m_block_dev_sdc,
-    NRF_BLOCK_DEV_SDC_CONFIG(
-        SDC_SECTOR_SIZE,
-        APP_SDCARD_CONFIG(SPI_MOSI_PIN, SPI_MISO_PIN, SPI_SCK_PIN, SPI_SD_SS_PIN)),
-    NFR_BLOCK_DEV_INFO_CONFIG("NAATOS", "SDC", "1.00"));
-
+#if USE_SD_CARD
 #define BLOCKDEV_LIST() ( \
     NRF_BLOCKDEV_BASE_ADDR(m_block_dev_sdc, block_dev))
+#endif 
+
+#if USE_NOR_FLASH
+#define BLOCKDEV_LIST() ( \
+    NRF_BLOCKDEV_BASE_ADDR(m_block_dev_qspi, block_dev))
+#endif
 
 #ifndef SAMPLE_PREP_BOARD
 typedef enum {
@@ -155,20 +149,16 @@ typedef struct {
   bool config_dir_needed;
 } directories_needed_t;
 
-extern bool sd_card_inited;
-
-void init_sd_card(void);
-void uninit_sd_card(void);
-void sd_card_list_contents(void);
+// NAATOS Storage Functions
+void init_naatos_storage(void);
+void uninit_naatos_storage(void);
+void mount_storage(void);
+void unmount_storage(void);
 void create_naatos_directories(void);
-FRESULT sd_card_create_log_file(const char *file_name);
-FRESULT sd_card_mount(void);
-FRESULT sd_card_unmount(void);
-FRESULT sd_card_write_log_line(const char *logName, const char *writeBuff, uint32_t writeBuffSize);
-FRESULT sd_card_reset_set_time_date(void);
+FRESULT check_for_config_file(void);
 FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters);
+FRESULT reset_set_time_date(void);
 
+// Parse Helpers
 double parse_double(const char *str, double default_value);
 int parse_int(const char *str, int default_value);
-
-#endif

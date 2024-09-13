@@ -18,19 +18,6 @@
 #include "../heater/heater.h"
 #include "../naatos_config.h"
 
-#define LOGS_DIR "logs"
-#define CONFIG_DIR "config"
-
-#define NAATOS_CONFIG_FILE "config_v2.0a.txt"
-
-#ifdef SAMPLE_PREP_BOARD
-#define CSV_HEADER "Time,HeaterTemp,HeaterPWM,MotorSpeed,MotorPWM,Battery,Event\r\n"
-#define CSV_HEADER_SIZE 61
-#else
-#define CSV_HEADER "Time,ValveTemp,ValvePWM,Amp0Temp,Amp0PWM,Amp1Temp,Amp1PWM,Amp2Temp,Amp2PWM,Batt,Event\r\n"
-#define CSV_HEADER_SIZE 86
-#endif
-
 /**
  * @brief  QSPI block device definition
  */
@@ -41,5 +28,12 @@ NRF_BLOCK_DEV_QSPI_DEFINE(
         NRF_BLOCK_DEV_QSPI_FLAG_CACHE_WRITEBACK,
         NRF_DRV_QSPI_DEFAULT_CONFIG),
     NFR_BLOCK_DEV_INFO_CONFIG("Nordic", "QSPI", "1.00"));
+
+extern bool nor_flash_inited;
+
+void init_nor_flash(void);
+void uninit_nor_flash(void);
+FRESULT mount_nor_flash(void);
+FRESULT unmount_nor_flash(void);
 
 #endif

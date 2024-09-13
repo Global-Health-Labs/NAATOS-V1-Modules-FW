@@ -37,9 +37,6 @@
 #define USB_TASK_DELAY pdMS_TO_TICKS(10)
 #define USB__TASK_DELAY pdMS_TO_TICKS(100)
 
-// SD card enable/disable
-#define USE_SD_CARD 1
-
 // CDC ACM Defines
 #define CDC_ACM_COMM_INTERFACE 1
 #define CDC_ACM_COMM_EPIN NRF_DRV_USBD_EPIN2
