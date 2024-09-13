@@ -30,7 +30,7 @@ SDK Version: 17.1
 #include "nordic_common.h"
 #include "nrf_drv_clock.h"
 #include "pid.h"
-#include "storage/sd_card.h"
+#include "storage/naatos_storage.h"
 #include "sdk_errors.h"
 #include "sensors.h"
 #include "spi.h"
@@ -289,7 +289,7 @@ void main_task(void *pvParameters) {
         }
         if (config.set_date_time) {
           calendar_set_time_helper();
-          sd_card_reset_set_time_date();
+          reset_set_time_date();
         }
 
         updateLedState(LED_WAKEUP, true);

@@ -1,5 +1,13 @@
 #include "naatos_storage.h"
 
+/* Storage Variables */
+static FIL file;
+static DIR dir;
+static FILINFO fno;
+uint32_t b_written;
+
+bool naatos_storage_initalized = false;
+
 // Initalizes either the SD Card or NOR Flash storage
 void init_naatos_storage(void) {
 #if USE_SD_CARD
@@ -10,6 +18,8 @@ void init_naatos_storage(void) {
 
   // Create directories if needed
   create_naatos_directories();
+  // Set storage initalized to true
+  naatos_storage_initalized = true;
 }
 
 // Uninitalizes either the SD Card or the NOR Flash storage
@@ -19,6 +29,8 @@ void uninit_naatos_storage(void) {
 #elif USE_NOR_FLASH
   uninit_nor_flash();
 #endif
+  // Set storage initalized to false
+  naatos_storage_initalized = false;
 }
 
 // Mount SD Card or NOR Flash Storage
@@ -65,6 +77,100 @@ void create_naatos_directories() {
     printf("New config.txt config file in config subdirectory created with default parameters.\n");
   } else if (res != FR_EXIST) {
     printf("Unable to retreive config.txt from sd card.\n");
+  }
+}
+
+// Create a new file under the log subdirectory ** NO NAMES WITH : ALLOWED **
+FRESULT create_log_file(const char *file_name) {
+  FRESULT res;
+
+  // Go to the logs directory
+  res = remount_goto_logs_dir();
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Make the log file
+  res = f_open(&file, file_name, FA_CREATE_NEW | FA_WRITE);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Write the csv header to the file
+  res = f_write(&file, CSV_HEADER, CSV_HEADER_SIZE, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Close the file
+  res = f_close(&file);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Change back directories
+  res = f_chdir("..");
+  if (res != FR_OK) {
+    return res;
+  }
+
+  return res;
+}
+
+// Write a line to the log file
+FRESULT write_log_line(const char *logName, const char *writeBuff, uint32_t writeBuffSize) {
+  FRESULT res;
+  uint32_t b_written;
+
+  // Go to the logs directory
+  res = remount_goto_logs_dir();
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Open the log file
+  res = f_open(&file, logName, FA_WRITE | FA_OPEN_APPEND);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Write the given line
+  res = f_write(&file, writeBuff, writeBuffSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Close the file
+  res = f_close(&file);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Change back directories
+  res = f_chdir("..");
+  if (res != FR_OK) {
+    return res;
+  }
+
+  return res;
+}
+
+FRESULT remount_goto_logs_dir(void) {
+  FRESULT res;
+
+  // Re-Mount Storage
+  mount_storage();
+
+  // Open root directory
+  res = f_opendir(&dir, "/");
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Change directory into logs
+  res = f_chdir(LOGS_DIR);
+  if (res != FR_OK) {
+    return res;
   }
 }
 

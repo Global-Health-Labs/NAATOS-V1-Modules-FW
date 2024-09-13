@@ -10,7 +10,7 @@
 #include "naatos_config.h"
 #include "nrf_drv_power.h"
 #include "nrf_drv_usbd.h"
-#include "storage/sd_card.h"
+#include "storage/naatos_storage.h"
 #include "timers.h"
 #include "semphr.h"
 
@@ -318,8 +318,8 @@ void usb_suspend_conflicting_tasks(void) {
 void start_usb(bool cdc_acm, bool msc) {
   ret_code_t ret;
 
-  if (sd_card_inited && msc) {
-    uninit_sd_card();
+  if (naatos_storage_initalized && msc) {
+    uninit_naatos_storage();
   }
 
   static const app_usbd_config_t usbd_config = {
@@ -372,7 +372,7 @@ void restart_usb_only_cdc_acm(void) {
   printf("USB: Restarting USB to only have Virtual COM Port.\n");
   app_usbd_stop();
   //app_usbd_ep_disable(ENDPOINT_LIST());
-  init_sd_card();
+  init_naatos_storage();
 
   //usb_done_config = false;
   usb_started = false;

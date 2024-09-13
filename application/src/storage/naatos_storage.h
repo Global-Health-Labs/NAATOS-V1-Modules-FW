@@ -149,6 +149,8 @@ typedef struct {
   bool config_dir_needed;
 } directories_needed_t;
 
+extern bool naatos_storage_initalized;
+
 // NAATOS Storage Functions
 void init_naatos_storage(void);
 void uninit_naatos_storage(void);
@@ -158,6 +160,9 @@ void create_naatos_directories(void);
 FRESULT check_for_config_file(void);
 FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters);
 FRESULT reset_set_time_date(void);
+FRESULT create_log_file(const char *file_name);
+FRESULT write_log_line(const char *logName, const char *writeBuff, uint32_t writeBuffSize);
+FRESULT remount_goto_logs_dir(void);
 
 // Parse Helpers
 double parse_double(const char *str, double default_value);

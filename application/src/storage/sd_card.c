@@ -5,15 +5,11 @@
 
 /* SD Card Variables */
 static FATFS fs;
-static DIR dir;
-static FILINFO fno;
-static FIL file;
-uint32_t bytes_written;
-FRESULT ff_result;
-DSTATUS disk_state = STA_NOINIT;
-uint32_t blocks_per_mb;
-uint32_t capacity;
-uint32_t b_written;
+uint32_t sd_bytes_written;
+FRESULT sd_ff_result;
+DSTATUS sd_disk_state = STA_NOINIT;
+uint32_t sd_blocks_per_mb;
+uint32_t sd_capacity;
 
 bool sd_card_inited = false;
 
@@ -41,7 +37,7 @@ void init_sd_card(void) {
       NRF_GPIO_PIN_H0H1, // Require High Drive low/high level
       NRF_GPIO_PIN_NOSENSE);
 
-  disk_state = STA_NOINIT;
+  sd_disk_state = STA_NOINIT;
 
   memset(&fs, 0, sizeof(FATFS));
 
@@ -49,22 +45,22 @@ void init_sd_card(void) {
   diskio_blockdev_register(drives, ARRAY_SIZE(drives));
 
   // Initalize the disk on the SD
-  for (uint32_t retries = 3; retries && disk_state; --retries) {
-    disk_state = disk_initialize(0);
+  for (uint32_t retries = 3; retries && sd_disk_state; --retries) {
+    sd_disk_state = disk_initialize(0);
   }
-  if (disk_state) {
+  if (sd_disk_state) {
     printf("SD Card initialization failed.\n");
     return;
   }
 
   // Get SD Card Specifications
-  blocks_per_mb = (1024uL * 1024uL) / m_block_dev_sdc.block_dev.p_ops->geometry(&m_block_dev_sdc.block_dev)->blk_size;
-  capacity = m_block_dev_sdc.block_dev.p_ops->geometry(&m_block_dev_sdc.block_dev)->blk_count / blocks_per_mb;
-  printf("Capactity: %d MB\n", capacity);
+  sd_blocks_per_mb = (1024uL * 1024uL) / m_block_dev_sdc.block_dev.p_ops->geometry(&m_block_dev_sdc.block_dev)->blk_size;
+  sd_capacity = m_block_dev_sdc.block_dev.p_ops->geometry(&m_block_dev_sdc.block_dev)->blk_count / sd_blocks_per_mb;
+  printf("Capactity: %d MB\n", sd_capacity);
 
   // Mount SD Card
-  ff_result = sd_card_mount();
-  if (ff_result != FR_OK) {
+  sd_ff_result = sd_card_mount();
+  if (sd_ff_result != FR_OK) {
     printf("Unable to mount SD Card!\n");
   }
 
@@ -72,7 +68,7 @@ void init_sd_card(void) {
 }
 
 void uninit_sd_card(void) {
-  disk_state = 0;
+  sd_disk_state = 0;
 
   UNUSED_RETURN_VALUE(sd_card_unmount());
   UNUSED_RETURN_VALUE(disk_uninitialize(0));
@@ -91,82 +87,8 @@ FRESULT sd_card_unmount(void) {
   return f_mount(0, "", 0);
 }
 
-// Create a new file under the log subdirectory ** NO NAMES WITH : ALLOWED **
-FRESULT sd_card_create_log_file(const char *file_name) {
-  FRESULT res;
-
-  // Go to the logs directory
-  res = remount_goto_logs_dir();
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Make the log file
-  res = f_open(&file, file_name, FA_CREATE_NEW | FA_WRITE);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write the csv header to the file
-  res = f_write(&file, CSV_HEADER, CSV_HEADER_SIZE, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Close the file
-  res = f_close(&file);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Change back directories
-  res = f_chdir("..");
-  if (res != FR_OK) {
-    return res;
-  }
-
-  return res;
-}
-
-// Write a line to the log file on the SD card
-FRESULT sd_card_write_log_line(const char *logName, const char *writeBuff, uint32_t writeBuffSize) {
-  FRESULT res;
-  uint32_t b_written;
-
-  // Go to the logs directory
-  res = remount_goto_logs_dir();
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Open the log file
-  res = f_open(&file, logName, FA_WRITE | FA_OPEN_APPEND);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write the given line
-  res = f_write(&file, writeBuff, writeBuffSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Close the file
-  res = f_close(&file);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Change back directories
-  res = f_chdir("..");
-  if (res != FR_OK) {
-    return res;
-  }
-
-  return res;
-}
-
 // Prints directories seen on the sd card -- Was used during debug of sd card, only prints directories and files at root
+/* Depreciated, keeping in here incase we want to be able to list contents of the file system in the future.
 void sd_card_list_contents(void) {
   printf("\r\n Listing directory: /\n");
   // Open Root Directory
@@ -193,26 +115,4 @@ void sd_card_list_contents(void) {
     }
   } while (fno.fname[0]);
 }
-
-FRESULT remount_goto_logs_dir(void) {
-  FRESULT res;
-
-  // Re-Mount SD Card
-  res = sd_card_mount();
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Open root directory
-  res = f_opendir(&dir, "/");
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Change directory into logs
-  res = f_chdir(LOGS_DIR);
-  if (res != FR_OK) {
-    return res;
-  }
-}
-
+*/

@@ -7,13 +7,11 @@
 static FATFS fs;
 static DIR dir;
 static FILINFO fno;
-static FIL file;
 uint32_t bytes_written;
 FRESULT ff_result;
 DSTATUS disk_state = STA_NOINIT;
 uint32_t blocks_per_mb;
 uint32_t capacity;
-uint32_t b_written;
 
 bool nor_flash_inited = false;
 
@@ -32,7 +30,7 @@ void init_nor_flash(void) {
   disk_state = disk_initialize(0);
   if (disk_state) {
       printf("Disk initialization failed.");
-      return false;
+      return;
   }
 
   // Mount the NOR Flash Volume

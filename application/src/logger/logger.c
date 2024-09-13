@@ -90,7 +90,7 @@ void logger_task(void *pvParameters) {
       // Create Log File based on the UTC Time of the Sample preparation
       getLogFileName(logFileName);
       //loggerInterface->getLogFileName(logFileName);
-      res = sd_card_create_log_file(logFileName);
+      res = create_log_file(logFileName);
       if (res == FR_EXIST) {
         printf("LOG_TASK: Warning! Log file with name already exist, will be overwritting that file.\n");
       } else if (res != FR_OK) {
@@ -114,7 +114,7 @@ void logger_task(void *pvParameters) {
       // Check UART Only
       if (!uart_only) {
         // Write to sample log file
-        FRESULT res = sd_card_write_log_line(logFileName, logFileLine, logFileLineSize);
+        FRESULT res = write_log_line(logFileName, logFileLine, logFileLineSize);
         if (res != FR_OK) {
           printf("LOG_TASK: Unable to write last log line!\n");
         }
@@ -151,7 +151,7 @@ void logger_task(void *pvParameters) {
       // Check UART Only
       if (!uart_only) {
         // Write to sample log file
-        FRESULT res = sd_card_write_log_line(logFileName, logFileLine, logFileLineSize);
+        FRESULT res = write_log_line(logFileName, logFileLine, logFileLineSize);
         if (res != FR_OK) {
           printf("LOG_TASK: Unable to write last log line!\n");
         }
