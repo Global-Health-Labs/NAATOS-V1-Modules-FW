@@ -426,7 +426,7 @@ typedef struct {
 
 typedef struct {
   event_t event;
-  char *message;
+  char message[256];
 } log_event_t;
 
 typedef enum {
