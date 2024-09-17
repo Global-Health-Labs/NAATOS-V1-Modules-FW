@@ -40,7 +40,7 @@ static log_data_message_t logMsg = {
 void handle_cycle2_stopstart_heater(bool heating) {
   BaseType_t xReturned;
 
-  // Handle case where amplification zone is on already, dont want to send stop
+  // Handle case where cycle one is already running, dont want to send stop
   if (heater_cycle1_running && !heating)
     return;
 
@@ -229,7 +229,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
   // Update PID and PWM
   if (heater_cycle1_running) {
-    // Update Amplification 2 PID loop with new temperatures
+    // Update Heater Zone 3 PID loop with new temperatures
     if (config.run_heater_1) {
       pid_controller_compute(&heater_pid_1, temperature_data.heat_zone_3_temp);
       if (rampToTemp && (temperature_data.heat_zone_3_temp >= heater1SetPoint)) {
@@ -248,16 +248,16 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
         .heat_zone_2_pwm = 0,
         .heat_zone_3_pwm = 0};
 
-    // Update Amplification 2 PWM with PID output
+    // Update Heater Zone 3 PWM with PID output
     h_pwm_data.heat_zone_0_pwm = pwmData.heat_zone_0_pwm;
     h_pwm_data.heat_zone_1_pwm = pwmData.heat_zone_1_pwm;
-    // Dont want Amp1, its from the motor task
+    // Dont Heater Zone 2, its from the motor task
     h_pwm_data.heat_zone_3_pwm = pwmData.heat_zone_3_pwm;
 
     updateDutyCycles(h_pwm_data);
 
     char tmp[150];
-    sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %d,%d,%d,%d\r\n", 
+    sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f\r\n", 
                   temperature_data.heat_zone_0_temp, temperature_data.heat_zone_1_temp, temperature_data.heat_zone_2_temp, temperature_data.heat_zone_3_temp, 
                   h_pwm_data.heat_zone_0_pwm, h_pwm_data.heat_zone_1_pwm, h_pwm_data.heat_zone_2_pwm, h_pwm_data.heat_zone_3_pwm);
     printf(tmp);
@@ -268,7 +268,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   }
 
   if (heater_cycle2_running) { //AMP 1 will be used for motor
-    // Update Amplification 2 PID loop with new temperatures
+    // Update Heater Zone 3 PID loop with new temperatures
     if (config.run_heater_2) {
       pid_controller_compute(&heater_pid_2, temperature_data.heat_zone_3_temp);
       if (rampToTemp && (temperature_data.heat_zone_3_temp >= heater2SetPoint)) {
@@ -293,7 +293,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     updateDutyCycles(h_pwm_data);
 
     char tmp[150];
-    sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %d,%d,%d,%d\r\n", 
+    sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f\r\n", 
                   temperature_data.heat_zone_0_temp, temperature_data.heat_zone_1_temp, temperature_data.heat_zone_2_temp, temperature_data.heat_zone_3_temp, 
                   h_pwm_data.heat_zone_0_pwm, h_pwm_data.heat_zone_1_pwm, h_pwm_data.heat_zone_2_pwm, h_pwm_data.heat_zone_3_pwm);
     printf(tmp);
@@ -384,8 +384,8 @@ void handleSampleMotorDataRx(int motor_speed) {
 void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
 #ifdef SAMPLE_PREP_BOARD
   // Set zones enabled
-  if (heaterRxMessage.zoneSelect == AMPLIFICATION) {
-    heater_cycle1_running = heaterRxMessage.zoneEnabled;
+  if (heaterRxMessage.cycleSelect == CYCLE_ONE) {
+    heater_cycle1_running = heaterRxMessage.cycleEnabled;
     rampToTemp = config.ramp_to_temp_before_start_cycle_1;
     if (!heater_cycle1_running) { //AMP2 will be used in sample prep for heating
       heater_pid_1.out = 0;
@@ -408,8 +408,8 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
       // Send starting heater to sensors task
       handle_cycle1_stopstart_heater(heater_run);
     }
-  } else if (heaterRxMessage.zoneSelect = VALVE) {
-    heater_cycle2_running = heaterRxMessage.zoneEnabled;
+  } else if (heaterRxMessage.cycleSelect = CYCLE_TWO) {
+    heater_cycle2_running = heaterRxMessage.cycleEnabled;
     rampToTemp = config.ramp_to_temp_before_start_cycle_2;
     if (!heater_cycle2_running) {
       heater_pid_2.out = 0;

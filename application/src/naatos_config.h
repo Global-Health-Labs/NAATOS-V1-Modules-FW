@@ -141,10 +141,10 @@
 #define STOP_EVENT_MSG "Sample Preperation Completed."
 #define INTERRUPT_HAL_EVENT_MSG "Sample Preperation Interrupted. Cover Removed."
 #define INTERRUPT_OPT_EVENT_MSG "Sample Preperation Interrupted. Sample Removed."
-#define AMP_START_MSG "Cycle 1 Heating Started."
-#define AMP_END_MSG "Cycle 1 Heating Stopped."
-#define VALV_START_MSG "Cycle 2 Heating Started."
-#define VALV_STOP_MSG "Cycle 2 Heating Stopped."
+#define CYCLE_ONE_START_MSG "Cycle 1 Heating Started."
+#define CYCLE_ONE_END_MSG "Cycle 1 Heating Stopped."
+#define CYCLE_TWO_START_MSG "Cycle 2 Heating Started."
+#define CYCLE_TWO_STOP_MSG "Cycle 2 Heating Stopped."
 #define TEMPS_NOT_STABLE "Zone Temperatures are not below the minimum run temperature. Aborting run."
 #define RECOVERY_BATT "Battery Percentage lower than the recovery threshold. Charge Battery!: "
 #define OVER_TEMP_MSG "A Zone went over its maximum temperature. Run stopped."
@@ -186,11 +186,11 @@ typedef enum {
   NOT_CHARGING
 } charge_state_t;
 
-// Zone Identification Enum
+// Cycle Identification Enum
 typedef enum {
-  AMPLIFICATION,
-  VALVE
-} zone_t;
+  CYCLE_ONE,
+  CYCLE_TWO
+} cycle_t;
 
 // Type of update message being sent to usb queue
 typedef enum {
@@ -204,10 +204,10 @@ typedef enum {
   SAMPLE_INTERRUPTED,
   SAMPLE_BUTTON_CANCEL,
   SAMPLE_HAL_CANCEL,
-  SAMPLE_AMP_STARTED,
-  SAMPLE_AMP_ENDED,
-  SAMPLE_VALV_STARTED,
-  SAMPLE_VALV_ENDED,
+  SAMPLE_CYCLE_ONE_STARTED,
+  SAMPLE_CYCLE_ONE_ENDED,
+  SAMPLE_CYCLE_TWO_STARTED,
+  SAMPLE_CYCLE_TWO_ENDED,
   SAMPLE_TEMPS_NOT_STABALIZED,
   SAMPLE_RECOVERY_BATT,
   SAMPLE_OVER_TEMP,
@@ -417,9 +417,9 @@ typedef enum {
 
 typedef struct {
   HeaterRxQueueType_t type;
-  zone_t zoneSelect;
+  cycle_t cycleSelect;
   temperature_data_t tempData;
-  bool zoneEnabled;
+  bool cycleEnabled;
   bool usbSuspend;
   bool heaterRunning;
   double motorSpeed;

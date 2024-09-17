@@ -419,8 +419,8 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
 void handle_exit_notifications(void) {
   log_event_t exit_event_info = {
-      .event = SAMPLE_AMP_ENDED,
-      .message = AMP_END_MSG};
+      .event = SAMPLE_CYCLE_ONE_ENDED,
+      .message = CYCLE_ONE_END_MSG};
 
   log_data_message_t exit_log_message = {
       .data_type = EVENT_DATA,
@@ -514,12 +514,12 @@ bool begin_cycle_1(void) {
   bool start_run = false;
   // Send start zone request
 
-  xRet = xQueueSend(heaterRxQueue, &run_cycle_two_zone_heating, 0);
+  xRet = xQueueSend(heaterRxQueue, &run_cycle_one_zone_heating, 0);
   if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send run amplification zone request.\n");
   }
   // Send Start Amplification Event to logging task
-  xRet = xQueueSend(logger_logMessageQueue, &amplification_start_log_msg, 0);
+  xRet = xQueueSend(logger_logMessageQueue, &cycle_one_start_log_msg, 0);
   if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
   }
@@ -546,7 +546,7 @@ void begin_cycle_2(void) {
     printf("MAIN_TASK: Unable to send run valve zone request.\n");
   }
   // Send Start Valve Event to logging task
-  xRet = xQueueSend(logger_logMessageQueue, &valve_start_log_msg, 0);
+  xRet = xQueueSend(logger_logMessageQueue, &cycle_two_start_log_msg, 0);
   if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send start valve zone event to logging task.\n");
   }
@@ -566,7 +566,7 @@ void end_cycle_1(void) {
     printf("MAIN_TASK: Unable to send stop amplification zone request.\n");
   }
   // Send stop amplification Event to logging task
-  xRet = xQueueSend(logger_logMessageQueue, &amplification_stop_log_msg, 50);
+  xRet = xQueueSend(logger_logMessageQueue, &cycle_one_stop_log_msg, 50);
   if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send stop amplification zone event to logging task.\n");
   }
@@ -586,7 +586,7 @@ void end_cycle_2(void) {
     printf("MAIN_TASK: Unable to send stop valve zone request.\n");
   }
   // Send stop valve Event to logging task
-  xRet = xQueueSend(logger_logMessageQueue, &valve_stop_log_msg, 0);
+  xRet = xQueueSend(logger_logMessageQueue, &cycle_two_stop_log_msg, 0);
   if (xRet != pdPASS) {
     printf("MAIN_TASK: Unable to send stop valve zone event to logging task.\n");
   }

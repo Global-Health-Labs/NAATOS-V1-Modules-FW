@@ -135,7 +135,7 @@ void logger_task(void *pvParameters) {
       last_temp_message.event_data = rxLogMsg.event_data;
 
       logFileLineSize = loggerInterface->constructEventDataLogLine(logFileLine, time, last_temp_message, batteryPercent);
-      if (rxLogMsg.event_data.event == SAMPLE_VALV_ENDED ||
+      if (rxLogMsg.event_data.event == SAMPLE_CYCLE_TWO_ENDED ||
           rxLogMsg.event_data.event == SAMPLE_INTERRUPTED ||
           rxLogMsg.event_data.event == SAMPLE_TEMPS_NOT_STABALIZED ||
           rxLogMsg.event_data.event == SAMPLE_RECOVERY_BATT ||
