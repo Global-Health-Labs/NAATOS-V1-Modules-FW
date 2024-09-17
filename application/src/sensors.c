@@ -7,20 +7,20 @@ void sensorCollection(void);
 
 sensor_switches_t switches;
 temperature_data_t temperatures = {
-    .amp0_zone_pwm = 0,
-    .amp0_zone_temp = 0,
-    .amp1_zone_pwm = 0,
-    .amp1_zone_temp = 0,
-    .amp2_zone_pwm = 0,
-    .amp2_zone_temp = 0,
-    .valve_zone_pwm = 0,
-    .valve_zone_temp = 0};
+    .heat_zone_0_pwm = 0,
+    .heat_zone_0_temp = 0,
+    .heat_zone_1_pwm = 0,
+    .heat_zone_1_temp = 0,
+    .heat_zone_2_pwm = 0,
+    .heat_zone_2_temp = 0,
+    .heat_zone_3_pwm = 0,
+    .heat_zone_3_temp = 0};
 
 temperature_pwm_data_t pwm_data = {
-    .valve_zone_pwm = 0,
-    .amp0_zone_pwm = 0,
-    .amp1_zone_pwm = 0,
-    .amp2_zone_pwm = 0};
+    .heat_zone_0_pwm = 0,
+    .heat_zone_1_pwm = 0,
+    .heat_zone_2_pwm = 0,
+    .heat_zone_3_pwm = 0};
 
 static const nrf_drv_timer_t *p_counter1;
 static uint32_t motor_speed_read_t1 = 0;
@@ -353,26 +353,26 @@ void runPowerModuleSensorCollection(void) {
   if (heaterRunning) {
     bool readTempSuccess = false;
     heaterMsg.readTempFailed = false;
-    // I2C Read for Valve Zone
-    readTempSuccess = readTemp(valve_zone, &temperatures.valve_zone_temp);
+    // I2C Read for Heater Zone 0
+    readTempSuccess = readTemp(valve_zone, &temperatures.heat_zone_0_temp);
     if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }
 
-    // I2C Read for Amplification Zone 0
-    readTempSuccess = readTemp(amp_zone_0, &temperatures.amp0_zone_temp);
+    // I2C Read for Heater Zone 1
+    readTempSuccess = readTemp(amp_zone_0, &temperatures.heat_zone_1_temp);
     if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }
 
-    // I2C Read for Amplification Zone 1
-    readTempSuccess = readTemp(amp_zone_1, &temperatures.amp1_zone_temp);
+    // I2C Read for Heater Zone 2
+    readTempSuccess = readTemp(amp_zone_1, &temperatures.heat_zone_2_temp);
     if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }
 
-    // I2C Read for Amplification Zone 2
-    readTempSuccess = readTemp(amp_zone_2, &temperatures.amp2_zone_temp);
+    // I2C Read for Heater Zone 3
+    readTempSuccess = readTemp(amp_zone_2, &temperatures.heat_zone_3_temp);
     if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }
@@ -409,7 +409,7 @@ void runSamplePrepSensorCollection(void) {
     }
   }
 
-  readTempSuccess = readTemp(amp_zone_2, &temperatures.amp2_zone_temp);
+  readTempSuccess = readTemp(amp_zone_2, &temperatures.heat_zone_3_temp);
   if (!readTempSuccess) {
     heaterMsg.readTempFailed = true;
   }
@@ -421,7 +421,7 @@ void runSamplePrepSensorCollection(void) {
   }
 
   if (heaterRunning) {
-    readTempSuccess = readTemp(amp_zone_2, &temperatures.amp2_zone_temp);
+    readTempSuccess = readTemp(amp_zone_2, &temperatures.heat_zone_3_temp);
     if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }

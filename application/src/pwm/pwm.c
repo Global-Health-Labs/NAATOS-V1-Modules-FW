@@ -69,10 +69,10 @@ void updateDutyCycles(temperature_pwm_data_t pwmData) {
       .type = PWM_MSG_CALLBACK_EVENT};
   BaseType_t xReturned;
 
-  valve_duty = pwmData.valve_zone_pwm;
-  amp0_duty = pwmData.amp0_zone_pwm;
-  amp1_duty = pwmData.amp1_zone_pwm;
-  amp2_duty = pwmData.amp2_zone_pwm;
+  valve_duty = pwmData.heat_zone_0_pwm;
+  amp0_duty = pwmData.heat_zone_1_pwm;
+  amp1_duty = pwmData.heat_zone_2_pwm;
+  amp2_duty = pwmData.heat_zone_3_pwm;
 
   if (valve_duty > 0) {
     valve_zone_active = true;

@@ -243,23 +243,23 @@ typedef struct {
 
 // Temperature Data Struct
 typedef struct {
-  float amp0_zone_temp;
-  float valve_zone_pwm;
-  float amp1_zone_temp;
-  float amp0_zone_pwm;
-  float amp1_zone_pwm;
-  float amp2_zone_temp;
-  float valve_zone_temp;
-  float amp2_zone_pwm;
+  float heat_zone_0_temp;
+  float heat_zone_0_pwm;
+  float heat_zone_1_temp;
+  float heat_zone_1_pwm;
+  float heat_zone_2_temp;
+  float heat_zone_2_pwm;
+  float heat_zone_3_temp;
+  float heat_zone_3_pwm;
   double motorSpeed;
 } temperature_data_t;
 
 // Temperature PWM Data Struct
 typedef struct {
-  float valve_zone_pwm;
-  float amp0_zone_pwm;
-  float amp1_zone_pwm;
-  float amp2_zone_pwm;
+  float heat_zone_0_pwm;
+  float heat_zone_1_pwm;
+  float heat_zone_2_pwm;
+  float heat_zone_3_pwm;
   float sample_prep_heater_pwm;
 } temperature_pwm_data_t;
 

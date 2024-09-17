@@ -1,5 +1,4 @@
-#ifndef NOR_FLASH_H
-#define NOR_FLASH_H
+#pragma once
 
 #include <string.h>
 
@@ -55,7 +54,6 @@ NRF_BLOCK_DEV_QSPI_DEFINE(
      ),
      NFR_BLOCK_DEV_INFO_CONFIG("Nordic", "QSPI", "1.00")
 );
-#endif
 
 extern bool nor_flash_inited;
 
@@ -63,5 +61,3 @@ void init_nor_flash(void);
 void uninit_nor_flash(void);
 FRESULT mount_nor_flash(void);
 FRESULT unmount_nor_flash(void);
-
-#endif

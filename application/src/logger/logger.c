@@ -142,10 +142,10 @@ void logger_task(void *pvParameters) {
           rxLogMsg.event_data.event == SAMPLE_OVER_TEMP) {
 
         //Zero out the last_temp_message elements so that they all start at zero for the next log file
-        last_temp_message.temperature_data.amp2_zone_temp = 0;
-        last_temp_message.temperature_data.amp0_zone_pwm = 0;
+        last_temp_message.temperature_data.heat_zone_3_temp = 0;
+        last_temp_message.temperature_data.heat_zone_1_pwm = 0;
         last_temp_message.temperature_data.motorSpeed = 0;
-        last_temp_message.temperature_data.amp1_zone_pwm = 0;
+        last_temp_message.temperature_data.heat_zone_2_pwm = 0;
       }
 
       // Check UART Only
@@ -185,10 +185,10 @@ void normalize_pwm_data(log_data_message_t *rxLogMsg) {
   //MAX_MOTOR_PID
 
 #ifdef SAMPLE_PREP_BOARD
-  rxLogMsg->temperature_data.amp0_zone_pwm = normalize(rxLogMsg->temperature_data.amp0_zone_pwm, 0, DEFAULT_MAX_HEATER_PID, 0.0, 100.0);
-  rxLogMsg->temperature_data.amp1_zone_pwm = normalize(rxLogMsg->temperature_data.amp1_zone_pwm, 0, MAX_MOTOR_PID, 0.0, 100.0);
-  rxLogMsg->temperature_data.amp2_zone_pwm = normalize(rxLogMsg->temperature_data.amp2_zone_pwm, 0, DEFAULT_MAX_HEATER_PID, 0.0, 100.0);
-  rxLogMsg->temperature_data.valve_zone_pwm = normalize(rxLogMsg->temperature_data.valve_zone_pwm, 0, DEFAULT_MAX_HEATER_PID, 0.0, 100.0);
+  rxLogMsg->temperature_data.heat_zone_0_pwm = normalize(rxLogMsg->temperature_data.heat_zone_0_pwm, 0, DEFAULT_MAX_HEATER_PID, 0.0, 100.0);
+  rxLogMsg->temperature_data.heat_zone_1_pwm = normalize(rxLogMsg->temperature_data.heat_zone_1_pwm, 0, DEFAULT_MAX_HEATER_PID, 0.0, 100.0);
+  rxLogMsg->temperature_data.heat_zone_2_pwm = normalize(rxLogMsg->temperature_data.heat_zone_2_pwm, 0, MAX_MOTOR_PID, 0.0, 100.0);
+  rxLogMsg->temperature_data.heat_zone_3_pwm = normalize(rxLogMsg->temperature_data.heat_zone_3_pwm, 0, DEFAULT_MAX_HEATER_PID, 0.0, 100.0);
 #else
 
 #endif

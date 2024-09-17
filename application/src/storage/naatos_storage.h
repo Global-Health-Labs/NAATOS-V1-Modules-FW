@@ -9,8 +9,8 @@
 #include "nor_flash.h"
 #include "../naatos_config.h"
 
-#define USE_SD_CARD     0
-#define USE_NOR_FLASH   1
+#define USE_SD_CARD     1
+#define USE_NOR_FLASH   0
 
 #if (!USE_SD_CARD && !USE_NOR_FLASH)
 #define USE_NOR_FLASH   1

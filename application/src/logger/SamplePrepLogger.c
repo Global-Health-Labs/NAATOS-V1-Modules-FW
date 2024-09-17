@@ -10,10 +10,10 @@ uint32_t samplePrepConstructSensorDataLogLine(char *logLineBuffer, calendar_time
         time.hour,
         time.minute,
         time.second,
-        log_message.temperature_data.amp2_zone_temp,
-        log_message.temperature_data.amp0_zone_pwm,
+        log_message.temperature_data.heat_zone_3_temp,
+        log_message.temperature_data.heat_zone_1_pwm,
         log_message.temperature_data.motorSpeed,
-        log_message.temperature_data.amp1_zone_pwm,
+        log_message.temperature_data.heat_zone_2_pwm,
         battery_percent);
 
 }
@@ -24,10 +24,10 @@ uint32_t samplePrepConstructEventDataLogLine(char *logLineBuffer, calendar_time_
       time.hour,
       time.minute,
       time.second,
-      log_message.temperature_data.amp2_zone_temp,
-      log_message.temperature_data.amp0_zone_pwm,
+      log_message.temperature_data.heat_zone_3_temp,
+      log_message.temperature_data.heat_zone_1_pwm,
       log_message.temperature_data.motorSpeed,
-      log_message.temperature_data.amp1_zone_pwm,
+      log_message.temperature_data.heat_zone_2_pwm,
       battery_percent,
       log_message.event_data.message);
   return ret;

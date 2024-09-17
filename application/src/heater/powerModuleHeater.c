@@ -12,10 +12,10 @@ pid_controller_t amp1_pid_2;
 pid_controller_t amp2_pid_2;
 
 temperature_pwm_data_t pm_h_pwm_data = {
-    .valve_zone_pwm = 0,
-    .amp0_zone_pwm = 0,
-    .amp1_zone_pwm = 0,
-    .amp2_zone_pwm = 0,
+    .heat_zone_0_pwm = 0,
+    .heat_zone_1_pwm = 0,
+    .heat_zone_2_pwm = 0,
+    .heat_zone_3_pwm = 0,
     .sample_prep_heater_pwm = 0};
 
 bool pm_greater_than_max = false;

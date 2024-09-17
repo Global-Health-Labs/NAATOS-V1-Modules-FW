@@ -451,14 +451,14 @@ void handle_exit_notifications(void) {
     break;
 
   case CYCLE_ERROR_OVER_TEMP:
-    sprintf(exitString, "%s: %d", SAMPLE_OVER_TEMP, over_temp_data.amp0_zone_temp);
+    sprintf(exitString, "%s: %d", SAMPLE_OVER_TEMP, over_temp_data.heat_zone_1_temp);
     exit_event_info.event = SAMPLE_OVER_TEMP;
     exit_event_info.message = exitString;
     exit_log_message.event_data = exit_event_info;
     break;
 
   case CYCLE_ERROR_START_TEMP_TOO_HIGH:
-    sprintf(exitString, "%s: %d", TEMPS_NOT_STABLE, over_temp_data.amp0_zone_temp);
+    sprintf(exitString, "%s: %d", TEMPS_NOT_STABLE, over_temp_data.heat_zone_1_temp);
     exit_event_info.event = SAMPLE_TEMPS_NOT_STABALIZED;
     exit_event_info.message = exitString;
     exit_log_message.event_data = exit_event_info;
