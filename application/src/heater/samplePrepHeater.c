@@ -243,10 +243,10 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
     temperature_pwm_data_t pwmData = {
         .heat_zone_0_pwm = 0,
-        .heat_zone_1_pwm = heater_pid_1.out,
+        .heat_zone_1_pwm = 0,
         .sample_prep_heater_pwm = heater_pid_1.out,
         .heat_zone_2_pwm = 0,
-        .heat_zone_3_pwm = 0};
+        .heat_zone_3_pwm = heater_pid_1.out};
 
     // Update Heater Zone 3 PWM with PID output
     h_pwm_data.heat_zone_0_pwm = pwmData.heat_zone_0_pwm;
@@ -256,11 +256,13 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
     updateDutyCycles(h_pwm_data);
 
+#if VERBOSE_HEATING
     char tmp[150];
     sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f\r\n", 
                   temperature_data.heat_zone_0_temp, temperature_data.heat_zone_1_temp, temperature_data.heat_zone_2_temp, temperature_data.heat_zone_3_temp, 
                   h_pwm_data.heat_zone_0_pwm, h_pwm_data.heat_zone_1_pwm, h_pwm_data.heat_zone_2_pwm, h_pwm_data.heat_zone_3_pwm);
     printf(tmp);
+#endif
 
     if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0 || temperature_data.heat_zone_3_temp > 120) {
       greater_than_max = true;
@@ -282,9 +284,9 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
     temperature_pwm_data_t pwmData = {
         .heat_zone_0_pwm = 0,
-        .heat_zone_1_pwm = heater_pid_2.out,
+        .heat_zone_1_pwm = 0,
         .heat_zone_2_pwm = 0,
-        .heat_zone_3_pwm = 0};
+        .heat_zone_3_pwm = heater_pid_2.out};
 
     h_pwm_data.heat_zone_0_pwm = pwmData.heat_zone_0_pwm;
     h_pwm_data.heat_zone_1_pwm = pwmData.heat_zone_1_pwm;
@@ -292,11 +294,13 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
     updateDutyCycles(h_pwm_data);
 
+#if VERBOSE_HEATING
     char tmp[150];
     sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f\r\n", 
                   temperature_data.heat_zone_0_temp, temperature_data.heat_zone_1_temp, temperature_data.heat_zone_2_temp, temperature_data.heat_zone_3_temp, 
                   h_pwm_data.heat_zone_0_pwm, h_pwm_data.heat_zone_1_pwm, h_pwm_data.heat_zone_2_pwm, h_pwm_data.heat_zone_3_pwm);
     printf(tmp);
+#endif
 
     if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0 || temperature_data.heat_zone_3_temp > 120) {
       greater_than_max = true;

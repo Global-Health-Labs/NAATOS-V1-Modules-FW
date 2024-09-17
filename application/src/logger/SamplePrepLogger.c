@@ -11,7 +11,7 @@ uint32_t samplePrepConstructSensorDataLogLine(char *logLineBuffer, calendar_time
         time.minute,
         time.second,
         log_message.temperature_data.heat_zone_3_temp,
-        log_message.temperature_data.heat_zone_1_pwm,
+        log_message.temperature_data.heat_zone_3_pwm,
         log_message.temperature_data.motorSpeed,
         log_message.temperature_data.heat_zone_2_pwm,
         battery_percent);
@@ -25,7 +25,7 @@ uint32_t samplePrepConstructEventDataLogLine(char *logLineBuffer, calendar_time_
       time.minute,
       time.second,
       log_message.temperature_data.heat_zone_3_temp,
-      log_message.temperature_data.heat_zone_1_pwm,
+      log_message.temperature_data.heat_zone_3_pwm,
       log_message.temperature_data.motorSpeed,
       log_message.temperature_data.heat_zone_2_pwm,
       battery_percent,
