@@ -48,10 +48,18 @@
 #define READ_SIZE 1
 
 // Endpoint list passed to APP_USBD_MSC_GLOBAL_DEF
+#if USE_SD_CARD
 #define ENDPOINT_LIST() APP_USBD_MSC_ENDPOINT_LIST(3, 3)
+#elif USE_NOR_FLASH
+#define ENDPOINT_LIST() APP_USBD_MSC_ENDPOINT_LIST(1, 1)
+#endif
 
 // Mass storage class work buffer size
+#if USE_SD_CARD
 #define MSC_WORKBUFFER_SIZE (2048)
+#elif USE_NOR_FLASH
+#define MSC_WORKBUFFER_SIZE (1024)
+#endif
 
 /* ***** Handlers ***** */
 void cdc_acm_user_ev_handler(app_usbd_class_inst_t const *p_inst,

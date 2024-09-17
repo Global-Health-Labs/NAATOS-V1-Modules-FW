@@ -21,13 +21,41 @@
 /**
  * @brief  QSPI block device definition
  */
+#define EXTERNAL_1G_MEM_CONFIG                                        \
+{                                                                       \
+    .xip_offset  = NRFX_QSPI_CONFIG_XIP_OFFSET,                         \
+    .pins = {                                                           \
+       .sck_pin     = NRFX_QSPI_PIN_SCK,                                \
+       .csn_pin     = NRFX_QSPI_PIN_CSN,                                \
+       .io0_pin     = NRFX_QSPI_PIN_IO0,                                \
+       .io1_pin     = NRFX_QSPI_PIN_IO1,                                \
+       .io2_pin     = NRFX_QSPI_PIN_IO2,                                \
+       .io3_pin     = NRFX_QSPI_PIN_IO3,                                \
+    },                                                                  \
+    .prot_if = {                                                        \
+        .readoc     = (nrf_qspi_readoc_t)NRFX_QSPI_CONFIG_READOC,       \
+        .writeoc    = (nrf_qspi_writeoc_t)NRFX_QSPI_CONFIG_WRITEOC,     \
+        .addrmode   = (nrf_qspi_addrmode_t)NRFX_QSPI_CONFIG_ADDRMODE,   \
+        .dpmconfig  = false,                                            \
+    },                                                                  \
+    .phy_if = {                                                         \
+        .sck_delay  = (uint8_t)NRFX_QSPI_CONFIG_SCK_DELAY,              \
+        .dpmen      = false,                                            \
+        .spi_mode   = (nrf_qspi_spi_mode_t)NRFX_QSPI_CONFIG_MODE,       \
+        .sck_freq   = (nrf_qspi_frequency_t)NRFX_QSPI_CONFIG_FREQUENCY, \
+    },                                                                  \
+    .irq_priority   = (uint8_t)NRFX_QSPI_CONFIG_IRQ_PRIORITY,           \
+}
 NRF_BLOCK_DEV_QSPI_DEFINE(
     m_block_dev_qspi,
     NRF_BLOCK_DEV_QSPI_CONFIG(
         512,
         NRF_BLOCK_DEV_QSPI_FLAG_CACHE_WRITEBACK,
-        NRF_DRV_QSPI_DEFAULT_CONFIG),
-    NFR_BLOCK_DEV_INFO_CONFIG("Nordic", "QSPI", "1.00"));
+        EXTERNAL_1G_MEM_CONFIG
+     ),
+     NFR_BLOCK_DEV_INFO_CONFIG("Nordic", "QSPI", "1.00")
+);
+#endif
 
 extern bool nor_flash_inited;
 

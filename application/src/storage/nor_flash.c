@@ -41,7 +41,7 @@ void init_nor_flash(void) {
 }
 
 void uninit_nor_flash(void) {
-
+  UNUSED_RETURN_VALUE(disk_uninitialize(0));
 }
 
 FRESULT mount_nor_flash(void) {

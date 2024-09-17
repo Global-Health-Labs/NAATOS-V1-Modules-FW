@@ -46,6 +46,13 @@ static const nrf_serial_flash_params_t m_sflash_params[] = {
         .size = 8 * 1024 * 1024,
         .erase_size = 4 * 1024,
         .program_size = 256,
+    },
+    {    /*MXIC MX66L1G45G*/
+        .read_id = { 0xC2, 0x20, 0x1B },
+        .capabilities = 0x00,
+        .size = 128 * 1024 * 1024,
+        .erase_size = 4 * 1024,
+        .program_size = 256,
     }
 };
 
