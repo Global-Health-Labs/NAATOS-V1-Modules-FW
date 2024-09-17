@@ -704,7 +704,7 @@ void send_usb_change(usb_command_t cmd) {
 
   printf("MAIN_TASK: Sending USB change request.\n");
   //if (cmd != USB_CDC_ACM)
-  uninit_sd_card();
+  uninit_naatos_storage();
 
   // Send command
   xReturned = xQueueSend(usbRxQueue, &usb_msg, 0);
@@ -718,7 +718,7 @@ void send_usb_change(usb_command_t cmd) {
   }
 
   if (cmd == USB_CDC_ACM)
-    init_sd_card();
+    init_naatos_storage();
 
   printf("MAIN_TASK: USB state successfully changed.\n");
 }
@@ -971,7 +971,7 @@ int main(void) {
   led_driver_init();
 #endif
   fuelGauge_init();
-  init_sd_card();
+  init_naatos_storage();
   button_init();
   nrf_drv_gpiote_init();
   setup_uart_semaphore();
