@@ -95,7 +95,7 @@ bool calendar_set_time(calendar_time_t *now) {
   buff[6] = calendar_encode(now->month);
   buff[7] = calendar_encode(now->year);
 
-  ret = xUtil_TWI_Write_Single(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 8);
+  ret = xUtil_TWI_Write_Single(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 8);
   if (ret) {
     return false;
   }
@@ -111,7 +111,7 @@ bool calendar_reset(void) {
   uint8_t buff = 0x58;
   ret_code_t ret;
 #if I2C_CONNECTED
-  ret = xUtil_TWI_Write(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
+  ret = xUtil_TWI_Write(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
   if (ret)
     return false;
   return true;
@@ -126,7 +126,7 @@ bool calendar_stop(void) {
   uint8_t buff = 0x1 << 5;
   ret_code_t ret;
 #if I2C_CONNECTED
-  ret = xUtil_TWI_Write(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
+  ret = xUtil_TWI_Write(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
   if (ret)
     return false;
   return true;
@@ -141,7 +141,7 @@ bool calendar_start(void) {
   uint8_t buff = 0x00;
   ret_code_t ret;
 #if I2C_CONNECTED
-  ret = xUtil_TWI_Write(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
+  ret = xUtil_TWI_Write(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
   if (ret)
     return false;
   return true;
@@ -160,7 +160,7 @@ bool calendar_set_32k(void) {
 
   ret_code_t ret;
 #if I2C_CONNECTED
-  ret = xUtil_TWI_Write_Single(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_CTRL2_ADDR, buff, 2);
+  ret = xUtil_TWI_Write_Single(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL2_ADDR, buff, 2);
   if (ret)
     return false;
   return true;

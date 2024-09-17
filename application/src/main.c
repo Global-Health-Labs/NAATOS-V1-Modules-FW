@@ -961,12 +961,9 @@ int main(void) {
   nrf_gpio_cfg_output(MOTOR_POWER_ENABLE);
   nrf_gpio_pin_clear(MOTOR_POWER_ENABLE);
 
-#ifdef SAMPLE_PREP_BOARD
-  vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_100k); // I2C
-#else
   vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_100k);  // I2C
   vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_100k); // I2C
-#endif
+
 #if ENABLE_LEDS
   led_driver_init();
 #endif
