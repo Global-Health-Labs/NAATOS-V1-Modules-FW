@@ -159,10 +159,6 @@ bool use_default_configuration_parameters = false;
 // Function defs
 void sendWdtHeaterInvalid();
 void sendWdtMain(bool valid);
-bool begin_amplification_zone(void);
-void end_amplification_zone(void);
-void begin_valve_zone(void);
-void end_valve_zone(void);
 void create_tasks(void);
 void send_usb_change(usb_command_t cmd);
 void reset_and_enter_dfu(void);
@@ -204,13 +200,13 @@ void read_sd_and_notify_tasks(void) {
 
   xReturned = xQueueSend(heaterRxQueue, &heaterConfigMsg, 0);
   if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send run amplification zone request.\n");
+    printf("MAIN_TASK: Unable to send update config request to heaterRxQueue.\n");
   }
 
   // Send to Sensors task
   xReturned = xQueueSend(sensorRxQueue, &sensorConfigMsg, 0);
   if (xReturned != pdPASS) {
-    printf("USB: Unable to send usb suspend request to sensorRxQueue.\n");
+    printf("USB: Unable to send update config request to sensorRxQueue.\n");
   }
 }
 
@@ -993,7 +989,7 @@ int main(void) {
 
       xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
       if (xReturned != pdPASS) {
-        printf("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
+        printf("MAIN_TASK: Unable to send configuration error to logging task.\n");
       }
       xReturned = xQueueSend(logger_logMessageQueue, &exit_log_message, 0);
       if (xReturned != pdPASS) {

@@ -35,10 +35,10 @@
 #define BOOST_CONTROL_ENABLE_PIN 21
 #define BUTTON_INPUT_PIN NRF_GPIO_PIN_MAP(1, 6)
 
-#define VALVE_ZONE_PIN 20                    // P0.20
-#define AMP0_ZONE_PIN 19                     // P0.19
-#define AMP1_ZONE_PIN 34                     // P1.02
-#define AMP2_ZONE_PIN NRF_GPIO_PIN_MAP(1, 1) // P1.01
+#define HEATER_ZONE_0_PIN 20                    // P0.20
+#define HEATER_ZONE_1_PIN 19                     // P0.19
+#define HEATER_ZONE_2_PIN 34                     // P1.02
+#define HEATER_ZONE_3_PIN NRF_GPIO_PIN_MAP(1, 1) // P1.01
 
 #define SAMPLE_HEATER_PIN NRF_GPIO_PIN_MAP(1, 1) // P1.01
 #define SENSORS_EN NRF_GPIO_PIN_MAP(1, 7)

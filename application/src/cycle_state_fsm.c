@@ -516,12 +516,12 @@ bool begin_cycle_1(void) {
 
   xRet = xQueueSend(heaterRxQueue, &run_cycle_one_zone_heating, 0);
   if (xRet != pdPASS) {
-    printf("MAIN_TASK: Unable to send run amplification zone request.\n");
+    printf("MAIN_TASK: Unable to send run cycle one request.\n");
   }
-  // Send Start Amplification Event to logging task
+  // Send Start Cycle One to logging task
   xRet = xQueueSend(logger_logMessageQueue, &cycle_one_start_log_msg, 0);
   if (xRet != pdPASS) {
-    printf("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
+    printf("MAIN_TASK: Unable to send start cycle one event to logging task.\n");
   }
   // Wait for run confirmation response
   xRet = xQueueReceive(main_runConfRespQueue, &start_run, portMAX_DELAY);
@@ -540,15 +540,15 @@ bool begin_cycle_1(void) {
 void begin_cycle_2(void) {
   BaseType_t xRet;
   bool heat_conf = false;
-  // Send start valve message to heater queue
+  // Send Start Cycle Two to heater queue
   xRet = xQueueSend(heaterRxQueue, &run_cycle_two_zone_heating, 0);
   if (xRet != pdPASS) {
-    printf("MAIN_TASK: Unable to send run valve zone request.\n");
+    printf("MAIN_TASK: Unable to send run cycle two request.\n");
   }
-  // Send Start Valve Event to logging task
+  // Send Start Cycle Two Event to logging task
   xRet = xQueueSend(logger_logMessageQueue, &cycle_two_start_log_msg, 0);
   if (xRet != pdPASS) {
-    printf("MAIN_TASK: Unable to send start valve zone event to logging task.\n");
+    printf("MAIN_TASK: Unable to send start cycle two event to logging task.\n");
   }
   // Wait for run confirmation response
   xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
@@ -560,15 +560,15 @@ void begin_cycle_2(void) {
 void end_cycle_1(void) {
   BaseType_t xRet;
   bool heat_conf = false;
-  // Send stop amplification message to heater queue
+  // Send stop cycle one message to heater queue
   xRet = xQueueSend(heaterRxQueue, &stop_cycle_one_zone_heating, 50);
   if (xRet != pdPASS) {
-    printf("MAIN_TASK: Unable to send stop amplification zone request.\n");
+    printf("MAIN_TASK: Unable to send stop cycle one request.\n");
   }
   // Send stop amplification Event to logging task
   xRet = xQueueSend(logger_logMessageQueue, &cycle_one_stop_log_msg, 50);
   if (xRet != pdPASS) {
-    printf("MAIN_TASK: Unable to send stop amplification zone event to logging task.\n");
+    printf("MAIN_TASK: Unable to send stop cycle one event to logging task.\n");
   }
   // Wait for run confirmation response
   xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
@@ -583,12 +583,12 @@ void end_cycle_2(void) {
   // Send valve zone stop request
   xRet = xQueueSend(heaterRxQueue, &stop_cycle_two_zone_heating, 0);
   if (xRet != pdPASS) {
-    printf("MAIN_TASK: Unable to send stop valve zone request.\n");
+    printf("MAIN_TASK: Unable to send stop cycle two request.\n");
   }
   // Send stop valve Event to logging task
   xRet = xQueueSend(logger_logMessageQueue, &cycle_two_stop_log_msg, 0);
   if (xRet != pdPASS) {
-    printf("MAIN_TASK: Unable to send stop valve zone event to logging task.\n");
+    printf("MAIN_TASK: Unable to send stop cycle two event to logging task.\n");
   }
   // Wait for run confirmation response
   xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);

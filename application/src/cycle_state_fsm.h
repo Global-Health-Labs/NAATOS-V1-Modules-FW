@@ -80,9 +80,6 @@ void reset_cycle_state_machine(void);
 
 cycle_state_exit_t run_cycle_state_machine(void);
 
-/* For sample prep this will start heating the sample and or spin the motor.
- * For power module this will start the amplification zone heating.
- */
 bool begin_cycle_1(void);
 
 void begin_cycle_2(void);
