@@ -32,9 +32,12 @@ LoggerInterface powerModuleLogger_I = {
 
 void normalize_pwm_data(log_data_message_t *rxLogMsg);
 
+uint32_t constructDebugLogLine(char *logLineBuffer, char *message, calendar_time_t time);
+
+int battery_percent = 0;
+
 int getBatteryPercent(void) {
   BaseType_t xReturned;
-  int battery_percent = 0;
   // Request the battery percentage from the bettery task
   xReturned = xQueueSend(batteryRxQueue, &batt_req_log, 0);
   if (xReturned != pdPASS) {
@@ -163,12 +166,13 @@ void logger_task(void *pvParameters) {
     }
     case UART_DATA: {
       normalize_pwm_data(&rxLogMsg);
-      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, 0);
+      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, battery_percent);
       write_to_com(logFileLine, logFileLineSize);
       break;
     }
     case LOGGER_LOG_DEBUG_EVENT:
-
+      logFileLineSize = constructDebugLogLine(logFileLine, rxLogMsg.event_data.message, time);
+      write_to_com(logFileLine, logFileLineSize);
       break;
     default:
       break;
@@ -193,3 +197,63 @@ void normalize_pwm_data(log_data_message_t *rxLogMsg) {
 
 #endif
 }
+
+uint32_t constructDebugLogLine(char *logLineBuffer, char *message, calendar_time_t time) {
+  return sprintf(logLineBuffer, "%02d:%02d:%02d - %s\n",
+      time.hour,
+      time.minute,
+      time.second,
+      message);
+}
+
+void send_event_log_message(event_t eventType, char *message) {
+  log_event_t event_info = {
+      .event = eventType};
+
+  strncpy(event_info.message, message, sizeof(event_info.message) - 1);
+  event_info.message[sizeof(event_info.message) - 1] = '\0';  // Ensure null termination
+
+  log_data_message_t log_message = {
+    .data_type = EVENT_DATA,
+    .temperature_data = NULL,
+    .event_data = event_info};
+
+  BaseType_t xReturned = xQueueSend(logger_logMessageQueue, &log_message, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send event log message.\n");
+  }
+}
+
+bool send_event_log_message_struct(const log_data_message_t *message) {
+  BaseType_t xReturned = xQueueSend(logger_logMessageQueue, message, 0);
+  if (xReturned != pdPASS) {
+    return false;
+  }
+  return true;
+}
+
+void send_data_log_message() {
+
+}
+
+
+void send_debug_log_message(char *message) {
+  printf(message);
+  log_event_t event_info = {
+      .event = SAMPLE_UNKNOWN};
+
+  strncpy(event_info.message, message, sizeof(event_info.message) - 1);
+  event_info.message[sizeof(event_info.message) - 1] = '\0';  // Ensure null termination
+
+  log_data_message_t log_message = {
+      .data_type = LOGGER_LOG_DEBUG_EVENT,
+      .temperature_data = NULL,
+      .event_data = event_info};
+
+  BaseType_t xReturned = xQueueSend(logger_logMessageQueue, &log_message, 0);
+  if (xReturned != pdPASS) {
+    printf("MAIN_TASK: Unable to send debug log message.\n");
+  }
+}
+
+
