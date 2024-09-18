@@ -424,7 +424,7 @@ void handle_exit_notifications(void) {
       .data_type = EVENT_DATA,
       .temperature_data = NULL,
       .event_data = exit_event_info};
-  event_t eventType = SAMPLE_AMP_ENDED;
+  event_t eventType = SAMPLE_CYCLE_ONE_ENDED;
 
   switch (exitInfo) {
   case CYCLE_COMPLETE:
@@ -447,16 +447,16 @@ void handle_exit_notifications(void) {
 
   case CYCLE_ERROR_OVER_TEMP:
     sprintf(exitString, "%s: %d", SAMPLE_OVER_TEMP, over_temp_data.heat_zone_1_temp);
-    exit_event_info.event = SAMPLE_OVER_TEMP;
-    exit_event_info.message = exitString;
-    exit_log_message.event_data = exit_event_info;
+    eventType = SAMPLE_OVER_TEMP;
+    //exit_event_info.message = exitString;
+    //exit_log_message.event_data = exit_event_info;
     break;
 
   case CYCLE_ERROR_START_TEMP_TOO_HIGH:
     sprintf(exitString, "%s: %d", TEMPS_NOT_STABLE, over_temp_data.heat_zone_1_temp);
-    exit_event_info.event = SAMPLE_TEMPS_NOT_STABALIZED;
-    exit_event_info.message = exitString;
-    exit_log_message.event_data = exit_event_info;
+    eventType = SAMPLE_TEMPS_NOT_STABALIZED;
+    //exit_event_info.message = exitString;
+    //exit_log_message.event_data = exit_event_info;
     break;
 
   case CYCLE_ERROR_TIMEOUT_DURING_RAMP:
