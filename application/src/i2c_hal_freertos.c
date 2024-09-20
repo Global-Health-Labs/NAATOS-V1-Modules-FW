@@ -59,8 +59,8 @@ void i2c_error_recovery(i2c_interface_selection_t interface) {
 
   int size;
   char buff[60];
-  size = sprintf(buff, "I2C error recovery attempt on interface: %i\n", interface);
-  printf("I2C error recovery attempt on interface: %i\n", interface);
+  size = sprintf(buff, "I2C error recovery attempt on interface: %i\r\n", interface);
+  printf("I2C error recovery attempt on interface: %i\r\n", interface);
   write_to_com(buff, size);
 }
 
