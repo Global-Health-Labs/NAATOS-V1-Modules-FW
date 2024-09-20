@@ -33,6 +33,7 @@ SDK Version: 17.1
 #include "sd_card.h"
 #include "sdk_errors.h"
 #include "sensors.h"
+#include "motor_task.h"
 #include "spi.h"
 #include "states.h"
 #include "switch.h"
@@ -69,6 +70,7 @@ xTaskHandle wdtTaskHandle;
 xTaskHandle compositeTaskHandle;
 xTaskHandle buttonTaskHandle;
 xTaskHandle ledTaskHandle;
+xTaskHandle motorTaskHandle;
 
 xQueueHandle main_batteryDataQueue;
 xQueueHandle main_switchQueue;
@@ -886,6 +888,14 @@ void create_tasks() {
     printf("Error creating Composite ledTaskHandle task. Error: %d\n", xReturned);
     vTaskDelete(ledTaskHandle);
   }
+  // Motor Task
+  xReturned = xTaskCreate(motorTask, "MotorTask", 1024, NULL, 0, &motorTaskHandle);
+  if (xReturned != pdPASS) {
+    // The task was created.  Use the task's handle to delete the task.
+    printf("Error creating MotorTaskHandle task. Error: %d\n", xReturned);
+    vTaskDelete(ledTaskHandle);
+  }
+
 }
 
 /*********************************************************************
@@ -1003,6 +1013,11 @@ void create_queues() {
   if (main_setPointReached == NULL) {
     printf("Unable to create main_setPointReached queue\n");
   }
+
+  motorRxQueue = xQueueCreate(QUEUE_SIZE, sizeof(MotorRxQueueMsg_t));
+  if (motorRxQueue == NULL) {
+    printf("Unable to create motorRxQueue queue\n");
+  }
 }
 
 // Stack Overflow detection.
@@ -1034,6 +1049,7 @@ int main(void) {
 
   // Full Peripheral Initalizations
   init_adc();           // ADC
+  init_motor_gpio();
   init_sensors_gpios(); // Sensor GPIOs
   init_pwms();
 

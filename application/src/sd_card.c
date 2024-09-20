@@ -805,7 +805,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       parameters->sample_rate = atof(val);
       if (parameters->sample_rate < 0.048) {
         printf("Warning: Sample rate lower than minimum (0.048), setting sample rate to minimum.");
-        parameters->sample_rate = 0.048;
+        parameters->sample_rate = 0.2;
         break;
       }
       break;
