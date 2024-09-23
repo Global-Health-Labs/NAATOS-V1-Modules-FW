@@ -14,6 +14,8 @@ static long double moving_avg_speed = 0.0;
 
 double motorSpeed = 0;
 
+bool motorRunning = false;
+
 TimerHandle_t sensorMotorTimer;
 
 xQueueHandle motorRxQueue;
@@ -51,6 +53,22 @@ void motorTask(void *pvParameters) {
       send_debug_log_message("Unable to Rx data to motor queue\n");
     } else {
       switch (motorRxMessage.type) {
+         case MOTOR_MSG_HEATER_STATE: {
+          motorRunning = motorRxMessage.motorRunning;
+          printf("start/stop motor\r\n");
+
+          /*HeaterRxQueueMsg_t heaterMsg = {
+            .type = HEATER_MSG_SENSOR_CONFIRM,
+            .task = MOTOR,
+            .heaterRunning = motorRunning};
+
+            // Respond to heater change
+            xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
+            if (xReturned != pdPASS) {
+              send_debug_log_message("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
+            }*/
+          break;
+         }
          case MOTOR_MSG_TIMER_MOTOR_EVENT: {
           sensorMotorCollection();
           break;
@@ -109,7 +127,7 @@ void sensorMotorCollection(void) {
   BaseType_t xReturned;
   HeaterRxQueueMsg_t heaterMsg;
 
-  //if (heaterRunning) {
+  if (motorRunning) {
     motorSpeed = readMotorSpeed();
     avg_speed[2] = avg_speed[1];
     avg_speed[1] = avg_speed[0];
@@ -125,7 +143,7 @@ void sensorMotorCollection(void) {
       sprintf(errorString, "SENSORS_TASK: Unable to send temperature data in heaterRxQueue. Error: %d\n", xReturned);
       send_debug_log_message(errorString);
     }
-  //}
+  }
 }
 
 double readMotorSpeed(void) {

@@ -371,7 +371,8 @@ typedef enum {
   MOTOR_MSG_TIMER_MOTOR_EVENT,
   MOTOR_MSG_SLEEP,
   MOTOR_MSG_WAKEUP,
-  MOTOR_CONFIG_UPDATED
+  MOTOR_CONFIG_UPDATED,
+  MOTOR_MSG_HEATER_STATE
 } MotorRxQueueType_t;
 
 typedef struct {
@@ -430,6 +431,7 @@ typedef enum {
 
 typedef struct {
   HeaterRxQueueType_t type;
+  tasks_t task;
   zone_t zoneSelect;
   temperature_data_t tempData;
   bool zoneEnabled;

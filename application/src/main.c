@@ -281,6 +281,14 @@ void main_task(void *pvParameters) {
           printf("MAIN: Unable to send sensor wakeup to sensorRxQueue.\n");
         }
 
+        MotorRxQueueMsg_t motorMsg;
+        motorMsg.type = MOTOR_MSG_WAKEUP;
+
+        xReturned = xQueueSend(motorRxQueue, &motorMsg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN: Unable to send sensor wakeup to motorRxQueue.\n");
+        }
+
         vTaskDelay(300);
         read_sd_and_notify_tasks();
         // Get the alert timeout
@@ -591,8 +599,15 @@ void main_task(void *pvParameters) {
           printf("MAIN_TASK: Unable to send sensor sleep to sensorRxQueue queue.\n");
         }
 
+        MotorRxQueueMsg_t motorMsg;
+        motorMsg.type = MOTOR_MSG_SLEEP;
+        xReturned = xQueueSend(motorRxQueue, &motorMsg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send motor sleep to motorRxQueue queue.\n");
+        }
+
         BatteryRxQueueMsg_t battMsg;
-        msg.type = BATTERY_MSG_SLEEP;
+        battMsg.type = BATTERY_MSG_SLEEP;
 
         xReturned = xQueueSend(batteryRxQueue, &battMsg, 0);
         if (xReturned != pdPASS) {
@@ -646,8 +661,15 @@ void main_task(void *pvParameters) {
         printf("MAIN_TASK: Unable to send sensor sleep to sensorRxQueue queue.\n");
       }
 
+      MotorRxQueueMsg_t motorMsg;
+      motorMsg.type = MOTOR_MSG_WAKEUP;
+      xReturned = xQueueSend(motorRxQueue, &motorMsg, 0);
+      if (xReturned != pdPASS) {
+        printf("MAIN_TASK: Unable to send motor wake to motorRxQueue queue.\n");
+      }
+
       BatteryRxQueueMsg_t battMsg;
-      msg.type = BATTERY_MSG_WAKEUP;
+      battMsg.type = BATTERY_MSG_WAKEUP;
 
       xReturned = xQueueSend(batteryRxQueue, &battMsg, 0);
       if (xReturned != pdPASS) {

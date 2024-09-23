@@ -58,6 +58,16 @@ void handle_cycle2_stopstart_heater(bool heating) {
     printf("HEATER_TASK: Unable to send heater state to sensorRxQueue.\n");
   }
 
+  MotorRxQueueMsg_t motorMsg;
+  motorMsg.type = MOTOR_MSG_HEATER_STATE;
+  motorMsg.motorRunning = heating;
+
+  // Send the motor status
+  xReturned = xQueueSend(motorRxQueue, &motorMsg, 0);
+  if (xReturned != pdPASS) {
+    printf("HEATER_TASK: Unable to send heater state to motorRxQueue.\n");
+  }
+
   watchdog_time_update_t wdtUpdate = {
       .taskName = HEATER,
       .valid = false};
@@ -111,6 +121,16 @@ void handle_cycle1_stopstart_heater(bool heating) {
   xReturned = xQueueSend(sensorRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
     printf("HEATER_TASK: Unable to send heater state to sensorRxQueue.\n");
+  }
+
+  MotorRxQueueMsg_t motorMsg;
+  motorMsg.type = MOTOR_MSG_HEATER_STATE;
+  motorMsg.motorRunning = heating;
+
+  // Send the motor status
+  xReturned = xQueueSend(motorRxQueue, &motorMsg, 0);
+  if (xReturned != pdPASS) {
+    printf("HEATER_TASK: Unable to send heater state to motorRxQueue.\n");
   }
 
   watchdog_time_update_t wdtUpdate = {

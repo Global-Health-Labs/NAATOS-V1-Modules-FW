@@ -158,6 +158,7 @@ void sensors_task(void *pvParameters) {
 
         HeaterRxQueueMsg_t heaterMsg = {
             .type = HEATER_MSG_SENSOR_CONFIRM,
+            .task = SENSORS,
             .heaterRunning = heaterRunning};
 
         // Respond to heater change
