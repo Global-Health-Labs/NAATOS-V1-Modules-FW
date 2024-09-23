@@ -33,6 +33,7 @@ SDK Version: 17.1
 #include "sd_card.h"
 #include "sdk_errors.h"
 #include "sensors.h"
+#include "motor_task.h"
 #include "spi.h"
 #include "states.h"
 #include "switch.h"
@@ -69,6 +70,7 @@ xTaskHandle wdtTaskHandle;
 xTaskHandle compositeTaskHandle;
 xTaskHandle buttonTaskHandle;
 xTaskHandle ledTaskHandle;
+xTaskHandle motorTaskHandle;
 
 xQueueHandle main_batteryDataQueue;
 xQueueHandle main_switchQueue;
@@ -277,6 +279,14 @@ void main_task(void *pvParameters) {
         xReturned = xQueueSend(sensorRxQueue, &msg, 0);
         if (xReturned != pdPASS) {
           printf("MAIN: Unable to send sensor wakeup to sensorRxQueue.\n");
+        }
+
+        MotorRxQueueMsg_t motorMsg;
+        motorMsg.type = MOTOR_MSG_WAKEUP;
+
+        xReturned = xQueueSend(motorRxQueue, &motorMsg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN: Unable to send sensor wakeup to motorRxQueue.\n");
         }
 
         vTaskDelay(300);
@@ -589,8 +599,15 @@ void main_task(void *pvParameters) {
           printf("MAIN_TASK: Unable to send sensor sleep to sensorRxQueue queue.\n");
         }
 
+        MotorRxQueueMsg_t motorMsg;
+        motorMsg.type = MOTOR_MSG_SLEEP;
+        xReturned = xQueueSend(motorRxQueue, &motorMsg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send motor sleep to motorRxQueue queue.\n");
+        }
+
         BatteryRxQueueMsg_t battMsg;
-        msg.type = BATTERY_MSG_SLEEP;
+        battMsg.type = BATTERY_MSG_SLEEP;
 
         xReturned = xQueueSend(batteryRxQueue, &battMsg, 0);
         if (xReturned != pdPASS) {
@@ -644,8 +661,15 @@ void main_task(void *pvParameters) {
         printf("MAIN_TASK: Unable to send sensor sleep to sensorRxQueue queue.\n");
       }
 
+      MotorRxQueueMsg_t motorMsg;
+      motorMsg.type = MOTOR_MSG_WAKEUP;
+      xReturned = xQueueSend(motorRxQueue, &motorMsg, 0);
+      if (xReturned != pdPASS) {
+        printf("MAIN_TASK: Unable to send motor wake to motorRxQueue queue.\n");
+      }
+
       BatteryRxQueueMsg_t battMsg;
-      msg.type = BATTERY_MSG_WAKEUP;
+      battMsg.type = BATTERY_MSG_WAKEUP;
 
       xReturned = xQueueSend(batteryRxQueue, &battMsg, 0);
       if (xReturned != pdPASS) {
@@ -886,6 +910,14 @@ void create_tasks() {
     printf("Error creating Composite ledTaskHandle task. Error: %d\n", xReturned);
     vTaskDelete(ledTaskHandle);
   }
+  // Motor Task
+  xReturned = xTaskCreate(motorTask, "MotorTask", 1024, NULL, 0, &motorTaskHandle);
+  if (xReturned != pdPASS) {
+    // The task was created.  Use the task's handle to delete the task.
+    printf("Error creating MotorTaskHandle task. Error: %d\n", xReturned);
+    vTaskDelete(ledTaskHandle);
+  }
+
 }
 
 /*********************************************************************
@@ -1003,6 +1035,11 @@ void create_queues() {
   if (main_setPointReached == NULL) {
     printf("Unable to create main_setPointReached queue\n");
   }
+
+  motorRxQueue = xQueueCreate(QUEUE_SIZE, sizeof(MotorRxQueueMsg_t));
+  if (motorRxQueue == NULL) {
+    printf("Unable to create motorRxQueue queue\n");
+  }
 }
 
 // Stack Overflow detection.
@@ -1035,6 +1072,7 @@ int main(void) {
   // Full Peripheral Initalizations
   init_adc();           // ADC
   init_sensors_gpios(); // Sensor GPIOs
+  init_motor_gpio();
   init_pwms();
 
   nrf_gpio_cfg_output(BOOST_CONTROL_ENABLE_PIN);

@@ -47,8 +47,6 @@ void heater_task(void *pvParameters) {
 #else
   HeaterInterface *heaterInterface = &powerModuleHeater_I;
 #endif
-
-  //heater_reset_all_pids();
   heaterInterface->resetHeaterPIDs();
 
   for (;;) {

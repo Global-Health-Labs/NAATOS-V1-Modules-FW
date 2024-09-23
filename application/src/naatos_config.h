@@ -365,6 +365,22 @@ typedef struct {
   temperature_pwm_data_t pwmData;
 } SensorRxQueueMsg_t;
 
+
+typedef enum {
+  MOTOR_MSG_USB_SUSPEND,
+  MOTOR_MSG_TIMER_MOTOR_EVENT,
+  MOTOR_MSG_SLEEP,
+  MOTOR_MSG_WAKEUP,
+  MOTOR_CONFIG_UPDATED,
+  MOTOR_MSG_HEATER_STATE
+} MotorRxQueueType_t;
+
+typedef struct {
+  MotorRxQueueType_t type;
+  bool motorRunning;
+  bool usbSuspend;
+} MotorRxQueueMsg_t;
+
 // Battery messages
 
 typedef enum {
@@ -415,6 +431,7 @@ typedef enum {
 
 typedef struct {
   HeaterRxQueueType_t type;
+  tasks_t task;
   zone_t zoneSelect;
   temperature_data_t tempData;
   bool zoneEnabled;

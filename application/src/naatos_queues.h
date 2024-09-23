@@ -56,4 +56,6 @@ extern xQueueHandle button_mainStateQueue;
 
 extern xQueueHandle ledRxQueue;
 
+extern xQueueHandle motorRxQueue;
+
 #endif
