@@ -56,7 +56,7 @@ void vSensorTempTimerCallback(TimerHandle_t xTimer) {
   if (!usb_suspend) {
     xReturned = xQueueSend(sensorRxQueue, &msg, 0);
     if (xReturned != pdPASS) {
-      send_debug_log_message("Sensor: Unable to send timer update to sensorRxQueue queue. from temp callback\n");
+      send_debug_log_message("Sensor: Unable to send timer update to sensorRxQueue queue. from temp callback\r\n");
     }
   }
 }
@@ -75,13 +75,13 @@ void startSensorTempTimer(void) {
   }
 
   if (xTimerStart(sensorTempTimer, 0) != pdPASS) {
-    send_debug_log_message("Failed to start sensor timer. \n");
+    send_debug_log_message("Failed to start sensor timer. \r\n");
   }
 }
 
 void stopSensorTempTimer(void) {
   if (xTimerStop(sensorTempTimer, 100) != pdPASS) {
-    send_debug_log_message("Failed to stop sensor timer. \n");
+    send_debug_log_message("Failed to stop sensor timer. \r\n");
   }
 }
 
@@ -150,7 +150,7 @@ void sensors_task(void *pvParameters) {
 
     xReturned = xQueueReceive(sensorRxQueue, &sensorRxMessage, portMAX_DELAY);
     if (xReturned != pdPASS) {
-      send_debug_log_message("Unable to Rx data to sensor queue\n");
+      send_debug_log_message("Unable to Rx data to sensor queue\r\n");
     } else {
       switch (sensorRxMessage.type) {
       case SENSOR_MSG_HEATER_STATE: {
@@ -164,7 +164,7 @@ void sensors_task(void *pvParameters) {
         // Respond to heater change
         xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
         if (xReturned != pdPASS) {
-          send_debug_log_message("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
+          send_debug_log_message("USB: Unable to send main state response to main_mainStateRespQueue queue.\r\n");
         }
         break;
       }
@@ -173,7 +173,7 @@ void sensors_task(void *pvParameters) {
         // Send Suspend Accepted
         xReturned = xQueueSend(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0);
         if (xReturned != pdPASS) {
-          send_debug_log_message("SENSORS: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\n");
+          send_debug_log_message("SENSORS: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\r\n");
         }
 
         usb_suspend = true;
@@ -183,7 +183,7 @@ void sensors_task(void *pvParameters) {
         // Send Suspend Over
         xReturned = xQueueSend(usb_usbWaitOverQueue, &sus_over, 0);
         if (xReturned != pdPASS) {
-          send_debug_log_message("SENSORS: Unable to send usb suspend over to usb_usbWaitOverQueue\n");
+          send_debug_log_message("SENSORS: Unable to send usb suspend over to usb_usbWaitOverQueue\r\n");
         }
         usb_suspend = false;
         break;
@@ -261,9 +261,9 @@ void runPowerModuleSensorCollection(void) {
   switches.optical_tiggered = get_optical_triggered();
   if (prev != switches.optical_tiggered) {
     if (switches.optical_tiggered) {
-      send_debug_log_message("Optical sensor triggered!\n");
+      send_debug_log_message("Optical sensor triggered!\r\n");
     } else {
-      send_debug_log_message("Optical sensor no longer triggered!\n");
+      send_debug_log_message("Optical sensor no longer triggered!\r\n");
     }
   }
   // GPIO Read for Hall Sensor
@@ -274,9 +274,9 @@ void runPowerModuleSensorCollection(void) {
     switches.hal_triggered = true;
   if (prev != switches.hal_triggered) {
     if (switches.hal_triggered) {
-      send_debug_log_message("Hal sensor triggered!\n");
+      send_debug_log_message("Hal sensor triggered!\r\n");
     } else {
-      send_debug_log_message("Hal sensor no longer triggered!\n");
+      send_debug_log_message("Hal sensor no longer triggered!\r\n");
     }
   }
 
@@ -435,6 +435,4 @@ bool readTemp(sensor_selection_t sensor, float *temperature) {
     }
     return true;
   }
-
-  //return temperature;
 }
