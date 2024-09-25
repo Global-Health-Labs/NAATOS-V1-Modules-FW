@@ -331,6 +331,7 @@ void main_task(void *pvParameters) {
       /* **** HANDLE USB AND SWITCH **** */
       // Get switch status if it has changed
       if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
+        printf("MAIN_TASK: Button click in idle \n");
         usbRxMsgType_t conn_req_msg = {
             .cmd = NULL,
             .msg_type = USB_MSG_CONN_STATUS_REQ};
@@ -932,7 +933,7 @@ void create_queues() {
   if (main_batteryDataQueue == NULL)
     printf("Unable to create main_batteryDataQueue queue\n");
 
-  main_switchQueue = xQueueCreate(QUEUE_SIZE, sizeof(sensor_switches_t));
+  main_switchQueue = xQueueCreate(10, sizeof(sensor_switches_t));
   if (main_switchQueue == NULL)
     printf("Unable to create main_switchQueue queue\n");
 
@@ -1036,7 +1037,7 @@ void create_queues() {
     printf("Unable to create main_setPointReached queue\n");
   }
 
-  motorRxQueue = xQueueCreate(QUEUE_SIZE, sizeof(MotorRxQueueMsg_t));
+  motorRxQueue = xQueueCreate(10, sizeof(MotorRxQueueMsg_t));
   if (motorRxQueue == NULL) {
     printf("Unable to create motorRxQueue queue\n");
   }

@@ -63,7 +63,7 @@ void handle_cycle2_stopstart_heater(bool heating) {
   motorMsg.motorRunning = heating;
 
   // Send the motor status
-  xReturned = xQueueSend(motorRxQueue, &motorMsg, 0);
+  xReturned = xQueueSend(motorRxQueue, &motorMsg, 10);
   if (xReturned != pdPASS) {
     printf("HEATER_TASK: Unable to send heater state to motorRxQueue.\n");
   }
@@ -128,7 +128,7 @@ void handle_cycle1_stopstart_heater(bool heating) {
   motorMsg.motorRunning = heating;
 
   // Send the motor status
-  xReturned = xQueueSend(motorRxQueue, &motorMsg, 0);
+  xReturned = xQueueSend(motorRxQueue, &motorMsg, 10);
   if (xReturned != pdPASS) {
     printf("HEATER_TASK: Unable to send heater state to motorRxQueue.\n");
   }
