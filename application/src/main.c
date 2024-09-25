@@ -932,7 +932,7 @@ void create_queues() {
   if (main_batteryDataQueue == NULL)
     printf("Unable to create main_batteryDataQueue queue\n");
 
-  main_switchQueue = xQueueCreate(QUEUE_SIZE, sizeof(sensor_switches_t));
+  main_switchQueue = xQueueCreate(10, sizeof(sensor_switches_t));
   if (main_switchQueue == NULL)
     printf("Unable to create main_switchQueue queue\n");
 
@@ -1036,7 +1036,7 @@ void create_queues() {
     printf("Unable to create main_setPointReached queue\n");
   }
 
-  motorRxQueue = xQueueCreate(QUEUE_SIZE, sizeof(MotorRxQueueMsg_t));
+  motorRxQueue = xQueueCreate(10, sizeof(MotorRxQueueMsg_t));
   if (motorRxQueue == NULL) {
     printf("Unable to create motorRxQueue queue\n");
   }

@@ -8,11 +8,10 @@ static const nrf_drv_timer_t *p_counter1;
 static uint32_t motor_speed_read_t1 = 0;
 static uint32_t motor_speed_read_t2;
 static bool skipped_last_call = false;
-static long double motor_speed = 0.0; //RPM
 static long double avg_speed[3] = {0, 0, 0};
 static long double moving_avg_speed = 0.0;
 
-double motorSpeed = 0;
+static long double motorSpeed = 0;
 
 bool motorRunning = false;
 
@@ -56,17 +55,6 @@ void motorTask(void *pvParameters) {
          case MOTOR_MSG_HEATER_STATE: {
           motorRunning = motorRxMessage.motorRunning;
           printf("start/stop motor\r\n");
-
-          /*HeaterRxQueueMsg_t heaterMsg = {
-            .type = HEATER_MSG_SENSOR_CONFIRM,
-            .task = MOTOR,
-            .heaterRunning = motorRunning};
-
-            // Respond to heater change
-            xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
-            if (xReturned != pdPASS) {
-              send_debug_log_message("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
-            }*/
           break;
          }
          case MOTOR_MSG_TIMER_MOTOR_EVENT: {
@@ -143,6 +131,9 @@ void sensorMotorCollection(void) {
       sprintf(errorString, "SENSORS_TASK: Unable to send temperature data in heaterRxQueue. Error: %d\n", xReturned);
       send_debug_log_message(errorString);
     }
+  } else {
+    moving_avg_speed = 0.0;
+    motorSpeed = 0.0;
   }
 }
 
