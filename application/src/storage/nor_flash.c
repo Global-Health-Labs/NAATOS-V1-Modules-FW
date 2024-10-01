@@ -29,7 +29,7 @@ void init_nor_flash(void) {
   // Initalize the disk
   disk_state = disk_initialize(0);
   if (disk_state) {
-      printf("Disk initialization failed.\n");
+      printf("Disk initialization failed. State: %d\n", disk_state);
       return;
   }
 
@@ -43,7 +43,7 @@ void init_nor_flash(void) {
   }
 
   // Show contents
-  //nor_flash_list_contents();
+  nor_flash_list_contents();
 }
 
 void uninit_nor_flash(void) {

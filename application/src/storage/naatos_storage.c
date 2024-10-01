@@ -76,7 +76,7 @@ void create_naatos_directories() {
   if (res == FR_OK) {
     printf("New config.txt config file in config subdirectory created with default parameters.\n");
   } else if (res != FR_EXIST) {
-    printf("Unable to retreive config.txt from sd card.\n");
+    printf("Unable to retreive config.txt\n");
   }
 }
 

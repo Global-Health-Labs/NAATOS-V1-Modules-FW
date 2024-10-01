@@ -699,8 +699,9 @@ void send_usb_change(usb_command_t cmd) {
       .msg_type = USB_MSG_COMMAND};
 
   printf("MAIN_TASK: Sending USB change request.\n");
-  //if (cmd != USB_CDC_ACM)
-  uninit_naatos_storage();
+  if (cmd != USB_CDC_ACM)
+    unmount_storage();
+    uninit_naatos_storage();
 
   // Send command
   xReturned = xQueueSend(usbRxQueue, &usb_msg, 0);
