@@ -32,6 +32,14 @@
 #define SPI_MISO_PIN 14  /* P0.14 */
 #define SPI_SD_SS_PIN 12 /* P0.12 */
 
+
+#define QSPI_IO0_PIN 44 /* P1.12 REVA*/ // 5   /* P0.05 REVB*/ 
+#define QSPI_IO1_PIN 45 /* P1.13 REVA*/ // 6   /* P0.06 REVB*/
+#define QSPI_IO2_PIN 46 /* P1.14 REVA*/ // 7   /* P0.07 REVB*/
+#define QSPI_IO3_PIN 47 /* P1.15 REVA*/ // 8   /* P0.08 REVB*/
+#define QSPI_CS_PIN  42 /* P1.10 REVA*/ // 30  /* P0.30 REVB*/
+#define QSPI_CLK_PIN 43 /* P1.11 REVA*/ // 3   /* P0.03 REVB*/
+
 #define BOOST_CONTROL_ENABLE_PIN 21
 #define BUTTON_INPUT_PIN NRF_GPIO_PIN_MAP(1, 6)
 

@@ -570,7 +570,7 @@ void usb_task(void *pvParameters) {
         app_usbd_uninit();
  
         // Restart the USB
-        start_usb(true, true);
+        start_usb(false, true);
         usbd_user_ev_handler(APP_USBD_EVT_POWER_DETECTED);
         break;
       }
