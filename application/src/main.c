@@ -723,9 +723,10 @@ void send_usb_change(usb_command_t cmd) {
       .msg_type = USB_MSG_COMMAND};
 
   printf("MAIN_TASK: Sending USB change request.\n");
-  if (cmd != USB_CDC_ACM)
+  if (cmd != USB_CDC_ACM) {
     unmount_storage();
     uninit_naatos_storage();
+  }
 
   // Send command
   xReturned = xQueueSend(usbRxQueue, &usb_msg, 0);
@@ -738,8 +739,10 @@ void send_usb_change(usb_command_t cmd) {
     printf("MAIN_TASK: Unable to receive usb change confirmation from main_usbChangedConfQueue. \n");
   }
 
-  if (cmd == USB_CDC_ACM)
-    init_naatos_storage();
+  if (cmd == USB_CDC_ACM) {
+    //init_naatos_storage();
+    NVIC_SystemReset();
+  }
 
   printf("MAIN_TASK: USB state successfully changed.\n");
 }

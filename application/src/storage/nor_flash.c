@@ -16,7 +16,10 @@ uint32_t capacity;
 bool nor_flash_inited = false;
 
 // Initialize FATFS disk I/O interface by providing the block device.
-static diskio_blkdev_t drives[] = {DISKIO_BLOCKDEV_CONFIG(NRF_BLOCKDEV_BASE_ADDR(m_block_dev_qspi, block_dev), NULL)};
+static diskio_blkdev_t drives[] =
+{
+    DISKIO_BLOCKDEV_CONFIG(NRF_BLOCKDEV_BASE_ADDR(m_block_dev_qspi, block_dev), NULL)
+};
 
 void init_nor_flash(void) {
   disk_state = STA_NOINIT;
@@ -32,7 +35,6 @@ void init_nor_flash(void) {
       printf("Disk initialization failed. State: %d\n", disk_state);
       return;
   }
-
   printf("NOR Flash Storage initialized\n");
 
   // Mount the NOR Flash Volume
@@ -47,7 +49,10 @@ void init_nor_flash(void) {
 }
 
 void uninit_nor_flash(void) {
-  UNUSED_RETURN_VALUE(disk_uninitialize(0));
+  disk_state = disk_uninitialize(0);
+
+  app_usbd_ep_disable(ENDPOINT_LIST());
+
   printf("NOR Flash Storage Uninitialized.\n");
 }
 

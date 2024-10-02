@@ -146,7 +146,7 @@ DSTATUS disk_uninitialize(BYTE drv)
     if (m_drives[drv].state & STA_NOINIT)
     {
         // Disk already uninitialized.
-        //return m_drives[drv].state;
+        return m_drives[drv].state;
     }
 
     (void)nrf_blk_dev_ioctl(m_drives[drv].config.p_block_device,
@@ -170,7 +170,7 @@ DSTATUS disk_uninitialize(BYTE drv)
     {
         m_drives[drv].state |= STA_NOINIT;
     }
-
+    
     return m_drives[drv].state;
 }
 
