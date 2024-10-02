@@ -58,6 +58,10 @@ void getLogFileName(const char *_logFileName) {
     printf("LOG_TASK: Unable to get time for log file name!\n");
     sprintf(_logFileName, "unknown.csv");
   }
+  if (!(calendar_get_time(&time))) {
+    printf("LOG_TASK: Unable to get time for log file name!\n");
+    sprintf(_logFileName, "unknown.csv");
+  }
   // Get current Date and Time and update vars
   sprintf(_logFileName, "sample_%02d-%02d-%02d_%02d%02d%02d.csv",
       time.month, time.day, time.year, // Assuming 'year' is the full year, so we use % 100 to get last two digits
