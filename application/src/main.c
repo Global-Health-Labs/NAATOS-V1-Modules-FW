@@ -89,8 +89,8 @@ xQueueHandle main_setPointReached;
 naatos_config_parameters config = {
     .logging_rate = 0,
     .sample_rate = 0,
-    .amplification_zone_run_time_m = 0,
-    .valve_zone_run_time_m = 0,
+    .cycle_1_run_time_m = 0,
+    .cycle_2_run_time_m = 0,
     .sample_valid_timeout_s = 0,
     .sample_complete_delay_s = 0,
     .low_power_threshold = 0,

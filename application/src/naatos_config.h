@@ -103,6 +103,8 @@
 #else
 #define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
 #define DEFAULT_LOGGING_RATE 5.000
+#define DEFAULT_CYCLE_1_RUNTIME 1800.0
+#define DEFAULT_CYCLE_2_RUNTIME 180.0
 #define DEFAULT_WAIT_TIME_AFTER_VALVE_S 900.00 // 15 min
 #define VALVE_SETPOINT 67.6
 #define AMP0_SETPOINT 67.2
@@ -541,8 +543,8 @@ extern xTaskHandle buttonTaskHandle;
 typedef struct {
   float sample_rate;
   float logging_rate;
-  uint16_t valve_zone_run_time_m;
-  uint16_t amplification_zone_run_time_m;
+  float cycle_2_run_time_m;
+  float cycle_1_run_time_m;
   uint16_t low_power_threshold;
   uint16_t recovery_power_thresh;
   uint16_t min_wait_time_after_valve_s;
@@ -555,6 +557,7 @@ typedef struct {
   float amp1_max_temp;
   float amp2_max_temp;
   float min_run_zone_temp;
+  float alert_timeout_time_s;
   float max_heater_pid_pwm;
   bool min_run_zone_temp_en;
   float alert_timeout_time_m;

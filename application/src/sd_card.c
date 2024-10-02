@@ -850,10 +850,10 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       break;
 #ifndef SAMPLE_PREP_BOARD
     case VALVE_ZONE_RUN_TIME:
-      parameters->valve_zone_run_time_m = atoi(val);
+      parameters->cycle_2_run_time_m = parse_int(val, DEFAULT_CYCLE_2_RUNTIME);
       break;
     case AMP_ZONE_RUN_TIME:
-      parameters->amplification_zone_run_time_m = atoi(val);
+      parameters->cycle_1_run_time_m = parse_int(val, DEFAULT_CYCLE_1_RUNTIME);
       break;
     case MIN_WAIT_TIME_AFTER_VALVE:
       parameters->min_wait_time_after_valve_s = atoi(val);

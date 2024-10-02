@@ -27,6 +27,7 @@ bool starting_run = true;
 
 temperature_data_t pm_local_temp_data;
 
+
 void handle_valve_stopstart_heater(bool heating) {
 #ifndef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
@@ -296,7 +297,7 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
     } else {
       starting_run = true;
       pm_heater_run = true;
-      heater_reset_all_pids();
+      powerModuleResetHeaterPIDs();
       // Send starting heater to sensors task
       handle_amplification_stopstart_heater(pm_heater_run);
     }
@@ -323,7 +324,7 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
       handle_valve_stopstart_heater(pm_heater_run);
     } else {
       pm_heater_run = true;
-      heater_reset_all_pids();
+      powerModuleResetHeaterPIDs();
       handle_valve_stopstart_heater(pm_heater_run);
     }
   }
