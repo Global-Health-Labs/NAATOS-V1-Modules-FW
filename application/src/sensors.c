@@ -158,7 +158,6 @@ void sensors_task(void *pvParameters) {
 
         HeaterRxQueueMsg_t heaterMsg = {
             .type = HEATER_MSG_SENSOR_CONFIRM,
-            .task = SENSORS,
             .heaterRunning = heaterRunning};
 
         // Respond to heater change
@@ -382,7 +381,7 @@ void runSamplePrepSensorCollection(void) {
     float avg_temp = (temp_samples[2] + temp_samples[3]) / 2.0;
 
     // Update the temperature reading with the averaged value
-    temperatures.amp2_zone_temp = avg_temp;
+    temperatures.heat_zone_3_temp = avg_temp;
 
   // Put Switch Data into queue
   xReturned = xQueueSend(main_switchQueue, (void *)&switches, 10);

@@ -204,6 +204,8 @@
         <file file_name="../src/storage/naatos_storage.c" />
         <file file_name="../src/storage/naatos_storage.h" />
       </folder>
+      <file file_name="../src/motor_task.c" />
+      <file file_name="../src/motor_task.h" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../sdk/external/segger_rtt/SEGGER_RTT.c" />
