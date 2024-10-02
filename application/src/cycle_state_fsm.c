@@ -87,7 +87,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       }
 
       updateLedState(LED_RUN, true);
-
+#ifdef SAMPLE_PREP_BOARD
       if (config.ramp_to_temp_before_start_cycle_1 && config.run_heater_1) {
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
@@ -99,6 +99,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       } else {
         next_state = CYCLE_1_TIMER;
       }
+#else
+      next_state = CYCLE_1_TIMER;
+#endif
       break;
     }
 
@@ -208,7 +211,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
     case START_CYCLE_2: {
       begin_cycle_2();
-
+#ifdef SAMPLE_PREP_BOARD
       if (config.ramp_to_temp_before_start_cycle_2 && config.run_heater_2) {
         if (!config.ramp_to_temp_before_start_cycle_1 || (config.heater_setpoint_1 != config.heater_setpoint_2)) {
           next_state = CYCLE_2_RAMP_TO_TEMP;
@@ -216,7 +219,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       } else {
         next_state = CYCLE_2_TIMER;
       }
-
+#else
+      next_state = CYCLE_2_TIMER;
+#endif
       break;
     }
 

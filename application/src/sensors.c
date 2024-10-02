@@ -23,13 +23,6 @@ temperature_pwm_data_t pwm_data = {
     .heat_zone_2_pwm = 0,
     .heat_zone_3_pwm = 0};
 
-static const nrf_drv_timer_t *p_counter1;
-static uint32_t motor_speed_read_t1 = 0;
-static uint32_t motor_speed_read_t2;
-static bool skipped_last_call = false;
-static long double motor_speed = 0.0; //RPM
-static long double avg_speed[3] = {0, 0, 0};
-static long double moving_avg_speed = 0.0;
 
 static tsys01_errors_t tsys01_err;
 
@@ -39,10 +32,8 @@ static long double amp1_temperature = 0.0;
 static long double amp2_temperature = 0.0;
 
 xQueueHandle sensorRxQueue;
-double motorSpeed = 0;
 
 TimerHandle_t sensorTempTimer;
-TimerHandle_t sensorMotorTimer;
 TickType_t sampleRateTicks;
 
 bool heaterRunning = false;
@@ -65,20 +56,7 @@ void vSensorTempTimerCallback(TimerHandle_t xTimer) {
   if (!usb_suspend) {
     xReturned = xQueueSend(sensorRxQueue, &msg, 0);
     if (xReturned != pdPASS) {
-      send_debug_log_message("Sensor: Unable to send timer update to sensorRxQueue queue. from temp callback\n");
-    }
-  }
-}
-
-void vSensorMotorTimerCallback(TimerHandle_t xTimer) {
-  BaseType_t xReturned;
-  SensorRxQueueMsg_t msg;
-
-  msg.type = SENSOR_MSG_TIMER_MOTOR_EVENT;
-  if (!usb_suspend) {
-    xReturned = xQueueSend(sensorRxQueue, &msg, 0);
-    if (xReturned != pdPASS) {
-      send_debug_log_message("Sensor: Unable to send timer update to sensorRxQueue queue. from motor timer callback\n");
+      send_debug_log_message("Sensor: Unable to send timer update to sensorRxQueue queue. from temp callback\r\n");
     }
   }
 }
@@ -97,33 +75,13 @@ void startSensorTempTimer(void) {
   }
 
   if (xTimerStart(sensorTempTimer, 0) != pdPASS) {
-    send_debug_log_message("Failed to start sensor timer. \n");
-  }
-}
-
-void startSensorMotorTimer(void) {
-  TickType_t sampleRateTicks;
-
-  sampleRateTicks = pdMS_TO_TICKS(50);
-
-  if (xTimerChangePeriod(sensorMotorTimer, sampleRateTicks, 100) != pdPASS) {
-    send_debug_log_message("Cannot change period of sensor timer. \n");
-  }
-
-  if (xTimerStart(sensorMotorTimer, 0) != pdPASS) {
-    send_debug_log_message("Failed to start sensor timer. \n");
+    send_debug_log_message("Failed to start sensor timer. \r\n");
   }
 }
 
 void stopSensorTempTimer(void) {
   if (xTimerStop(sensorTempTimer, 100) != pdPASS) {
-    send_debug_log_message("Failed to stop sensor timer. \n");
-  }
-}
-
-void stopSensorMotorTimer(void) {
-  if (xTimerStop(sensorMotorTimer, 100) != pdPASS) {
-    send_debug_log_message("Failed to stop sensor timer. \n");
+    send_debug_log_message("Failed to stop sensor timer. \r\n");
   }
 }
 
@@ -135,7 +93,6 @@ void samplePrepSensorTaskSetup(void) {
     asm volatile("nop");
   }
   sensorTempTimer = xTimerCreate("SensorTempTimer", sampleRateTicks, pdTRUE, (void *)0, vSensorTempTimerCallback);
-  sensorMotorTimer = xTimerCreate("SensorMotorTimer", 2, pdTRUE, (void *)0, vSensorMotorTimerCallback);
 }
 
 void powerModuleSensorTaskSetup(void) {
@@ -193,7 +150,7 @@ void sensors_task(void *pvParameters) {
 
     xReturned = xQueueReceive(sensorRxQueue, &sensorRxMessage, portMAX_DELAY);
     if (xReturned != pdPASS) {
-      send_debug_log_message("Unable to Rx data to sensor queue\n");
+      send_debug_log_message("Unable to Rx data to sensor queue\r\n");
     } else {
       switch (sensorRxMessage.type) {
       case SENSOR_MSG_HEATER_STATE: {
@@ -201,12 +158,13 @@ void sensors_task(void *pvParameters) {
 
         HeaterRxQueueMsg_t heaterMsg = {
             .type = HEATER_MSG_SENSOR_CONFIRM,
+            .task = SENSORS,
             .heaterRunning = heaterRunning};
 
         // Respond to heater change
         xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
         if (xReturned != pdPASS) {
-          send_debug_log_message("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
+          send_debug_log_message("USB: Unable to send main state response to main_mainStateRespQueue queue.\r\n");
         }
         break;
       }
@@ -215,7 +173,7 @@ void sensors_task(void *pvParameters) {
         // Send Suspend Accepted
         xReturned = xQueueSend(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0);
         if (xReturned != pdPASS) {
-          send_debug_log_message("SENSORS: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\n");
+          send_debug_log_message("SENSORS: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue\r\n");
         }
 
         usb_suspend = true;
@@ -225,7 +183,7 @@ void sensors_task(void *pvParameters) {
         // Send Suspend Over
         xReturned = xQueueSend(usb_usbWaitOverQueue, &sus_over, 0);
         if (xReturned != pdPASS) {
-          send_debug_log_message("SENSORS: Unable to send usb suspend over to usb_usbWaitOverQueue\n");
+          send_debug_log_message("SENSORS: Unable to send usb suspend over to usb_usbWaitOverQueue\r\n");
         }
         usb_suspend = false;
         break;
@@ -239,12 +197,6 @@ void sensors_task(void *pvParameters) {
 #endif
         break;
       }
-
-      case SENSOR_MSG_TIMER_MOTOR_EVENT: {
-        sensorMotorCollection();
-        break;
-      }
-
       case SENSOR_MSG_SLEEP: {
         handleSensorSleep();
         //send to main queue that we are asleep
@@ -272,43 +224,23 @@ void handleSensorSleep(void) {
   if (xTimerIsTimerActive(sensorTempTimer) == pdTRUE) {
     stopSensorTempTimer();
   }
-#ifdef SAMPLE_PREP_BOARD
-  if (xTimerIsTimerActive(sensorMotorTimer) == pdTRUE) {
-    stopSensorMotorTimer();
-  }
-#endif
 }
 
 void handleSensorWake(void) {
   if (xTimerIsTimerActive(sensorTempTimer) == pdFALSE) {
     startSensorTempTimer();
   }
-#ifdef SAMPLE_PREP_BOARD
-  if (xTimerIsTimerActive(sensorMotorTimer) == pdFALSE) {
-    startSensorMotorTimer();
-  }
-#endif
 }
 
 void handleConfigUpdated(void) {
   if (xTimerIsTimerActive(sensorTempTimer) == pdTRUE) {
     stopSensorTempTimer();
   }
-#ifdef SAMPLE_PREP_BOARD
-  if (xTimerIsTimerActive(sensorMotorTimer) == pdTRUE) {
-    stopSensorMotorTimer();
-  }
-#endif
   updateSampleLogMax();
 
   if (xTimerIsTimerActive(sensorTempTimer) == pdFALSE) {
     startSensorTempTimer();
   }
-#ifdef SAMPLE_PREP_BOARD
-  if (xTimerIsTimerActive(sensorMotorTimer) == pdFALSE) {
-    startSensorMotorTimer();
-  }
-#endif
 }
 
 void updateSampleLogMax(void) {
@@ -329,9 +261,9 @@ void runPowerModuleSensorCollection(void) {
   switches.optical_tiggered = get_optical_triggered();
   if (prev != switches.optical_tiggered) {
     if (switches.optical_tiggered) {
-      send_debug_log_message("Optical sensor triggered!\n");
+      send_debug_log_message("Optical sensor triggered!\r\n");
     } else {
-      send_debug_log_message("Optical sensor no longer triggered!\n");
+      send_debug_log_message("Optical sensor no longer triggered!\r\n");
     }
   }
   // GPIO Read for Hall Sensor
@@ -339,16 +271,16 @@ void runPowerModuleSensorCollection(void) {
   switches.hal_triggered = get_hal_triggered();
   if (prev != switches.hal_triggered) {
     if (switches.hal_triggered) {
-      send_debug_log_message("Hal sensor triggered!\n");
+      send_debug_log_message("Hal sensor triggered!\r\n");
     } else {
-      send_debug_log_message("Hal sensor no longer triggered!\n");
+      send_debug_log_message("Hal sensor no longer triggered!\r\n");
     }
   }
 
   // Put Switch Data into queue
-  xReturned = xQueueSend(main_switchQueue, (void *)&switches, 0);
+  xReturned = xQueueSend(main_switchQueue, (void *)&switches, 10);
   if (xReturned != pdPASS) {
-    send_debug_log_message("SENSORS_TASK: Unable to send switch data in main_switchQueue.\n");
+    send_debug_log_message("SENSORS_TASK: Unable to send switch data in main_switchQueue.\r\n");
   }
   // Send temperature data to Log Data queue
   if (heaterRunning) {
@@ -384,7 +316,7 @@ void runPowerModuleSensorCollection(void) {
     xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
     if (xReturned != pdPASS) {
       char errorString[100];
-      sprintf(errorString, "SENSORS_TASK: Unable to send temperature data in heaterRxQueue. Error: %d\n", xReturned);
+      sprintf(errorString, "SENSORS_TASK: Unable to send temperature data in heaterRxQueue. Error: %d\r\n", xReturned);
       send_debug_log_message(errorString);
     }
   }
@@ -396,6 +328,7 @@ void runSamplePrepSensorCollection(void) {
   bool readTempSuccess = false;
   heaterMsg.readTempFailed = false;
   bool prev;
+  int consecutive_failures = 0; // Counter for consecutive failures
 
   // GPIO Read for Hall Sensor
   prev = switches.hal_triggered;
@@ -406,28 +339,58 @@ void runSamplePrepSensorCollection(void) {
   }
   if (prev != switches.hal_triggered) {
     if (switches.hal_triggered) {
-      send_debug_log_message("Hal sensor triggered!\n");
+      send_debug_log_message("Hal sensor triggered!\r\n");
     } else {
-      send_debug_log_message("Hal sensor no longer triggered!\n");
+      send_debug_log_message("Hal sensor no longer triggered!\r\n");
     }
   }
 
-  readTempSuccess = readTemp(amp_zone_2, &temperatures.heat_zone_3_temp);
-  if (!readTempSuccess) {
-    heaterMsg.readTempFailed = true;
-  }
+    // Array to store temperature samples
+    float temp_samples[6];
+    float temp;
+
+    // Collect 10 temperature samples
+    for (int i = 0; i < 6; i++) {
+        bool readTempSuccess = readTemp(amp_zone_2, &temp);
+        if (readTempSuccess) {
+            temp_samples[i] = temp;
+            consecutive_failures = 0; // Reset the failure counter on success
+        } else {
+            consecutive_failures++; // Increment failure counter
+            send_debug_log_message("Failed to read temperature sample!\r\n");
+            if (consecutive_failures > 4) {
+                heaterMsg.readTempFailed = true;
+                send_debug_log_message("Temperature reading failed more than 6 times in a row!\r\n");
+                return; // Exit early if we have more than 6 consecutive failures
+            }
+        }
+        //vTaskDelay(pdMS_TO_TICKS(10)); // Optional delay between samples
+    }
+
+    // Sort the temperature samples (bubble sort for simplicity)
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5 - i; j++) {
+            if (temp_samples[j] > temp_samples[j + 1]) {
+                float temp_swap = temp_samples[j];
+                temp_samples[j] = temp_samples[j + 1];
+                temp_samples[j + 1] = temp_swap;
+            }
+        }
+    }
+
+    // Calculate the average of the middle 3 values (indexes 3, 4, 5 after sorting)
+    float avg_temp = (temp_samples[2] + temp_samples[3]) / 2.0;
+
+    // Update the temperature reading with the averaged value
+    temperatures.amp2_zone_temp = avg_temp;
 
   // Put Switch Data into queue
-  xReturned = xQueueSend(main_switchQueue, (void *)&switches, 0);
+  xReturned = xQueueSend(main_switchQueue, (void *)&switches, 10);
   if (xReturned != pdPASS) {
-    send_debug_log_message("SENSORS_TASK: Unable to send switch data in main_switchQueue.\n");
+    send_debug_log_message("SENSORS_TASK: Unable to send switch data in main_switchQueue.\r\n");
   }
 
   if (heaterRunning) {
-    readTempSuccess = readTemp(amp_zone_2, &temperatures.heat_zone_3_temp);
-    if (!readTempSuccess) {
-      heaterMsg.readTempFailed = true;
-    }
 
     heaterMsg.type = HEATER_MSG_TEMPERATURE_DATA;
     heaterMsg.tempData = temperatures;
@@ -435,30 +398,7 @@ void runSamplePrepSensorCollection(void) {
     xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
     if (xReturned != pdPASS) {
       char errorString[100];
-      sprintf(errorString, "SENSORS_TASK: Unable to send temperature data in heaterRxQueue. Error: %d\n", xReturned);
-      send_debug_log_message(errorString);
-    }
-  }
-}
-
-void sensorMotorCollection(void) {
-  BaseType_t xReturned;
-  HeaterRxQueueMsg_t heaterMsg;
-
-  if (heaterRunning) {
-    motorSpeed = readMotorSpeed();
-    avg_speed[2] = avg_speed[1];
-    avg_speed[1] = avg_speed[0];
-    avg_speed[0] = motorSpeed;
-
-    moving_avg_speed = (avg_speed[0] + avg_speed[1] + avg_speed[2]) / 3.0;
-
-    heaterMsg.type = HEATER_MSG_MOTOR_DATA;
-    heaterMsg.motorSpeed = moving_avg_speed;
-    xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
-    if (xReturned != pdPASS) {
-      char errorString[100];
-      sprintf(errorString, "SENSORS_TASK: Unable to send temperature data in heaterRxQueue. Error: %d\n", xReturned);
+      sprintf(errorString, "SENSORS_TASK: Unable to send temperature data in heaterRxQueue. Error: %d\r\n", xReturned);
       send_debug_log_message(errorString);
     }
   }
@@ -473,11 +413,6 @@ void init_sensors_gpios(void) {
   /*LED Driver Enable*/
   nrf_gpio_cfg_output(LED_HARDWARE_DRIVER_ENABLE_PIN);
   nrf_gpio_pin_set(LED_HARDWARE_DRIVER_ENABLE_PIN);
-
-#ifdef SAMPLE_PREP_BOARD
-  /* Setup Motor Speed Sensor Input*/
-  p_counter1 = motor_tach_init();
-#endif
 }
 
 bool readTemp(sensor_selection_t sensor, float *temperature) {
@@ -486,32 +421,15 @@ bool readTemp(sensor_selection_t sensor, float *temperature) {
 
   tsys_err = tsys01_startConversion(sensor);
   if (tsys_err != tsys01_success) {
-    send_debug_log_message("HEATER_TASK: Unable to triggr temperature conversion!\n");
+    send_debug_log_message("HEATER_TASK: Unable to triggr temperature conversion!\r\n");
+    return false;
   } else {
     vTaskDelay(pdMS_TO_TICKS(12)); // 12ms conversion time
     tsys_err = tsys01_getTemp(sensor, temperature);
     if (tsys_err != tsys01_success) {
-      send_debug_log_message("HEATER_TASK: Unable to read temperature! 1\n");
+      send_debug_log_message("HEATER_TASK: Unable to read temperature! 1\r\n");
+      return false;
     }
+    return true;
   }
-
-  return temperature;
-}
-
-double readMotorSpeed(void) {
-  //Check how many pulses have been captured in elapsed time since last call
-  motor_speed_read_t2 = xTaskGetTickCount();
-  uint32_t delta_t = pdTICKS_TO_MS(motor_speed_read_t2 - motor_speed_read_t1);
-  uint32_t pulse_count = (nrf_drv_timer_capture(p_counter1, NRF_TIMER_CC_CHANNEL0)) / 2; //Divide by two because counter increments for every rising AND falling edge
-
-  //Convert pulse count to rotational speed
-  double motor_speed_rpm = (1000 * 60 * ((double)pulse_count / (double)delta_t)) / 9;
-  //printf("Motor speed: %f\r\n", motor_speed_rpm);
-
-  //Clear the counter, update variable for tracking elapsed time
-  nrf_drv_timer_clear(p_counter1);
-  motor_speed_read_t1 = xTaskGetTickCount();
-  skipped_last_call = false;
-
-  return motor_speed_rpm;
 }

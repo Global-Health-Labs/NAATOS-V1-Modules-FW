@@ -296,7 +296,7 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
     } else {
       starting_run = true;
       pm_heater_run = true;
-      heater_reset_all_pids();
+      powerModuleResetHeaterPIDs();
       // Send starting heater to sensors task
       handle_amplification_stopstart_heater(pm_heater_run);
     }
@@ -323,7 +323,7 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
       handle_valve_stopstart_heater(pm_heater_run);
     } else {
       pm_heater_run = true;
-      heater_reset_all_pids();
+      powerModuleResetHeaterPIDs();
       handle_valve_stopstart_heater(pm_heater_run);
     }
   }
