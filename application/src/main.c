@@ -317,6 +317,7 @@ void main_task(void *pvParameters) {
 
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(100)) == pdPASS) {
+        //printf("Battery percentage received: %d\n", percent_recv);
         if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
              //next_state = MAIN_SLEEP;
              //break;
@@ -984,7 +985,7 @@ int main(void) {
   nrf_drv_clock_lfclk_request(NULL);
 
   while (!nrf_drv_clock_lfclk_is_running()) {
-    // Just waiting
+    // Just waiting8
   }
 
   // Full Peripheral Initalizations
@@ -1001,6 +1002,7 @@ int main(void) {
 
 #ifdef SAMPLE_PREP_BOARD
   vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_100k); // I2C
+  vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_100k);  // I2C
 #else
   vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_100k);  // I2C
   vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_100k); // I2C
