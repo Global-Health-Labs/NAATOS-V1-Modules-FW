@@ -272,11 +272,11 @@ fuel_gauge_errors_t fuelGauge_init(void) {
     //    return opError;
     //}
 
-    opError = fuelGauge_writeRegisterBlocking(0x18, BATTERY_MAH * MAX77658_FUEL_GAUGE_DESIGNCAP_MULTI_FACTOR); // 2600mAh design cap
+    opError = fuelGauge_writeRegisterBlocking(0x18, BATTERY_MAH * MAX77658_FUEL_GAUGE_DESIGNCAP_MULTI_FACTOR); // 5000mAh design cap
     if (opError != fuel_gauge_success) {
       return opError;
     }
-    opError = fuelGauge_writeRegisterBlocking(0x1E, 0x0168); //11.25mA termination current
+    opError = fuelGauge_writeRegisterBlocking(0x1E, 0x0086); // 13.50mA termination current
     if (opError != fuel_gauge_success) {
       return opError;
     }

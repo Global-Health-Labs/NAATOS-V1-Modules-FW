@@ -21,7 +21,7 @@ extern "C" {
 #define MAX77658_FG_CURRENT_LSB 156.25f //uA
 #define MAX77658_FUEL_GAUGE_VOLTAGE_LSB 0.078125f //mV
 #define MAX77658_FUEL_GAUGE_REPCAP_CONV_FACTOR 0.5f
-#define MAX77658_FUEL_GAUGE_DESIGNCAP_MULTI_FACTOR 2u // Inverse of MAX77658_FUEL_GAUGE_REPCAP_CONV_FACTOR as integer
+#define MAX77658_FUEL_GAUGE_DESIGNCAP_MULTI_FACTOR 6u // Inverse of MAX77658_FUEL_GAUGE_REPCAP_CONV_FACTOR as integer
 /*=========================================================================
 
 
@@ -127,7 +127,7 @@ extern "C" {
 #define MAX77658_SFT_RESET 0x01
 #define BATT_CHARGER_WDT_PERIOD 64000 //ms
 #define CHARGING_CABLE_CONNECTED 0x0C
-#define BATTERY_MAH 14000 //mAh
+#define BATTERY_MAH 5000 //mAh
 /*=========================================================================*/
 
 typedef enum {
