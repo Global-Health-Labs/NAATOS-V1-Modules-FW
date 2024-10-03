@@ -318,10 +318,6 @@ void usb_suspend_conflicting_tasks(void) {
 void start_usb(bool cdc_acm, bool msc) {
   ret_code_t ret;
 
-  if (naatos_storage_initalized && msc) {
-    uninit_naatos_storage();
-  }
-
   static const app_usbd_config_t usbd_config = {
       .ev_state_proc = usbd_user_ev_handler};
 
@@ -370,9 +366,6 @@ void start_usb(bool cdc_acm, bool msc) {
 
 void restart_usb_only_cdc_acm(void) {
   printf("USB: Restarting USB to only have Virtual COM Port.\n");
-  app_usbd_stop();
-  //app_usbd_ep_disable(ENDPOINT_LIST());
-  init_naatos_storage();
 
   //usb_done_config = false;
   usb_started = false;
@@ -540,7 +533,6 @@ void usb_task(void *pvParameters) {
         usbd_user_ev_handler(APP_USBD_EVT_POWER_REMOVED);
         app_usbd_disable();
         app_usbd_uninit();
-        disk_uninitialize(0);
         // Restart the USB
         start_usb(true, false);
         usbd_user_ev_handler(APP_USBD_EVT_POWER_DETECTED);
@@ -570,7 +562,7 @@ void usb_task(void *pvParameters) {
         app_usbd_uninit();
  
         // Restart the USB
-        start_usb(true, true);
+        start_usb(false, true);
         usbd_user_ev_handler(APP_USBD_EVT_POWER_DETECTED);
         break;
       }

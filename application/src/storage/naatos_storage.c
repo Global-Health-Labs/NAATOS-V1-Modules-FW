@@ -41,7 +41,7 @@ void mount_storage(void) {
   }
 #elif USE_NOR_FLASH
   if (mount_nor_flash() != FR_OK) {
-    printf("Unable to mount NOR Flash");
+    printf("Unable to mount NOR Flash\n");
   }
 #endif
 }
@@ -54,7 +54,7 @@ void unmount_storage(void) {
   }
 #elif USE_NOR_FLASH
   if (unmount_nor_flash() != FR_OK) {
-    printf("Unable to unmount NOR Flash");
+    printf("Unable to unmount NOR Flash\n");
   }
 #endif
 }
@@ -76,7 +76,7 @@ void create_naatos_directories() {
   if (res == FR_OK) {
     printf("New config.txt config file in config subdirectory created with default parameters.\n");
   } else if (res != FR_EXIST) {
-    printf("Unable to retreive config.txt from sd card.\n");
+    printf("Unable to retreive config.txt\n");
   }
 }
 

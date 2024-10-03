@@ -13,10 +13,10 @@
 
 #define SAMPLE_HEATER_CHANNEL 0
 
-#define VALVE_CHANNEL 0
-#define AMP0_CHANNEL 1
-#define AMP1_CHANNEL 0
-#define AMP2_CHANNEL 1
+#define HEAT_ZONE_0_CHANNEL 0
+#define HEAT_ZONE_1_CHANNEL 1
+#define HEAT_ZONE_2_CHANNEL 0
+#define HEAT_ZONE_3_CHANNEL 1
 #define MOTOR_CHANNEL 0
 
 void init_pwms();

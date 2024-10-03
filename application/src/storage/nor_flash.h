@@ -1,5 +1,4 @@
-#ifndef NOR_FLASH_H
-#define NOR_FLASH_H
+#pragma once
 
 #include <string.h>
 
@@ -25,12 +24,12 @@
 {                                                                       \
     .xip_offset  = NRFX_QSPI_CONFIG_XIP_OFFSET,                         \
     .pins = {                                                           \
-       .sck_pin     = NRFX_QSPI_PIN_SCK,                                \
-       .csn_pin     = NRFX_QSPI_PIN_CSN,                                \
-       .io0_pin     = NRFX_QSPI_PIN_IO0,                                \
-       .io1_pin     = NRFX_QSPI_PIN_IO1,                                \
-       .io2_pin     = NRFX_QSPI_PIN_IO2,                                \
-       .io3_pin     = NRFX_QSPI_PIN_IO3,                                \
+       .sck_pin     = QSPI_CLK_PIN,                                \
+       .csn_pin     = QSPI_CS_PIN,                                \
+       .io0_pin     = QSPI_IO0_PIN,                                \
+       .io1_pin     = QSPI_IO1_PIN,                                \
+       .io2_pin     = QSPI_IO2_PIN,                                \
+       .io3_pin     = QSPI_IO3_PIN,                                \
     },                                                                  \
     .prot_if = {                                                        \
         .readoc     = (nrf_qspi_readoc_t)NRFX_QSPI_CONFIG_READOC,       \
@@ -55,7 +54,6 @@ NRF_BLOCK_DEV_QSPI_DEFINE(
      ),
      NFR_BLOCK_DEV_INFO_CONFIG("Nordic", "QSPI", "1.00")
 );
-#endif
 
 extern bool nor_flash_inited;
 
@@ -63,5 +61,4 @@ void init_nor_flash(void);
 void uninit_nor_flash(void);
 FRESULT mount_nor_flash(void);
 FRESULT unmount_nor_flash(void);
-
-#endif
+void nor_flash_list_contents(void);

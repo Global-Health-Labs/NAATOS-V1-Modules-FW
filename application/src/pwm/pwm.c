@@ -8,16 +8,16 @@ APP_PWM_INSTANCE(PWM2, 2); // Create instance "PWM2" using TIMER2
 static volatile bool pwm0_ready_flag = false;
 static volatile bool pwm2_ready_flag = false;
 
-int valve_duty = 0;
-int amp0_duty = 0;
-int amp1_duty = 0;
-int amp2_duty = 0;
+int heat_zone_0_duty = 0;
+int heat_zone_1_duty = 0;
+int heat_zone_2_duty = 0;
+int heat_zone_3_duty = 0;
 int motor_duty = 0;
 
-static bool valve_zone_active = false;
-static bool amp0_zone_active = false;
-static bool amp1_zone_active = false;
-static bool amp2_zone_active = false;
+static bool heat_zone_0_active = false;
+static bool heat_zone_1_active = false;
+static bool heat_zone_2_active = false;
+static bool heat_zone_3_active = false;
 static bool motor_active = false;
 
 xQueueHandle pwmRxQueue;
@@ -38,7 +38,7 @@ void init_pwms() {
   /* Create Configurations */
 
   /* 1 Channel PWM, 200Hz, Active High, Valve Zone Pin */
-  app_pwm_config_t pwm0_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, VALVE_ZONE_PIN, SAMPLE_HEATER_PIN);
+  app_pwm_config_t pwm0_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, HEATER_ZONE_0_PIN, SAMPLE_HEATER_PIN);
   pwm0_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
   pwm0_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
   //1 Channel PWM, 10kHz, Active High, Motor Control Pin */
@@ -59,9 +59,9 @@ void init_pwms() {
   pwmEnabled = true;
 
   // Set Original Duty Cycles to 0
-  app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 0);
-  app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL, 0);
-  app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, 0);
+  app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, 0);
+  app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, 0);
+  app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_2_CHANNEL, 0);
 }
 
 void updateDutyCycles(temperature_pwm_data_t pwmData) {
@@ -69,22 +69,22 @@ void updateDutyCycles(temperature_pwm_data_t pwmData) {
       .type = PWM_MSG_CALLBACK_EVENT};
   BaseType_t xReturned;
 
-  valve_duty = pwmData.valve_zone_pwm;
-  amp0_duty = pwmData.amp0_zone_pwm;
-  amp1_duty = pwmData.amp1_zone_pwm;
-  amp2_duty = pwmData.amp2_zone_pwm;
+  heat_zone_0_duty = pwmData.heat_zone_0_pwm;
+  heat_zone_1_duty = pwmData.heat_zone_1_pwm;
+  heat_zone_2_duty = pwmData.heat_zone_2_pwm;
+  heat_zone_3_duty = pwmData.heat_zone_3_pwm;
 
-  if (valve_duty > 0) {
-    valve_zone_active = true;
+  if (heat_zone_0_duty > 0) {
+    heat_zone_0_active = true;
   }
-  if (amp0_duty > 0) {
-    amp0_zone_active = true;
+  if (heat_zone_1_duty > 0) {
+    heat_zone_1_active = true;
   }
-  if (amp1_duty > 0) {
-    amp1_zone_active = true;
+  if (heat_zone_2_duty > 0) {
+    heat_zone_2_active = true;
   }
-  if (amp2_duty > 0) {
-    amp2_zone_active = true;
+  if (heat_zone_3_duty > 0) {
+    heat_zone_3_active = true;
   }
 
   xReturned = xQueueSend(pwmRxQueue, &msg, 0);
@@ -105,8 +105,8 @@ void pwm_task(void *pvParameters) {
 
 // Set Original Duty Cycles to 0
 #ifdef SAMPLE_PREP_BOARD
-  app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 0);
-  app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL, amp0_duty);
+  app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, 0);
+  app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, heat_zone_1_duty);
 #else
   app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty);
   app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL, amp0_duty);
@@ -114,7 +114,7 @@ void pwm_task(void *pvParameters) {
 #endif
 
   // for motor
-  app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, amp1_duty);
+  app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_2_CHANNEL, heat_zone_2_duty);
 
   PwmRxQueueMsg_t pwmMsg;
 
@@ -131,45 +131,45 @@ void pwm_task(void *pvParameters) {
       }
       case PWM_MSG_CALLBACK_EVENT: {
         if (pwm0_ready_flag) {
-          if (valve_zone_active || amp0_zone_active) {
+          if (heat_zone_0_active || heat_zone_1_active) {
             pwm0_ready_flag = false;
           }
 
-          if (valve_duty > 0) {
-            app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty);
-          } else if (valve_zone_active) {
-            valve_zone_active = false;
-            app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 0);
+          if (heat_zone_0_duty > 0) {
+            app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, heat_zone_0_duty);
+          } else if (heat_zone_0_active) {
+            heat_zone_0_active = false;
+            app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, 0);
           }
 
-          if (amp0_duty > 0) {
-            app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL, amp0_duty);
-          } else if (amp0_zone_active) {
-            amp0_zone_active = false;
-            app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL, 0);
+          if (heat_zone_1_duty > 0) {
+            app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, heat_zone_1_duty);
+          } else if (heat_zone_1_active) {
+            heat_zone_1_active = false;
+            app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, 0);
           }
         }
 
         if (pwm2_ready_flag) {
-          if (amp1_zone_active) {
+          if (heat_zone_2_active) {
             pwm2_ready_flag = false;
           }
 
-          if (amp1_duty > 0) {
-            app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, amp1_duty);
-          } else if (amp1_zone_active) {
-            app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, 0);
-            amp1_zone_active = false;
+          if (heat_zone_2_duty > 0) {
+            app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_2_CHANNEL, heat_zone_2_duty);
+          } else if (heat_zone_2_active) {
+            app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_2_CHANNEL, 0);
+            heat_zone_2_active = false;
           }
         }
         break;
       }
 
       case PWM_MSG_DISABLE: {
-        app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 0);
-        app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL, 0);
-        app_pwm_channel_duty_set(&PWM2, AMP1_CHANNEL, 0);
-        app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, 0);
+        app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, 0);
+        app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, 0);
+        app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_2_CHANNEL, 0);
+        app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_3_CHANNEL, 0);
         vTaskDelay(pdMS_TO_TICKS(100));
         if (pwmEnabled) {
           app_pwm_disable(&PWM0);

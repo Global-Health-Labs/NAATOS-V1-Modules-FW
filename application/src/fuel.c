@@ -88,7 +88,7 @@ void i2cDoneCallback(i2c_status_t outcome, uint8_t data_len, uint8_t *p_data_rea
         uint16_t regVal = readBuffer.readData[0];
         regVal += (uint16_t)readBuffer.readData[1] << 8;
         float tempRegVal = regVal;
-        tempRegVal *= MAX77658_FUEL_GAUGE_VOLTAGE_LSB;
+        tempRegVal *= MAX17263_FUEL_GAUGE_VOLTAGE_LSB;
         userData.data.battVoltage = round(tempRegVal);
         savedUserCallback(fuel_gauge_success, &userData);
       }
@@ -106,7 +106,7 @@ void i2cDoneCallback(i2c_status_t outcome, uint8_t data_len, uint8_t *p_data_rea
         uint16_t regVal = readBuffer.readData[0];
         regVal += (uint16_t)readBuffer.readData[1] << 8;
         float tempRegVal = regVal;
-        tempRegVal *= MAX77658_FUEL_GAUGE_REPCAP_CONV_FACTOR;
+        tempRegVal *= MAX17263_FUEL_GAUGE_REPCAP_CONV_FACTOR;
         userData.data.remainingCapacityMilliampHours = round(tempRegVal);
         savedUserCallback(fuel_gauge_success, &userData);
       }
@@ -126,7 +126,7 @@ void i2cDoneCallback(i2c_status_t outcome, uint8_t data_len, uint8_t *p_data_rea
         copyPointer[0] = readBuffer.readData[0];
         copyPointer[1] = readBuffer.readData[1];
         userData.data.batteryCurrentMilliamps = regVal;
-        userData.data.batteryCurrentMilliamps *= (MAX77658_FG_CURRENT_LSB);
+        userData.data.batteryCurrentMilliamps *= (MAX17263_FG_CURRENT_LSB);
         savedUserCallback(fuel_gauge_success, &userData);
       }
     }
@@ -150,7 +150,7 @@ static fuel_gauge_errors_t fuelGauge_writeRegister(uint8_t reg,
   writeBuffer[1] = (value >> 8);     //MSB of value
 
   current_op_type = fg_operation;
-  err_code = xUtil_TWI_Write(i2c_interface_system, MAX77658_FUELGAUGE_ADDRESS, reg, writeBuffer, 2);
+  err_code = xUtil_TWI_Write(i2c_interface_system, MAX17263_FUELGAUGE_ADDRESS, reg, writeBuffer, 2);
 
   if (err_code != NRF_SUCCESS) {
     fuelGaugeIsBusy = false;
@@ -183,7 +183,7 @@ static fuel_gauge_errors_t fuelGauge_readRegister(uint8_t reg, fuel_gauge_intern
   uint32_t err_code;
 
   current_op_type = fg_operation;
-  err_code = xUtil_TWI_Read(i2c_interface_system, MAX77658_FUELGAUGE_ADDRESS, reg, &readBuffer.readData[0], 2); //acquire data
+  err_code = xUtil_TWI_Read(i2c_interface_system, MAX17263_FUELGAUGE_ADDRESS, reg, &readBuffer.readData[0], 2); //acquire data
 
   if (err_code != NRF_SUCCESS) {
     fuelGaugeIsBusy = false;
@@ -225,9 +225,8 @@ fuel_gauge_errors_t fuelGauge_init(void) {
     return opError;
   }
 
-  if (1) //rxBuf & 0x02)
+  if ((rxBuf & 0x0002) != 0)
   {
-    //    return fuel_gauge_success;
 
     opError = fuelGauge_readRegisterBlocking(0x3D, &rxBuf);
     if (opError != fuel_gauge_success) {
@@ -235,7 +234,7 @@ fuel_gauge_errors_t fuelGauge_init(void) {
     }
     uint8_t count2 = 0;
     while (rxBuf & 0x01) {
-      vTaskDelay(10); //wait until FSTAT.DNR == 0
+      //vTaskDelay(10); //wait until FSTAT.DNR == 0
       opError = fuelGauge_readRegisterBlocking(0x3D, &rxBuf);
       if (opError != fuel_gauge_success) {
         return opError;
@@ -258,7 +257,7 @@ fuel_gauge_errors_t fuelGauge_init(void) {
     if (opError != fuel_gauge_success) {
       return opError;
     }
-    opError = fuelGauge_writeRegisterBlocking(0xBA, 0x00); //exit hibernation step two
+    opError = fuelGauge_writeRegisterBlocking(MAX17263_FG_REG_HIBCNFG, 0x00); //exit hibernation step two
     if (opError != fuel_gauge_success) {
       return opError;
     }
@@ -273,37 +272,37 @@ fuel_gauge_errors_t fuelGauge_init(void) {
     //    return opError;
     //}
 
-    opError = fuelGauge_writeRegisterBlocking(0x18, BATTERY_MAH * MAX77658_FUEL_GAUGE_DESIGNCAP_MULTI_FACTOR); // 2600mAh design cap
+    opError = fuelGauge_writeRegisterBlocking(MAX17263_FG_REG_DESIGNCAP, BATTERY_MAH * MAX17263_FUEL_GAUGE_DESIGNCAP_MULTI_FACTOR); // 5000mAh design cap
     if (opError != fuel_gauge_success) {
       return opError;
     }
-    opError = fuelGauge_writeRegisterBlocking(0x1E, 0x0168); //11.25mA termination current
+    opError = fuelGauge_writeRegisterBlocking(MAX17263_FG_REG_ICHGTERM, 0x0086); // 13.50mA termination current
     if (opError != fuel_gauge_success) {
       return opError;
     }
-    opError = fuelGauge_writeRegisterBlocking(0x3A, 0x9661); //empty cell voltage = 3.0v, recovery = 3.88
-    if (opError != fuel_gauge_success) {
-      return opError;
-    }
-
-    opError = fuelGauge_writeRegisterBlocking(0x1D, 0x2200); //Disable external thermistor
+    opError = fuelGauge_writeRegisterBlocking(MAX17263_FG_REG_VEMPTY, 0x9661); //empty cell voltage = 3.0v, recovery = 3.88
     if (opError != fuel_gauge_success) {
       return opError;
     }
 
-    opError = fuelGauge_writeRegisterBlocking(0xDB, 0x8000); //write modelcfg
+    opError = fuelGauge_writeRegisterBlocking(MAX17263_FG_REG_CONFIG, 0x2200); //Disable external thermistor
     if (opError != fuel_gauge_success) {
       return opError;
     }
 
-    opError = fuelGauge_readRegisterBlocking(0xDB, &rxBuf);
+    opError = fuelGauge_writeRegisterBlocking(MAX17263_FG_REG_MODELCFG, 0x8000); //write modelcfg
+    if (opError != fuel_gauge_success) {
+      return opError;
+    }
+
+    opError = fuelGauge_readRegisterBlocking(MAX17263_FG_REG_MODELCFG, &rxBuf);
     if (opError != fuel_gauge_success) {
       return opError;
     }
     count = 0;
     while (rxBuf & 0x8000) {
-      vTaskDelay(10); //wait until modelCFG.Refresh = 0
-      opError = fuelGauge_readRegisterBlocking(0xDB, &rxBuf);
+      //vTaskDelay(10); //wait until modelCFG.Refresh = 0
+      opError = fuelGauge_readRegisterBlocking(MAX17263_FG_REG_MODELCFG, &rxBuf);
       if (opError != fuel_gauge_success) {
         return opError;
       }
@@ -315,16 +314,16 @@ fuel_gauge_errors_t fuelGauge_init(void) {
       }
     }
 
-    opError = fuelGauge_writeRegisterBlocking(0xBA, hibcfg_original); //restore hibcfg
+    opError = fuelGauge_writeRegisterBlocking(MAX17263_FG_REG_HIBCNFG, hibcfg_original); //restore hibcfg
     if (opError != fuel_gauge_success) {
       return opError;
     }
 
-    opError = fuelGauge_readRegisterBlocking(0x00, &rxBuf); //read status
+    opError = fuelGauge_readRegisterBlocking(MAX17263_FG_REG_STATUS, &rxBuf); //read status
     if (opError != fuel_gauge_success) {
       return opError;
     }
-    opError = fuelGauge_writeRegisterBlocking(0x00, (rxBuf & 0xFD)); //clear POR flag
+    opError = fuelGauge_writeRegisterBlocking(MAX17263_FG_REG_STATUS, (rxBuf & 0xFD)); //clear POR flag
     if (opError != fuel_gauge_success) {
       return opError;
     }
@@ -343,7 +342,7 @@ fuel_gauge_errors_t fuelGauge_init(void) {
 }
 
 uint8_t fuelGauge_getSOC(fuelGauge_opDoneCallback_t cb) {
-  fuelGauge_readRegister(MAX77658_FG_REG_REPSOC, fg_get_soc, cb);
+  fuelGauge_readRegister(MAX17263_FG_REG_REPSOC, fg_get_soc, cb);
   uint8_t battPercent = readBuffer.readData[1];
   if (battPercent < 0) {
     battPercent = 0;
@@ -352,32 +351,32 @@ uint8_t fuelGauge_getSOC(fuelGauge_opDoneCallback_t cb) {
 }
 
 double fuelGauge_getBattVoltage(fuelGauge_opDoneCallback_t cb) {
-  fuelGauge_readRegister(MAX77658_FG_REG_VCELL, fg_get_batt_voltage, cb);
+  fuelGauge_readRegister(MAX17263_FG_REG_VCELL, fg_get_batt_voltage, cb);
   uint16_t regVal = readBuffer.readData[0];
   regVal += (uint16_t)readBuffer.readData[1] << 8;
   float tempRegVal = regVal;
-  tempRegVal *= MAX77658_FUEL_GAUGE_VOLTAGE_LSB;
+  tempRegVal *= MAX17263_FUEL_GAUGE_VOLTAGE_LSB;
   return round(tempRegVal);
 }
 
 double fuelGauge_getRepCap(fuelGauge_opDoneCallback_t cb) //capacity remaining in mAh
 {
-  fuelGauge_readRegister(MAX77658_FG_REG_REPCAP, fg_get_remaining_capacity, cb);
+  fuelGauge_readRegister(MAX17263_FG_REG_REPCAP, fg_get_remaining_capacity, cb);
   uint16_t regVal = readBuffer.readData[0];
   regVal += (uint16_t)readBuffer.readData[1] << 8;
   float tempRegVal = regVal;
-  tempRegVal *= MAX77658_FUEL_GAUGE_REPCAP_CONV_FACTOR;
+  tempRegVal *= MAX17263_FUEL_GAUGE_REPCAP_CONV_FACTOR;
   return round(tempRegVal);
 }
 
 //return the battery current in mA
 double fuelGauge_getBattCurrent(fuelGauge_opDoneCallback_t cb) {
-  fuelGauge_readRegister(MAX77658_FG_REG_AVGCURRENT, fg_get_battery_current, cb);
+  fuelGauge_readRegister(MAX17263_FG_REG_AVGCURRENT, fg_get_battery_current, cb);
   int16_t regVal;
   char *copyPointer = (char *)&regVal;
   copyPointer[0] = readBuffer.readData[0];
   copyPointer[1] = readBuffer.readData[1];
-  regVal *= (MAX77658_FG_CURRENT_LSB);
+  regVal *= (MAX17263_FG_CURRENT_LSB);
   return regVal;
 }
 

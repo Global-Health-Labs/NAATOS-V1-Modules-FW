@@ -32,13 +32,21 @@
 #define SPI_MISO_PIN 14  /* P0.14 */
 #define SPI_SD_SS_PIN 12 /* P0.12 */
 
+
+#define QSPI_IO0_PIN 44 /* P1.12 REVA*/ // 5   /* P0.05 REVB*/ 
+#define QSPI_IO1_PIN 45 /* P1.13 REVA*/ // 6   /* P0.06 REVB*/
+#define QSPI_IO2_PIN 46 /* P1.14 REVA*/ // 7   /* P0.07 REVB*/
+#define QSPI_IO3_PIN 47 /* P1.15 REVA*/ // 8   /* P0.08 REVB*/
+#define QSPI_CS_PIN  42 /* P1.10 REVA*/ // 30  /* P0.30 REVB*/
+#define QSPI_CLK_PIN 43 /* P1.11 REVA*/ // 3   /* P0.03 REVB*/
+
 #define BOOST_CONTROL_ENABLE_PIN 21
 #define BUTTON_INPUT_PIN NRF_GPIO_PIN_MAP(1, 6)
 
-#define VALVE_ZONE_PIN 20                    // P0.20
-#define AMP0_ZONE_PIN 19                     // P0.19
-#define AMP1_ZONE_PIN 34                     // P1.02
-#define AMP2_ZONE_PIN NRF_GPIO_PIN_MAP(1, 1) // P1.01
+#define HEATER_ZONE_0_PIN 20                    // P0.20
+#define HEATER_ZONE_1_PIN 19                     // P0.19
+#define HEATER_ZONE_2_PIN 34                     // P1.02
+#define HEATER_ZONE_3_PIN NRF_GPIO_PIN_MAP(1, 1) // P1.01
 
 #define SAMPLE_HEATER_PIN NRF_GPIO_PIN_MAP(1, 1) // P1.01
 #define SENSORS_EN NRF_GPIO_PIN_MAP(1, 7)
@@ -104,6 +112,8 @@
 #else
 #define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
 #define DEFAULT_LOGGING_RATE 5.000
+#define DEFAULT_CYCLE_1_RUNTIME 1800.0
+#define DEFAULT_CYCLE_2_RUNTIME 180.0
 #define DEFAULT_WAIT_TIME_AFTER_VALVE_S 900.00 // 15 min
 #define VALVE_SETPOINT 67.6
 #define AMP0_SETPOINT 67.2
@@ -141,10 +151,10 @@
 #define STOP_EVENT_MSG "Sample Preperation Completed."
 #define INTERRUPT_HAL_EVENT_MSG "Sample Preperation Interrupted. Cover Removed."
 #define INTERRUPT_OPT_EVENT_MSG "Sample Preperation Interrupted. Sample Removed."
-#define AMP_START_MSG "Cycle 1 Heating Started."
-#define AMP_END_MSG "Cycle 1 Heating Stopped."
-#define VALV_START_MSG "Cycle 2 Heating Started."
-#define VALV_STOP_MSG "Cycle 2 Heating Stopped."
+#define CYCLE_ONE_START_MSG "Cycle 1 Started."
+#define CYCLE_ONE_END_MSG "Cycle 1 Stopped."
+#define CYCLE_TWO_START_MSG "Cycle 2 Started."
+#define CYCLE_TWO_STOP_MSG "Cycle 2 Stopped."
 #define TEMPS_NOT_STABLE "Zone Temperatures are not below the minimum run temperature. Aborting run."
 #define RECOVERY_BATT "Battery Percentage lower than the recovery threshold. Charge Battery!: "
 #define OVER_TEMP_MSG "A Zone went over its maximum temperature. Run stopped."
@@ -186,11 +196,11 @@ typedef enum {
   NOT_CHARGING
 } charge_state_t;
 
-// Zone Identification Enum
+// Cycle Identification Enum
 typedef enum {
-  AMPLIFICATION,
-  VALVE
-} zone_t;
+  CYCLE_ONE,
+  CYCLE_TWO
+} cycle_t;
 
 // Type of update message being sent to usb queue
 typedef enum {
@@ -204,10 +214,10 @@ typedef enum {
   SAMPLE_INTERRUPTED,
   SAMPLE_BUTTON_CANCEL,
   SAMPLE_HAL_CANCEL,
-  SAMPLE_AMP_STARTED,
-  SAMPLE_AMP_ENDED,
-  SAMPLE_VALV_STARTED,
-  SAMPLE_VALV_ENDED,
+  SAMPLE_CYCLE_ONE_STARTED,
+  SAMPLE_CYCLE_ONE_ENDED,
+  SAMPLE_CYCLE_TWO_STARTED,
+  SAMPLE_CYCLE_TWO_ENDED,
   SAMPLE_TEMPS_NOT_STABALIZED,
   SAMPLE_RECOVERY_BATT,
   SAMPLE_OVER_TEMP,
@@ -243,23 +253,23 @@ typedef struct {
 
 // Temperature Data Struct
 typedef struct {
-  float amp0_zone_temp;
-  float valve_zone_pwm;
-  float amp1_zone_temp;
-  float amp0_zone_pwm;
-  float amp1_zone_pwm;
-  float amp2_zone_temp;
-  float valve_zone_temp;
-  float amp2_zone_pwm;
+  float heat_zone_0_temp;
+  float heat_zone_0_pwm;
+  float heat_zone_1_temp;
+  float heat_zone_1_pwm;
+  float heat_zone_2_temp;
+  float heat_zone_2_pwm;
+  float heat_zone_3_temp;
+  float heat_zone_3_pwm;
   double motorSpeed;
 } temperature_data_t;
 
 // Temperature PWM Data Struct
 typedef struct {
-  float valve_zone_pwm;
-  float amp0_zone_pwm;
-  float amp1_zone_pwm;
-  float amp2_zone_pwm;
+  float heat_zone_0_pwm;
+  float heat_zone_1_pwm;
+  float heat_zone_2_pwm;
+  float heat_zone_3_pwm;
   float sample_prep_heater_pwm;
 } temperature_pwm_data_t;
 
@@ -367,6 +377,22 @@ typedef struct {
   temperature_pwm_data_t pwmData;
 } SensorRxQueueMsg_t;
 
+
+typedef enum {
+  MOTOR_MSG_USB_SUSPEND,
+  MOTOR_MSG_TIMER_MOTOR_EVENT,
+  MOTOR_MSG_SLEEP,
+  MOTOR_MSG_WAKEUP,
+  MOTOR_CONFIG_UPDATED,
+  MOTOR_MSG_HEATER_STATE
+} MotorRxQueueType_t;
+
+typedef struct {
+  MotorRxQueueType_t type;
+  bool motorRunning;
+  bool usbSuspend;
+} MotorRxQueueMsg_t;
+
 // Battery messages
 
 typedef enum {
@@ -417,9 +443,9 @@ typedef enum {
 
 typedef struct {
   HeaterRxQueueType_t type;
-  zone_t zoneSelect;
+  cycle_t cycleSelect;
   temperature_data_t tempData;
-  bool zoneEnabled;
+  bool cycleEnabled;
   bool usbSuspend;
   bool heaterRunning;
   double motorSpeed;
@@ -428,7 +454,7 @@ typedef struct {
 
 typedef struct {
   event_t event;
-  char *message;
+  char message[256];
 } log_event_t;
 
 typedef enum {
@@ -526,8 +552,8 @@ extern xTaskHandle buttonTaskHandle;
 typedef struct {
   float sample_rate;
   float logging_rate;
-  uint16_t valve_zone_run_time_m;
-  uint16_t amplification_zone_run_time_m;
+  float cycle_2_run_time_m;
+  float cycle_1_run_time_m;
   uint16_t low_power_threshold;
   uint16_t recovery_power_thresh;
   uint16_t min_wait_time_after_valve_s;
@@ -540,6 +566,7 @@ typedef struct {
   float amp1_max_temp;
   float amp2_max_temp;
   float min_run_zone_temp;
+  float alert_timeout_time_s;
   float max_heater_pid_pwm;
   bool min_run_zone_temp_en;
   float alert_timeout_time_m;

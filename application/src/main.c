@@ -33,6 +33,7 @@ SDK Version: 17.1
 #include "storage/naatos_storage.h"
 #include "sdk_errors.h"
 #include "sensors.h"
+#include "motor_task.h"
 #include "spi.h"
 #include "states.h"
 #include "switch.h"
@@ -69,6 +70,7 @@ xTaskHandle wdtTaskHandle;
 xTaskHandle compositeTaskHandle;
 xTaskHandle buttonTaskHandle;
 xTaskHandle ledTaskHandle;
+xTaskHandle motorTaskHandle;
 
 xQueueHandle main_batteryDataQueue;
 xQueueHandle main_switchQueue;
@@ -87,8 +89,8 @@ xQueueHandle main_setPointReached;
 naatos_config_parameters config = {
     .logging_rate = 0,
     .sample_rate = 0,
-    .amplification_zone_run_time_m = 0,
-    .valve_zone_run_time_m = 0,
+    .cycle_1_run_time_m = 0,
+    .cycle_2_run_time_m = 0,
     .sample_valid_timeout_s = 0,
     .sample_complete_delay_s = 0,
     .low_power_threshold = 0,
@@ -159,10 +161,6 @@ bool use_default_configuration_parameters = false;
 // Function defs
 void sendWdtHeaterInvalid();
 void sendWdtMain(bool valid);
-bool begin_amplification_zone(void);
-void end_amplification_zone(void);
-void begin_valve_zone(void);
-void end_valve_zone(void);
 void create_tasks(void);
 void send_usb_change(usb_command_t cmd);
 void reset_and_enter_dfu(void);
@@ -204,13 +202,13 @@ void read_sd_and_notify_tasks(void) {
 
   xReturned = xQueueSend(heaterRxQueue, &heaterConfigMsg, 0);
   if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send run amplification zone request.\n");
+    printf("MAIN_TASK: Unable to send update config request to heaterRxQueue.\n");
   }
 
   // Send to Sensors task
   xReturned = xQueueSend(sensorRxQueue, &sensorConfigMsg, 0);
   if (xReturned != pdPASS) {
-    printf("USB: Unable to send usb suspend request to sensorRxQueue.\n");
+    printf("USB: Unable to send update config request to sensorRxQueue.\n");
   }
 }
 
@@ -279,6 +277,14 @@ void main_task(void *pvParameters) {
           printf("MAIN: Unable to send sensor wakeup to sensorRxQueue.\n");
         }
 
+        MotorRxQueueMsg_t motorMsg;
+        motorMsg.type = MOTOR_MSG_WAKEUP;
+
+        xReturned = xQueueSend(motorRxQueue, &motorMsg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN: Unable to send sensor wakeup to motorRxQueue.\n");
+        }
+
         vTaskDelay(300);
         read_sd_and_notify_tasks();
         // Get the alert timeout
@@ -311,6 +317,7 @@ void main_task(void *pvParameters) {
 
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(100)) == pdPASS) {
+        //printf("Battery percentage received: %d\n", percent_recv);
         if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
              //next_state = MAIN_SLEEP;
              //break;
@@ -588,8 +595,15 @@ void main_task(void *pvParameters) {
           printf("MAIN_TASK: Unable to send sensor sleep to sensorRxQueue queue.\n");
         }
 
+        MotorRxQueueMsg_t motorMsg;
+        motorMsg.type = MOTOR_MSG_SLEEP;
+        xReturned = xQueueSend(motorRxQueue, &motorMsg, 0);
+        if (xReturned != pdPASS) {
+          printf("MAIN_TASK: Unable to send motor sleep to motorRxQueue queue.\n");
+        }
+
         BatteryRxQueueMsg_t battMsg;
-        msg.type = BATTERY_MSG_SLEEP;
+        battMsg.type = BATTERY_MSG_SLEEP;
 
         xReturned = xQueueSend(batteryRxQueue, &battMsg, 0);
         if (xReturned != pdPASS) {
@@ -649,8 +663,15 @@ void main_task(void *pvParameters) {
         printf("MAIN_TASK: Unable to send sensor sleep to sensorRxQueue queue.\n");
       }
 
+      MotorRxQueueMsg_t motorMsg;
+      motorMsg.type = MOTOR_MSG_WAKEUP;
+      xReturned = xQueueSend(motorRxQueue, &motorMsg, 0);
+      if (xReturned != pdPASS) {
+        printf("MAIN_TASK: Unable to send motor wake to motorRxQueue queue.\n");
+      }
+
       BatteryRxQueueMsg_t battMsg;
-      msg.type = BATTERY_MSG_WAKEUP;
+      battMsg.type = BATTERY_MSG_WAKEUP;
 
       xReturned = xQueueSend(batteryRxQueue, &battMsg, 0);
       if (xReturned != pdPASS) {
@@ -703,8 +724,10 @@ void send_usb_change(usb_command_t cmd) {
       .msg_type = USB_MSG_COMMAND};
 
   printf("MAIN_TASK: Sending USB change request.\n");
-  //if (cmd != USB_CDC_ACM)
-  uninit_naatos_storage();
+  if (cmd != USB_CDC_ACM) {
+    unmount_storage();
+    uninit_naatos_storage();
+  }
 
   // Send command
   xReturned = xQueueSend(usbRxQueue, &usb_msg, 0);
@@ -717,8 +740,10 @@ void send_usb_change(usb_command_t cmd) {
     printf("MAIN_TASK: Unable to receive usb change confirmation from main_usbChangedConfQueue. \n");
   }
 
-  if (cmd == USB_CDC_ACM)
-    init_naatos_storage();
+  if (cmd == USB_CDC_ACM) {
+    //init_naatos_storage();
+    NVIC_SystemReset();
+  }
 
   printf("MAIN_TASK: USB state successfully changed.\n");
 }
@@ -804,6 +829,14 @@ void create_tasks() {
     printf("Error creating Composite ledTaskHandle task. Error: %d\n", xReturned);
     vTaskDelete(ledTaskHandle);
   }
+  // Motor Task
+  xReturned = xTaskCreate(motorTask, "MotorTask", 1024, NULL, 0, &motorTaskHandle);
+  if (xReturned != pdPASS) {
+    // The task was created.  Use the task's handle to delete the task.
+    printf("Error creating MotorTaskHandle task. Error: %d\n", xReturned);
+    vTaskDelete(ledTaskHandle);
+  }
+
 }
 
 /*********************************************************************
@@ -818,7 +851,7 @@ void create_queues() {
   if (main_batteryDataQueue == NULL)
     printf("Unable to create main_batteryDataQueue queue\n");
 
-  main_switchQueue = xQueueCreate(QUEUE_SIZE, sizeof(sensor_switches_t));
+  main_switchQueue = xQueueCreate(10, sizeof(sensor_switches_t));
   if (main_switchQueue == NULL)
     printf("Unable to create main_switchQueue queue\n");
 
@@ -921,6 +954,11 @@ void create_queues() {
   if (main_setPointReached == NULL) {
     printf("Unable to create main_setPointReached queue\n");
   }
+
+  motorRxQueue = xQueueCreate(10, sizeof(MotorRxQueueMsg_t));
+  if (motorRxQueue == NULL) {
+    printf("Unable to create motorRxQueue queue\n");
+  }
 }
 
 // Stack Overflow detection.
@@ -947,11 +985,12 @@ int main(void) {
   nrf_drv_clock_lfclk_request(NULL);
 
   while (!nrf_drv_clock_lfclk_is_running()) {
-    // Just waiting
+    // Just waiting8
   }
 
   // Full Peripheral Initalizations
   init_adc();           // ADC
+  init_motor_gpio();
   init_sensors_gpios(); // Sensor GPIOs
   init_pwms();
 
@@ -990,7 +1029,7 @@ int main(void) {
 
       xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
       if (xReturned != pdPASS) {
-        printf("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
+        printf("MAIN_TASK: Unable to send configuration error to logging task.\n");
       }
       xReturned = xQueueSend(logger_logMessageQueue, &exit_log_message, 0);
       if (xReturned != pdPASS) {

@@ -18,116 +18,69 @@ extern "C" {
     CONVERSION FACTORS
     -----------------------------------------------------------------------*/
 #define FG_SENSE_RESISTANCE 0.010f //10mOhms
-#define MAX77658_FG_CURRENT_LSB 156.25f //uA
-#define MAX77658_FUEL_GAUGE_VOLTAGE_LSB 0.078125f //mV
-#define MAX77658_FUEL_GAUGE_REPCAP_CONV_FACTOR 0.5f
-#define MAX77658_FUEL_GAUGE_DESIGNCAP_MULTI_FACTOR 2u // Inverse of MAX77658_FUEL_GAUGE_REPCAP_CONV_FACTOR as integer
+#define MAX17263_FG_CURRENT_LSB 156.25f //uA
+#define MAX17263_FUEL_GAUGE_VOLTAGE_LSB 0.078125f //mV
+#define MAX17263_FUEL_GAUGE_REPCAP_CONV_FACTOR 0.5f
+#define MAX17263_FUEL_GAUGE_DESIGNCAP_MULTI_FACTOR 6u // Inverse of MAX77658_FUEL_GAUGE_REPCAP_CONV_FACTOR as integer
 /*=========================================================================
-
 
 
 /*=========================================================================
     I2C ADDRESS/BITS
     -----------------------------------------------------------------------*/
-#define MAX77658_MAIN_ADDRESS 0x48
-#define MAX77658_FUELGAUGE_ADDRESS 0x36
+#define MAX17263_FUELGAUGE_ADDRESS 0x36
 
-/*=========================================================================*/
-
-/*=========================================================================
-    MAIN REGISTERS
-    -----------------------------------------------------------------------*/
-#define MAX77658_REG_CNFG_CHG_I 0x28
-#define MAX77658_REG_CNFG_SBB_TOP 0x38
-#define MAX77658_REG_CNFG_SBB0_A 0x39
-#define MAX77658_REG_CNFG_SBB0_B 0x3A
-#define MAX77658_REG_CNFG_SBB1_A 0x3B
-#define MAX77658_REG_CNFG_SBB1_B 0x3C
-#define MAX77658_REG_CNFG_SBB2_A 0x3D
-#define MAX77658_REG_CNFG_SBB2_B 0x3E
-#define MAX77658_REG_CNFG_DVS_SBB0_A 0x3F
-#define MAX77658_REG_CNFG_LDO0_A 0x48
-#define MAX77658_REG_CNFG_LDO0_B 0x49
-#define MAX77658_REG_CNFG_LDO1_A 0x4A
-#define MAX77658_REG_CNFG_LDO1_B 0x4B
-#define MAX77658_REG_INT_GLBL0 0x00
-#define MAX77658_REG_INT_GLBL1 0x04
-#define MAX77658_REG_ERCFLAG 0x05
-#define MAX77658_REG_STAT_GLBL 0x06
-#define MAX77658_REG_INTM_GLBL0 0x08
-#define MAX77658_REG_INTM_GLBL1 0x09
-#define MAX77658_REG_CNFG_GLBL 0x10
-#define MAX77658_REG_CNFG_GPIO0 0x11
-#define MAX77658_REG_CNFG_GPIO1 0x12
-#define MAX77658_REG_CNFG_GPIO2 0x13
-#define MAX77658_REG_CID 0x14
-#define MAX77658_REG_CNFG_WDT 0x17
-#define MAX77658_REG_INT_CHG 0x01
-#define MAX77658_REG_STAT_CHG_A 0x02
-#define MAX77658_REG_STAT_CHG_B 0x03
-#define MAX77658_REG_INT_M_CHG 0x07
-#define MAX77658_REG_CNFG_CHG_A 0x20
-#define MAX77658_REG_CNFG_CHG_B 0x21
-#define MAX77658_REG_CNFG_CHG_C 0x22
-#define MAX77658_REG_CNFG_CHG_D 0x23
-#define MAX77658_REG_CNFG_CHG_E 0x24
-#define MAX77658_REG_CNFG_CHG_F 0x25
-#define MAX77658_REG_CNFG_CHG_G 0x26
-#define MAX77658_REG_CNFG_CHG_H 0x27
 /*=========================================================================*/
 
 /*=========================================================================
     FUEL GAUGE REGISTERS
     -----------------------------------------------------------------------*/
-#define MAX77658_FG_REG_STATUS 0x00
-#define MAX77658_FG_REG_VALRTTH 0x01
-#define MAX77658_FG_REG_TALRTTH 0x02
-#define MAX77658_FG_REG_SALRTTH 0x03
-#define MAX77658_FG_REG_FULLSOCTHR 0x13
-#define MAX77658_FG_REG_DESIGNCAP 0x18
-#define MAX77658_FG_REG_CONFIG 0x1D
-#define MAX77658_FG_REG_ICHGTERM 0x1E
-#define MAX77658_FG_REG_DEVNAME 0x21
-#define MAX77658_FG_REG_LEARNCFG 0x28
-#define MAX77658_FG_REG_FILTERCFG 0x29
-#define MAX77658_FG_REG_VEMPTY 0x3A
-#define MAX77658_FG_REG_POWER 0xB1
-#define MAX77658_FG_REG_AVGPOWER 0xB3
-#define MAX77658_FG_REG_IALRTTH 0xB4
-#define MAX77658_FG_REG_CONFIG2 0xBB
-#define MAX77658_FG_REG_TEMP 0x08
-#define MAX77658_FG_REG_VCELL 0x09
-#define MAX77658_FG_REG_CURRENT 0x0A
-#define MAX77658_FG_REG_AVGCURRENT 0x0B
-#define MAX77658_FG_REG_AVGTA 0x16
-#define MAX77658_FG_REG_AVGVCELL 0x19
-#define MAX77658_FG_REG_MAXMINTEMP 0x1A
-#define MAX77658_FG_REG_MAXMINVOLT 0x1B
-#define MAX77658_FG_REG_MAXMINCURR 0x1C
-#define MAX77658_FG_REG_AIN0 0x27
-#define MAX77658_FG_REG_TIMER 0x3E
-#define MAX77658_FG_REG_TIMERH 0xBE
-#define MAX77658_FG_REG_REPCAP 0x05
-#define MAX77658_FG_REG_REPSOC 0x06
-#define MAX77658_FG_REG_AVSOC 0x0E
-#define MAX77658_FG_REG_FULLCAPREP 0x10
-#define MAX77658_FG_REG_TTE 0x11
-#define MAX77658_FG_REG_RCELL 0x14
-#define MAX77658_FG_REG_CYCLES 0x17
-#define MAX77658_FG_REG_AVCAP 0x1F
-#define MAX77658_FG_REG_TTF 0x20
+#define MAX17263_FG_REG_STATUS 0x00 
+#define MAX17263_FG_REG_VALRTTH 0x01 
+#define MAX17263_FG_REG_TALRTTH 0x02 
+#define MAX17263_FG_REG_SALRTTH 0x03 
+#define MAX17263_FG_REG_DESIGNCAP 0x18 
+#define MAX17263_FG_REG_CONFIG 0x1D 
+#define MAX17263_FG_REG_ICHGTERM 0x1E 
+#define MAX17263_FG_REG_VEMPTY 0x3A 
+#define MAX17263_FG_REG_POWER 0xB1 
+#define MAX17263_FG_REG_AVGPOWER 0xB3 
+#define MAX17263_FG_REG_IALRTTH 0xB4 
+#define MAX17263_FG_REG_CONFIG2 0xBB 
+#define MAX17263_FG_REG_TEMP 0x08 
+#define MAX17263_FG_REG_VCELL 0x09 
+#define MAX17263_FG_REG_CURRENT 0x0A 
+#define MAX17263_FG_REG_AVGCURRENT 0x0B 
+#define MAX17263_FG_REG_AVGTA 0x16 
+#define MAX17263_FG_REG_AVGVCELL 0x19 
+#define MAX17263_FG_REG_MAXMINTEMP 0x1A 
+#define MAX17263_FG_REG_MAXMINVOLT 0x1B 
+#define MAX17263_FG_REG_MAXMINCURR 0x1C 
+#define MAX17263_FG_REG_REPCAP 0x05 
+#define MAX17263_FG_REG_REPSOC 0x06 
+#define MAX17263_FG_REG_FULLCAPREP 0x10 
+#define MAX17263_FG_REG_TTE 0x11 
+#define MAX17263_FG_REG_CYCLES 0x17 
+#define MAX17263_FG_REG_TTF 0x20 
+#define MAX17263_FG_REG_HIBCNFG 0xBA
+#define MAX17263_FG_REG_MODELCFG 0xDB
+#define MAX17263_FG_REG_DIETEMP 0x34
+#define MAX17263_FG_REG_LEDCNFG1 0x40
+#define MAX17263_FG_REG_LEDCNFG2 0x4B
+#define MAX17263_FG_REG_LEDCNFG3 0x37
+#define MAX17263_FG_REG_CUSTLED 0x64
 /*=========================================================================*/
 
 /*=========================================================================
     OTHER
     -----------------------------------------------------------------------*/
-#define NUM_MAX77658_INIT_REGS_MAIN 38
-#define NUM_MAX77658_INIT_REGS_FG 0
-#define MAX77658_WATCHDOG_RESET 0x2F
-#define MAX77658_SFT_RESET 0x01
+#define NUM_MAX17263_INIT_REGS_MAIN 38
+#define NUM_MAX17263_INIT_REGS_FG 0
+#define MAX17263_WATCHDOG_RESET 0x2F
+#define MAX17263_SFT_RESET 0x01
 #define BATT_CHARGER_WDT_PERIOD 64000 //ms
 #define CHARGING_CABLE_CONNECTED 0x0C
-#define BATTERY_MAH 14000 //mAh
+#define BATTERY_MAH 5000 //mAh
 /*=========================================================================*/
 
 typedef enum {

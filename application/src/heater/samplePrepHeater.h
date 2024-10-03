@@ -14,6 +14,8 @@
 #define H_KI 0.010
 #define H_KD 0.0
 
+#define VERBOSE_HEATING 1
+
 extern HeaterInterface samplePrepHeater_I;
 
 void handleSampleMotorDataRx(int motor_speed);
