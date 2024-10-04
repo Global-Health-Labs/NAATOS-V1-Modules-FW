@@ -19,7 +19,6 @@ void handleConfigUpdated(void);
 
 // --------Sample Prep Functions--------
 void samplePrepSensorTaskSetup(void);
-double readMotorSpeed(void);
 void runSamplePrepSensorCollection(void);
 void sensorMotorCollection(void);
 

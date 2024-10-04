@@ -42,7 +42,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
       if (xReturned != pdPASS) {
-        send_debug_log_message("MAIN_TASK: Unable to send start amplification zone event to logging task.\n");
+        send_debug_log_message("MAIN_TASK: Unable to send start amplification zone event to logging task.\r\n");
       }
 
       exitInfo = CYCLE_RUNNING;
@@ -50,7 +50,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       // Request the battery percentage from the bettery task
       xReturned = xQueueSend(batteryRxQueue, &batt_req, 0);
       if (xReturned != pdPASS) {
-        send_debug_log_message("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.\n");
+        send_debug_log_message("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.\r\n");
       }
 
       // Check for Battery Data in Battery Queue
@@ -73,7 +73,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     case START_CYCLE_1: {
       // Send start cycle 1 message to heater queue
       if (!begin_cycle_1()) {
-        send_debug_log_message("MAIN_TASK: Unable to begin sample run, temperatures have not yet stabalized.\n");
+        send_debug_log_message("MAIN_TASK: Unable to begin sample run, temperatures have not yet stabalized.\r\n");
 
         // Stop cycle one
         end_cycle_1();
@@ -115,7 +115,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (setReachedRx) {
         xReturned = xQueueSend(logger_logMessageQueue, &ramp_to_temp_complete_log_msg, 0);
         if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send ramp_to_temp_complete_log_msg interruption event to logging task.\n");
+          printf("MAIN_TASK: Unable to send ramp_to_temp_complete_log_msg interruption event to logging task.\r\n");
         }
         next_state = CYCLE_1_TIMER;
         break;
@@ -234,7 +234,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       if (setReachedRx) {
         if(!send_event_log_message_struct(&ramp_to_temp_complete_log_msg)) {
-          send_debug_log_message("MAIN_TASK: Unable to send ramp_to_temp_complete_log_msg interruption event to logging task.\n");
+          send_debug_log_message("MAIN_TASK: Unable to send ramp_to_temp_complete_log_msg interruption event to logging task.\r\n");
         }
         next_state = CYCLE_2_TIMER;
         break;
@@ -536,17 +536,17 @@ void begin_cycle_2(void) {
   // Send Start Cycle Two to heater queue
   xRet = xQueueSend(heaterRxQueue, &run_cycle_two_zone_heating, 0);
   if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send run valve zone request.\n");
+    send_debug_log_message("MAIN_TASK: Unable to send run valve zone request.\r\n");
   }
   // Send Start Cycle Two Event to logging task
   xRet = xQueueSend(logger_logMessageQueue, &cycle_two_start_log_msg, 0);
   if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send start valve zone event to logging task.\n");
+    send_debug_log_message("MAIN_TASK: Unable to send start valve zone event to logging task.\r\n");
   }
   // Wait for run confirmation response
   xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
   if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
+    send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
   }
 }
 
@@ -556,17 +556,17 @@ void end_cycle_1(void) {
   // Send stop cycle one message to heater queue
   xRet = xQueueSend(heaterRxQueue, &stop_cycle_one_zone_heating, 50);
   if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send stop amplification zone request.\n");
+    send_debug_log_message("MAIN_TASK: Unable to send stop amplification zone request.\r\n");
   }
   // Send stop amplification Event to logging task
   xRet = xQueueSend(logger_logMessageQueue, &cycle_one_stop_log_msg, 50);
   if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send stop amplification zone event to logging task.\n");
+    send_debug_log_message("MAIN_TASK: Unable to send stop amplification zone event to logging task.\r\n");
   }
   // Wait for run confirmation response
   xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
   if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
+    send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
   }
 }
 
@@ -576,24 +576,24 @@ void end_cycle_2(void) {
   // Send valve zone stop request
   xRet = xQueueSend(heaterRxQueue, &stop_cycle_two_zone_heating, 0);
   if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send stop valve zone request.\n");
+    send_debug_log_message("MAIN_TASK: Unable to send stop valve zone request.\r\n");
   }
   // Send stop valve Event to logging task
   xRet = xQueueSend(logger_logMessageQueue, &cycle_two_stop_log_msg, 0);
   if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send stop valve zone event to logging task.\n");
+    send_debug_log_message("MAIN_TASK: Unable to send stop valve zone event to logging task.\r\n");
   }
   // Wait for run confirmation response
   xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
   if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
+    send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
   }
 }
 
 cycle_state_t handleMainErrorMessage() {
     xReturned = xQueueReceive(main_runErrorQueue, &main_err_msg, 0);
     if (xReturned != pdPASS) {
-      send_debug_log_message("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\n");
+      send_debug_log_message("MAIN_TASK: Unable to receive run error from main_runErrorQueue queue.\r\n");
     }
 
     if(main_err_msg.errType == ERR_TEMP_SENSOR_READ) {

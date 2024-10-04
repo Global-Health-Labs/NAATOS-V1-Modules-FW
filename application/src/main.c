@@ -327,6 +327,7 @@ void main_task(void *pvParameters) {
       /* **** HANDLE USB AND SWITCH **** */
       // Get switch status if it has changed
       if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
+        printf("MAIN_TASK: Button click in idle \n");
         usbRxMsgType_t conn_req_msg = {
             .cmd = NULL,
             .msg_type = USB_MSG_CONN_STATUS_REQ};
@@ -990,8 +991,8 @@ int main(void) {
 
   // Full Peripheral Initalizations
   init_adc();           // ADC
-  init_motor_gpio();
   init_sensors_gpios(); // Sensor GPIOs
+  init_motor_gpio();
   init_pwms();
 
   nrf_gpio_cfg_output(BOOST_CONTROL_ENABLE_PIN);
@@ -999,6 +1000,9 @@ int main(void) {
 
   nrf_gpio_cfg_output(MOTOR_POWER_ENABLE);
   nrf_gpio_pin_clear(MOTOR_POWER_ENABLE);
+
+  nrf_gpio_cfg_output(MOTOR_CWCCW);
+  nrf_gpio_pin_set(MOTOR_CWCCW);
 
   vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_100k);  // I2C
   vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_100k); // I2C

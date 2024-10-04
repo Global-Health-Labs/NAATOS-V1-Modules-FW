@@ -420,7 +420,7 @@ bool readTemp(sensor_selection_t sensor, float *temperature) {
 
   tsys_err = tsys01_startConversion(sensor);
   if (tsys_err != tsys01_success) {
-    send_debug_log_message("HEATER_TASK: Unable to triggr temperature conversion!\r\n");
+    send_debug_log_message("HEATER_TASK: Unable to trigger temperature conversion!\r\n");
     return false;
   } else {
     vTaskDelay(pdMS_TO_TICKS(12)); // 12ms conversion time

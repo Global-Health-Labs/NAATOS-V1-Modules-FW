@@ -120,7 +120,7 @@ void handle_cycle1_stopstart_heater(bool heating) {
   // Send the heater status
   xReturned = xQueueSend(sensorRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
-    printf("HEATER_TASK: Unable to send heater state to sensorRxQueue.\n");
+    printf("HEATER_TASK: Unable to send heater state to sensorRxQueue.\r\n");
   }
 
   MotorRxQueueMsg_t motorMsg;
@@ -145,7 +145,7 @@ void handle_cycle1_stopstart_heater(bool heating) {
 
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
   if (xReturned != pdPASS) {
-    printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+    printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task\r\n");
   }
 
   PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_DISABLE};
@@ -429,6 +429,9 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
           .heat_zone_3_pwm = 0};
       updateDutyCycles(pwmData);
 
+      nrf_gpio_pin_clear(MOTOR_POWER_ENABLE);
+      vTaskDelay(pdMS_TO_TICKS(200));
+      updateDutyCycles(pwmData);
       // Send stop heater to sensors task
       heater_run = false;
       starting_sample_prep_run = false;

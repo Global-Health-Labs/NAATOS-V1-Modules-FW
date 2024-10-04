@@ -11,7 +11,7 @@ static bool skipped_last_call = false;
 static long double avg_speed[3] = {0, 0, 0};
 static long double moving_avg_speed = 0.0;
 
-static long double motorSpeed = 0;
+static long double motorSpeed = 0.0;
 
 bool motorRunning = false;
 
