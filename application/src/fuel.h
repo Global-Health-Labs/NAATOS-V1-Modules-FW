@@ -5,6 +5,7 @@ extern "C" {
 #endif
 
 #include "i2c_hal_freertos.h"
+#include "naatos_config.h"
 #include <stdbool.h>
 #include <stdint.h>
 

@@ -8,6 +8,14 @@
 /*Define this when building sample prep only otherwise comment out*/
 #define SAMPLE_PREP_BOARD
 
+#ifdef SAMPLE_PREP_BOARD
+#define SAMPLE_PREP_REV_A 1
+#define SAMPLE_PREP_REV_B 0
+#if SAMPLE_PREP_REV_A == 0 && SAMPLE_PREP_REV_B == 0
+#define SAMPLE_PREP_REV_B 1
+#endif
+#endif
+
 /* Device Debug Parameters */
 #define I2C_CONNECTED 1
 #define USE_CALENDAR_CHIP 1

@@ -384,6 +384,10 @@ void handleSampleMotorDataRx(int motor_speed) {
     h_pwm_data.heat_zone_2_pwm = pwmData.heat_zone_2_pwm;
     last_motor_speed = motor_speed;
 
+#if VERBOSE_MOTOR
+  printf("Motor Speed: %d rpm; Motor PWM: %0.2f\n", motor_speed, pwmData.heat_zone_2_pwm);
+#endif
+
     updateDutyCycles(pwmData);
   } else if (heater_cycle2_running) {
     temperature_pwm_data_t pwmData = {
@@ -399,6 +403,10 @@ void handleSampleMotorDataRx(int motor_speed) {
 
     h_pwm_data.heat_zone_2_pwm = pwmData.heat_zone_2_pwm;
     last_motor_speed = motor_speed;
+
+#if VERBOSE_MOTOR
+  printf("Motor Speed: %d rpm; Motor PWM: %0.2f\n", motor_speed, pwmData.heat_zone_2_pwm);
+#endif
 
     updateDutyCycles(pwmData);
   }
