@@ -24,6 +24,7 @@ bool greater_than_max = false;
 bool heater_run = false;
 bool rampToTemp = false;
 bool motorStalled = false;
+bool motorReachedSpeed = false;
 int last_motor_speed = 0;
 
 temperature_data_t local_temp_data;
@@ -392,15 +393,23 @@ void handleSampleMotorDataRx(int motor_speed) {
     h_pwm_data.heat_zone_2_pwm = pwmData.heat_zone_2_pwm;
     last_motor_speed = motor_speed;
 
+    if (motor_speed >= config.motor_setpoint_1 && !use_default_configuration_parameters) {
+      motorReachedSpeed = true;
+    }
+    else if (motor_speed >= MOTOR_SETPOINT_1 && use_default_configuration_parameters) {
+      motorReachedSpeed = true;
+    }
+
 #if VERBOSE_MOTOR
   printf("Motor Speed: %d rpm; Motor PWM: %0.2f\n", motor_speed, pwmData.heat_zone_2_pwm);
 #endif
+
     if (!use_default_configuration_parameters) {
-      if (motor_speed < (config.motor_setpoint_1 - ((float)config.motor_setpoint_1 * ((float)config.motor_stall_percent / 100.0 )))) {
+      if (motorReachedSpeed && motor_speed < (config.motor_setpoint_1 - ((float)config.motor_setpoint_1 * ((float)config.motor_stall_percent / 100.0 )))) {
         motorStalled = true;
       }
     } else {
-      if (motor_speed < (MOTOR_SETPOINT_1 - ((float)MOTOR_SETPOINT_1 * ((float)DEFAULT_MOTOR_STALL_PERCENTAGE / 100.0 )))) {
+      if (motorReachedSpeed && motor_speed < (MOTOR_SETPOINT_1 - ((float)MOTOR_SETPOINT_1 * ((float)DEFAULT_MOTOR_STALL_PERCENTAGE / 100.0 )))) {
         motorStalled = true;
       } 
     }
@@ -431,6 +440,17 @@ void handleSampleMotorDataRx(int motor_speed) {
     h_pwm_data.heat_zone_2_pwm = pwmData.heat_zone_2_pwm;
     last_motor_speed = motor_speed;
 
+    if (motor_speed >= config.motor_setpoint_1 && !use_default_configuration_parameters) {
+      motorReachedSpeed = true;
+    }
+    else if (motor_speed >= MOTOR_SETPOINT_1 && use_default_configuration_parameters) {
+      motorReachedSpeed = true;
+    }
+
+#if VERBOSE_MOTOR
+  printf("Motor Speed: %d rpm; Motor PWM: %0.2f\n", motor_speed, pwmData.heat_zone_2_pwm);
+#endif
+
     if (!use_default_configuration_parameters) {
       if (motor_speed < (config.motor_setpoint_2 - ((float)config.motor_setpoint_2 * ((float)config.motor_stall_percent / 100.0 )))) {
         motorStalled = true;
@@ -439,11 +459,7 @@ void handleSampleMotorDataRx(int motor_speed) {
       if (motor_speed < (MOTOR_SETPOINT_2 - ((float)MOTOR_SETPOINT_2 * ((float)DEFAULT_MOTOR_STALL_PERCENTAGE / 100.0 )))) {
         motorStalled = true;
       } 
-    }
-
-#if VERBOSE_MOTOR
-  printf("Motor Speed: %d rpm; Motor PWM: %0.2f\n", motor_speed, pwmData.heat_zone_2_pwm);
-#endif
+    } 
 
     updateDutyCycles(pwmData);
 
@@ -485,6 +501,7 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
     } else {
       starting_sample_prep_run = true;
       heater_run = true;
+      motorReachedSpeed = false;
       samplePrepResetHeaterPIDs();
       // Send starting heater to sensors task
       handle_cycle1_stopstart_heater(heater_run);
@@ -507,6 +524,7 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
       handle_cycle2_stopstart_heater(heater_run);
     } else {
       heater_run = true;
+      motorReachedSpeed = false;
       samplePrepResetHeaterPIDs();
       handle_cycle2_stopstart_heater(heater_run);
     }
