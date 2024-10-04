@@ -418,7 +418,7 @@ void handleSampleMotorDataRx(int motor_speed) {
     
     if (motorStalled) {
       // Send alert message to main task
-      xReturned = xQueueSend(main_runErrorQueue, &motorStalled, 0);
+      xReturned = xQueueSend(main_runErrorQueue, &motor_stall_err_msg, 0);
       if (xReturned != pdPASS) {
         printf("HEATER_TASK: Unable to send run error for motor stalled to main_runErrorQueue.\n");
       }
@@ -465,7 +465,7 @@ void handleSampleMotorDataRx(int motor_speed) {
 
     if (motorStalled) {
       // Send alert message to main task
-      xReturned = xQueueSend(main_runErrorQueue, &motorStalled, 0);
+      xReturned = xQueueSend(main_runErrorQueue, &motor_stall_err_msg, 0);
       if (xReturned != pdPASS) {
         printf("HEATER_TASK: Unable to send run error for motor stalled to main_runErrorQueue.\n");
       }

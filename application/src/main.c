@@ -865,7 +865,7 @@ void create_queues() {
   if (main_runRespQueue == NULL)
     printf("Unable to create main_runRespQueue queue\n");
 
-  main_runErrorQueue = xQueueCreate(QUEUE_SIZE, sizeof(MainStateErrorQueueMsg_t));
+  main_runErrorQueue = xQueueCreate(5, sizeof(MainStateErrorQueueMsg_t));
   if (main_runErrorQueue == NULL)
     printf("Unable to create main_runErrorQueue queue\n");
 
