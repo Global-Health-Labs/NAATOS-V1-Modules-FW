@@ -174,6 +174,7 @@
 #define UNKNOWN_ERROR_MESSAGE "An unknown error has occured."
 #define HALL_SENSOR_BRAKE_MSG "HALL sensor interrupted."
 #define SAMPLE_I2C_READ_ERROR_MSG "I2C sensor read error"
+#define SAMPLE_MOTOR_STALLED_ERROR_MSG "Motor stalled detected."
 
 #define USB_SUSPEND_TASKS_TIME 15000
 
@@ -237,6 +238,7 @@ typedef enum {
   SAMPLE_INVALID_TIMEOUT,
   SAMPLE_I2C_READ_ERROR,
   SAMPLE_CANT_READ_CONFIG,
+  SAMPLE_MOTOR_STALLED,
   SAMPLE_UNKNOWN
   // Add more events here
 } event_t;

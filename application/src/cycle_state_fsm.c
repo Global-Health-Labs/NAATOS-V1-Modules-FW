@@ -479,6 +479,11 @@ void handle_exit_notifications(void) {
     sprintf(exitString, SAMPLE_I2C_READ_ERROR_MSG);
     break;
 
+  case CYCLE_ERROR_MOTOR_STALLED:
+    eventType = SAMPLE_MOTOR_STALLED;
+    sprintf(exitString, SAMPLE_MOTOR_STALLED_ERROR_MSG);
+    break;
+
   case CYCLE_ERROR_UNKNOWN: // drop to default
   default:
     eventType = SAMPLE_UNKNOWN;
@@ -601,6 +606,8 @@ cycle_state_t handleMainErrorMessage() {
     } else if (main_err_msg.errType == ERR_OVERTEMP_EVENT) {
       over_temp_data = main_err_msg.overTempData;
       exitInfo = CYCLE_ERROR_OVER_TEMP;
+    } else if (main_err_msg.errType == ERR_MOTOR_STALLED) {
+      exitInfo = CYCLE_ERROR_MOTOR_STALLED;
     }
 
     runThrough = true;
