@@ -3,6 +3,11 @@
 #include "../usb.h"
 #include "timers.h"
 
+const MainStateErrorQueueMsg_t motor_stall_err_msg = {
+  .errType = ERR_MOTOR_STALLED,
+  .overTempData = NULL
+};
+
 pid_controller_t heater_pid_1;
 pid_controller_t heater_pid_2;
 pid_controller_t motor_pid_1;
@@ -18,6 +23,7 @@ bool h_pwm_req = false;
 bool greater_than_max = false;
 bool heater_run = false;
 bool rampToTemp = false;
+bool motorStalled = false;
 int last_motor_speed = 0;
 
 temperature_data_t local_temp_data;
@@ -369,6 +375,8 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
 void handleSampleMotorDataRx(int motor_speed) {
 #ifdef SAMPLE_PREP_BOARD
+  BaseType_t xReturned;
+
   if (heater_cycle1_running) {
     temperature_pwm_data_t pwmData = {
         .heat_zone_0_pwm = 0,
@@ -387,8 +395,27 @@ void handleSampleMotorDataRx(int motor_speed) {
 #if VERBOSE_MOTOR
   printf("Motor Speed: %d rpm; Motor PWM: %0.2f\n", motor_speed, pwmData.heat_zone_2_pwm);
 #endif
+    if (!use_default_configuration_parameters) {
+      if (motor_speed < (config.motor_setpoint_1 - ((float)config.motor_setpoint_1 * ((float)config.motor_stall_percent / 100.0 )))) {
+        motorStalled = true;
+      }
+    } else {
+      if (motor_speed < (MOTOR_SETPOINT_1 - ((float)MOTOR_SETPOINT_1 * ((float)DEFAULT_MOTOR_STALL_PERCENTAGE / 100.0 )))) {
+        motorStalled = true;
+      } 
+    }
 
     updateDutyCycles(pwmData);
+    
+    if (motorStalled) {
+      // Send alert message to main task
+      xReturned = xQueueSend(main_runErrorQueue, &motorStalled, 0);
+      if (xReturned != pdPASS) {
+        printf("HEATER_TASK: Unable to send run error for motor stalled to main_runErrorQueue.\n");
+      }
+      motorStalled = false;
+    }
+
   } else if (heater_cycle2_running) {
     temperature_pwm_data_t pwmData = {
         .heat_zone_0_pwm = 0,
@@ -404,11 +431,30 @@ void handleSampleMotorDataRx(int motor_speed) {
     h_pwm_data.heat_zone_2_pwm = pwmData.heat_zone_2_pwm;
     last_motor_speed = motor_speed;
 
+    if (!use_default_configuration_parameters) {
+      if (motor_speed < (config.motor_setpoint_2 - ((float)config.motor_setpoint_2 * ((float)config.motor_stall_percent / 100.0 )))) {
+        motorStalled = true;
+      }
+    } else {
+      if (motor_speed < (MOTOR_SETPOINT_2 - ((float)MOTOR_SETPOINT_2 * ((float)DEFAULT_MOTOR_STALL_PERCENTAGE / 100.0 )))) {
+        motorStalled = true;
+      } 
+    }
+
 #if VERBOSE_MOTOR
   printf("Motor Speed: %d rpm; Motor PWM: %0.2f\n", motor_speed, pwmData.heat_zone_2_pwm);
 #endif
 
     updateDutyCycles(pwmData);
+
+    if (motorStalled) {
+      // Send alert message to main task
+      xReturned = xQueueSend(main_runErrorQueue, &motorStalled, 0);
+      if (xReturned != pdPASS) {
+        printf("HEATER_TASK: Unable to send run error for motor stalled to main_runErrorQueue.\n");
+      }
+      motorStalled = false;
+    }
   }
   #endif
 }

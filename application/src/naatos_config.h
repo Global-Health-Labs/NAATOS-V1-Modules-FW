@@ -114,6 +114,7 @@
 #define DEFAULT_MOTOR_SPEED_PWM 71
 #define DEFAULT_MAX_HEATER_PID 70
 #define DEFAULT_HAL_SENSOR_THRESHOLD  0.75f
+#define DEFAULT_MOTOR_STALL_PERCENTAGE  20 
 
 #define MAX_MOTOR_PID 150
 
@@ -536,7 +537,8 @@ typedef struct {
 
 typedef enum {
   ERR_TEMP_SENSOR_READ,
-  ERR_OVERTEMP_EVENT
+  ERR_OVERTEMP_EVENT,
+  ERR_MOTOR_STALLED
 } MainStateErrorNotification_t;
 
 typedef struct {
@@ -653,6 +655,7 @@ typedef struct {
   bool run_motor_2;
   bool run_heater_2;
   float hal_sensor_thresh;
+  int motor_stall_percent;
   int mmddyy;
   int hhmmss;
   bool set_date_time;

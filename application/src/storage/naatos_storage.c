@@ -472,6 +472,9 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       num = strcmp(val, "true");
       parameters->run_heater_2 = num ? false : true;
       break;
+    case MOTOR_STALL_PERCENT:
+      parameters->motor_stall_percent = parse_int(val, DEFAULT_MOTOR_STALL_PERCENTAGE);
+      break;
 #endif
 
     default:
@@ -972,6 +975,12 @@ FRESULT check_for_config_file(void) {
   }
   // Write Run Heater 2
   configBufferSize = sprintf(configBuffer, "run_heater_2:%s\n", DEFAULT_RUN_HEATER_2 ? "true" : "false");
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Motor Stall Percentage
+  configBufferSize = sprintf(configBuffer, "motor_stall_percentage:%d\n", DEFAULT_MOTOR_STALL_PERCENTAGE);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;

@@ -151,10 +151,11 @@ naatos_config_parameters config = {
     .motor_ki_2 = 0,
     .motor_kd_2 = 0,
     .motor_setpoint_2 = 0,
+    .motor_stall_percent = 0,
     .run_motor_1 = false,
     .run_heater_1 = false,
     .run_motor_2 = false,
-    .run_heater_2 = false};
+    .run_heater_2 = false };
 #endif
 bool use_default_configuration_parameters = false;
 
