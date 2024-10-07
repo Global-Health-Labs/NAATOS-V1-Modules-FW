@@ -62,7 +62,7 @@ void handle_cycle2_stopstart_heater(bool heating) {
   // Send the heater status
   xReturned = xQueueSend(sensorRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
-    printf("HEATER_TASK: Unable to send heater state to sensorRxQueue.\n");
+    naatosPrintf("HEATER_TASK: Unable to send heater state to sensorRxQueue.");
   }
 
   MotorRxQueueMsg_t motorMsg;
@@ -72,7 +72,7 @@ void handle_cycle2_stopstart_heater(bool heating) {
   // Send the motor status
   xReturned = xQueueSend(motorRxQueue, &motorMsg, 10);
   if (xReturned != pdPASS) {
-    printf("HEATER_TASK: Unable to send heater state to motorRxQueue.\n");
+    naatosPrintf("HEATER_TASK: Unable to send heater state to motorRxQueue.");
   }
 
   watchdog_time_update_t wdtUpdate = {
@@ -86,7 +86,7 @@ void handle_cycle2_stopstart_heater(bool heating) {
 
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
   if (xReturned != pdPASS) {
-    printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+    naatosPrintf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task");
   }
 
   PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_DISABLE};
@@ -98,7 +98,7 @@ void handle_cycle2_stopstart_heater(bool heating) {
   // Respond to heater change
   xReturned = xQueueSend(pwmRxQueue, &pwmMsg, 0);
   if (xReturned != pdPASS) {
-    printf("heater: Unable to send stop to pwmRxQueue.\n");
+    naatosPrintf("heater: Unable to send stop to pwmRxQueue.");
   }
 
   // Set the last sample based on config
@@ -127,7 +127,7 @@ void handle_cycle1_stopstart_heater(bool heating) {
   // Send the heater status
   xReturned = xQueueSend(sensorRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
-    printf("HEATER_TASK: Unable to send heater state to sensorRxQueue.\r\n");
+    naatosPrintf("HEATER_TASK: Unable to send heater state to sensorRxQueue.");
   }
 
   MotorRxQueueMsg_t motorMsg;
@@ -137,7 +137,7 @@ void handle_cycle1_stopstart_heater(bool heating) {
   // Send the motor status
   xReturned = xQueueSend(motorRxQueue, &motorMsg, 10);
   if (xReturned != pdPASS) {
-    printf("HEATER_TASK: Unable to send heater state to motorRxQueue.\n");
+    naatosPrintf("HEATER_TASK: Unable to send heater state to motorRxQueue.");
   }
 
   watchdog_time_update_t wdtUpdate = {
@@ -152,7 +152,7 @@ void handle_cycle1_stopstart_heater(bool heating) {
 
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
   if (xReturned != pdPASS) {
-    printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task\r\n");
+    naatosPrintf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task");
   }
 
   PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_DISABLE};
@@ -164,7 +164,7 @@ void handle_cycle1_stopstart_heater(bool heating) {
   // Respond to heater change
   xReturned = xQueueSend(pwmRxQueue, &pwmMsg, 0);
   if (xReturned != pdPASS) {
-    printf("heater: Unable to send stop to pwmRxQueue.\n");
+    naatosPrintf("heater: Unable to send stop to pwmRxQueue.");
   }
 
   // Set the last sample based on config
@@ -230,7 +230,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
       // Send cannot start
       xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
       if (xReturned != pdPASS) {
-        printf("HEATER_TASK: Unable to send cannot start run response.\n");
+        naatosPrintf("HEATER_TASK: Unable to send cannot start run response.");
       }
       return;
     } else if (starting_sample_prep_run &&
@@ -241,7 +241,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
       // Send can start
       xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
       if (xReturned != pdPASS) {
-        printf("HEATER_TASK: Unable to send cannot start run response.\n");
+        naatosPrintf("HEATER_TASK: Unable to send cannot start run response.");
       }
       starting_sample_prep_run = false;
     }
@@ -249,7 +249,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     // Send can start
     xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
     if (xReturned != pdPASS) {
-      printf("HEATER_TASK: Unable to send cannot start run response.\n");
+      naatosPrintf("HEATER_TASK: Unable to send cannot start run response.");
     }
     starting_sample_prep_run = false;
   }
@@ -262,7 +262,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
       if (rampToTemp && (temperature_data.heat_zone_3_temp >= heater1SetPoint)) {
         xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
         if (xReturned != pdPASS) {
-          printf("HEATER_TASK: Unable to send set point reached message.\n");
+          naatosPrintf("HEATER_TASK: Unable to send set point reached message.");
         }
         rampToTemp = false;
       }
@@ -285,10 +285,10 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
 #if VERBOSE_HEATING
     char tmp[150];
-    sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f\r\n", 
+    sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f", 
                   temperature_data.heat_zone_0_temp, temperature_data.heat_zone_1_temp, temperature_data.heat_zone_2_temp, temperature_data.heat_zone_3_temp, 
                   h_pwm_data.heat_zone_0_pwm, h_pwm_data.heat_zone_1_pwm, h_pwm_data.heat_zone_2_pwm, h_pwm_data.heat_zone_3_pwm);
-    printf(tmp);
+    naatosPrintf(tmp);
 #endif
 
     if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0 || temperature_data.heat_zone_3_temp > 120) {
@@ -303,7 +303,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
       if (rampToTemp && (temperature_data.heat_zone_3_temp >= heater2SetPoint)) {
         xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
         if (xReturned != pdPASS) {
-          printf("HEATER_TASK: Unable to send set point reached message.\n");
+          naatosPrintf("HEATER_TASK: Unable to send set point reached message.");
         }
         rampToTemp = false;
       }
@@ -323,10 +323,10 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
 #if VERBOSE_HEATING
     char tmp[150];
-    sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f\r\n", 
+    sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f", 
                   temperature_data.heat_zone_0_temp, temperature_data.heat_zone_1_temp, temperature_data.heat_zone_2_temp, temperature_data.heat_zone_3_temp, 
                   h_pwm_data.heat_zone_0_pwm, h_pwm_data.heat_zone_1_pwm, h_pwm_data.heat_zone_2_pwm, h_pwm_data.heat_zone_3_pwm);
-    printf(tmp);
+    naatosPrintf(tmp);
 #endif
 
     if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0 || temperature_data.heat_zone_3_temp > 120) {
@@ -339,7 +339,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     // Send alert message to main task
     xReturned = xQueueSend(main_runErrorQueue, &greater_than_max, 0);
     if (xReturned != pdPASS) {
-      printf("HEATER_TASK: Unable to send run error for greater than max temp to main_runErrorQueue.\n");
+      naatosPrintf("HEATER_TASK: Unable to send run error for greater than max temp to main_runErrorQueue.");
     }
     greater_than_max = false;
   }
@@ -358,7 +358,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   // Send the Log message
   xReturned = xQueueSend(logger_logMessageQueue, (void *)&logMsg, 0);
   if (xReturned != pdPASS) {
-    printf("SENSORS_TASK: Unable to send log message to logger_logMessageQueue.\n");
+    naatosPrintf("SENSORS_TASK: Unable to send log message to logger_logMessageQueue.");
   }
 
   samp_log_index++;
@@ -368,7 +368,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     // Send the Log message
     xReturned = xQueueSend(logger_logMessageQueue, (void *)&logMsg, 0);
     if (xReturned != pdPASS) {
-      printf("SENSORS_TASK: Unable to send log message to logger_logMessageQueue.\n");
+      naatosPrintf("SENSORS_TASK: Unable to send log message to logger_logMessageQueue.");
     }
   }
   #endif
@@ -377,6 +377,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 void handleSampleMotorDataRx(int motor_speed) {
 #ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
+  char tmp[100];
 
   if (heater_cycle1_running) {
     temperature_pwm_data_t pwmData = {
@@ -401,7 +402,8 @@ void handleSampleMotorDataRx(int motor_speed) {
     }
 
 #if VERBOSE_MOTOR
-  printf("Motor Speed: %d rpm; Motor PWM: %0.2f\n", motor_speed, pwmData.heat_zone_2_pwm);
+  sprintf(tmp, "Motor Speed: %d rpm; Motor PWM: %0.2f", motor_speed, pwmData.heat_zone_2_pwm);
+  naatosPrintf(tmp);
 #endif
 
     if (!use_default_configuration_parameters) {
@@ -420,7 +422,7 @@ void handleSampleMotorDataRx(int motor_speed) {
       // Send alert message to main task
       xReturned = xQueueSend(main_runErrorQueue, &motor_stall_err_msg, 0);
       if (xReturned != pdPASS) {
-        printf("HEATER_TASK: Unable to send run error for motor stalled to main_runErrorQueue.\n");
+        naatosPrintf("HEATER_TASK: Unable to send run error for motor stalled to main_runErrorQueue.");
       }
       motorStalled = false;
     }
@@ -448,7 +450,8 @@ void handleSampleMotorDataRx(int motor_speed) {
     }
 
 #if VERBOSE_MOTOR
-  printf("Motor Speed: %d rpm; Motor PWM: %0.2f\n", motor_speed, pwmData.heat_zone_2_pwm);
+  sprintf(tmp, "Motor Speed: %d rpm; Motor PWM: %0.2f", motor_speed, pwmData.heat_zone_2_pwm);
+  naatosPrintf(tmp);
 #endif
 
     if (!use_default_configuration_parameters) {
@@ -467,7 +470,7 @@ void handleSampleMotorDataRx(int motor_speed) {
       // Send alert message to main task
       xReturned = xQueueSend(main_runErrorQueue, &motor_stall_err_msg, 0);
       if (xReturned != pdPASS) {
-        printf("HEATER_TASK: Unable to send run error for motor stalled to main_runErrorQueue.\n");
+        naatosPrintf("HEATER_TASK: Unable to send run error for motor stalled to main_runErrorQueue.");
       }
       motorStalled = false;
     }

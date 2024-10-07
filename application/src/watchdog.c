@@ -113,6 +113,6 @@ void sendWatchdogKickFromTask(tasks_t task, bool valid) {
 
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
   if (xReturned != pdPASS) {
-    printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+    naatosPrintf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task");
   }
 }

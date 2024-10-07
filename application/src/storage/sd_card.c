@@ -37,6 +37,8 @@ void init_sd_card(void) {
       NRF_GPIO_PIN_H0H1, // Require High Drive low/high level
       NRF_GPIO_PIN_NOSENSE);
 
+  char buff[50];
+
   sd_disk_state = STA_NOINIT;
 
   memset(&fs, 0, sizeof(FATFS));
@@ -49,19 +51,20 @@ void init_sd_card(void) {
     sd_disk_state = disk_initialize(0);
   }
   if (sd_disk_state) {
-    printf("SD Card initialization failed.\n");
+    naatosPrintf("SD Card initialization failed.");
     return;
   }
 
   // Get SD Card Specifications
   sd_blocks_per_mb = (1024uL * 1024uL) / m_block_dev_sdc.block_dev.p_ops->geometry(&m_block_dev_sdc.block_dev)->blk_size;
   sd_capacity = m_block_dev_sdc.block_dev.p_ops->geometry(&m_block_dev_sdc.block_dev)->blk_count / sd_blocks_per_mb;
-  printf("Capactity: %d MB\n", sd_capacity);
+  sprintf(buff, "Capactity: %d MB", sd_capacity);
+  naatosPrintf(buff);
 
   // Mount SD Card
   sd_ff_result = sd_card_mount();
   if (sd_ff_result != FR_OK) {
-    printf("Unable to mount SD Card!\n");
+    naatosPrintf("Unable to mount SD Card!");
   }
 
   sd_card_inited = true;
@@ -74,7 +77,7 @@ void uninit_sd_card(void) {
   UNUSED_RETURN_VALUE(disk_uninitialize(0));
 
   sd_card_inited = false;
-  printf("SD Card Uninitalized.\n");
+  naatosPrintf("SD Card Uninitalized.");
 }
 
 // Mount the SD card volume
@@ -90,11 +93,11 @@ FRESULT sd_card_unmount(void) {
 // Prints directories seen on the sd card -- Was used during debug of sd card, only prints directories and files at root
 /* Depreciated, keeping in here incase we want to be able to list contents of the file system in the future.
 void sd_card_list_contents(void) {
-  printf("\r\n Listing directory: /\n");
+  naatosPrintf("\r\n Listing directory: /");
   // Open Root Directory
   ff_result = f_opendir(&dir, "/");
   if (ff_result) {
-    printf("Directory listing failed!\n");
+    naatosPrintf("Directory listing failed!");
     return;
   }
 
@@ -102,15 +105,15 @@ void sd_card_list_contents(void) {
   do {
     ff_result = f_readdir(&dir, &fno);
     if (ff_result != FR_OK) {
-      printf("Directory read failed.\n");
+      naatosPrintf("Directory read failed.");
       return;
     }
 
     if (fno.fname[0]) {
       if (fno.fattrib & AM_DIR) {
-        printf("   <DIR>   %s\n", (uint32_t)fno.fname);
+        naatosPrintf("   <DIR>   %s", (uint32_t)fno.fname);
       } else {
-        printf("%9lu  %s\n", fno.fsize, (uint32_t)fno.fname);
+        naatosPrintf("%9lu  %s", fno.fsize, (uint32_t)fno.fname);
       }
     }
   } while (fno.fname[0]);

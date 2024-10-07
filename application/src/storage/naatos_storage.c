@@ -37,11 +37,11 @@ void uninit_naatos_storage(void) {
 void mount_storage(void) {
 #if USE_SD_CARD
   if (sd_card_mount() != FR_OK) {
-    printf("Unable to unmount SD Card");
+    naatosPrintf("Unable to unmount SD Card");
   }
 #elif USE_NOR_FLASH
   if (mount_nor_flash() != FR_OK) {
-    printf("Unable to mount NOR Flash\n");
+    naatosPrintf("Unable to mount NOR Flash");
   }
 #endif
 }
@@ -50,11 +50,11 @@ void mount_storage(void) {
 void unmount_storage(void) {
 #if USE_SD_CARD
   if (sd_card_unmount() != FR_OK) {
-    printf("Unable to unmount SD Card");
+    naatosPrintf("Unable to unmount SD Card");
   }
 #elif USE_NOR_FLASH
   if (unmount_nor_flash() != FR_OK) {
-    printf("Unable to unmount NOR Flash\n");
+    naatosPrintf("Unable to unmount NOR Flash");
   }
 #endif
 }
@@ -65,18 +65,18 @@ void create_naatos_directories() {
   // Create logs directory
   res = f_mkdir(LOGS_DIR);
   if (res == FR_OK) {
-    printf("Logs directory created\n");
+    naatosPrintf("Logs directory created");
   }
   // Create config directory
   res = f_mkdir(CONFIG_DIR);
   if (res == FR_OK) {
-    printf("Config directory created\n");
+    naatosPrintf("Config directory created");
   }
   res = check_for_config_file();
   if (res == FR_OK) {
-    printf("New config.txt config file in config subdirectory created with default parameters.\n");
+    naatosPrintf("New config.txt config file in config subdirectory created with default parameters.");
   } else if (res != FR_EXIST) {
-    printf("Unable to retreive config.txt\n");
+    naatosPrintf("Unable to retreive config.txt");
   }
 }
 
@@ -219,7 +219,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case SAMPLE_RATE:
       parameters->sample_rate = atof(val);
       if (parameters->sample_rate < 0.048) {
-        printf("Warning: Sample rate lower than minimum (0.048), setting sample rate to minimum.");
+        naatosPrintf("Warning: Sample rate lower than minimum (0.048), setting sample rate to minimum.");
         parameters->sample_rate = 0.048;
         break;
       }

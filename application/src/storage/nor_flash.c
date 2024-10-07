@@ -22,6 +22,7 @@ static diskio_blkdev_t drives[] =
 };
 
 void init_nor_flash(void) {
+  char buff[100];
   disk_state = STA_NOINIT;
 
   memset(&fs, 0, sizeof(FATFS));
@@ -32,15 +33,16 @@ void init_nor_flash(void) {
   // Initalize the disk
   disk_state = disk_initialize(0);
   if (disk_state) {
-      printf("Disk initialization failed. State: %d\n", disk_state);
+      sprintf(buff, "Disk initialization failed. State: %d", disk_state);
+      naatosPrintf(buff);
       return;
   }
-  printf("NOR Flash Storage initialized\n");
+  naatosPrintf("NOR Flash Storage initialized");
 
   // Mount the NOR Flash Volume
   ff_result = mount_nor_flash();
   if (ff_result != FR_OK) {
-    printf("Unable to mount NOR flash!\n");
+    naatosPrintf("Unable to mount NOR flash!");
     return;
   }
 
@@ -53,7 +55,7 @@ void uninit_nor_flash(void) {
 
   app_usbd_ep_disable(ENDPOINT_LIST());
 
-  printf("NOR Flash Storage Uninitialized.\n");
+  naatosPrintf("NOR Flash Storage Uninitialized.");
 }
 
 FRESULT mount_nor_flash(void) {
@@ -65,11 +67,13 @@ FRESULT unmount_nor_flash(void) {
 }
 
 void nor_flash_list_contents(void) {
-  printf("\r\n Listing NOR Flash directory: /\n");
+  char buff[50];
+
+  naatosPrintf("\r\n Listing NOR Flash directory: /");
   // Open Root Directory
   ff_result = f_opendir(&dir, "/");
   if (ff_result) {
-    printf("Directory listing failed!\n");
+    naatosPrintf("Directory listing failed!");
     return;
   }
 
@@ -77,15 +81,17 @@ void nor_flash_list_contents(void) {
   do {
     ff_result = f_readdir(&dir, &fno);
     if (ff_result != FR_OK) {
-      printf("Directory read failed.\n");
+      naatosPrintf("Directory read failed.");
       return;
     }
 
     if (fno.fname[0]) {
       if (fno.fattrib & AM_DIR) {
-        printf("   <DIR>   %s\n", (uint32_t)fno.fname);
+        sprintf(buff, "   <DIR>   %s", (uint32_t)fno.fname);
+        naatosPrintf(buff);
       } else {
-        printf("%9lu  %s\n", fno.fsize, (uint32_t)fno.fname);
+        sprintf("%9lu  %s", fno.fsize, (uint32_t)fno.fname);
+        naatosPrintf(buff);
       }
     }
   } while (fno.fname[0]);

@@ -41,12 +41,12 @@ int getBatteryPercent(void) {
   // Request the battery percentage from the bettery task
   xReturned = xQueueSend(batteryRxQueue, &batt_req_log, 0);
   if (xReturned != pdPASS) {
-    printf("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.\n");
+    naatosPrintf("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.");
   }
   // Wait for response
   xReturned = xQueueReceive(logger_recvBattPercentQueue, &battery_percent, portMAX_DELAY);
   if (xReturned != pdPASS) {
-    printf("LOG_TASK: Unable to get battery percentage from battery_requestPercentQueue.\n");
+    naatosPrintf("LOG_TASK: Unable to get battery percentage from battery_requestPercentQueue.");
   }
 
   return battery_percent;
@@ -55,11 +55,11 @@ int getBatteryPercent(void) {
 // Puts log file name in char pointer
 void getLogFileName(const char *_logFileName) {
   if (!(calendar_get_time(&time))) {
-    printf("LOG_TASK: Unable to get time for log file name!\n");
+    naatosPrintf("LOG_TASK: Unable to get time for log file name!");
     sprintf(_logFileName, "unknown.csv");
   }
   if (!(calendar_get_time(&time))) {
-    printf("LOG_TASK: Unable to get time for log file name!\n");
+    naatosPrintf("LOG_TASK: Unable to get time for log file name!");
     sprintf(_logFileName, "unknown.csv");
   }
   // Get current Date and Time and update vars
@@ -99,16 +99,16 @@ void logger_task(void *pvParameters) {
       //loggerInterface->getLogFileName(logFileName);
       res = create_log_file(logFileName);
       if (res == FR_EXIST) {
-        printf("LOG_TASK: Warning! Log file with name already exist, will be overwritting that file.\n");
+        naatosPrintf("LOG_TASK: Warning! Log file with name already exist, will be overwritting that file.");
       } else if (res != FR_OK) {
-        printf("LOG_TASK: Unable to create log file for current sample preperation.\n");
+        naatosPrintf("LOG_TASK: Unable to create log file for current sample preperation.");
       }
       break;
     }
     case TEMPERATURE_DATA: {
       // Get current time
       if (!(calendar_get_time(&time))) {
-        printf("LOG_TASK: Unable to retreive time!");
+        naatosPrintf("LOG_TASK: Unable to retreive time!");
       }
 
       batteryPercent = getBatteryPercent();
@@ -123,7 +123,7 @@ void logger_task(void *pvParameters) {
         // Write to sample log file
         FRESULT res = write_log_line(logFileName, logFileLine, logFileLineSize);
         if (res != FR_OK) {
-          printf("LOG_TASK: Unable to write last log line!\n");
+          naatosPrintf("LOG_TASK: Unable to write last log line!");
         }
       }
       break;
@@ -132,7 +132,7 @@ void logger_task(void *pvParameters) {
     case EVENT_DATA: {
       // Get current time
       if (!(calendar_get_time(&time))) {
-        printf("LOG_TASK: Unable to retreive time!");
+        naatosPrintf("LOG_TASK: Unable to retreive time!");
       }
 
       batteryPercent = getBatteryPercent();
@@ -160,7 +160,7 @@ void logger_task(void *pvParameters) {
         // Write to sample log file
         FRESULT res = write_log_line(logFileName, logFileLine, logFileLineSize);
         if (res != FR_OK) {
-          printf("LOG_TASK: Unable to write last log line!\n");
+          naatosPrintf("LOG_TASK: Unable to write last log line!");
         }
       }
 
@@ -224,7 +224,7 @@ void send_event_log_message(event_t eventType, char *message) {
 
   BaseType_t xReturned = xQueueSend(logger_logMessageQueue, &log_message, 0);
   if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send event log message.\n");
+    naatosPrintf("MAIN_TASK: Unable to send event log message.");
   }
 }
 
@@ -242,7 +242,7 @@ void send_data_log_message() {
 
 
 void send_debug_log_message(char *message) {
-  printf(message);
+  naatosPrintf(message);
   log_event_t event_info = {
       .event = SAMPLE_UNKNOWN};
 
@@ -256,7 +256,7 @@ void send_debug_log_message(char *message) {
 
   BaseType_t xReturned = xQueueSend(logger_logMessageQueue, &log_message, 0);
   if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send debug log message.\n");
+    naatosPrintf("MAIN_TASK: Unable to send debug log message.");
   }
 }
 

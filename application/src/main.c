@@ -195,7 +195,7 @@ void read_sd_and_notify_tasks(void) {
 
   xReturned = get_naatos_configuration_parameters(&config);
   if (xReturned != FR_OK) {
-    printf("Warning: configuration file was not able to be read. Using default configuration parameters.");
+    naatosPrintf("Warning: configuration file was not able to be read. Using default configuration parameters.");
     use_default_configuration_parameters = true;
   } else {
     use_default_configuration_parameters = false;
@@ -203,13 +203,13 @@ void read_sd_and_notify_tasks(void) {
 
   xReturned = xQueueSend(heaterRxQueue, &heaterConfigMsg, 0);
   if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send update config request to heaterRxQueue.\n");
+    naatosPrintf("MAIN_TASK: Unable to send update config request to heaterRxQueue.");
   }
 
   // Send to Sensors task
   xReturned = xQueueSend(sensorRxQueue, &sensorConfigMsg, 0);
   if (xReturned != pdPASS) {
-    printf("USB: Unable to send update config request to sensorRxQueue.\n");
+    naatosPrintf("USB: Unable to send update config request to sensorRxQueue.");
   }
 }
 
@@ -275,7 +275,7 @@ void main_task(void *pvParameters) {
         // Send to Sensors task
         xReturned = xQueueSend(sensorRxQueue, &msg, 0);
         if (xReturned != pdPASS) {
-          printf("MAIN: Unable to send sensor wakeup to sensorRxQueue.\n");
+          naatosPrintf("MAIN: Unable to send sensor wakeup to sensorRxQueue.");
         }
 
         MotorRxQueueMsg_t motorMsg;
@@ -283,7 +283,7 @@ void main_task(void *pvParameters) {
 
         xReturned = xQueueSend(motorRxQueue, &motorMsg, 0);
         if (xReturned != pdPASS) {
-          printf("MAIN: Unable to send sensor wakeup to motorRxQueue.\n");
+          naatosPrintf("MAIN: Unable to send sensor wakeup to motorRxQueue.");
         }
 
         vTaskDelay(300);
@@ -313,12 +313,12 @@ void main_task(void *pvParameters) {
       // Request the battery percentage from the bettery task
       xReturned = xQueueSend(batteryRxQueue, &batt_req, 0);
       if (xReturned != pdPASS) {
-        printf("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.\n");
+        naatosPrintf("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.");
       }
 
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(100)) == pdPASS) {
-        //printf("Battery percentage received: %d\n", percent_recv);
+        //naatosPrintf("Battery percentage received: %d\n", percent_recv);
         if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
              //next_state = MAIN_SLEEP;
              //break;
@@ -328,19 +328,19 @@ void main_task(void *pvParameters) {
       /* **** HANDLE USB AND SWITCH **** */
       // Get switch status if it has changed
       if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
-        printf("MAIN_TASK: Button click in idle \n");
+        naatosPrintf("MAIN_TASK: Button click in idle");
         usbRxMsgType_t conn_req_msg = {
             .cmd = NULL,
             .msg_type = USB_MSG_CONN_STATUS_REQ};
         // Get The USB Connection Status
         xReturned = xQueueSend(usbRxQueue, &conn_req_msg, 0);
         if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send usb connection request to usbRxQueue. \n");
+          naatosPrintf("MAIN_TASK: Unable to send usb connection request to usbRxQueue. ");
         }
         // Receive the USB Connection Status
         xReturned = xQueueReceive(main_usbConnRecvQueue, &usb_conn_status, portMAX_DELAY);
         if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to receive usb connection status from main_usbConnRecvQueue. \n");
+          naatosPrintf("MAIN_TASK: Unable to receive usb connection status from main_usbConnRecvQueue. ");
         }
         usb_needs_update = true;
       }
@@ -399,7 +399,7 @@ void main_task(void *pvParameters) {
       // Wait for Sensor Switch Data
       xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
       if (xReturned != pdPASS) {
-        printf("MAIN_TASK: Error receiving switch data from main_switchQueue\n");
+        naatosPrintf("MAIN_TASK: Error receiving switch data from main_switchQueue");
       }
 
       // Update switches triggered
@@ -467,12 +467,14 @@ void main_task(void *pvParameters) {
 
     case MAIN_ALERT: {
       if (last_state != main_state) {
+        char tmp[50];
         updateLedState(LED_WAKEUP, true);
         updateLedState(LED_RUN, false);
         updateLedState(LED_STANDBY, true);
         updateLedState(LED_COMPLETE, false);
         a_t_start = xTaskGetTickCount();
-        printf("MAIN_TASK: Alert Timeout - %dms\n", pdTICKS_TO_MS(alert_timeout_ticks));
+        sprintf(tmp, "MAIN_TASK: Alert Timeout - %dms", pdTICKS_TO_MS(alert_timeout_ticks));\
+        naatosPrintf(tmp);
       }
 
       main_wdt_time_left = pdTICKS_TO_MS(xTaskGetTickCount() - main_wdt_start_time);
@@ -503,7 +505,7 @@ void main_task(void *pvParameters) {
         msg.type = SENSOR_MSG_SLEEP;
         xReturned = xQueueSend(sensorRxQueue, &msg, 0);
         if (xReturned != pdPASS) {
-          printf("Sensor: Unable to send timer update to sensorRxQueue queue from main.\n");
+          naatosPrintf("Sensor: Unable to send timer update to sensorRxQueue queue from main.");
         }
         mainWatchDogKickCount = 0;
         sendWatchdogKickFromTask(MAIN, true);
@@ -523,12 +525,12 @@ void main_task(void *pvParameters) {
         // Get The USB Connection Status
         xReturned = xQueueSend(usbRxQueue, &conn_req_msg, 0);
         if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send usb connection request to usbRxQueue. \n");
+          naatosPrintf("MAIN_TASK: Unable to send usb connection request to usbRxQueue.");
         }
         // Receive the USB Connection Status
         xReturned = xQueueReceive(main_usbConnRecvQueue, &usb_conn_status, portMAX_DELAY);
         if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to receive usb connection status from main_usbConnRecvQueue. \n");
+          naatosPrintf("MAIN_TASK: Unable to receive usb connection status from main_usbConnRecvQueue.");
         }
         usb_needs_update = true;
       }
@@ -589,19 +591,19 @@ void main_task(void *pvParameters) {
         updateLedState(LED_STANDBY, false);
         updateLedState(LED_USB_MSC_STARTING, false);
         updateLedState(LED_WAKEUP, false);
-        printf("Going to sleep...\n");
+        naatosPrintf("Going to sleep...");
         SensorRxQueueMsg_t msg;
         msg.type = SENSOR_MSG_SLEEP;
         xReturned = xQueueSend(sensorRxQueue, &msg, 0);
         if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send sensor sleep to sensorRxQueue queue.\n");
+          naatosPrintf("MAIN_TASK: Unable to send sensor sleep to sensorRxQueue queue.");
         }
 
         MotorRxQueueMsg_t motorMsg;
         motorMsg.type = MOTOR_MSG_SLEEP;
         xReturned = xQueueSend(motorRxQueue, &motorMsg, 0);
         if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send motor sleep to motorRxQueue queue.\n");
+          naatosPrintf("MAIN_TASK: Unable to send motor sleep to motorRxQueue queue.");
         }
 
         BatteryRxQueueMsg_t battMsg;
@@ -609,7 +611,7 @@ void main_task(void *pvParameters) {
 
         xReturned = xQueueSend(batteryRxQueue, &battMsg, 0);
         if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send battery sleep to batteryRxQueue.\n");
+          naatosPrintf("MAIN_TASK: Unable to send battery sleep to batteryRxQueue.");
         }
 
         ButtonRxQueueMsg_t buttonMsg;
@@ -617,20 +619,20 @@ void main_task(void *pvParameters) {
 
         xReturned = xQueueSend(buttonRxQueue, &buttonMsg, 0);
         if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send button sleep to batteryRxQueue.\n");
+          naatosPrintf("MAIN_TASK: Unable to send button sleep to batteryRxQueue.");
         }
 
         usbRxMsgType_t usbMsg;
         usbMsg.msg_type = USB_MSG_SLEEP;
         xReturned = xQueueSend(usbRxQueue, &usbMsg, 0);
         if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send usb sleep to usbRxQueue. \n");
+          naatosPrintf("MAIN_TASK: Unable to send usb sleep to usbRxQueue.");
         }
 
         CompositeUSBRxQueueType_t compositeMsg = COMPOSITE_MSG_SLEEP;
         xReturned = xQueueSend(compositeRxQueue, &compositeMsg, 0);
         if (xReturned != pdPASS) {
-          printf("MAIN_TASK: Unable to send composite sleep to usbRxQueue. \n");
+          naatosPrintf("MAIN_TASK: Unable to send composite sleep to usbRxQueue.");
         }
 
         updateLedState(LED_RUN, false);
@@ -644,7 +646,7 @@ void main_task(void *pvParameters) {
       // this queue is blocked indefinitly until a switch interrupt or usb  interrupt
       xReturned = xQueueReceive(main_wakeupTasksQueue, &wake_up, portMAX_DELAY);
       if (xReturned != pdPASS) {
-        printf("MAIN_TASK: Unable to receive tasks wakeup from main_wakeupTasksQueue. \n");
+        naatosPrintf("MAIN_TASK: Unable to receive tasks wakeup from main_wakeupTasksQueue.");
       }
 
       // Dont wake up if the battery percentage is still too low
@@ -653,7 +655,7 @@ void main_task(void *pvParameters) {
            break;
       }
 
-      printf("Waking up...\n");
+      naatosPrintf("Waking up...");
 
       nrf_gpio_pin_set(SENSORS_EN);
       vTaskDelay(100);
@@ -662,14 +664,14 @@ void main_task(void *pvParameters) {
       msg.type = SENSOR_MSG_WAKEUP;
       xReturned = xQueueSend(sensorRxQueue, &msg, 0);
       if (xReturned != pdPASS) {
-        printf("MAIN_TASK: Unable to send sensor sleep to sensorRxQueue queue.\n");
+        naatosPrintf("MAIN_TASK: Unable to send sensor sleep to sensorRxQueue queue.");
       }
 
       MotorRxQueueMsg_t motorMsg;
       motorMsg.type = MOTOR_MSG_WAKEUP;
       xReturned = xQueueSend(motorRxQueue, &motorMsg, 0);
       if (xReturned != pdPASS) {
-        printf("MAIN_TASK: Unable to send motor wake to motorRxQueue queue.\n");
+        naatosPrintf("MAIN_TASK: Unable to send motor wake to motorRxQueue queue.");
       }
 
       BatteryRxQueueMsg_t battMsg;
@@ -677,7 +679,7 @@ void main_task(void *pvParameters) {
 
       xReturned = xQueueSend(batteryRxQueue, &battMsg, 0);
       if (xReturned != pdPASS) {
-        printf("MAIN_TASK: Unable to send battery sleep to batteryRxQueue.\n");
+        naatosPrintf("MAIN_TASK: Unable to send battery sleep to batteryRxQueue.");
       }
 
       ButtonRxQueueMsg_t buttonMsg;
@@ -685,20 +687,20 @@ void main_task(void *pvParameters) {
 
       xReturned = xQueueSend(buttonRxQueue, &buttonMsg, 0);
       if (xReturned != pdPASS) {
-        printf("MAIN_TASK: Unable to send button sleep to batteryRxQueue.\n");
+        naatosPrintf("MAIN_TASK: Unable to send button sleep to batteryRxQueue.");
       }
 
       CompositeUSBRxQueueType_t compositeMsg = COMPOSITE_MSG_WAKEUP;
       xReturned = xQueueSend(compositeRxQueue, &compositeMsg, 0);
       if (xReturned != pdPASS) {
-        printf("MAIN_TASK: Unable to send composite sleep to usbRxQueue. \n");
+        naatosPrintf("MAIN_TASK: Unable to send composite sleep to usbRxQueue.");
       }
 
       usbRxMsgType_t usbMsg;
       usbMsg.msg_type = USB_MSG_WAKEUP;
       xReturned = xQueueSend(usbRxQueue, &usbMsg, 0);
       if (xReturned != pdPASS) {
-        printf("MAIN_TASK: Unable to send usb sleep to usbRxQueue. \n");
+        naatosPrintf("MAIN_TASK: Unable to send usb sleep to usbRxQueue.");
       }
 
       next_state = MAIN_STANDBY;
@@ -725,7 +727,7 @@ void send_usb_change(usb_command_t cmd) {
       .cmd = cmd,
       .msg_type = USB_MSG_COMMAND};
 
-  printf("MAIN_TASK: Sending USB change request.\n");
+  naatosPrintf("MAIN_TASK: Sending USB change request.");
   if (cmd != USB_CDC_ACM) {
     unmount_storage();
     uninit_naatos_storage();
@@ -734,12 +736,12 @@ void send_usb_change(usb_command_t cmd) {
   // Send command
   xReturned = xQueueSend(usbRxQueue, &usb_msg, 0);
   if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to send usb command to usb_stateChangeQueue. \n");
+    naatosPrintf("MAIN_TASK: Unable to send usb command to usb_stateChangeQueue.");
   }
   // Wait for response
   xReturned = xQueueReceive(main_usbChangedConfQueue, &confirmed, portMAX_DELAY);
   if (xReturned != pdPASS) {
-    printf("MAIN_TASK: Unable to receive usb change confirmation from main_usbChangedConfQueue. \n");
+    naatosPrintf("MAIN_TASK: Unable to receive usb change confirmation from main_usbChangedConfQueue.");
   }
 
   if (cmd == USB_CDC_ACM) {
@@ -747,7 +749,7 @@ void send_usb_change(usb_command_t cmd) {
     NVIC_SystemReset();
   }
 
-  printf("MAIN_TASK: USB state successfully changed.\n");
+  naatosPrintf("MAIN_TASK: USB state successfully changed.");
 }
 
 
@@ -759,26 +761,30 @@ void send_usb_change(usb_command_t cmd) {
 */
 void create_tasks() {
   BaseType_t xReturned;
+  char buff[100];
 
   // Heater Task
   xReturned = xTaskCreate(heater_task, "HeaterTask", 1024, NULL, 0, &heaterTaskHandle);
   if (xReturned != pdPASS) {
     // The task was created.  Use the task's handle to delete the task.
-    printf("Error creating heater task. Error: %d\n", xReturned);
+    sprintf(buff, "Error creating heater task. Error: %d", xReturned);
+    naatosPrintf(buff);
     vTaskDelete(heaterTaskHandle);
   }
   // Logger Task
   xReturned = xTaskCreate(logger_task, "LoggerTask", 1024, NULL, 0, &loggerTaskHandle);
   if (xReturned != pdPASS) {
     // The task was created.  Use the task's handle to delete the task.
-    printf("Error creating logger task. Error: %d\n", xReturned);
+    sprintf(buff, "Error creating logger task. Error: %d", xReturned);
+    naatosPrintf(buff);
     vTaskDelete(loggerTaskHandle);
   }
   // Sensors Task
   xReturned = xTaskCreate(sensors_task, "SensorsTask", 2048, NULL, 0, &sensorsTaskHandle);
   if (xReturned != pdPASS) {
     // The task was created.  Use the task's handle to delete the task.
-    printf("Error creating sensors task. Error: %d\n", xReturned);
+    sprintf(buff, "Error creating sensors task. Error: %d", xReturned);
+    naatosPrintf(buff);
     vTaskDelete(sensorsTaskHandle);
   }
 
@@ -786,56 +792,64 @@ void create_tasks() {
   xReturned = xTaskCreate(battery_task, "BatteryTask", 1024, NULL, 0, &batteryTaskHandle);
   if (xReturned != pdPASS) {
     // The task was created.  Use the task's handle to delete the task.
-    printf("Error creating battery management task. Error: %d\n", xReturned);
+    sprintf(buff, "Error creating battery management task. Error: %d", xReturned);
+    naatosPrintf(buff);
     vTaskDelete(batteryTaskHandle);
   }
   // USB Management Task
   xReturned = xTaskCreate(usb_task, "USBTask", 1024, NULL, 0, &usbTaskHandle);
   if (xReturned != pdPASS) {
     // The task was created.  Use the task's handle to delete the task.
-    printf("Error creating usb management task. Error: %d\n", xReturned);
+    sprintf(buff, "Error creating usb management task. Error: %d", xReturned);
+    naatosPrintf(buff);
     vTaskDelete(usbTaskHandle);
   }
   // USB Composite Task
   xReturned = xTaskCreate(composite_usb_task, "CompositeUSBTask", 1024, NULL, 0, &compositeTaskHandle);
   if (xReturned != pdPASS) {
     // The task was created.  Use the task's handle to delete the task.
-    printf("Error creating Composite USB task. Error: %d\n", xReturned);
+    sprintf(buff, "Error creating Composite USB task. Error: %d", xReturned);
+    naatosPrintf(buff);
     vTaskDelete(compositeTaskHandle);
   }
   // PWM Task
   xReturned = xTaskCreate(pwm_task, "PWMTask", 1024, NULL, 0, &pwmTaskHandle);
   if (xReturned != pdPASS) {
     // The task was created.  Use the task's handle to delete the task.
-    printf("Error creating PWM task. Error: %d\n", xReturned);
+    sprintf(buff, "Error creating PWM task. Error: %d", xReturned);
+    naatosPrintf(buff);
     vTaskDelete(pwmTaskHandle);
   }
   // WDT Task
   xReturned = xTaskCreate(wdtFeedTask, "WDTTask", 100, NULL, 0, &wdtTaskHandle);
   if (xReturned != pdPASS) {
     /* The task was created.  Use the task's handle to delete the task. */
-    printf("Error creating WDT task. Error: %d\n", xReturned);
+    sprintf(buff, "Error creating WDT task. Error: %d", xReturned);
+    naatosPrintf(buff);
     vTaskDelete(wdtTaskHandle);
   }
   //Button Task
   xReturned = xTaskCreate(buttonTask, "ButtonTask", 1024, NULL, 0, &buttonTaskHandle);
   if (xReturned != pdPASS) {
     // The task was created.  Use the task's handle to delete the task.
-    printf("Error creating Composite Button task. Error: %d\n", xReturned);
+    sprintf(buff, "Error creating Composite Button task. Error: %d", xReturned);
+    naatosPrintf(buff);
     vTaskDelete(buttonTaskHandle);
   }
   //LED Task
   xReturned = xTaskCreate(led_task, "LedTask", 1024, NULL, 0, &ledTaskHandle);
   if (xReturned != pdPASS) {
     // The task was created.  Use the task's handle to delete the task.
-    printf("Error creating Composite ledTaskHandle task. Error: %d\n", xReturned);
+    sprintf(buff, "Error creating Composite ledTaskHandle task. Error: %d", xReturned);
+    naatosPrintf(buff);
     vTaskDelete(ledTaskHandle);
   }
   // Motor Task
   xReturned = xTaskCreate(motorTask, "MotorTask", 1024, NULL, 0, &motorTaskHandle);
   if (xReturned != pdPASS) {
     // The task was created.  Use the task's handle to delete the task.
-    printf("Error creating MotorTaskHandle task. Error: %d\n", xReturned);
+    sprintf(buff, "Error creating MotorTaskHandle task. Error: %d", xReturned);
+    naatosPrintf(buff);
     vTaskDelete(ledTaskHandle);
   }
 
@@ -851,122 +865,122 @@ void create_queues() {
   // Main Task Queues
   main_batteryDataQueue = xQueueCreate(5, sizeof(int));
   if (main_batteryDataQueue == NULL)
-    printf("Unable to create main_batteryDataQueue queue\n");
+    naatosPrintf("Unable to create main_batteryDataQueue queue");
 
   main_switchQueue = xQueueCreate(10, sizeof(sensor_switches_t));
   if (main_switchQueue == NULL)
-    printf("Unable to create main_switchQueue queue\n");
+    naatosPrintf("Unable to create main_switchQueue queue");
 
   main_mainStateRespQueue = xQueueCreate(4, sizeof(tasks_t));
   if (main_mainStateRespQueue == NULL)
-    printf("Unable to create main_mainStateRespQueue queue\n");
+    naatosPrintf("Unable to create main_mainStateRespQueue queue");
 
   main_runRespQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (main_runRespQueue == NULL)
-    printf("Unable to create main_runRespQueue queue\n");
+    naatosPrintf("Unable to create main_runRespQueue queue");
 
   main_runErrorQueue = xQueueCreate(5, sizeof(MainStateErrorQueueMsg_t));
   if (main_runErrorQueue == NULL)
-    printf("Unable to create main_runErrorQueue queue\n");
+    naatosPrintf("Unable to create main_runErrorQueue queue");
 
   main_runConfRespQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (main_runConfRespQueue == NULL)
-    printf("Unable to create main_runConfRespQueue queue\n");
+    naatosPrintf("Unable to create main_runConfRespQueue queue");
 
   main_usbConnRecvQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (main_usbConnRecvQueue == NULL)
-    printf("Unable to create main_usbConnRecvQueue queue\n");
+    naatosPrintf("Unable to create main_usbConnRecvQueue queue");
 
   main_usbChangedConfQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (main_usbChangedConfQueue == NULL) {
-    printf("Unable to create main_usbChangedConfQueue queue\n");
+    naatosPrintf("Unable to create main_usbChangedConfQueue queue");
   }
 
   main_wakeupTasksQueue = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (main_wakeupTasksQueue == NULL) {
-    printf("Unable to create main_wakeupTasksQueue queue\n");
+    naatosPrintf("Unable to create main_wakeupTasksQueue queue");
   }
   // Heater Task Queues
   heaterRxQueue = xQueueCreate(10, sizeof(HeaterRxQueueMsg_t));
   if (heaterRxQueue == NULL) {
-    printf("Unable to create heaterRxQueue queue\n");
+    naatosPrintf("Unable to create heaterRxQueue queue");
   }
 
   // Sensor Task Queues
   sensorRxQueue = xQueueCreate(20, sizeof(SensorRxQueueMsg_t));
   if (sensorRxQueue == NULL) {
-    printf("Unable to create sensorRxQueue queue\n");
+    naatosPrintf("Unable to create sensorRxQueue queue");
   }
 
   // Battery Management Task Queues
   batteryRxQueue = xQueueCreate(10, sizeof(BatteryRxQueueMsg_t));
   if (batteryRxQueue == NULL) {
-    printf("Unable to create batteryRxQueue queue\n");
+    naatosPrintf("Unable to create batteryRxQueue queue");
   }
 
   // Button Task Queue
   buttonRxQueue = xQueueCreate(10, sizeof(ButtonRxQueueMsg_t));
   if (buttonRxQueue == NULL) {
-    printf("Unable to create buttonRxQueue queue\n");
+    naatosPrintf("Unable to create buttonRxQueue queue");
   }
 
   // USB Management Task Queues
   usbRxQueue = xQueueCreate(10, sizeof(usbRxMsgType_t));
   if (usbRxQueue == NULL) {
-    printf("Unable to create usbRxQueue queue\n");
+    naatosPrintf("Unable to create usbRxQueue queue");
   }
 
   // Composite USB Task Queues
   compositeRxQueue = xQueueCreate(10, sizeof(CompositeUSBRxQueueType_t));
   if (compositeRxQueue == NULL) {
-    printf("Unable to create compositeRxQueue queue\n");
+    naatosPrintf("Unable to create compositeRxQueue queue");
   }
 
   // Logger Task Queues
   logger_recvBattPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
   if (logger_recvBattPercentQueue == NULL)
-    printf("Unable to create logger_recvBattPercentQueue queue\n");
+    naatosPrintf("Unable to create logger_recvBattPercentQueue queue");
 
   logger_logMessageQueue = xQueueCreate(10, sizeof(log_data_message_t));
   if (logger_logMessageQueue == NULL)
-    printf("Unable to create logger_logMessageQueue queue\n");
+    naatosPrintf("Unable to create logger_logMessageQueue queue");
 
   // Watchdog Task Queues
   watchdog_rxTimesQueue = xQueueCreate(WATCH_DOG_QUEUE_SIZE, sizeof(watchdog_time_update_t));
   if (watchdog_rxTimesQueue == NULL)
-    printf("Unable to create watchdog_rxTimesQueue queue\n");
+    naatosPrintf("Unable to create watchdog_rxTimesQueue queue");
 
   // Button Task Queues
   button_mainStateQueue = xQueueCreate(QUEUE_SIZE, sizeof(button_update_t));
   if (button_mainStateQueue == NULL)
-    printf("Unable to create button_mainStateQueue queue\n");
+    naatosPrintf("Unable to create button_mainStateQueue queue");
 
   // PWM Task Queues
   pwmRxQueue = xQueueCreate(10, sizeof(PwmRxQueueMsg_t));
   if (pwmRxQueue == NULL) {
-    printf("Unable to create pwmRxQueue queue\n");
+    naatosPrintf("Unable to create pwmRxQueue queue");
   }
 
   ledRxQueue = xQueueCreate(10, sizeof(LEDRxQueueMsg_t));
   if (pwmRxQueue == NULL) {
-    printf("Unable to create ledRxQueue queue\n");
+    naatosPrintf("Unable to create ledRxQueue queue");
   }
 
   main_setPointReached = xQueueCreate(QUEUE_SIZE, sizeof(bool));
   if (main_setPointReached == NULL) {
-    printf("Unable to create main_setPointReached queue\n");
+    naatosPrintf("Unable to create main_setPointReached queue");
   }
 
   motorRxQueue = xQueueCreate(10, sizeof(MotorRxQueueMsg_t));
   if (motorRxQueue == NULL) {
-    printf("Unable to create motorRxQueue queue\n");
+    naatosPrintf("Unable to create motorRxQueue queue");
   }
 }
 
 // Stack Overflow detection.
 void vApplicationStackOverflowHook(TaskHandle_t xTask,
     signed char *pcTaskName) {
-  printf("FreeRTOS Stack Overflow Has Occured.");
+  naatosPrintf("FreeRTOS Stack Overflow Has Occured.");
 }
 
 /*********************************************************************
@@ -979,6 +993,7 @@ int main(void) {
   BaseType_t xReturned;
   ret_code_t err_code;
   FRESULT res;
+  char buff[100];
 
   // Initialize clock driver for better time accuracy in FREERTOS
   err_code = nrf_drv_clock_init();
@@ -1020,7 +1035,7 @@ int main(void) {
   // Get the configuration parameters
   res = get_naatos_configuration_parameters(&config);
   if (res != FR_OK) {
-    printf("Warning: configuration file was not able to be read. Using default configuration parameters.");
+    naatosPrintf("Warning: configuration file was not able to be read. Using default configuration parameters.");
     use_default_configuration_parameters = true;
     // Report that the confirguation file cannot be read to a log if sd card is ok
     if (sd_card_inited) {
@@ -1034,11 +1049,11 @@ int main(void) {
 
       xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
       if (xReturned != pdPASS) {
-        printf("MAIN_TASK: Unable to send configuration error to logging task.\n");
+        naatosPrintf("MAIN_TASK: Unable to send configuration error to logging task.");
       }
       xReturned = xQueueSend(logger_logMessageQueue, &exit_log_message, 0);
       if (xReturned != pdPASS) {
-        printf("MAIN_TASK: Unable to send recovery battery percentage event to logging task.\n");
+        naatosPrintf("MAIN_TASK: Unable to send recovery battery percentage event to logging task.");
       }
    }
   } else {
@@ -1052,7 +1067,8 @@ int main(void) {
   xReturned = xTaskCreate(main_task, "MainTask", 1024, NULL, 0, &mainTaskHandle);
   if (xReturned != pdPASS) {
     // The task was created.  Use the task's handle to delete the task.
-    printf("Error creating main task. Error: %d\n", xReturned);
+    sprintf(buff, "Error creating main task. Error: %d", xReturned);
+    naatosPrintf(buff);
     vTaskDelete(mainTaskHandle);
   }
 
@@ -1068,7 +1084,7 @@ void sendWdtHeaterInvalid() {
 
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
   if (xReturned != pdPASS) {
-    printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+    naatosPrintf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task");
   }
 }
 
@@ -1080,7 +1096,7 @@ void sendWdtMain(bool valid) {
 
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
   if (xReturned != pdPASS) {
-    printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+    naatosPrintf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task");
   }
 }
 

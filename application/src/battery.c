@@ -27,7 +27,7 @@ void vBatteryTimerCallback(TimerHandle_t xTimer) {
 
   xReturned = xQueueSend(batteryRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
-    printf("Battery: Unable to send timer update to batteryRxQueue queue.\n");
+    naatosPrintf("Battery: Unable to send timer update to batteryRxQueue queue.");
   }
 }
 
@@ -35,17 +35,17 @@ void startBatteryTimer(void) {
   TickType_t sampleRateTicks = pdMS_TO_TICKS(BATT_SEND_WDT_EVENT_MS);
 
   if (xTimerChangePeriod(batteryTimer, sampleRateTicks, 100) != pdPASS) {
-    printf("Cannot change period of battery timer. \n");
+    naatosPrintf("Cannot change period of battery timer.");
   }
 
   if (xTimerStart(batteryTimer, 0) != pdPASS) {
-    printf("Failed to start sensor timer. \n");
+    naatosPrintf("Failed to start sensor timer.");
   }
 }
 
 void stopBatteryTimer(void) {
   if (xTimerStop(batteryTimer, 100) != pdPASS) {
-    printf("Failed to stop sensor timer. \n");
+    naatosPrintf("Failed to stop sensor timer.");
   }
 }
 
@@ -84,29 +84,31 @@ void battery_task(void *pvParameters) {
 
     xReturned = xQueueReceive(batteryRxQueue, &batteryRxMessage, portMAX_DELAY);
     if (xReturned != pdPASS) {
-      printf("Unable to Rx data to sensor queue\n");
+      naatosPrintf("Unable to Rx data to sensor queue");
     } else {
       switch (batteryRxMessage.type) {
       case BATTERY_MSG_TIMER_EVENT: {
         xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
         if (xReturned != pdPASS) {
-          printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+          naatosPrintf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task");
         }
         break;
       }
 
       case BATTERY_SOC_REQUEST: {
+        char tmp[100];
         // I2C Fuel Gauge read
         battery_percentage = fuelGauge_getSOC(NULL);
         if (batteryRxMessage.sendTo == BATTERY_MSG_SOC_MAIN) {
           xReturned = xQueueSend(main_batteryDataQueue, (void *)&battery_percentage, 1000); // TODO: Probably want to send full BMS information instead
           if (xReturned != pdPASS) {
-            printf("BATT_TASK: Was unable to send battery percentage to main queue. Error:%d\n", xReturned);
+            sprintf(tmp, "BATT_TASK: Was unable to send battery percentage to main queue. Error:%d", xReturned);
+            naatosPrintf(tmp);
           }
         } else if (batteryRxMessage.sendTo == BATTERY_MSG_SOC_LOG) {
           xReturned = xQueueSend(logger_recvBattPercentQueue, &battery_percentage, 0); // TODO: Probably want to send full BMS information instead
           if (xReturned != pdPASS) {
-            printf("BATT_TASK: Was unable to send battery information to logger queue\n");
+            naatosPrintf("BATT_TASK: Was unable to send battery information to logger queue");
           }
         }
 
@@ -122,7 +124,7 @@ void battery_task(void *pvParameters) {
         wdtUpdate.valid = false;
         xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
         if (xReturned != pdPASS) {
-          printf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task \n");
+          naatosPrintf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task");
         }
 
         //send to main queue that we are asleep
@@ -142,7 +144,7 @@ void battery_task(void *pvParameters) {
         // Respond to main state change
         xReturned = xQueueSend(main_mainStateRespQueue, &batt_task, 0);
         if (xReturned != pdPASS) {
-          printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
+          naatosPrintf("USB: Unable to send main state response to main_mainStateRespQueue queue.");
         }
         break;
 

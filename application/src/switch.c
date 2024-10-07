@@ -23,7 +23,7 @@ void button_init(void) {
 void sendButtonUpdate(button_update_t msg) {
   BaseType_t xReturned = xQueueSend(button_mainStateQueue, &msg, 0);
   if (xReturned != pdPASS) {
-    printf("SWITCH_TASK: Unable to send to button_mainStateQueue.\n");
+    naatosPrintf("SWITCH_TASK: Unable to send to button_mainStateQueue.");
   }
 }
 
@@ -34,7 +34,7 @@ void vButtonTimerCallback(TimerHandle_t xTimer) {
 
   xReturned = xQueueSend(buttonRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
-    printf("SWITCH_TASK: Unable to send timer update to buttonRxQueue queue.\n");
+    naatosPrintf("SWITCH_TASK: Unable to send timer update to buttonRxQueue queue.");
   }
 }
 
@@ -42,17 +42,17 @@ void startButtonTimer(void) {
   TickType_t sampleRateTicks = pdMS_TO_TICKS(BUTTON_TASK_DELAY);
 
   if (xTimerChangePeriod(buttonTimer, sampleRateTicks, 100) != pdPASS) {
-    printf("SWITCH_TASK: Cannot change period of button timer. \n");
+    naatosPrintf("SWITCH_TASK: Cannot change period of button timer. ");
   }
 
   if (xTimerStart(buttonTimer, 0) != pdPASS) {
-    printf("SWITCH_TASK: Failed to start button timer. \n");
+    naatosPrintf("SWITCH_TASK: Failed to start button timer. ");
   }
 }
 
 void stopButtonTimer(void) {
   if (xTimerStop(buttonTimer, 100) != pdPASS) {
-    printf("Failed to stop button timer. \n");
+    naatosPrintf("Failed to stop button timer. ");
   }
 }
 
@@ -74,7 +74,7 @@ void gpiote_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action
 
   xReturned = xQueueSendFromISR(buttonRxQueue, &msg, &xHigherPriorityTaskWoken);
   if (xReturned != pdPASS) {
-    printf("SWITCH_TASK:: Unable to send timer update to buttonRxQueue queue.\n");
+    naatosPrintf("SWITCH_TASK:: Unable to send timer update to buttonRxQueue queue.");
   }
 
   skip_cnt++;
@@ -104,7 +104,7 @@ void buttonTask(void *pvParameters) {
   while (true) {
     xReturned = xQueueReceive(buttonRxQueue, &buttonRxMessage, portMAX_DELAY);
     if (xReturned != pdPASS) {
-      printf("Unable to Rx data to button queue\n");
+      naatosPrintf("Unable to Rx data to button queue");
     } else {
       switch (buttonRxMessage.type) {
       case BUTTON_MSG_SLEEP:
@@ -134,7 +134,7 @@ void buttonTask(void *pvParameters) {
         if (notify <= 0) {
           xReturned = xQueueSend(main_wakeupTasksQueue, &awake, 0);
           if (xReturned != pdPASS) {
-            printf("SWITCH_TASK: Unable to send tasks wake up to main_wakeupTasksQueue. \n");
+            naatosPrintf("SWITCH_TASK: Unable to send tasks wake up to main_wakeupTasksQueue.");
           }
           notify++;
         }

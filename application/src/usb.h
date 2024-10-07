@@ -47,6 +47,8 @@
 
 #define READ_SIZE 1
 
+#define UART_PRINT_F_ENABLED
+
 // Endpoint list passed to APP_USBD_MSC_GLOBAL_DEF
 #if USE_SD_CARD
 #define ENDPOINT_LIST() APP_USBD_MSC_ENDPOINT_LIST(3, 3)
@@ -77,7 +79,7 @@ static char m_tx_buffer[NRF_DRV_USBD_EPSIZE];
 static bool m_send_flag = 0;
 
 void setup_uart_semaphore(void);
-void naatosPrintf(const char * msg, int len);
+void naatosPrintf(const char * msg);
 
 
 void usb_task(void *pvParameters);

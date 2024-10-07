@@ -56,7 +56,7 @@ bool calendar_get_time(calendar_time_t *now) {
   ret = xUtil_TWI_Read(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
 #endif
   if (ret) {
-    printf("Unable to i2c communicate with calendar chip!\n");
+    naatosPrintf("Unable to i2c communicate with calendar chip!");
     return false;
   }
 
@@ -225,7 +225,7 @@ bool calendar_set_time_helper(void) {
   //calendar_stop();
   calendar_set_time(&now);
 
-  printf("Requested time  M: %d D: %d Y:%d h: %d m: %d s: %d\r\n",
+  naatosPrintf("Requested time  M: %d D: %d Y:%d h: %d m: %d s: %d",
       now.month,
       now.day,
       now.year,
@@ -236,7 +236,7 @@ bool calendar_set_time_helper(void) {
   //calendar_start();
   calendar_get_time(&now);
 
-  printf("Read back time  M: %d D: %d Y:%d h: %d m: %d s: %d\r\n",
+  naatosPrintf("Read back time  M: %d D: %d Y:%d h: %d m: %d s: %d",
       now.month,
       now.day,
       now.year,

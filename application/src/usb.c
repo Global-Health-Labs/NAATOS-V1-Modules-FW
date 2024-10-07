@@ -75,7 +75,7 @@ void vUSBTimerCallback(TimerHandle_t xTimer) {
 
   xReturned = xQueueSend(usbRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
-    printf("USB_TASK: Unable to send check connection from timer.\n");
+    naatosPrintf("USB_TASK: Unable to send check connection from timer.");
   }
 }
 
@@ -83,17 +83,17 @@ void startUSBTimer(void) {
   TickType_t sampleRateTicks = USB__TASK_DELAY;
 
   if (xTimerChangePeriod(usbTimer, sampleRateTicks, 100) != pdPASS) {
-    printf("Cannot change period of usb timer. \n");
+    naatosPrintf("Cannot change period of usb timer. ");
   }
 
   if (xTimerStart(usbTimer, 0) != pdPASS) {
-    printf("Failed to start usb timer. \n");
+    naatosPrintf("Failed to start usb timer. ");
   }
 }
 
 void stopUSBTimer(void) {
   if (xTimerStop(usbTimer, 100) != pdPASS) {
-    printf("Failed to stop usb timer. \n");
+    naatosPrintf("Failed to stop usb timer. ");
   }
 }
 
@@ -103,7 +103,7 @@ void vCompositeUSBTimerCallback(TimerHandle_t xTimer) {
 
   xReturned = xQueueSend(compositeRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
-    printf("COMPOSITE_TASK: Unable to send continue from timer.\n");
+    naatosPrintf("COMPOSITE_TASK: Unable to send continue from timer.");
   }
 }
 
@@ -111,17 +111,17 @@ void startCompositeTimer(void) {
   TickType_t sampleRateTicks = USB_TASK_DELAY;
 
   if (xTimerChangePeriod(compositeUsbTimer, sampleRateTicks, 100) != pdPASS) {
-    printf("Cannot change period of composite usb timer. \n");
+    naatosPrintf("Cannot change period of composite usb timer. ");
   }
 
   if (xTimerStart(compositeUsbTimer, 0) != pdPASS) {
-    printf("Failed to start composite usb timer. \n");
+    naatosPrintf("Failed to start composite usb timer. ");
   }
 }
 
 void stopCompositeTimer(void) {
   if (xTimerStop(compositeUsbTimer, 100) != pdPASS) {
-    printf("Failed to stop composite usb timer. \n");
+    naatosPrintf("Failed to stop composite usb timer. ");
   }
 }
 
@@ -131,7 +131,7 @@ void respond_to_usb_change(void) {
 
   xReturned = xQueueSend(main_usbChangedConfQueue, &state_changed, 0);
   if (xReturned != pdPASS) {
-    printf("USB_TASK: Unable to send usb changed response to main_usbChangedConfQueue. \n");
+    naatosPrintf("USB_TASK: Unable to send usb changed response to main_usbChangedConfQueue.");
   }
 }
 
@@ -144,12 +144,16 @@ void setup_uart_semaphore(void) {
     xSemaphoreGive( uartSemaphore );  // 'Give' the peripheral protection semaphore
 }
 
-void naatosPrintf(const char * msg, int len) {
+void naatosPrintf(const char * msg) {
+ char tmp[strlen(msg) + 1];
 #ifdef UART_PRINT_F_ENABLED
-  write_to_com(msg, len);
-#else
-  printf(msg);
+  int len = sprintf(tmp, "%s\r\n", msg);
+  if (com_port_open) 
+    write_to_com(tmp, len);
+#else 
+  sprintf(tmp, "%s\n", msg);
 #endif
+  printf(tmp);
 }
 
 void write_to_com(const char * msg, int len) {
@@ -172,7 +176,7 @@ void cdc_acm_user_ev_handler(app_usbd_class_inst_t const *p_inst,
 
   switch (event) {
   case APP_USBD_CDC_ACM_USER_EVT_PORT_OPEN: {
-    printf("COM port opened.\n");
+    naatosPrintf("COM port opened.");
     com_port_open = true;
     //Setup first transfer
     ret_code_t ret = app_usbd_cdc_acm_read(&m_app_cdc_acm,
@@ -188,12 +192,14 @@ void cdc_acm_user_ev_handler(app_usbd_class_inst_t const *p_inst,
     break;
   case APP_USBD_CDC_ACM_USER_EVT_RX_DONE: {
     ret_code_t ret;
-    printf("Bytes waiting: %d\n", app_usbd_cdc_acm_bytes_stored(p_cdc_acm));
+    char tmp[128];
+    sprintf(tmp, "Bytes waiting: %d", app_usbd_cdc_acm_bytes_stored(p_cdc_acm));
+    naatosPrintf(tmp);
     do {
       //Get amount of data transfered
       size_t size = app_usbd_cdc_acm_rx_size(p_cdc_acm);
-      printf("RX: size: %lu char: %c\n", size, m_rx_buffer[0]);
-
+      sprintf(tmp, "RX: size: %lu char: %c", size, m_rx_buffer[0]);
+      naatosPrintf(tmp);
       // Fetch data until internal buffer is empty
       ret = app_usbd_cdc_acm_read(&m_app_cdc_acm,
           m_rx_buffer,
@@ -209,22 +215,22 @@ void cdc_acm_user_ev_handler(app_usbd_class_inst_t const *p_inst,
 void usbd_user_ev_handler(app_usbd_event_type_t event) {
   switch (event) {
   case APP_USBD_EVT_DRV_SUSPEND:
-    printf("USB: Suspended\n");
+    naatosPrintf("USB: Suspended");
     break;
   case APP_USBD_EVT_DRV_RESUME:
-    printf("USB: Resumed\n");
+    naatosPrintf("USB: Resumed");
     break;
   case APP_USBD_EVT_STARTED:
-    printf("USB: Started\n");
+    naatosPrintf("USB: Started");
     usb_started = true;
     break;
   case APP_USBD_EVT_STOPPED:
-    printf("USB: Stopped\n");
+    naatosPrintf("USB: Stopped");
     usb_started = false;
     //app_usbd_disable();
     break;
   case APP_USBD_EVT_POWER_DETECTED:
-    printf("USB: Power detected\n");
+    naatosPrintf("USB: Power detected");
     usb_detected = true;
     usb_conn_updated = true;
     //set_led2_blue_breathe();
@@ -233,7 +239,7 @@ void usbd_user_ev_handler(app_usbd_event_type_t event) {
     }
     break;
   case APP_USBD_EVT_POWER_REMOVED:
-    printf("USB: Power removed\n");
+    naatosPrintf("USB: Power removed");
     if (nrf_drv_usbd_is_enabled()) {
       app_usbd_stop();
     }
@@ -245,7 +251,7 @@ void usbd_user_ev_handler(app_usbd_event_type_t event) {
     usb_conn_updated = true;
     break;
   case APP_USBD_EVT_POWER_READY:
-    printf("USB: Ready\n");
+    naatosPrintf("USB: Ready");
     app_usbd_start();
     m_usb_connected = true;
     break;
@@ -276,7 +282,7 @@ void usb_suspend_conflicting_tasks(void) {
   // Send to Sensors task
   xReturned = xQueueSend(sensorRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
-    printf("USB: Unable to send usb suspend request to sensorRxQueue.\n");
+    naatosPrintf("USB: Unable to send usb suspend request to sensorRxQueue.");
   }
 
   /* Receive back suspend request acceptances */
@@ -284,7 +290,7 @@ void usb_suspend_conflicting_tasks(void) {
     if (uxQueueMessagesWaiting(usb_recvUsbWaitAcceptQueue) > 0) {
       xReturned = xQueueReceive(usb_recvUsbWaitAcceptQueue, &sus_acpt, 0);
       if (xReturned != pdPASS) {
-        printf("USB: Unable to receive from usb_recvUsbWaitAcceptQueue queue.\n");
+        naatosPrintf("USB: Unable to receive from usb_recvUsbWaitAcceptQueue queue.");
         continue;
       } else {
         switch (sus_acpt.task) {
@@ -350,7 +356,7 @@ void start_usb(bool cdc_acm, bool msc) {
     ret = app_usbd_power_events_enable();
     APP_ERROR_CHECK(ret);
   } else {
-    printf("No USB power detection enabled\r\nStarting USB now");
+    naatosPrintf("No USB power detection enabled\r\nStarting USB now");
 
     app_usbd_enable();
     app_usbd_start();
@@ -365,7 +371,7 @@ void start_usb(bool cdc_acm, bool msc) {
 }
 
 void restart_usb_only_cdc_acm(void) {
-  printf("USB: Restarting USB to only have Virtual COM Port.\n");
+  naatosPrintf("USB: Restarting USB to only have Virtual COM Port.");
 
   //usb_done_config = false;
   usb_started = false;
@@ -391,14 +397,14 @@ void composite_usb_task(void *pvParameters) {
 
   xReturned = xQueueSend(compositeRxQueue, &temp_msg, 0);
   if (xReturned != pdPASS) {
-    printf("COMPOSITE_TASK: Unable to send continue from timer.\n");
+    naatosPrintf("COMPOSITE_TASK: Unable to send continue from timer.");
   }
 
   for (;;) {
 
     xReturned = xQueueReceive(compositeRxQueue, &msg, portMAX_DELAY);
     if (xReturned != pdPASS) {
-      printf("COMPOSITE_TASK: Unable to receive continue from composite timer");
+      naatosPrintf("COMPOSITE_TASK: Unable to receive continue from composite timer");
     }
 
     switch (msg) {
@@ -420,28 +426,28 @@ void composite_usb_task(void *pvParameters) {
         if (uxQueueMessagesWaiting(usb_usbWaitOverQueue) > 0) {
           xReturned = xQueueReceive(usb_usbWaitOverQueue, &sus_over, 0);
           if (xReturned != pdPASS) {
-            printf("USB: Unable to receive usb wait over from usb_usbWaitOverQueue\n");
+            naatosPrintf("USB: Unable to receive usb wait over from usb_usbWaitOverQueue");
           }
           switch (sus_over.task) {
           case BATTERY:
             if (sus_over.over)
               batt_over = true;
-            printf("USB: battery task suspension over.\n");
+            naatosPrintf("USB: battery task suspension over.");
             break;
           case HEATER:
             if (sus_over.over)
               heater_over = true;
-            printf("USB: heater task suspension over.\n");
+            naatosPrintf("USB: heater task suspension over.");
             break;
           case PWM:
             if (sus_over.over)
               pwm_over = true;
-            printf("USB: pwm task suspension over.\n");
+            naatosPrintf("USB: pwm task suspension over.");
             break;
           case SENSORS:
             if (sus_over.over)
               sensor_over = true;
-            printf("USB: sensor task suspension over.\n");
+            naatosPrintf("USB: sensor task suspension over.");
             break;
           default:
             break;
@@ -497,7 +503,7 @@ void usb_task(void *pvParameters) {
     // Receive from usbRxQueue
     xReturned = xQueueReceive(usbRxQueue, &rx_msg, portMAX_DELAY);
     if (xReturned != pdPASS) {
-      printf("USB_TASK: Unable to recieve usb message from usbRxQueue. \n");
+      naatosPrintf("USB_TASK: Unable to recieve usb message from usbRxQueue.");
     }
 
     switch (rx_msg.msg_type) {
@@ -505,7 +511,7 @@ void usb_task(void *pvParameters) {
       // Respond to connection status request
       xReturned = xQueueSend(main_usbConnRecvQueue, &usb_detected, 0);
       if (xReturned != pdPASS) {
-        printf("USB_TASK: Unable to send usb connection status to main_usbConnRecvQueue. \n");
+        naatosPrintf("USB_TASK: Unable to send usb connection status to main_usbConnRecvQueue.");
       }
       break;
     }
@@ -577,7 +583,7 @@ void usb_task(void *pvParameters) {
       if (usb_conn_updated) {
         xReturned = xQueueSend(main_usbConnRecvQueue, &usb_detected, 0);
         if (xReturned != pdPASS) {
-          printf("USB_TASK: Unable to send updated usb connection state to main_usbConnRecvQueue");
+          naatosPrintf("USB_TASK: Unable to send updated usb connection state to main_usbConnRecvQueue");
         }
         usb_conn_updated = false;
       }

@@ -89,7 +89,7 @@ void updateDutyCycles(temperature_pwm_data_t pwmData) {
 
   xReturned = xQueueSend(pwmRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
-    printf("USB: Unable to send main state response to main_mainStateRespQueue queue.\n");
+    naatosPrintf("USB: Unable to send main state response to main_mainStateRespQueue queue.");
   }
 }
 
@@ -122,7 +122,7 @@ void pwm_task(void *pvParameters) {
   for (;;) {
     xReturned = xQueueReceive(pwmRxQueue, &pwmMsg, portMAX_DELAY);
     if (xReturned != pdPASS) {
-      printf("Unable to Rx data to sensor queue\n");
+      naatosPrintf("Unable to Rx data to sensor queue");
     } else {
       switch (pwmMsg.type) {
       case PWM_MSG_UPDATE_DUTY: {
