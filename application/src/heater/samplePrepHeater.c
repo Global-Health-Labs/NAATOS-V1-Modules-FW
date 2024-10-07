@@ -409,10 +409,12 @@ void handleSampleMotorDataRx(int motor_speed) {
     if (!use_default_configuration_parameters) {
       if (motorReachedSpeed && motor_speed < (config.motor_setpoint_1 - ((float)config.motor_setpoint_1 * ((float)config.motor_stall_percent / 100.0 )))) {
         motorStalled = true;
+        motorReachedSpeed = false;
       }
     } else {
       if (motorReachedSpeed && motor_speed < (MOTOR_SETPOINT_1 - ((float)MOTOR_SETPOINT_1 * ((float)DEFAULT_MOTOR_STALL_PERCENTAGE / 100.0 )))) {
         motorStalled = true;
+        motorReachedSpeed = false;
       } 
     }
 
