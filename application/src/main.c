@@ -286,7 +286,7 @@ void main_task(void *pvParameters) {
           naatosPrintf("MAIN: Unable to send sensor wakeup to motorRxQueue.");
         }
 
-        vTaskDelay(300);
+        //vTaskDelay(300);
         read_sd_and_notify_tasks();
         // Get the alert timeout
         if (!use_default_configuration_parameters) {
@@ -762,7 +762,7 @@ void send_usb_change(usb_command_t cmd) {
 void create_tasks() {
   BaseType_t xReturned;
   char buff[100];
-
+  
   // Heater Task
   xReturned = xTaskCreate(heater_task, "HeaterTask", 1024, NULL, 0, &heaterTaskHandle);
   if (xReturned != pdPASS) {
@@ -787,7 +787,6 @@ void create_tasks() {
     naatosPrintf(buff);
     vTaskDelete(sensorsTaskHandle);
   }
-
   // Battery Management Task
   xReturned = xTaskCreate(battery_task, "BatteryTask", 1024, NULL, 0, &batteryTaskHandle);
   if (xReturned != pdPASS) {
@@ -812,7 +811,8 @@ void create_tasks() {
     naatosPrintf(buff);
     vTaskDelete(compositeTaskHandle);
   }
-  // PWM Task
+  
+  // PWM Task  
   xReturned = xTaskCreate(pwm_task, "PWMTask", 1024, NULL, 0, &pwmTaskHandle);
   if (xReturned != pdPASS) {
     // The task was created.  Use the task's handle to delete the task.
@@ -823,7 +823,7 @@ void create_tasks() {
   // WDT Task
   xReturned = xTaskCreate(wdtFeedTask, "WDTTask", 100, NULL, 0, &wdtTaskHandle);
   if (xReturned != pdPASS) {
-    /* The task was created.  Use the task's handle to delete the task. */
+    // The task was created.  Use the task's handle to delete the task.
     sprintf(buff, "Error creating WDT task. Error: %d", xReturned);
     naatosPrintf(buff);
     vTaskDelete(wdtTaskHandle);
@@ -852,7 +852,7 @@ void create_tasks() {
     naatosPrintf(buff);
     vTaskDelete(ledTaskHandle);
   }
-
+  
 }
 
 /*********************************************************************

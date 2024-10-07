@@ -89,6 +89,7 @@ static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t re
 
   current_op_type = ts_operation;
 
+#if SAMPLE_PREP_REV_B
   switch (sensor) {
   case valve_zone:
     interface = i2c_interface_system;
@@ -107,6 +108,27 @@ static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t re
     slave_addr = TSYS01_ADDR;
     break;
   }
+#elif SAMPLE_PREP_REV_A
+  switch (sensor) {
+  case valve_zone:
+    interface = i2c_interface_system;
+    slave_addr = TSYS01_ADDR_ALT;
+    break;
+  case amp_zone_0:
+    interface = i2c_interface_system;
+    slave_addr = TSYS01_ADDR;
+    break;
+  case amp_zone_1:
+    interface = i2c_interface_sensors;
+    slave_addr = TSYS01_ADDR_ALT;
+    break;
+  case amp_zone_2:
+    interface = i2c_interface_sensors;
+    slave_addr = TSYS01_ADDR;
+    break;
+  }
+#endif
+  
 
   err_code = xUtil_TWI_Read(interface, slave_addr, reg, read_buf, read_len);
 

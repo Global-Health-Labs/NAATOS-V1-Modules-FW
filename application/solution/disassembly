@@ -1,0 +1,324 @@
+    F88D3108    strb.w r3, [sp, #0x0108]
+--- main.c -- 236 ------------------------------------------
+int mainWatchDogKickCount = 0;
+const BatteryRxQueueMsg_t batt_req = {
+.type = BATTERY_SOC_REQUEST,
+.sendTo = BATTERY_MSG_SOC_MAIN};
+BaseType_t xHigherPriorityTaskWoken = pdTRUE;
+    2301        movs r3, #1
+    934C        str r3, [sp, #0x0130]
+--- main.c -- 241 ------------------------------------------
+// Set Start up state to standby
+main_state_t main_state = MAIN_SLEEP;
+    2303        movs r3, #3
+    F88D3147    strb.w r3, [sp, #0x0147]
+--- main.c -- 244 ------------------------------------------
+main_state_t next_state = MAIN_STANDBY;
+    2300        movs r3, #0
+    F88D3146    strb.w r3, [sp, #0x0146]
+--- main.c -- 245 ------------------------------------------
+main_state_t last_state = MAIN_SLEEP;
+    2303        movs r3, #3
+    F88D312F    strb.w r3, [sp, #0x012F]
+--- main.c -- 246 ------------------------------------------
+int i = 0;
+    2300        movs r3, #0
+    934A        str r3, [sp, #0x0128]
+--- main.c -- 247 ------------------------------------------
+// Get the alert timeout
+if (!use_default_configuration_parameters) {
+    4BB3        ldr r3, =0x20000A48 <use_default_configuration_parameters>
+    781B        ldrb r3, [r3]
+    F0830301    eor r3, r3, #1
+    B2DB        uxtb r3, r3
+    2B00        cmp r3, #0
+    D017        beq 0x00012ED8
+--- main.c -- 250 ------------------------------------------
+alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(config.alert_timeout_time_s * 1000.0));
+    4BB0        ldr r3, =0x200009B4 <config>
+    6B5B        ldr r3, [r3, #0x34]
+    4618        mov r0, r3
+    F011FFDB    bl 0x00024E68 <__aeabi_f2d>
+    F04F0200    mov.w r2, #0
+    4BAE        ldr r3, =0x408F4000
+    F011FD1C    bl 0x000248F4 <__aeabi_dmul>
+    4602        mov r2, r0
+    460B        mov r3, r1
+    4610        mov r0, r2
+    4619        mov r1, r3
+    F011FF4C    bl 0x00024D60 <__aeabi_d2uiz>
+    4603        mov r3, r0
+    029A        lsls r2, r3, #10
+    4BA9        ldr r3, =0x10624DD3
+    FBA32302    umull r2, r3, r3, r2
+    099B        lsrs r3, r3, #6
+    9354        str r3, [sp, #0x0150]
+    E002        b 0x00012EDE
+--- main.c -- 251 ------------------------------------------
+} else {
+alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(DEFAULT_ALERT_TIMEOUT_S * 1000.0));
+    F44F6340    mov.w r3, #0x0C00
+    9354        str r3, [sp, #0x0150]
+--- main.c -- 253 ------------------------------------------
+}
+uint32_t main_wdt_start_time = 0;
+    2300        movs r3, #0
+    9350        str r3, [sp, #0x0140]
+--- main.c -- 256 ------------------------------------------
+uint32_t main_wdt_end_time = pdMS_TO_TICKS(1000);
+    F44F6380    mov.w r3, #0x0400
+    9349        str r3, [sp, #0x0124]
+--- main.c -- 257 ------------------------------------------
+uint32_t main_wdt_time_left = 0;
+    2300        movs r3, #0
+    9348        str r3, [sp, #0x0120]
+--- main.c -- 258 ------------------------------------------
+create_tasks();
+    F000FDF8    bl 0x00013AE0 <create_tasks>
+--- main.c -- 260 ------------------------------------------
+// Main State Loop
+for (;;) {
+last_state = main_state;
+    F89D3147    ldrb.w r3, [sp, #0x0147]
+    F88D312F    strb.w r3, [sp, #0x012F]
+--- main.c -- 264 ------------------------------------------
+main_state = next_state;
+    F89D3146    ldrb.w r3, [sp, #0x0146]
+    F88D3147    strb.w r3, [sp, #0x0147]
+--- main.c -- 265 ------------------------------------------
+switch (main_state) {
+    F89D3147    ldrb.w r3, [sp, #0x0147]
+    2B05        cmp r3, #5
+    F2008569    bhi.w 0x000139DC
+    A201        adr r2, 0x00012F10
+    F852F023    ldr.w pc, [r2, r3, lsl #2]
+    00012F29    .word 0x00012F29
+    000132C9    .word 0x000132C9
+    00013583    .word 0x00013583
+    00013779    .word 0x00013779
+    000139D7    .word 0x000139D7
+    000133C1    .word 0x000133C1
+--- main.c -- 267 ------------------------------------------
+// In Standby State
+case MAIN_STANDBY:
+if (last_state != main_state) {
+    F89D212F    ldrb.w r2, [sp, #0x012F]
+    F89D3147    ldrb.w r3, [sp, #0x0147]
+    429A        cmp r2, r3
+    D06A        beq 0x0001300A
+--- main.c -- 270 ------------------------------------------
+sendWdtHeaterInvalid(); // Invalidate the heater to stop WDT from watching it
+    F001FA32    bl 0x0001439C <sendWdtHeaterInvalid>
+--- main.c -- 271 ------------------------------------------
+SensorRxQueueMsg_t msg;
+msg.type = SENSOR_MSG_WAKEUP;
+    2305        movs r3, #5
+    F88D30F0    strb.w r3, [sp, #0xF0]
+--- main.c -- 274 ------------------------------------------
+// Send to Sensors task
+xReturned = xQueueSend(sensorRxQueue, &msg, 0);
+    4B8E        ldr r3, =0x20001C94 <sensorRxQueue>
+    6818        ldr r0, [r3]
+    A93C        add r1, sp, #0xF0
+    2300        movs r3, #0
+    2200        movs r2, #0
+    F00FFE9A    bl 0x00022C80 <xQueueGenericSend>
+    9047        str r0, [sp, #0x011C]
+--- main.c -- 277 ------------------------------------------
+if (xReturned != pdPASS) {
+    9B47        ldr r3, [sp, #0x011C]
+    2B01        cmp r3, #1
+    D002        beq 0x00012F5A
+--- main.c -- 278 ------------------------------------------
+naatosPrintf("MAIN: Unable to send sensor wakeup to sensorRxQueue.");
+    4889        ldr r0, =0x000289C0
+    F001FCDB    bl 0x00014910 <naatosPrintf>
+--- main.c -- 279 ------------------------------------------
+}
+MotorRxQueueMsg_t motorMsg;
+motorMsg.type = MOTOR_MSG_WAKEUP;
+    2303        movs r3, #3
+    F88D30EC    strb.w r3, [sp, #0xEC]
+--- main.c -- 283 ------------------------------------------
+xReturned = xQueueSend(motorRxQueue, &motorMsg, 0);
+    4B87        ldr r3, =0x20002490 <motorRxQueue>
+    6818        ldr r0, [r3]
+    A93B        add r1, sp, #0xEC
+    2300        movs r3, #0
+    2200        movs r2, #0
+    F00FFE89    bl 0x00022C80 <xQueueGenericSend>
+    9047        str r0, [sp, #0x011C]
+--- main.c -- 285 ------------------------------------------
+if (xReturned != pdPASS) {
+    9B47        ldr r3, [sp, #0x011C]
+    2B01        cmp r3, #1
+    D002        beq 0x00012F7C
+--- main.c -- 286 ------------------------------------------
+naatosPrintf("MAIN: Unable to send sensor wakeup to motorRxQueue.");
+    4883        ldr r0, =0x000289F8
+    F001FCCA    bl 0x00014910 <naatosPrintf>
+--- main.c -- 287 ------------------------------------------
+}
+vTaskDelay(300);
+    F44F7096    mov.w r0, #0x012C
+    F00EFEA6    bl 0x00021CD0 <vTaskDelay>
+--- main.c -- 290 ------------------------------------------
+read_sd_and_notify_tasks();
+    F7FFFEFA    bl 0x00012D7C <read_sd_and_notify_tasks>
+--- main.c -- 291 ------------------------------------------
+// Get the alert timeout
+if (!use_default_configuration_parameters) {
+    4B77        ldr r3, =0x20000A48 <use_default_configuration_parameters>
+    781B        ldrb r3, [r3]
+    F0830301    eor r3, r3, #1
+    B2DB        uxtb r3, r3
+    2B00        cmp r3, #0
+    D017        beq 0x00012FC6
+--- main.c -- 293 ------------------------------------------
+alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(config.alert_timeout_time_s * 1000.0));
+    4B75        ldr r3, =0x200009B4 <config>
+    6B5B        ldr r3, [r3, #0x34]
+    4618        mov r0, r3
+    F011FF64    bl 0x00024E68 <__aeabi_f2d>
+    F04F0200    mov.w r2, #0
+    4B72        ldr r3, =0x408F4000
+    F011FCA5    bl 0x000248F4 <__aeabi_dmul>
+    4602        mov r2, r0
+    460B        mov r3, r1
+    4610        mov r0, r2
+    4619        mov r1, r3
+    F011FED5    bl 0x00024D60 <__aeabi_d2uiz>
+    4603        mov r3, r0
+    029A        lsls r2, r3, #10
+    4B6E        ldr r3, =0x10624DD3
+    FBA32302    umull r2, r3, r3, r2
+    099B        lsrs r3, r3, #6
+    9354        str r3, [sp, #0x0150]
+    E002        b 0x00012FCC
+--- main.c -- 294 ------------------------------------------
+} else {
+alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(DEFAULT_ALERT_TIMEOUT_S * 1000.0));
+    F44F6340    mov.w r3, #0x0C00
+    9354        str r3, [sp, #0x0150]
+--- main.c -- 296 ------------------------------------------
+}
+if (config.set_date_time) {
+    4B67        ldr r3, =0x200009B4 <config>
+    F8933090    ldrb.w r3, [r3, #0x90]
+    2B00        cmp r3, #0
+    D003        beq 0x00012FDE
+--- main.c -- 298 ------------------------------------------
+calendar_set_time_helper();
+    F003FA91    bl 0x000164FC <calendar_set_time_helper>
+--- main.c -- 299 ------------------------------------------
+reset_set_time_date();
+    F009FE5B    bl 0x0001CC94 <reset_set_time_date>
+--- main.c -- 300 ------------------------------------------
+}
+updateLedState(LED_WAKEUP, true);
+    2101        movs r1, #1
+    2000        movs r0, #0
+    F004FC1D    bl 0x00017820 <updateLedState>
+--- main.c -- 303 ------------------------------------------
+updateLedState(LED_RUN, false);
+    2100        movs r1, #0
+    2003        movs r0, #3
+    F004FC19    bl 0x00017820 <updateLedState>
+--- main.c -- 304 ------------------------------------------
+updateLedState(LED_STANDBY, true);
+    2101        movs r1, #1
+    2002        movs r0, #2
+    F004FC15    bl 0x00017820 <updateLedState>
+--- main.c -- 305 ------------------------------------------
+updateLedState(LED_COMPLETE, false);
+    2100        movs r1, #0
+    2006        movs r0, #6
+    F004FC11    bl 0x00017820 <updateLedState>
+--- main.c -- 306 ------------------------------------------
+sendWdtMain(true);
+    2001        movs r0, #1
+    F001F9EA    bl 0x000143D8 <sendWdtMain>
+--- main.c -- 307 ------------------------------------------
+start_time = xTaskGetTickCount();
+    F00EFFB2    bl 0x00021F6C <xTaskGetTickCount>
+    904E        str r0, [sp, #0x0138]
+--- main.c -- 308 ------------------------------------------
+}
+hal_triggered = false;
+    2300        movs r3, #0
+    F88D313F    strb.w r3, [sp, #0x013F]
+--- main.c -- 311 ------------------------------------------
+optical_triggered = false;
+    2300        movs r3, #0
+    F88D313E    strb.w r3, [sp, #0x013E]
+--- main.c -- 312 ------------------------------------------
+// Request the battery percentage from the bettery task
+xReturned = xQueueSend(batteryRxQueue, &batt_req, 0);
+    4B5C        ldr r3, =0x20000A4C <batteryRxQueue>
+    6818        ldr r0, [r3]
+    A942        add r1, sp, #0x0108
+    2300        movs r3, #0
+    2200        movs r2, #0
+    F00FFE2E    bl 0x00022C80 <xQueueGenericSend>
+    9047        str r0, [sp, #0x011C]
+--- main.c -- 315 ------------------------------------------
+if (xReturned != pdPASS) {
+    9B47        ldr r3, [sp, #0x011C]
+    2B01        cmp r3, #1
+    D002        beq 0x00013032
+--- main.c -- 316 ------------------------------------------
+naatosPrintf("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.");
+    4857        ldr r0, =0x00028A2C
+    F001FC6F    bl 0x00014910 <naatosPrintf>
+--- main.c -- 317 ------------------------------------------
+}
+// Check for Battery Data in Battery Queue
+if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(100)) == pdPASS) {
+    4B57        ldr r3, =0x20000988 <main_batteryDataQueue>
+    6818        ldr r0, [r3]
+    AB45        add r3, sp, #0x0114
+    2266        movs r2, #0x66
+    4619        mov r1, r3
+    F00FFF72    bl 0x00022F24 <xQueueReceive>
+    4603        mov r3, r0
+    2B01        cmp r3, #1
+    D101        bne 0x0001304A
+--- main.c -- 321 ------------------------------------------
+//naatosPrintf("Battery percentage received: %d\n", percent_recv);
+if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
+    9B45        ldr r3, [sp, #0x0114]
+    2B13        cmp r3, #19
+--- main.c -- 326 ------------------------------------------
+}
+/* **** HANDLE USB AND SWITCH **** */
+// Get switch status if it has changed
+if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
+    4B52        ldr r3, =0x200009A0 <button_mainStateQueue>
+    6818        ldr r0, [r3]
+    AB44        add r3, sp, #0x0110
+    2200        movs r2, #0
+    4619        mov r1, r3
+    F00FFF66    bl 0x00022F24 <xQueueReceive>
+    4603        mov r3, r0
+    2B01        cmp r3, #1
+    D129        bne 0x000130B2
+--- main.c -- 331 ------------------------------------------
+naatosPrintf("MAIN_TASK: Button click in idle");
+    484E        ldr r0, =0x00028A74
+    F001FC56    bl 0x00014910 <naatosPrintf>
+--- main.c -- 332 ------------------------------------------
+usbRxMsgType_t conn_req_msg = {
+    2300        movs r3, #0
+    F88D30E8    strb.w r3, [sp, #0xE8]
+    2300        movs r3, #0
+    F88D30E9    strb.w r3, [sp, #0xE9]
+--- main.c -- 333 ------------------------------------------
+.cmd = NULL,
+.msg_type = USB_MSG_CONN_STATUS_REQ};
+// Get The USB Connection Status
+xReturned = xQueueSend(usbRxQueue, &conn_req_msg, 0);
+    4B4A        ldr r3, =0x20000A74 <usbRxQueue>
+    6818        ldr r0, [r3]
+    A93A        add r1, sp, #0xE8
+    2300        movs r3, #0
+    2200        movs r2, #0

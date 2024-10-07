@@ -22,7 +22,7 @@ void watchdog_init(void) {
   APP_ERROR_CHECK(err_code);
 
   // Enable the WDT
-  nrf_drv_wdt_enable();
+  // nrf_drv_wdt_enable();
 }
 
 #define WDT_TASK_DELAY 500 // msec
@@ -48,9 +48,11 @@ void wdtFeedTask(void *pvParameters) {
   bool mainValid = false;
   int mainTicks = 0;
 
+
 #if NAATOS_ENABLE_WATCHDOG
   watchdog_init();
 #endif
+
 
   while (true) {
 
@@ -97,7 +99,7 @@ void wdtFeedTask(void *pvParameters) {
     }
 
     if (heaterTicks < MAX_WDT_TASK_TIMEOUT && batteryTicks < MAX_WDT_TASK_TIMEOUT && mainTicks < MAX_WDT_TASK_TIMEOUT) {
-      nrf_drv_wdt_channel_feed(m_channel_id);
+      //nrf_drv_wdt_channel_feed(m_channel_id);
     }
 #endif
     // Delay for a period shorter than the watchdog timeout
