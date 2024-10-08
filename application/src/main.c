@@ -234,6 +234,7 @@ void main_task(void *pvParameters) {
   bool usb_needs_update = false;
   bool wake_up = false;
   int mainWatchDogKickCount = 0;
+  char w_buff[100];
   const BatteryRxQueueMsg_t batt_req = {
       .type = BATTERY_SOC_REQUEST,
       .sendTo = BATTERY_MSG_SOC_MAIN};
@@ -317,10 +318,9 @@ void main_task(void *pvParameters) {
 
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(100)) == pdPASS) {
-        //send_debug_log_message("Battery percentage received: %d\n", percent_recv);
         if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
-             //next_state = MAIN_SLEEP;
-             //break;
+             next_state = MAIN_SLEEP;
+             break;
         }
       }
 
@@ -1001,7 +1001,7 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask,
   nrf_drv_clock_lfclk_request(NULL);
 
   while (!nrf_drv_clock_lfclk_is_running()) {
-    // Just waiting8
+    // Just waiting
   }
 
   // Full Peripheral Initalizations

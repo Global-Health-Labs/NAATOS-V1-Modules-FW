@@ -47,6 +47,8 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       exitInfo = CYCLE_RUNNING;
 
+      vTaskDelay(pdMS_TO_TICKS(150));
+
       // Request the battery percentage from the bettery task
       xReturned = xQueueSend(batteryRxQueue, &batt_req, 0);
       if (xReturned != pdPASS) {
@@ -56,11 +58,11 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(1000)) == pdPASS) {
         if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
-          //updateLedState(LED_DECLINE, true);
-          //exitInfo = CYCLE_ERROR_POWER_LOW;
-          //runThrough = true;
-          //next_state = EXIT_CYCLE;
-          //break;
+          updateLedState(LED_DECLINE, true);
+          exitInfo = CYCLE_ERROR_POWER_LOW;
+          runThrough = true;
+          next_state = EXIT_CYCLE;
+          break;
         }
       }
 
