@@ -1,6 +1,8 @@
 #include "watchdog.h"
 #include "boards.h"
 #include "naatos_queues.h"
+#include "../logger/logger.h"
+
 static nrfx_wdt_channel_id m_channel_id;
 
 xQueueHandle watchdog_rxTimesQueue;
@@ -13,16 +15,28 @@ void watchdog_init(void) {
   uint32_t err_code = NRF_SUCCESS;
 
   nrf_drv_wdt_config_t config = NRF_DRV_WDT_DEAFULT_CONFIG;
-  config.behaviour = NRF_WDT_BEHAVIOUR_RUN_SLEEP_HALT; // Ensure this behaviour is supported
+  config.behaviour = NRF_WDT_BEHAVIOUR_RUN_SLEEP; // Ensure this behaviour is supported
   config.reload_value = 6000;                          // 12 seconds
   err_code = nrf_drv_wdt_init(&config, wdt_event_handler);
   APP_ERROR_CHECK(err_code);
 
-  err_code = nrf_drv_wdt_channel_alloc(&m_channel_id);
+  nrfx_wdt_channel_id tmp_channel_id;
+  err_code = nrf_drv_wdt_channel_alloc(&tmp_channel_id);
   APP_ERROR_CHECK(err_code);
+
+  nrfx_wdt_channel_id volatile *p_channel_id = (nrfx_wdt_channel_id volatile *)&m_channel_id;
+  *p_channel_id = tmp_channel_id;
+
+  __DMB();
+  __DSB();
+  __ISB();
 
   // Enable the WDT
   nrf_drv_wdt_enable();
+}
+
+void watchdog_feed(void) {
+  nrf_drv_wdt_channel_feed(m_channel_id);
 }
 
 #define WDT_TASK_DELAY 500 // msec
@@ -50,8 +64,15 @@ void wdtFeedTask(void *pvParameters) {
 
 
 #if NAATOS_ENABLE_WATCHDOG
-  watchdog_init();
+  //watchdog_init();
 #endif
+  watchdog_feed();
+
+  while(1) {
+    printf("comin through\n");
+    vTaskDelay(100);
+    watchdog_feed();
+  }
 
   while (true) {
     //if msg in queue
@@ -100,11 +121,11 @@ void wdtFeedTask(void *pvParameters) {
     }
 
     if (heaterTicks < MAX_WDT_TASK_TIMEOUT && batteryTicks < MAX_WDT_TASK_TIMEOUT && mainTicks < MAX_WDT_TASK_TIMEOUT) {
-      nrf_drv_wdt_channel_feed(m_channel_id);
+      watchdog_feed();
     }
 #endif
     // Delay for a period shorter than the watchdog timeout
-    vTaskDelay(WDT_TASK_DELAY);
+    vTaskDelay(100/*WDT_TASK_DELAY*/);
   }
 }
 

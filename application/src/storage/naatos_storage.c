@@ -1,4 +1,5 @@
 #include "naatos_storage.h"
+#include "../logger/logger.h"
 
 /* Storage Variables */
 static FIL file;

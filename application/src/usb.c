@@ -13,6 +13,7 @@
 #include "storage/naatos_storage.h"
 #include "timers.h"
 #include "semphr.h"
+#include "../logger/logger.h"
 
 /* ***** Variables ***** */
 // USB connection status

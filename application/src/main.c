@@ -220,6 +220,14 @@ void read_sd_and_notify_tasks(void) {
 *   Main Task of NAATOS Application
 */
 void main_task(void *pvParameters) {
+  for (uint32_t i = 0; i < 10000000; ++i) {
+    __ASM("nop");
+  }
+  create_tasks();
+  for (;;) {
+    vTaskDelay(100);
+  }
+  
   BaseType_t xReturned;
   uint8_t queue_size;
   sensor_switches_t switch_data = {.optical_tiggered = false};
@@ -761,7 +769,7 @@ void send_usb_change(usb_command_t cmd) {
 void create_tasks() {
   BaseType_t xReturned;
   char buff[100];
-  
+  /*
   // Heater Task
   xReturned = xTaskCreate(heater_task, "HeaterTask", 1024, NULL, 0, &heaterTaskHandle);
   if (xReturned != pdPASS) {
@@ -819,14 +827,16 @@ void create_tasks() {
     send_debug_log_message(buff);
     vTaskDelete(pwmTaskHandle);
   }
+  */
   // WDT Task
-  xReturned = xTaskCreate(wdtFeedTask, "WDTTask", 100, NULL, 0, &wdtTaskHandle);
+  xReturned = xTaskCreate(wdtFeedTask, "WDTTask", 4096, NULL, 0, &wdtTaskHandle);
   if (xReturned != pdPASS) {
     // The task was created.  Use the task's handle to delete the task.
     sprintf(buff, "Error creating WDT task. Error: %d", xReturned);
     send_debug_log_message(buff);
     vTaskDelete(wdtTaskHandle);
   }
+  /*
   //Button Task
   xReturned = xTaskCreate(buttonTask, "ButtonTask", 1024, NULL, 0, &buttonTaskHandle);
   if (xReturned != pdPASS) {
@@ -851,6 +861,7 @@ void create_tasks() {
     send_debug_log_message(buff);
     vTaskDelete(ledTaskHandle);
   }
+  */
 }
 
 /*********************************************************************
@@ -997,11 +1008,19 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask,
   err_code = nrf_drv_clock_init();
   APP_ERROR_CHECK(err_code);
 
-  nrf_drv_clock_lfclk_request(NULL);
+  //nrf_drv_clock_lfclk_request(NULL);
 
-  while (!nrf_drv_clock_lfclk_is_running()) {
+  //while (!nrf_drv_clock_lfclk_is_running()) {
     // Just waiting
-  }
+  //}
+
+  err_code = app_timer_init();
+  APP_ERROR_CHECK(err_code);
+
+  watchdog_init();
+  watchdog_feed();
+
+  #if 0
 
   // Full Peripheral Initalizations
   init_adc();           // ADC
@@ -1060,6 +1079,7 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask,
 
   // Create Queues
   create_queues();
+  #endif
 
   // Main Task
   xReturned = xTaskCreate(main_task, "MainTask", 1024, NULL, 0, &mainTaskHandle);

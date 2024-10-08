@@ -2,6 +2,7 @@
 #include "naatos_queues.h"
 #include "nrf_drv_gpiote.h"
 #include "timers.h"
+#include "../logger/logger.h"
 
 #define BUTTON_TASK_DELAY 80 // msec
 

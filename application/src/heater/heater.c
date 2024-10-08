@@ -1,6 +1,7 @@
 #include "heater.h"
 #include "../motor.h"
 #include "timers.h"
+#include "../logger/logger.h"
 
 xQueueHandle heaterRxQueue;
 

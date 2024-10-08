@@ -13,7 +13,9 @@
 
 void wdt_event_handler(void);
 
-void watchdog_init(void);
+void watchdog_init();
+
+void watchdog_feed();
 
 void sendWatchdogKickFromTask(tasks_t task, bool valid);
 

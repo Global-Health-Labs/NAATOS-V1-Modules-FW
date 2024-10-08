@@ -1,4 +1,5 @@
 #include "led.h"
+#include "../logger/logger.h"
 
 led_color led1_current_color = blue;
 led_color led2_current_color = blue;

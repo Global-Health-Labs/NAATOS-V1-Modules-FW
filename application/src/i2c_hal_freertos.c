@@ -15,6 +15,7 @@
 #include "semphr.h"
 #include "task.h"
 #include "timers.h"
+#include "../logger/logger.h"
 
 static const nrf_drv_twi_t m_i2c[i2c_num_interfaces] = {
     NRF_DRV_TWI_INSTANCE(I2C_SYSTEM_INSTANCE_ID),

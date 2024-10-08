@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../logger/logger.h"
 
 /* SD Card Variables */
 static FATFS fs;

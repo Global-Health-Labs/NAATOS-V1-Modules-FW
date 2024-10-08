@@ -8,6 +8,7 @@
 
 #include "battery.h"
 #include "timers.h"
+#include "../logger/logger.h"
 
 xQueueHandle batteryRxQueue;
 TimerHandle_t batteryTimer;

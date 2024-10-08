@@ -1,4 +1,4 @@
-#include "logger.h"
+#include "../logger/logger.h"
 #include "../naatos_messages.h"
 #include "PowerModuleLogger.h"
 #include "SamplePrepLogger.h"

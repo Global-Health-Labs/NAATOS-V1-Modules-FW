@@ -2,6 +2,7 @@
 #include "../motor.h"
 #include "../usb.h"
 #include "timers.h"
+#include "../logger/logger.h"
 
 const MainStateErrorQueueMsg_t motor_stall_err_msg = {
   .errType = ERR_MOTOR_STALLED,

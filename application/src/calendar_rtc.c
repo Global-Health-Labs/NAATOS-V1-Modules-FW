@@ -1,6 +1,7 @@
 #include "calendar_rtc.h"
 #include "ff.h"
 #include "time.h"
+#include "../logger/logger.h"
 
 // Decode retreived info
 uint8_t calendar_decode(uint8_t reading) {
@@ -122,9 +123,9 @@ bool calendar_reset(void) {
 #if I2C_CONNECTED
 
 #if SAMPLE_PREP_REV_A
-  ret = xUtil_TWI_Write(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
+  ret = xUtil_TWI_Write(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, &buff, 1);
 #elif SAMPLE_PREP_REV_B
-  ret = xUtil_TWI_Write(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
+  ret = xUtil_TWI_Write(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, &buff, 1);
 #endif
   if (ret)
     return false;
@@ -141,9 +142,9 @@ bool calendar_stop(void) {
   ret_code_t ret;
 #if I2C_CONNECTED
 #if SAMPLE_PREP_REV_A
-  ret = xUtil_TWI_Write(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
+  ret = xUtil_TWI_Write(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, &buff, 1);
 #elif SAMPLE_PREP_REV_B
-  ret = xUtil_TWI_Write(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
+  ret = xUtil_TWI_Write(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, &buff, 1);
 #endif
   if (ret)
     return false;
@@ -160,9 +161,9 @@ bool calendar_start(void) {
   ret_code_t ret;
 #if I2C_CONNECTED
 #if SAMPLE_PREP_REV_A
-  ret = xUtil_TWI_Write(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
+  ret = xUtil_TWI_Write(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, &buff, 1);
 #elif SAMPLE_PREP_REV_B
-  ret = xUtil_TWI_Write(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
+  ret = xUtil_TWI_Write(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, &buff, 1);
 #endif
   if (ret)
     return false;
@@ -224,7 +225,7 @@ bool calendar_set_time_helper(void) {
 
   //calendar_stop();
   calendar_set_time(&now);
-
+#if 0
   send_debug_log_message("Requested time  M: %d D: %d Y:%d h: %d m: %d s: %d",
       now.month,
       now.day,
@@ -243,6 +244,6 @@ bool calendar_set_time_helper(void) {
       now.hour,
       now.minute,
       now.second);
-
+#endif
   return true;
 }
