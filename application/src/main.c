@@ -286,7 +286,6 @@ void main_task(void *pvParameters) {
           send_debug_log_message("MAIN: Unable to send sensor wakeup to motorRxQueue.");
         }
 
-        //vTaskDelay(300);
         read_sd_and_notify_tasks();
         // Get the alert timeout
         if (!use_default_configuration_parameters) {
