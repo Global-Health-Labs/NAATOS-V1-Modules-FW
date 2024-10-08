@@ -14,7 +14,7 @@ void watchdog_init(void) {
 
   nrf_drv_wdt_config_t config = NRF_DRV_WDT_DEAFULT_CONFIG;
   config.behaviour = NRF_WDT_BEHAVIOUR_RUN_SLEEP_HALT; // Ensure this behaviour is supported
-  config.reload_value = 6000;                          // 12 seconds
+  config.reload_value = 500; //6000;                          // 12 seconds
   err_code = nrf_drv_wdt_init(&config, wdt_event_handler);
   APP_ERROR_CHECK(err_code);
 
@@ -22,7 +22,7 @@ void watchdog_init(void) {
   APP_ERROR_CHECK(err_code);
 
   // Enable the WDT
-  // nrf_drv_wdt_enable();
+  nrf_drv_wdt_enable();
 }
 
 #define WDT_TASK_DELAY 500 // msec
@@ -99,7 +99,7 @@ void wdtFeedTask(void *pvParameters) {
     }
 
     if (heaterTicks < MAX_WDT_TASK_TIMEOUT && batteryTicks < MAX_WDT_TASK_TIMEOUT && mainTicks < MAX_WDT_TASK_TIMEOUT) {
-      //nrf_drv_wdt_channel_feed(m_channel_id);
+      nrf_drv_wdt_channel_feed(m_channel_id);
     }
 #endif
     // Delay for a period shorter than the watchdog timeout

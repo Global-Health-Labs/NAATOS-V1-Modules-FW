@@ -989,7 +989,7 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask,
 *
 *   Application entry point.
 */
-int main(void) {
+ int main(void) {
   BaseType_t xReturned;
   ret_code_t err_code;
   FRESULT res;
