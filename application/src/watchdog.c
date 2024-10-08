@@ -14,7 +14,7 @@ void watchdog_init(void) {
 
   nrf_drv_wdt_config_t config = NRF_DRV_WDT_DEAFULT_CONFIG;
   config.behaviour = NRF_WDT_BEHAVIOUR_RUN_SLEEP_HALT; // Ensure this behaviour is supported
-  config.reload_value = 500; //6000;                          // 12 seconds
+  config.reload_value = 6000;                          // 12 seconds
   err_code = nrf_drv_wdt_init(&config, wdt_event_handler);
   APP_ERROR_CHECK(err_code);
 
@@ -53,9 +53,7 @@ void wdtFeedTask(void *pvParameters) {
   watchdog_init();
 #endif
 
-
   while (true) {
-
     //if msg in queue
     // Set watchdog time and or set valid flag
     while (xQueueReceive(watchdog_rxTimesQueue,
@@ -67,16 +65,19 @@ void wdtFeedTask(void *pvParameters) {
 
       switch (recv_req.taskName) {
       case BATTERY:
+        printf("Battery wdt kicked.\n");
         batteryValid = recv_req.valid;
         batteryTicks = 0;
         break;
 
       case HEATER:
+        printf("Heater wdt kicked.\n");
         heaterValid = recv_req.valid;
         heaterTicks = 0;
         break;
 
       case MAIN:
+        printf("Main wdt kicked.\n");
         mainValid = recv_req.valid;
         mainTicks = 0;
         break;

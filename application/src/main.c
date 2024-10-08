@@ -851,7 +851,6 @@ void create_tasks() {
     send_debug_log_message(buff);
     vTaskDelete(ledTaskHandle);
   }
-  
 }
 
 /*********************************************************************
