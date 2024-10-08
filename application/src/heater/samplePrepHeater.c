@@ -421,6 +421,8 @@ void handleSampleMotorDataRx(int motor_speed) {
     updateDutyCycles(pwmData);
     
     if (motorStalled) {
+      // Set LEDs
+      updateLedState(LED_ABORT, true);
       // Send alert message to main task
       xReturned = xQueueSend(main_runErrorQueue, &motor_stall_err_msg, 0);
       if (xReturned != pdPASS) {
