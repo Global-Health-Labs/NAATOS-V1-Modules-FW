@@ -54,7 +54,7 @@ void motorTask(void *pvParameters) {
       switch (motorRxMessage.type) {
          case MOTOR_MSG_HEATER_STATE: {
           motorRunning = motorRxMessage.motorRunning;
-          naatosPrintf("start/stop motor");
+          send_debug_log_message("start/stop motor");
           break;
          }
          case MOTOR_MSG_TIMER_MOTOR_EVENT: {
@@ -146,7 +146,7 @@ double readMotorSpeed(void) {
   //Convert pulse count to rotational speed
   //double motor_speed_rpm = (1000 * 60 * ((double)pulse_count / (double)delta_t)) / 9; //Old motor
   double motor_speed_rpm = (1000 * 60 * ((double)pulse_count / (double)delta_t)) / 6; //New motor
-  //naatosPrintf("Motor speed: %f\r\n", motor_speed_rpm);
+  //send_debug_log_message("Motor speed: %f\r\n", motor_speed_rpm);
 
   //Clear the counter, update variable for tracking elapsed time
   nrf_drv_timer_clear(p_counter1);

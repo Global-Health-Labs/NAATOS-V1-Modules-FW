@@ -34,15 +34,15 @@ void init_nor_flash(void) {
   disk_state = disk_initialize(0);
   if (disk_state) {
       sprintf(buff, "Disk initialization failed. State: %d", disk_state);
-      naatosPrintf(buff);
+      send_debug_log_message(buff);
       return;
   }
-  naatosPrintf("NOR Flash Storage initialized");
+  send_debug_log_message("NOR Flash Storage initialized");
 
   // Mount the NOR Flash Volume
   ff_result = mount_nor_flash();
   if (ff_result != FR_OK) {
-    naatosPrintf("Unable to mount NOR flash!");
+    send_debug_log_message("Unable to mount NOR flash!");
     return;
   }
 
@@ -55,7 +55,7 @@ void uninit_nor_flash(void) {
 
   app_usbd_ep_disable(ENDPOINT_LIST());
 
-  naatosPrintf("NOR Flash Storage Uninitialized.");
+  send_debug_log_message("NOR Flash Storage Uninitialized.");
 }
 
 FRESULT mount_nor_flash(void) {
@@ -69,11 +69,11 @@ FRESULT unmount_nor_flash(void) {
 void nor_flash_list_contents(void) {
   char buff[50];
 
-  naatosPrintf("\r\n Listing NOR Flash directory: /");
+  send_debug_log_message("\r\n Listing NOR Flash directory: /");
   // Open Root Directory
   ff_result = f_opendir(&dir, "/");
   if (ff_result) {
-    naatosPrintf("Directory listing failed!");
+    send_debug_log_message("Directory listing failed!");
     return;
   }
 
@@ -81,17 +81,17 @@ void nor_flash_list_contents(void) {
   do {
     ff_result = f_readdir(&dir, &fno);
     if (ff_result != FR_OK) {
-      naatosPrintf("Directory read failed.");
+      send_debug_log_message("Directory read failed.");
       return;
     }
 
     if (fno.fname[0]) {
       if (fno.fattrib & AM_DIR) {
         sprintf(buff, "   <DIR>   %s", (uint32_t)fno.fname);
-        naatosPrintf(buff);
+        send_debug_log_message(buff);
       } else {
         sprintf("%9lu  %s", fno.fsize, (uint32_t)fno.fname);
-        naatosPrintf(buff);
+        send_debug_log_message(buff);
       }
     }
   } while (fno.fname[0]);

@@ -115,7 +115,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (setReachedRx) {
         xReturned = xQueueSend(logger_logMessageQueue, &ramp_to_temp_complete_log_msg, 0);
         if (xReturned != pdPASS) {
-          naatosPrintf("MAIN_TASK: Unable to send ramp_to_temp_complete_log_msg interruption event to logging task.");
+          send_debug_log_message("MAIN_TASK: Unable to send ramp_to_temp_complete_log_msg interruption event to logging task.");
         }
         next_state = CYCLE_1_TIMER;
         break;

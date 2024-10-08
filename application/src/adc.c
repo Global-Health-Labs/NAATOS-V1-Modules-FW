@@ -8,7 +8,7 @@ bool get_optical_triggered(void) {
   nrf_saadc_value_t adc_val;
   // Start adc sample conversion and get value
   nrfx_saadc_sample_convert(OPTICAL_CHANNEL, &adc_val);
-  //naatosPrintf("Optical Value: %d\n", adc_val);
+  //send_debug_log_message("Optical Value: %d\n", adc_val);
   // Check to see if adc value is below threshold
 #ifndef SAMPLE_PREP_BOARD
   if (use_default_configuration_parameters) {

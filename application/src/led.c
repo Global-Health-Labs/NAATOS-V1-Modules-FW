@@ -18,7 +18,7 @@ void led_task(void *pvParameters) {
   for (;;) {
     xReturned = xQueueReceive(ledRxQueue, &ledRxMessage, portMAX_DELAY);
     if (xReturned != pdPASS) {
-      naatosPrintf("Unable to Rx data to sensor queue");
+      send_debug_log_message("Unable to Rx data to sensor queue");
     } else {
       handleLedState(ledRxMessage);
     }
@@ -63,7 +63,7 @@ void handleLedState(LEDRxQueueMsg_t ledMsg) {
     ledFlags.testAbort = false;
     break;
   default:
-    naatosPrintf("Handling unknown led state");
+    send_debug_log_message("Handling unknown led state");
     break;
   }
 
@@ -225,6 +225,6 @@ void updateLedState(LEDEvent_e event, bool active) {
   ledMsg.active = active;
   xReturned = xQueueSend(ledRxQueue, &ledMsg, 0);
   if (xReturned != pdPASS) {
-    naatosPrintf("SENSORS: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue");
+    send_debug_log_message("SENSORS: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue");
   }
 }

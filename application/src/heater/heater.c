@@ -34,7 +34,7 @@ void sendWdtHeaterValid() {
 
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
   if (xReturned != pdPASS) {
-    naatosPrintf("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task");
+    send_debug_log_message("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task");
   }
 }
 
@@ -52,7 +52,7 @@ void heater_task(void *pvParameters) {
   for (;;) {
     xReturned = xQueueReceive(heaterRxQueue, &heaterRxMessage, portMAX_DELAY);
     if (xReturned != pdPASS) {
-      naatosPrintf("Unable to Rx data to heater queue");
+      send_debug_log_message("Unable to Rx data to heater queue");
     } else {
       switch (heaterRxMessage.type) {
       case HEATER_MSG_SLEEP:
@@ -79,7 +79,7 @@ void heater_task(void *pvParameters) {
 
           xReturned = xQueueSend(main_runErrorQueue, &greaterThanMaxTemp, 0);
           if (xReturned != pdPASS) {
-            naatosPrintf("HEATER_TASK: Unable to send run error for greater than max temp to main_runErrorQueue.");
+            send_debug_log_message("HEATER_TASK: Unable to send run error for greater than max temp to main_runErrorQueue.");
           }
         } else {
           if (wdtTimeout++ > (1 / config.sample_rate)) { // send out once a second
@@ -103,7 +103,7 @@ void heater_task(void *pvParameters) {
         bool heaterRun = heaterInterface->getHeaterRunningStatus();
         xReturned = xQueueSend(main_runConfRespQueue, &heaterRun, 0);
         if (xReturned != pdPASS) {
-          naatosPrintf("HEATER_TASK: Unable to send run response to main_runConfRespQueue.");
+          send_debug_log_message("HEATER_TASK: Unable to send run response to main_runConfRespQueue.");
         }
         break;
       }

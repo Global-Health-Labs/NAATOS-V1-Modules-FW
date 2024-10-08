@@ -138,7 +138,7 @@ static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t re
       return tsys01_busy;
     }
 
-    naatosPrintf("I2C Read error hit 3");
+    send_debug_log_message("I2C Read error hit 3");
     return tsys01_i2c_error;
   }
   sensorIsBusy = false;

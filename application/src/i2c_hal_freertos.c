@@ -60,7 +60,7 @@ void i2c_error_recovery(i2c_interface_selection_t interface) {
   int size;
   char buff[60];
   size = sprintf(buff, "I2C error recovery attempt on interface: %i", interface);
-  naatosPrintf(buff);
+  send_debug_log_message(buff);
 }
 
 /* INIT for TWI hardware for peripheral */

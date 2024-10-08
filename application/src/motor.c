@@ -14,12 +14,12 @@ static nrf_ppi_channel_t ppi_channel_1;
 /* Empty event handler. Not used since tasks/events are handled in hardware (PPI), but needs to be defined for semantical reasons. */
 static void empty_gpiote_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
   //uint32_t count = nrf_drv_timer_capture(&m_counter1, NRF_TIMER_CC_CHANNEL0);
-  //naatosPrintf("Value on MOTOR_INPUT_PIN changed. Counter value = %d\r\n", count);
+  //send_debug_log_message("Value on MOTOR_INPUT_PIN changed. Counter value = %d\r\n", count);
 }
 
 /* Empty event handler. Not used since tasks/events are handled in hardware (PPI), but needs to be defined for semantical reasons. */
 static void empty_timer_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
-  //naatosPrintf("Timer event triggered\r\n");
+  //send_debug_log_message("Timer event triggered\r\n");
 }
 
 /** @brief Function GPIOTE initialization

@@ -51,7 +51,7 @@ void init_sd_card(void) {
     sd_disk_state = disk_initialize(0);
   }
   if (sd_disk_state) {
-    naatosPrintf("SD Card initialization failed.");
+    send_debug_log_message("SD Card initialization failed.");
     return;
   }
 
@@ -59,12 +59,12 @@ void init_sd_card(void) {
   sd_blocks_per_mb = (1024uL * 1024uL) / m_block_dev_sdc.block_dev.p_ops->geometry(&m_block_dev_sdc.block_dev)->blk_size;
   sd_capacity = m_block_dev_sdc.block_dev.p_ops->geometry(&m_block_dev_sdc.block_dev)->blk_count / sd_blocks_per_mb;
   sprintf(buff, "Capactity: %d MB", sd_capacity);
-  naatosPrintf(buff);
+  send_debug_log_message(buff);
 
   // Mount SD Card
   sd_ff_result = sd_card_mount();
   if (sd_ff_result != FR_OK) {
-    naatosPrintf("Unable to mount SD Card!");
+    send_debug_log_message("Unable to mount SD Card!");
   }
 
   sd_card_inited = true;
@@ -77,7 +77,7 @@ void uninit_sd_card(void) {
   UNUSED_RETURN_VALUE(disk_uninitialize(0));
 
   sd_card_inited = false;
-  naatosPrintf("SD Card Uninitalized.");
+  send_debug_log_message("SD Card Uninitalized.");
 }
 
 // Mount the SD card volume
@@ -93,11 +93,11 @@ FRESULT sd_card_unmount(void) {
 // Prints directories seen on the sd card -- Was used during debug of sd card, only prints directories and files at root
 /* Depreciated, keeping in here incase we want to be able to list contents of the file system in the future.
 void sd_card_list_contents(void) {
-  naatosPrintf("\r\n Listing directory: /");
+  send_debug_log_message("\r\n Listing directory: /");
   // Open Root Directory
   ff_result = f_opendir(&dir, "/");
   if (ff_result) {
-    naatosPrintf("Directory listing failed!");
+    send_debug_log_message("Directory listing failed!");
     return;
   }
 
@@ -105,15 +105,15 @@ void sd_card_list_contents(void) {
   do {
     ff_result = f_readdir(&dir, &fno);
     if (ff_result != FR_OK) {
-      naatosPrintf("Directory read failed.");
+      send_debug_log_message("Directory read failed.");
       return;
     }
 
     if (fno.fname[0]) {
       if (fno.fattrib & AM_DIR) {
-        naatosPrintf("   <DIR>   %s", (uint32_t)fno.fname);
+        send_debug_log_message("   <DIR>   %s", (uint32_t)fno.fname);
       } else {
-        naatosPrintf("%9lu  %s", fno.fsize, (uint32_t)fno.fname);
+        send_debug_log_message("%9lu  %s", fno.fsize, (uint32_t)fno.fname);
       }
     }
   } while (fno.fname[0]);
