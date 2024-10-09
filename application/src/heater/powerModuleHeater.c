@@ -81,10 +81,10 @@ void handle_cycle_one_stopstart_heater(bool heating) {
     return;
 
   if (heating) {
-    //nrf_gpio_pin_set(BOOST_CONTROL_ENABLE_PIN);
+    //nrf_gpio_pin_set(HEATER_PWR_EN);
     //vTaskDelay(pdMS_TO_TICKS(400));
   } else {
-    nrf_gpio_pin_clear(BOOST_CONTROL_ENABLE_PIN);
+    nrf_gpio_pin_clear(HEATER_PWR_EN);
   }
 
   SensorRxQueueMsg_t msg;

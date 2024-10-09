@@ -1010,11 +1010,11 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask,
   init_motor_gpio();
   init_pwms();
 
-  nrf_gpio_cfg_output(BOOST_CONTROL_ENABLE_PIN);
-  nrf_gpio_pin_clear(BOOST_CONTROL_ENABLE_PIN); // turn off boost for heaters
+  nrf_gpio_cfg_output(HEATER_PWR_EN);
+  nrf_gpio_pin_clear(HEATER_PWR_EN); // turn off boost for heaters
 
-  nrf_gpio_cfg_output(MOTOR_POWER_ENABLE);
-  nrf_gpio_pin_clear(MOTOR_POWER_ENABLE);
+  nrf_gpio_cfg_output(MOTOR_PWR_EN);
+  nrf_gpio_pin_clear(MOTOR_PWR_EN);
 
   nrf_gpio_cfg_output(MOTOR_CWCCW);
   nrf_gpio_pin_set(MOTOR_CWCCW);

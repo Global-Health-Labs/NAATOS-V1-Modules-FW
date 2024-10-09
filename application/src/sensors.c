@@ -410,8 +410,8 @@ void init_sensors_gpios(void) {
   nrf_gpio_pin_set(SENSORS_EN);
 
   /*LED Driver Enable*/
-  nrf_gpio_cfg_output(LED_HARDWARE_DRIVER_ENABLE_PIN);
-  nrf_gpio_pin_set(LED_HARDWARE_DRIVER_ENABLE_PIN);
+  nrf_gpio_cfg_output(LED_DRV_EN);
+  nrf_gpio_pin_set(LED_DRV_EN);
 }
 
 bool readTemp(sensor_selection_t sensor, float *temperature) {
