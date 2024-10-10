@@ -32,10 +32,10 @@ typedef enum {
 } tsys01_errors_t;
 
 typedef enum {
-  valve_zone,
-  amp_zone_0,
-  amp_zone_1,
-  amp_zone_2,
+  heat_zone_0,
+  heat_zone_1,
+  heat_zone_2,
+  heat_zone_3,
   num_sensors
 } sensor_selection_t;
 

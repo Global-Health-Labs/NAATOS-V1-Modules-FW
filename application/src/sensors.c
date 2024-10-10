@@ -87,7 +87,7 @@ void stopSensorTempTimer(void) {
 
 void samplePrepSensorTaskSetup(void) {
   /* Get TSYS01 Calibration Values */
-  tsys01_err = tsys01_getCalibrationValues(amp_zone_2);
+  tsys01_err = tsys01_getCalibrationValues(heat_zone_3);
   if (tsys01_err == tsys01_i2c_error) {
     NVIC_SystemReset();
     asm volatile("nop");
@@ -96,10 +96,10 @@ void samplePrepSensorTaskSetup(void) {
 }
 
 void powerModuleSensorTaskSetup(void) {
-  tsys01_err = tsys01_getCalibrationValues(valve_zone);
-  tsys01_err = tsys01_getCalibrationValues(amp_zone_0);
-  tsys01_err = tsys01_getCalibrationValues(amp_zone_1);
-  tsys01_err = tsys01_getCalibrationValues(amp_zone_2);
+  tsys01_err = tsys01_getCalibrationValues(heat_zone_0);
+  tsys01_err = tsys01_getCalibrationValues(heat_zone_1);
+  tsys01_err = tsys01_getCalibrationValues(heat_zone_2);
+  tsys01_err = tsys01_getCalibrationValues(heat_zone_3);
   sensorTempTimer = xTimerCreate("SensorTempTimer", sampleRateTicks, pdTRUE, (void *)0, vSensorTempTimerCallback);
 }
 
@@ -286,25 +286,25 @@ void runPowerModuleSensorCollection(void) {
     bool readTempSuccess = false;
     heaterMsg.readTempFailed = false;
     // I2C Read for Heater Zone 0
-    readTempSuccess = readTemp(valve_zone, &temperatures.heat_zone_0_temp);
+    readTempSuccess = readTemp(heat_zone_0, &temperatures.heat_zone_0_temp);
     if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }
 
     // I2C Read for Heater Zone 1
-    readTempSuccess = readTemp(amp_zone_0, &temperatures.heat_zone_1_temp);
+    readTempSuccess = readTemp(heat_zone_1, &temperatures.heat_zone_1_temp);
     if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }
 
     // I2C Read for Heater Zone 2
-    readTempSuccess = readTemp(amp_zone_1, &temperatures.heat_zone_2_temp);
+    readTempSuccess = readTemp(heat_zone_2, &temperatures.heat_zone_2_temp);
     if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }
 
     // I2C Read for Heater Zone 3
-    readTempSuccess = readTemp(amp_zone_2, &temperatures.heat_zone_3_temp);
+    readTempSuccess = readTemp(heat_zone_3, &temperatures.heat_zone_3_temp);
     if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }
@@ -350,7 +350,7 @@ void runSamplePrepSensorCollection(void) {
 
     // Collect 10 temperature samples
     for (int i = 0; i < 6; i++) {
-        bool readTempSuccess = readTemp(amp_zone_2, &temp);
+        bool readTempSuccess = readTemp(heat_zone_3, &temp);
         if (readTempSuccess) {
             temp_samples[i] = temp;
             consecutive_failures = 0; // Reset the failure counter on success
