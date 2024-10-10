@@ -406,12 +406,15 @@ void main_task(void *pvParameters) {
         send_debug_log_message("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.");
       }
 
+
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(100)) == pdPASS) {
+#if ENABLE_LOW_POWER_MODE
         if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
              next_state = MAIN_SLEEP;
              break;
         }
+#endif
       }
 
       /* **** HANDLE USB AND SWITCH **** */
@@ -472,12 +475,15 @@ void main_task(void *pvParameters) {
           send_usb_change(USB_MSC_CDC_ACM);
           break;
         }
+#if ENABLE_LOW_POWER_MODE
         // Switch off and USB not connected
         else if (buttonData.event == OFF_EVENT && !usb_conn_status) {
           sendWdtMain(false);
           next_state = MAIN_SLEEP;
           send_usb_change(USB_DISABLED);
-        } else if (usb_conn_status) {
+        } 
+#endif
+        else if (usb_conn_status) {
           updateLedState(LED_CHARGING, true);
         } else if (!usb_conn_status) {
           updateLedState(LED_CHARGING, false);
@@ -655,6 +661,7 @@ void main_task(void *pvParameters) {
           //next_state = MAIN_FILE;
           //send_usb_change(USB_MSC_CDC_ACM);
         }
+#if ENABLE_LOW_POWER_MODE
         // Switch off and USB not connected
         else if (buttonData.event == OFF_EVENT && !usb_conn_status) {
           updateLedState(LED_USB_MSC_STARTING, false);
@@ -662,6 +669,7 @@ void main_task(void *pvParameters) {
           send_usb_change(USB_DISABLED);
           sendWatchdogKickFromTask(MAIN, false);
         }
+#endif
         // Updated USB Connection Status
         else if (buttonData.event == NONE && !usb_conn_status) {
           updateLedState(LED_USB_MSC_STARTING, false);
@@ -675,6 +683,7 @@ void main_task(void *pvParameters) {
 
     // In Low Power State
     case MAIN_SLEEP: {
+#if ENABLE_LOW_POWER_MODE
       if (last_state != main_state) {
         updateLedState(LED_RUN, false);
         updateLedState(LED_STANDBY, false);
@@ -799,7 +808,7 @@ void main_task(void *pvParameters) {
       }
 
       next_state = MAIN_STANDBY;
-
+#endif
       break;
     }
 

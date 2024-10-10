@@ -133,6 +133,10 @@ void vUninit_TWI_Hardware(i2c_interface_selection_t interface, uint32_t sda_pin,
 
   // Get rid of semaphore, will be recreated on initalization
   vSemaphoreDelete(m_i2c_semaphores[interface]);
+  
+  // Disconnect i2c pins
+  nrf_gpio_cfg_input(sda_pin, NRF_GPIO_PIN_INPUT_DISCONNECT);
+  nrf_gpio_cfg_input(scl_pin, NRF_GPIO_PIN_INPUT_DISCONNECT);
 }
 
 ret_code_t xUtil_TWI_Read(i2c_interface_selection_t interface, uint8_t slave_addr, uint8_t start_addr, uint8_t *p_buff, uint16_t length) {

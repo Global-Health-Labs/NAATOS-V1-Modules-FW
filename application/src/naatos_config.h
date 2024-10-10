@@ -25,6 +25,7 @@
 #define pdTICKS_TO_MS(xTimeInTicks) ((TickType_t)(((uint64_t)(xTimeInTicks) * (uint64_t)1000U) / (uint64_t)configTICK_RATE_HZ))
 
 /* Battery Parameters */
+#define ENABLE_LOW_POWER_MODE 0
 #define DEFAULT_LOW_POWER_THRESHOLD 20
 
 /*------------COMMON PIN CONFIGS------------*/
