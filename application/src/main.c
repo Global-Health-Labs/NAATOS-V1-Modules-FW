@@ -1078,6 +1078,7 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask,
   send_debug_log_message("FreeRTOS Stack Overflow Has Occured.");
 }
 
+
 /*********************************************************************
 *
 *       main()
