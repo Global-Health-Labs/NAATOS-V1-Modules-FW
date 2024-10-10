@@ -8,7 +8,8 @@
 
 void motorTask(void *pvParameters);
 
-void init_motor_gpio();
+void init_motor_gpio(void);
+void uninit_motor_gpio(void);
 
 void motorTaskSetup(void);
 double readMotorSpeed(void);

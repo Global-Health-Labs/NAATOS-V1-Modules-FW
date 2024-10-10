@@ -32,7 +32,7 @@ void pwm2_ready_callback(uint32_t pwm_id) {
 
 bool pwmEnabled = false;
 
-void init_pwms() {
+void init_pwms(void) {
   ret_code_t err;
 
   /* Create Configurations */
@@ -62,6 +62,23 @@ void init_pwms() {
   app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, 0);
   app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, 0);
   app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_2_CHANNEL, 0);
+}
+
+void uninit_pwms(void) {
+  ret_code_t err;
+  // Disable
+  app_pwm_disable(&PWM0);
+  app_pwm_disable(&PWM2);
+  // Uninitialize
+  err = app_pwm_uninit(&PWM0);
+  APP_ERROR_CHECK(err);
+  err = app_pwm_uninit(&PWM2);
+  APP_ERROR_CHECK(err);
+  // Set pins as input disconnect
+  nrf_gpio_cfg_input(HEATER_ZONE_0_PIN, NRF_GPIO_PIN_INPUT_DISCONNECT);
+  nrf_gpio_cfg_input(SAMPLE_HEATER_PIN, NRF_GPIO_PIN_INPUT_DISCONNECT);
+  nrf_gpio_cfg_input(MOTOR_OUTPUT_PIN, NRF_GPIO_PIN_INPUT_DISCONNECT);
+  nrf_gpio_cfg_input(MOTOR_OUTPUT_PIN2, NRF_GPIO_PIN_INPUT_DISCONNECT);
 }
 
 void updateDutyCycles(temperature_pwm_data_t pwmData) {

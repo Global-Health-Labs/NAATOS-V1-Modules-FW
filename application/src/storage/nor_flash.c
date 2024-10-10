@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if SAMPLE_PREP_REV_B
+
 /* NOR Flash Variables */
 static FATFS fs;
 static DIR dir;
@@ -96,3 +98,5 @@ void nor_flash_list_contents(void) {
     }
   } while (fno.fname[0]);
 }
+
+#endif

@@ -42,6 +42,7 @@ typedef enum {
 } i2c_speed_selection_t;
 
 void vInit_TWI_Hardware(i2c_interface_selection_t interface, uint32_t sda_pin, uint32_t scl_pin, i2c_speed_selection_t frequency);
+void vUninit_TWI_Hardware(i2c_interface_selection_t interface, uint32_t sda_pin, uint32_t scl_pin);
 ret_code_t xUtil_TWI_Write(i2c_interface_selection_t interface, uint8_t slave_addr, uint8_t start_addr, uint8_t const *p_buff, uint16_t length);
 ret_code_t xUtil_TWI_Read(i2c_interface_selection_t interface, uint8_t slave_addr, uint8_t start_addr, uint8_t *p_buff, uint16_t length);
 ret_code_t xUtil_TWI_Write_Single(i2c_interface_selection_t interface, uint8_t slave_addr, uint8_t start_addr, uint8_t const *p_buff, uint16_t length);

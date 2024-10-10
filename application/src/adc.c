@@ -83,6 +83,8 @@ void init_adc(void) {
   APP_ERROR_CHECK(err);
 
 #endif
+}
 
-
+void uninit_adc(void) {
+  nrfx_saadc_uninit();
 }

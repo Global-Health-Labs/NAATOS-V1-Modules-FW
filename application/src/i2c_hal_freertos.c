@@ -117,6 +117,24 @@ void vInit_TWI_Hardware(i2c_interface_selection_t interface, uint32_t sda_pin, u
   return;
 }
 
+void vUninit_TWI_Hardware(i2c_interface_selection_t interface, uint32_t sda_pin, uint32_t scl_pin) {
+  ret_code_t err_code;
+
+  // Ensure that the TWI hardware is not being used
+  if (xSemaphoreTake(m_i2c_semaphores[interface], 50) != pdPASS) {
+    return NRF_ERROR_BUSY;
+  }
+  
+  // Uninitalize semaphore
+  nrf_drv_twi_uninit(&m_i2c[interface]);
+
+  // Give up semaphore, wont be used anymore
+  xSemaphoreGive(m_i2c_semaphores[interface]);
+
+  // Get rid of semaphore, will be recreated on initalization
+  vSemaphoreDelete(m_i2c_semaphores[interface]);
+}
+
 ret_code_t xUtil_TWI_Read(i2c_interface_selection_t interface, uint8_t slave_addr, uint8_t start_addr, uint8_t *p_buff, uint16_t length) {
 #ifdef VERB_HW_TWI
   NRF_LOG_INFO("xUtil_TWI_Read:\tslave = 0x%02X\taddr = 0x%02X\tlenght = %u", slave_addr, start_addr, length);

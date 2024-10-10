@@ -28,8 +28,10 @@ static void empty_timer_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polar
 static void gpiote_init(void) {
   ret_code_t err_code;
 
-  err_code = nrf_drv_gpiote_init();
-  APP_ERROR_CHECK(err_code);
+  if (!nrf_drv_gpiote_is_init()) {
+    err_code = nrf_drv_gpiote_init();
+    APP_ERROR_CHECK(err_code);
+  }
 
   nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(false);
   in_config.pull = NRF_GPIO_PIN_NOPULL;
@@ -38,6 +40,25 @@ static void gpiote_init(void) {
   APP_ERROR_CHECK(err_code);
 
   nrf_drv_gpiote_in_event_enable(MOTOR_INPUT_PIN, true);
+
+  nrf_gpio_cfg_output(MOTOR_CWCCW);
+  nrf_gpio_pin_set(MOTOR_CWCCW);
+}
+
+static void gpiote_uninit(void) {
+  ret_code_t err_code;
+  
+  // Disable Events
+  nrf_drv_gpiote_in_event_disable(MOTOR_INPUT_PIN);
+  // Uninit input
+  nrf_drv_gpiote_in_uninit(MOTOR_INPUT_PIN);
+  // Uninit GPIOTE
+  //nrf_drv_gpiote_uninit(); Dont want to uninit GPIOTE, used by the button wake up event
+
+  // Set the pin to Input disconnect
+  nrf_gpio_cfg_input(MOTOR_CWCCW, NRF_GPIO_PIN_INPUT_DISCONNECT);
+  nrf_gpio_cfg_input(MOTOR_INPUT_PIN, NRF_GPIO_PIN_INPUT_DISCONNECT);
+
 }
 
 /** @brief Function for Counter 1 initialization.
@@ -54,6 +75,11 @@ static void counter1_init(void) {
 
   nrf_drv_timer_enable(&m_counter1);
   nrf_drv_timer_clear(&m_counter1);
+}
+
+static void counter1_uninit(void) {
+  nrf_drv_timer_disable(&m_counter1);
+  nrf_drv_timer_uninit(&m_counter1);
 }
 
 /** @brief Function for initializing the PPI peripheral.
@@ -77,6 +103,19 @@ static void ppi_init(void) {
   APP_ERROR_CHECK(err_code);
 }
 
+static void ppi_uninit(void) {
+  ret_code_t err_code;
+  
+  err_code = nrf_drv_ppi_channel_disable(ppi_channel_1);
+  APP_ERROR_CHECK(err_code);
+  
+  err_code = nrf_drv_ppi_channel_free(ppi_channel_1);
+  APP_ERROR_CHECK(err_code);
+
+  err_code = nrf_drv_ppi_uninit();
+  APP_ERROR_CHECK(err_code);
+}
+
 /** @brief Initializes motor speed reading
  */
 nrf_drv_timer_t *motor_tach_init(void) {
@@ -85,4 +124,10 @@ nrf_drv_timer_t *motor_tach_init(void) {
   ppi_init();
 
   return &m_counter1;
+}
+
+void motor_tach_uninit(void) {
+  counter1_uninit();
+  gpiote_uninit();
+  ppi_uninit();
 }

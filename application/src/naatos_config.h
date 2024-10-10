@@ -41,12 +41,14 @@
 #define SPI_SD_SS_PIN 12 /* P0.12 */
 
 /* QSPI Pins */
-#define QSPI_IO0_PIN 44 /* P1.12 REVA*/ // 5   /* P0.05 REVB*/ 
-#define QSPI_IO1_PIN 45 /* P1.13 REVA*/ // 6   /* P0.06 REVB*/
-#define QSPI_IO2_PIN 46 /* P1.14 REVA*/ // 7   /* P0.07 REVB*/
-#define QSPI_IO3_PIN 47 /* P1.15 REVA*/ // 8   /* P0.08 REVB*/
-#define QSPI_CS_PIN  42 /* P1.10 REVA*/ // 30  /* P0.30 REVB*/
-#define QSPI_CLK_PIN 43 /* P1.11 REVA*/ // 3   /* P0.03 REVB*/
+#if SAMPLE_PREP_REV_B
+#define QSPI_IO0_PIN  5   /* P0.05 REVB*/ 
+#define QSPI_IO1_PIN  6   /* P0.06 REVB*/
+#define QSPI_IO2_PIN  7   /* P0.07 REVB*/
+#define QSPI_IO3_PIN  8   /* P0.08 REVB*/
+#define QSPI_CS_PIN   30  /* P0.30 REVB*/
+#define QSPI_CLK_PIN  3   /* P0.03 REVB*/
+#endif
 
 /* Sample Prep Enables */
 #ifdef SAMPLE_PREP_BOARD
@@ -54,7 +56,6 @@
 #define MOTOR_PWR_EN    28    // Motor Enable
 #define LED_DRV_EN      35    // LED Driver Enable
 #define SENSORS_PWR_EN  39    // Sensors Power Enable
-
 #if SAMPLE_PREP_REV_B
 #define FLASH_PWR_EN    13    // NOR Flash Storage Enable
 #define PD_3V3_EN       34    // USB PD 3v3 Enable

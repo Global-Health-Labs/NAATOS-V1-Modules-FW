@@ -19,12 +19,14 @@ TimerHandle_t sensorMotorTimer;
 
 xQueueHandle motorRxQueue;
 
-void init_motor_gpio() {
-
+void init_motor_gpio(void) {
   /* Setup Motor Speed Sensor Input*/
   p_counter1 = motor_tach_init();
 }
 
+void uninit_motor_gpio(void) {
+  motor_tach_uninit();
+}
 
 void vSensorMotorTimerCallback(TimerHandle_t xTimer) {
   BaseType_t xReturned;

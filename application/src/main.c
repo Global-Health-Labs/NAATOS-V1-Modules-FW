@@ -213,6 +213,96 @@ void read_sd_and_notify_tasks(void) {
   }
 }
 
+void set_startup_enables(void) {
+  // Turn off boost for heaters
+  nrf_gpio_cfg_output(HEATER_PWR_EN);
+  nrf_gpio_pin_clear(HEATER_PWR_EN); 
+  // Turn off the motor enable
+  nrf_gpio_cfg_output(MOTOR_PWR_EN);
+  nrf_gpio_pin_clear(MOTOR_PWR_EN); 
+  // LED driver enable
+  nrf_gpio_cfg_output(LED_DRV_EN);
+  nrf_gpio_pin_set(LED_DRV_EN);
+  // Sensors power enable
+  nrf_gpio_cfg_output(SENSORS_PWR_EN);
+  nrf_gpio_pin_set(SENSORS_PWR_EN);
+// Sample Prep Rev. A only enables
+#if SAMPLE_PREP_REV_A
+  // SD Card Enable
+  nrf_gpio_cfg_output(SD_POWER_ENABLE);
+  nrf_gpio_pin_set(SD_POWER_ENABLE);
+#endif
+// Sample prep Rev. B. only enables
+#if SAMPLE_PREP_REV_B
+  // USB PD Controller Enable
+  nrf_gpio_cfg_output(PD_3V3_EN);
+  nrf_gpio_pin_set(PD_3V3_EN);
+  // NOR Flash Enable
+  nrf_gpio_cfg_output(FLASH_PWR_EN);
+  nrf_gpio_pin_set(FLASH_PWR_EN);
+#endif
+}
+
+void clear_enables(void) {
+  // Turn off boost for heaters
+  nrf_gpio_cfg_output(HEATER_PWR_EN);
+  nrf_gpio_pin_clear(HEATER_PWR_EN); 
+  // Turn off the motor enable
+  nrf_gpio_cfg_output(MOTOR_PWR_EN);
+  nrf_gpio_pin_clear(MOTOR_PWR_EN); 
+  // LED driver disable
+  nrf_gpio_cfg_output(LED_DRV_EN);
+  nrf_gpio_pin_clear(LED_DRV_EN);
+  // Sensors power disable
+  nrf_gpio_cfg_output(SENSORS_PWR_EN);
+  nrf_gpio_pin_clear(SENSORS_PWR_EN);
+  // Sample Prep Rev. A only disables
+#if SAMPLE_PREP_REV_A
+  // SD Card Disable
+  nrf_gpio_cfg_output(SD_POWER_ENABLE);
+  nrf_gpio_pin_clear(SD_POWER_ENABLE);
+#endif
+// Sample prep Rev. B. only disables
+#if SAMPLE_PREP_REV_B
+  // USB PD Controller Disable
+  nrf_gpio_cfg_output(PD_3V3_EN);
+  nrf_gpio_pin_clear(PD_3V3_EN);
+  // NOR Flash Disable
+  nrf_gpio_cfg_output(FLASH_PWR_EN);
+  nrf_gpio_pin_clear(FLASH_PWR_EN);
+#endif
+}
+
+void init_peripherals(void) {
+  // Full Peripheral Initalizations
+  init_adc();
+  init_motor_gpio();
+  init_pwms();
+  vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_100k);
+  vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_100k);
+#if ENABLE_LEDS
+  led_driver_init();
+#endif
+  fuelGauge_init();
+  init_naatos_storage();
+  button_init();
+}
+
+void uninit_peripherals(void) {
+  // Full Peripheral Uninitalization
+  uninit_naatos_storage();
+  // Dont want to turn off the Fuel Guage
+  // Dont want to turn off the Button, need it to wake back up
+#if ENABLE_LEDS
+  led_driver_uninit();
+#endif
+  vUninit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN);
+  vUninit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN);
+  uninit_pwms();
+  uninit_motor_gpio();
+  uninit_adc();
+}
+
 /*********************************************************************
 *
 *       main_task()
@@ -639,7 +729,10 @@ void main_task(void *pvParameters) {
         updateLedState(LED_USB_MSC_STARTING, false);
 
         vTaskDelay(100);
-        nrf_gpio_pin_clear(SENSORS_EN);
+
+        // Turn off peripherals and enables
+        uninit_peripherals();
+        clear_enables();
       }
 
       // this queue is blocked indefinitly until a switch interrupt or usb  interrupt
@@ -655,8 +748,11 @@ void main_task(void *pvParameters) {
       }
 
       send_debug_log_message("Waking up...");
+      
+      // Set the enables high then start up the peripherals
+      set_startup_enables();
+      init_peripherals();
 
-      nrf_gpio_pin_set(SENSORS_EN);
       vTaskDelay(100);
 
       SensorRxQueueMsg_t msg;
@@ -1003,31 +1099,12 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask,
   while (!nrf_drv_clock_lfclk_is_running()) {
     // Just waiting
   }
-
-  // Full Peripheral Initalizations
-  init_adc();           // ADC
-  init_sensors_gpios(); // Sensor GPIOs
-  init_motor_gpio();
-  init_pwms();
-
-  nrf_gpio_cfg_output(HEATER_PWR_EN);
-  nrf_gpio_pin_clear(HEATER_PWR_EN); // turn off boost for heaters
-
-  nrf_gpio_cfg_output(MOTOR_PWR_EN);
-  nrf_gpio_pin_clear(MOTOR_PWR_EN);
-
-  nrf_gpio_cfg_output(MOTOR_CWCCW);
-  nrf_gpio_pin_set(MOTOR_CWCCW);
-
-  vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_100k);  // I2C
-  vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_100k); // I2C
-
-#if ENABLE_LEDS
-  led_driver_init();
-#endif
-  fuelGauge_init();
-  init_naatos_storage();
-  button_init();
+  
+  // Enable Lines 
+  set_startup_enables();  
+  // Init Peripherals
+  init_peripherals();
+  // Other Initalizations
   nrf_drv_gpiote_init();
   setup_uart_semaphore();
 

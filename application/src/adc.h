@@ -11,6 +11,7 @@
 #define NOMINAL_HAL     1.0f
 
 void init_adc(void);
+void uninit_adc(void);
 bool get_optical_triggered(void);
 bool get_hal_triggered(void);
 float get_adc_voltage(nrf_saadc_value_t adc_val);

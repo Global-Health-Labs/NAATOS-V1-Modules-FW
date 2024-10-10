@@ -10,7 +10,6 @@
 //TODO add header comment for sensor.h
 
 // --------Common Functions--------
-void init_sensors_gpios(void);
 void sensors_task(void *pvParameters);
 bool readTemp(sensor_selection_t sensor, float *temperature);
 void handleSensorSleep(void);

@@ -190,6 +190,13 @@ void led_driver_init(void) {
   led_driver_writeRegisterBlocking(one_shot_buf, 2);
 }
 
+void led_driver_uninit(void) {
+  // Disable LED Driver
+  enable_led_driver(false);
+  // Should be all we have to do. The LED will be shutdown when going into sleep mode
+  // by turning the LED_DRV_EN pill low.
+}
+
 led_driver_errors_t led_driver_enable_channel(led_driver_led_selection led_selection, led_color color, led_driver_opDoneCallback_t cb) {
   led_driver_errors_t err_code;
   uint8_t target_addr = LED_DRIVER_CTRL_REG_1;

@@ -17,6 +17,7 @@
 #include "../heater/heater.h"
 #include "../naatos_config.h"
 
+#if SAMPLE_PREP_REV_B
 /**
  * @brief  QSPI block device definition
  */
@@ -54,6 +55,8 @@ NRF_BLOCK_DEV_QSPI_DEFINE(
      ),
      NFR_BLOCK_DEV_INFO_CONFIG("Nordic", "QSPI", "1.00")
 );
+
+#endif
 
 extern bool nor_flash_inited;
 

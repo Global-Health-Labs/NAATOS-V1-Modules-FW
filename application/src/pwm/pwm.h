@@ -19,7 +19,8 @@
 #define HEAT_ZONE_3_CHANNEL 1
 #define MOTOR_CHANNEL 0
 
-void init_pwms();
+void init_pwms(void);
+void uninit_pwms(void);
 void pwm_task(void *pvParameters);
 void updateDutyCycles(temperature_pwm_data_t pwmData);
 

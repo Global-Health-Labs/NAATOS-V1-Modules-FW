@@ -403,17 +403,6 @@ void runSamplePrepSensorCollection(void) {
   }
 }
 
-void init_sensors_gpios(void) {
-  /* Setup Hal Sensor */
-  nrf_gpio_cfg_input(HAL_INPUT_PIN, NRF_GPIO_PIN_PULLDOWN);
-  nrf_gpio_cfg_output(SENSORS_EN);
-  nrf_gpio_pin_set(SENSORS_EN);
-
-  /*LED Driver Enable*/
-  nrf_gpio_cfg_output(LED_DRV_EN);
-  nrf_gpio_pin_set(LED_DRV_EN);
-}
-
 bool readTemp(sensor_selection_t sensor, float *temperature) {
   int i2cRetry = 0;
   tsys01_errors_t tsys_err;
