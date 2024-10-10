@@ -157,6 +157,7 @@ naatos_config_parameters config = {
     .run_motor_2 = false,
     .run_heater_2 = false };
 #endif
+
 bool use_default_configuration_parameters = false;
 
 // Function defs
@@ -214,6 +215,8 @@ void read_sd_and_notify_tasks(void) {
 }
 
 void set_startup_enables(void) {
+  /* SAMPLE PREP BOARD */
+#ifdef SAMPLE_PREP_BOARD
   // Turn off boost for heaters
   nrf_gpio_cfg_output(HEATER_PWR_EN);
   nrf_gpio_pin_clear(HEATER_PWR_EN); 
@@ -241,9 +244,45 @@ void set_startup_enables(void) {
   nrf_gpio_cfg_output(FLASH_PWR_EN);
   nrf_gpio_pin_set(FLASH_PWR_EN);
 #endif
+#else 
+
+  /* POWER MODULE BOARD */
+#if POWER_MODULE_REV_A
+  // Turn off boost for heaters
+  nrf_gpio_cfg_output(HEATER_PWR_EN);
+  nrf_gpio_pin_clear(HEATER_PWR_EN); 
+  // LED driver enable
+  nrf_gpio_cfg_output(LED_DRV_EN);
+  nrf_gpio_pin_set(LED_DRV_EN);
+  // Sensors power enable
+  nrf_gpio_cfg_output(SENSORS_PWR_EN);
+  nrf_gpio_pin_set(SENSORS_PWR_EN);
+  // SD Card Enable
+  nrf_gpio_cfg_output(SD_POWER_ENABLE);
+  nrf_gpio_pin_set(SD_POWER_ENABLE);
+#elif POWER_MODULE_REV_B
+  // NOR Flash Enable
+  nrf_gpio_cfg_output(FLASH_PWR_EN);
+  nrf_gpio_pin_set(FLASH_PWR_EN);
+  // Top LED driver enable
+  nrf_gpio_cfg_output(TOP_LED_DRV_EN);
+  nrf_gpio_pin_set(TOP_LED_DRV_EN);
+  // Front LED driver enable
+  nrf_gpio_cfg_output(FRONT_LED_DRV_EN);
+  nrf_gpio_pin_set(FRONT_LED_DRV_EN);
+  // Turn off boost for Valve heater
+  nrf_gpio_cfg_output(VALVE_PWR_EN);
+  nrf_gpio_pin_clear(VALVE_PWR_EN); 
+  // Turn off boost for amp heater
+  nrf_gpio_cfg_output(AMP_PWR_EN);
+  nrf_gpio_pin_clear(AMP_PWR_EN); 
+#endif
+#endif
 }
 
 void clear_enables(void) {
+  /* SAMPLE PREP BOARD */
+#ifdef SAMPLE_PREP_BOARD
   // Turn off boost for heaters
   nrf_gpio_cfg_output(HEATER_PWR_EN);
   nrf_gpio_pin_clear(HEATER_PWR_EN); 
@@ -270,6 +309,40 @@ void clear_enables(void) {
   // NOR Flash Disable
   nrf_gpio_cfg_output(FLASH_PWR_EN);
   nrf_gpio_pin_clear(FLASH_PWR_EN);
+#endif
+#else
+
+  /* POWER MODULE BOARD */
+#if POWER_MODULE_REV_A
+  // Turn off boost for heaters
+  nrf_gpio_cfg_output(HEATER_PWR_EN);
+  nrf_gpio_pin_clear(HEATER_PWR_EN); 
+  // LED driver Disable
+  nrf_gpio_cfg_output(LED_DRV_EN);
+  nrf_gpio_pin_clear(LED_DRV_EN);
+  // Sensors power Disable
+  nrf_gpio_cfg_output(SENSORS_PWR_EN);
+  nrf_gpio_pin_clear(SENSORS_PWR_EN);
+  // SD Card Disable
+  nrf_gpio_cfg_output(SD_POWER_ENABLE);
+  nrf_gpio_pin_clear(SD_POWER_ENABLE);
+#elif POWER_MODULE_REV_B
+  // NOR Flash disable
+  nrf_gpio_cfg_output(FLASH_PWR_EN);
+  nrf_gpio_pin_clear(FLASH_PWR_EN);
+  // Top LED driver disable
+  nrf_gpio_cfg_output(TOP_LED_DRV_EN);
+  nrf_gpio_pin_clear(TOP_LED_DRV_EN);
+  // Front LED driver disable
+  nrf_gpio_cfg_output(FRONT_LED_DRV_EN);
+  nrf_gpio_pin_clear(FRONT_LED_DRV_EN);
+  // Turn off boost for Valve heater
+  nrf_gpio_cfg_output(VALVE_PWR_EN);
+  nrf_gpio_pin_clear(VALVE_PWR_EN); 
+  // Turn off boost for amp heater
+  nrf_gpio_cfg_output(AMP_PWR_EN);
+  nrf_gpio_pin_clear(AMP_PWR_EN); 
+#endif
 #endif
 }
 

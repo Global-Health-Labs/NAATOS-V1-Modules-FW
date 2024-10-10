@@ -45,6 +45,7 @@ static log_data_message_t logMsg = {
     .temperature_data = NULL};
 
 void handle_cycle2_stopstart_heater(bool heating) {
+#ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
 
   // Handle case where cycle one is already running, dont want to send stop
@@ -107,9 +108,11 @@ void handle_cycle2_stopstart_heater(bool heating) {
   } else {
     samp_log_max = (config.logging_rate / config.sample_rate);
   }
+#endif
 }
 
 void handle_cycle1_stopstart_heater(bool heating) {
+#ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
 
   // Handle case where valve zone is on already, dont want to send stop
@@ -173,6 +176,7 @@ void handle_cycle1_stopstart_heater(bool heating) {
   } else {
     samp_log_max = (config.logging_rate / config.sample_rate);
   }
+#endif
 }
 
 void samplePrepResetHeaterPIDs(void) {

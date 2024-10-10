@@ -162,7 +162,7 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   }
 
   // Update PID and PWM
-  if (amplification_zone_running) {
+  if (cycle_one_running) {
     // Update Amplification 0 PID loop with new temperatures
     pid_controller_compute(&amp0_pid, temperature_data.heat_zone_1_temp);
     // Update Amplification 0 PWM with PID output
@@ -267,8 +267,8 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
     }
   }
   // Set zones enabled
-  if (heaterRxMessage.zoneSelect == CYCLE_ONE) {
-    cycle_one_running = heaterRxMessage.zoneEnabled;
+  if (heaterRxMessage.cycleSelect == CYCLE_ONE) {
+    cycle_one_running = heaterRxMessage.cycleEnabled;
     if (!cycle_one_running) {
       amp0_pid.out = 0;
       amp1_pid.out = 0;
@@ -300,8 +300,8 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
       // Send starting heater to sensors task
       handle_amplification_stopstart_heater(pm_heater_run);
     }
-  } else if (heaterRxMessage.zoneSelect = CYCLE_TWO) {
-    cycle_two_running = heaterRxMessage.zoneEnabled;
+  } else if (heaterRxMessage.cycleSelect = CYCLE_TWO) {
+    cycle_two_running = heaterRxMessage.cycleEnabled;
     if (!cycle_two_running) {
       valve_pid.out = 0;
       amp0_pid.out = 0;

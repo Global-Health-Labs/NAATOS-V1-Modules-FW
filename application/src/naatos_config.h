@@ -6,13 +6,28 @@
 #include <stdint.h>
 
 /*Define this when building sample prep only otherwise comment out*/
-#define SAMPLE_PREP_BOARD
+//#define SAMPLE_PREP_BOARD
+#define POWER_MODULE_BOARD
 
 #ifdef SAMPLE_PREP_BOARD
 #define SAMPLE_PREP_REV_A 1
 #define SAMPLE_PREP_REV_B 0
 #if SAMPLE_PREP_REV_A == 0 && SAMPLE_PREP_REV_B == 0
 #define SAMPLE_PREP_REV_B 1
+#endif
+#endif
+
+#ifdef POWER_MODULE_BOARD
+#define POWER_MODULE_REV_A  1
+#define POWER_MODULE_REV_B  0
+#if POWER_MODULE_REV_A == 1 && POWER_MODULE_REV_B ==1
+#define POWER_MODULE_REV_B  1
+#endif 
+#endif
+
+#ifndef SAMPLE_PREP_BOARD 
+#ifndef POWER_MODULE_BOARD
+#warning You do not have NAATOS a board selected!
 #endif
 #endif
 
@@ -62,6 +77,23 @@
 #define PD_3V3_EN       34    // USB PD 3v3 Enable
 #elif SAMPLE_PREP_REV_A
 #define SD_POWER_ENABLE NRF_GPIO_PIN_MAP(1, 8)  // SD Card Enable
+#endif
+#endif
+
+/* Power Module Enables */
+#ifdef POWER_MODULE_BOARD
+#if POWER_MODULE_REV_A
+#define HEATER_PWR_EN     21
+#define LED_DRV_EN        35
+#define SENSORS_PWR_EN    39
+#define SD_POWER_ENABLE   40
+#endif
+#if POWER_MODULE_REV_B
+#define FLASH_PWR_EN      13
+#define TOP_LED_DRV_EN    35
+#define FRONT_LED_DRV_EN  37
+#define VALVE_PWR_EN      20
+#define AMP_PWR_EN        21
 #endif
 #endif
 
