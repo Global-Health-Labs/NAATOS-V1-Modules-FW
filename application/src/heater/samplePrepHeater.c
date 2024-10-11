@@ -295,7 +295,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     send_debug_log_message(tmp);
 #endif
 
-    if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0 || temperature_data.heat_zone_3_temp > 120) {
+    if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0) {
       greater_than_max = true;
     }
   }
@@ -333,7 +333,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     send_debug_log_message(tmp);
 #endif
 
-    if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0 || temperature_data.heat_zone_3_temp > 120) {
+    if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0) {
       greater_than_max = true;
     }
   }

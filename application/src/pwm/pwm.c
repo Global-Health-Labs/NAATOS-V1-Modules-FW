@@ -125,9 +125,8 @@ void pwm_task(void *pvParameters) {
   app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, 0);
   app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, heat_zone_1_duty);
 #else
-  app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty);
-  app_pwm_channel_duty_set(&PWM0, AMP0_CHANNEL, amp0_duty);
-  app_pwm_channel_duty_set(&PWM2, AMP2_CHANNEL, amp2_duty);
+  app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, heat_zone_0_duty);
+  app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_2_CHANNEL, heat_zone_2_duty);
 #endif
 
   // for motor

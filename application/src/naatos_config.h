@@ -169,26 +169,21 @@
 #define DEFAULT_LOGGING_RATE 5.000
 #define DEFAULT_CYCLE_1_RUNTIME 1800.0
 #define DEFAULT_CYCLE_2_RUNTIME 180.0
-#define DEFAULT_WAIT_TIME_AFTER_VALVE_S 900.00 // 15 min
-#define VALVE_SETPOINT 67.6
-#define AMP0_SETPOINT 67.2
-#define AMP1_SETPOINT 67.4
-#define AMP2_SETPOINT 68.5
+#define DEFAULT_WAIT_TIME_AFTER_CYCLE_S 900.00 // 15 min
+#define VALVE_SETPOINT_1 67.6
+#define AMP_SETPOINT_1 67.2
 #define VALVE_SETPOINT_2 93.0
-#define AMP0_SETPOINT_2 67.0
-#define AMP1_SETPOINT_2 67.0
-#define AMP2_SETPOINT_2 67.0
+#define AMP_SETPOINT_2 67.0
 #define DEFAULT_VALVE_MAX_TEMP 105.0
-#define DEFAULT_AMP0_MAX_TEMP 80.0
-#define DEFAULT_AMP1_MAX_TEMP 80.0
-#define DEFAULT_AMP2_MAX_TEMP 80.0
+#define DEFAULT_AMP_MAX_TEMP 80.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP 50.0
 #define DEFAULT_MIN_RUN_ZONE_TEMP_EN false
 #define DEFAULT_ALERT_TIMEOUT_S 3.0   // seconds
 #define DEFAULT_VALID_TIMEOUT_S 3600.0 // 1 hour
 #define DEFAULT_RECOVERY_THRES 40      // Percent
 #define OPTICAL_TRIG_THRES 800
-#define DEFAULT_MAX_HEATER_PID 150
+#define DEFAULT_MAX_AMP_PID 150
+#define DEFAULT_MAX_VALVE_PID 150
 #endif
 
 #define DEFAULT_DATE 100124                // Oct. 1 2024
@@ -606,84 +601,54 @@ extern xTaskHandle compositeTaskHandle;
 extern xTaskHandle buttonTaskHandle;
 
 // Config parameters
-#ifndef SAMPLE_PREP_BOARD
+
 typedef struct {
   float sample_rate;
   float logging_rate;
-  float cycle_2_run_time_m;
-  float cycle_1_run_time_m;
+  float cycle_1_run_time_s;
+  float cycle_2_run_time_s;
   uint16_t low_power_threshold;
   uint16_t recovery_power_thresh;
-  uint16_t min_wait_time_after_valve_s;
-  float valve_setpoint;
-  float amp0_setpoint;
-  float amp1_setpoint;
-  float amp2_setpoint;
-  float valve_max_temp;
-  float amp0_max_temp;
-  float amp1_max_temp;
-  float amp2_max_temp;
-  float min_run_zone_temp;
-  float alert_timeout_time_s;
-  float max_heater_pid_pwm;
-  bool min_run_zone_temp_en;
-  float alert_timeout_time_m;
   float sample_valid_timeout_s;
   int sample_complete_delay_s;
-  float valve_kp;
-  float valve_ki;
-  float valve_kd;
-  float amp0_kp;
-  float amp0_ki;
-  float amp0_kd;
-  float amp1_kp;
-  float amp1_ki;
-  float amp1_kd;
-  float amp2_kp;
-  float amp2_ki;
-  float amp2_kd;
+  float alert_timeout_time_s;
+  float min_run_zone_temp;
+  bool min_run_zone_temp_en;
+#ifndef SAMPLE_PREP_BOARD  
   uint16_t optical_distance;
+  uint16_t min_wait_time_after_cycle_s;
+  float max_amp_pid_pwm;
+  float max_valve_pid_pwm;
+  float amp_max_temp;
+  float valve_max_temp;
+  float valve_setpoint_1;
+  float amp_setpoint_1;
+  float valve_kp_1;
+  float valve_ki_1;
+  float valve_kd_1;
+  float amp_kp_1;
+  float amp_ki_1;
+  float amp_kd_1;
   float valve_setpoint_2;
-  float amp0_setpoint_2;
-  float amp1_setpoint_2;
-  float amp2_setpoint_2;
+  float amp_setpoint_2;
   float valve_kp_2;
   float valve_ki_2;
   float valve_kd_2;
-  float amp0_kp_2;
-  float amp0_ki_2;
-  float amp0_kd_2;
-  float amp1_kp_2;
-  float amp1_ki_2;
-  float amp1_kd_2;
-  float amp2_kp_2;
-  float amp2_ki_2;
-  float amp2_kd_2;
+  float amp_kp_2;
+  float amp_ki_2;
+  float amp_kd_2;
   int mmddyy;
   int hhmmss;
   bool set_date_time;
-} naatos_config_parameters;
 #else
-typedef struct {
-  float sample_rate;
-  float logging_rate;
-  float cycle_1_run_time_m;
-  float cycle_2_run_time_m;
+  float max_heater_pid_pwm;
   bool ramp_to_temp_before_start_cycle_1;
   bool ramp_to_temp_before_start_cycle_2;
   float ramp_to_temp_c1_timeout;
   float ramp_to_temp_c2_timeout;
-  uint16_t low_power_threshold;
-  uint16_t recovery_power_thresh;
   float heater_setpoint_1;
   float heater_setpoint_2;
   float heater_max_temp;
-  float min_run_zone_temp;
-  bool min_run_zone_temp_en;
-  float alert_timeout_time_s;
-  float sample_valid_timeout_s;
-  int sample_complete_delay_s;
-  float max_heater_pid_pwm;
   float heater_kp_1;
   float heater_ki_1;
   float heater_kd_1;
@@ -707,8 +672,8 @@ typedef struct {
   int mmddyy;
   int hhmmss;
   bool set_date_time;
-} naatos_config_parameters;
 #endif
+} naatos_config_parameters;
 
 /* Configuration Parameters Variables */
 extern bool use_default_configuration_parameters;

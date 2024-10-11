@@ -164,9 +164,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (last_state != current_state) {
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
-          end_time = (DEFAULT_CYCLE_ONE_ZONE_ON_TIME)*configTICK_RATE_HZ;
+          end_time = (DEFAULT_CYCLE_1_RUNTIME)*configTICK_RATE_HZ;
         } else {
-          end_time = (config.cycle_1_run_time_m) * configTICK_RATE_HZ;
+          end_time = (config.cycle_1_run_time_s) * configTICK_RATE_HZ;
         }
       }
 
@@ -282,9 +282,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (last_state != current_state) {
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
-          end_time = ((DEFAULT_CYCLE_TWO_ZONE_ON_TIME)*configTICK_RATE_HZ);
+          end_time = ((DEFAULT_CYCLE_2_RUNTIME)*configTICK_RATE_HZ);
         } else {
-          end_time = ((config.cycle_2_run_time_m) * configTICK_RATE_HZ);
+          end_time = ((config.cycle_2_run_time_s) * configTICK_RATE_HZ);
         }
       }
 
