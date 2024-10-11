@@ -333,12 +333,6 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case MAX_HEATER_PID_PWM:
       parameters->max_heater_pid_pwm = parse_int(val, DEFAULT_MAX_HEATER_PID);
       break;
-    case CYCLE_1_RUN_TIME:
-      parameters->cycle_1_run_time_m = parse_int(val, DEFAULT_CYCLE_1_RUNTIME);
-      break;
-    case CYCLE_2_RUN_TIME:
-      parameters->cycle_2_run_time_m = parse_int(val, DEFAULT_CYCLE_2_RUNTIME);
-      break;
     case RAMP_TO_TEMP_BEFORE_CYCLE_1_START:
       num = strcmp(val, "true");
       parameters->ramp_to_temp_before_start_cycle_1 = num ? false : true;
@@ -697,18 +691,6 @@ FRESULT check_for_config_file(void) {
 #else
   // Write Max Heater PID PWM
   configBufferSize = sprintf(configBuffer, "max_heater_pid_pwm:%d\n", DEFAULT_MAX_HEATER_PID);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  configBufferSize = sprintf(configBuffer, "cycle_1_run_time_m:%0.2f\n", DEFAULT_CYCLE_1_RUNTIME);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  configBufferSize = sprintf(configBuffer, "cycle_2_run_time_m:%0.2f\n", DEFAULT_CYCLE_2_RUNTIME);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
