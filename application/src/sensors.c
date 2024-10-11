@@ -330,6 +330,7 @@ void runSamplePrepSensorCollection(void) {
   int consecutive_failures = 0; // Counter for consecutive failures
 
   // GPIO Read for Hall Sensor
+#ifdef SAMPLE_PREP_BOARD
   prev = switches.hal_triggered;
   if (nrf_gpio_pin_read(HAL_INPUT_PIN)) {
     switches.hal_triggered = false;
@@ -343,6 +344,10 @@ void runSamplePrepSensorCollection(void) {
       send_debug_log_message("Hal sensor no longer triggered!\r\n");
     }
   }
+#else 
+  // No Hal sensor on Power Module, force it true
+  switches.hal_triggered = true;
+#endif
 
     // Array to store temperature samples
     float temp_samples[6];

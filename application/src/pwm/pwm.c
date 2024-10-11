@@ -20,6 +20,14 @@ static bool heat_zone_2_active = false;
 static bool heat_zone_3_active = false;
 static bool motor_active = false;
 
+static usb_suspend_acpt_t sus_acpt = {
+      .task = PWM,
+      .suspended = true};
+
+static usb_suspend_over_t sus_over = {
+      .task = PWM,
+      .over = true};
+
 xQueueHandle pwmRxQueue;
 
 void pwm0_ready_callback(uint32_t pwm_id) {
@@ -36,7 +44,7 @@ void init_pwms(void) {
   ret_code_t err;
 
   /* Create Configurations */
-
+#ifdef SAMPLE_PREP_BOARD
   /* 1 Channel PWM, 200Hz, Active High, Valve Zone Pin */
   app_pwm_config_t pwm0_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, HEATER_ZONE_0_PIN, SAMPLE_HEATER_PIN);
   pwm0_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
@@ -45,6 +53,16 @@ void init_pwms(void) {
   app_pwm_config_t pwm2_cfg = APP_PWM_DEFAULT_CONFIG_2CH(100L, MOTOR_OUTPUT_PIN, MOTOR_OUTPUT_PIN2);
   pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_LOW;
   pwm2_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_LOW;
+#else 
+  /* 1 Channel PWM, 200Hz, Active High, Valve Zone Pin */
+  app_pwm_config_t pwm0_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, HEATER_ZONE_0_PIN, HEATER_ZONE_1_PIN);
+  pwm0_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
+  pwm0_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
+  //1 Channel PWM, 10kHz, Active High, Motor Control Pin */
+  app_pwm_config_t pwm2_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, HEATER_ZONE_2_PIN, HEATER_ZONE_3_PIN);
+  pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_LOW;
+  pwm2_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_LOW;
+#endif
 
   /* Initalize with configurations */
   /* Initalize PWM0 */
@@ -62,6 +80,7 @@ void init_pwms(void) {
   app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, 0);
   app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, 0);
   app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_2_CHANNEL, 0);
+  app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_3_CHANNEL, 0);
 }
 
 void uninit_pwms(void) {
@@ -75,10 +94,17 @@ void uninit_pwms(void) {
   err = app_pwm_uninit(&PWM2);
   APP_ERROR_CHECK(err);
   // Set pins as input disconnect
+#ifdef SAMPLE_PREP_BOARD
   nrf_gpio_cfg_input(HEATER_ZONE_0_PIN, NRF_GPIO_PIN_INPUT_DISCONNECT);
   nrf_gpio_cfg_input(SAMPLE_HEATER_PIN, NRF_GPIO_PIN_INPUT_DISCONNECT);
   nrf_gpio_cfg_input(MOTOR_OUTPUT_PIN, NRF_GPIO_PIN_INPUT_DISCONNECT);
   nrf_gpio_cfg_input(MOTOR_OUTPUT_PIN2, NRF_GPIO_PIN_INPUT_DISCONNECT);
+#else
+  nrf_gpio_cfg_input(HEATER_ZONE_0_PIN, NRF_GPIO_PIN_INPUT_DISCONNECT);
+  nrf_gpio_cfg_input(HEATER_ZONE_1_PIN, NRF_GPIO_PIN_INPUT_DISCONNECT);
+  nrf_gpio_cfg_input(HEATER_ZONE_2_PIN, NRF_GPIO_PIN_INPUT_DISCONNECT);
+  nrf_gpio_cfg_input(HEATER_ZONE_3_PIN, NRF_GPIO_PIN_INPUT_DISCONNECT);
+#endif
 }
 
 void updateDutyCycles(temperature_pwm_data_t pwmData) {
@@ -112,27 +138,13 @@ void updateDutyCycles(temperature_pwm_data_t pwmData) {
 
 void pwm_task(void *pvParameters) {
   BaseType_t xReturned;
-  usb_suspend_req_t sus_req;
-  usb_suspend_acpt_t sus_acpt = {
-      .task = PWM,
-      .suspended = true};
-  usb_suspend_over_t sus_over = {
-      .task = PWM,
-      .over = true};
-
-// Set Original Duty Cycles to 0
-#ifdef SAMPLE_PREP_BOARD
-  app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, 0);
-  app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, heat_zone_1_duty);
-#else
-  app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, heat_zone_0_duty);
-  app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_2_CHANNEL, heat_zone_2_duty);
-#endif
-
-  // for motor
-  app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_2_CHANNEL, heat_zone_2_duty);
-
   PwmRxQueueMsg_t pwmMsg;
+  usb_suspend_req_t sus_req;
+
+  app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, heat_zone_0_duty);
+  app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, heat_zone_1_duty);
+  app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_2_CHANNEL, heat_zone_2_duty);
+  app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_3_CHANNEL, heat_zone_3_duty);
 
   // Main Task Loop
   for (;;) {
