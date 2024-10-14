@@ -31,7 +31,7 @@ bool get_hal_triggered(void) {
   nrfx_saadc_sample_convert(HAL_CHANNEL, &adc_val);
   // Convert to a voltage
   hal_v = get_adc_voltage(adc_val);
-
+  printf("hal_v: %0.2f\r\n", adc_val);
   // Check thresholds
   // Voltage idles at 1V and changes +/- 45 mV/mT depending on polarity of magnetic feild
   //    0V-2V
@@ -71,7 +71,7 @@ void init_adc(void) {
   APP_ERROR_CHECK(err);
 #else
   // Create channel configuration and assign it defualt values
-  // Create the config to be on AIN1 (P0.01) as an input and single ended
+  // Create the config to be on AIN0 (P0.02) as an input and single ended
   nrf_saadc_channel_config_t channel_config = NRFX_SAADC_DEFAULT_CHANNEL_CONFIG_SE(NRF_SAADC_INPUT_AIN0);
 
   // Initalize saadc

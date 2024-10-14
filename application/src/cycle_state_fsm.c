@@ -513,7 +513,6 @@ bool begin_cycle_1(void) {
   BaseType_t xRet;
   bool start_run = false;
   // Send start zone request
-
   xRet = xQueueSend(heaterRxQueue, &run_cycle_one_zone_heating, 0);
   if (xRet != pdPASS) {
     send_debug_log_message("MAIN_TASK: Unable to send run amplification zone request.\n");

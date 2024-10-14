@@ -105,13 +105,14 @@
 #define HEATER_ZONE_3_PIN NRF_GPIO_PIN_MAP(1, 1) // P1.01
 #define SAMPLE_HEATER_PIN NRF_GPIO_PIN_MAP(1, 1) // P1.01
 #define HAL_INPUT_PIN NRF_GPIO_PIN_MAP(0, 2)
+#define BUTTON_INPUT_PIN  38
 #else 
 #ifdef POWER_MODULE_REV_A
 #define BUTTON_INPUT_PIN  44                     // USES TP1 on REVA
-#define HEATER_ZONE_0_PIN 33                     // P1.01
-#define HEATER_ZONE_1_PIN 34                     // P1.02
-#define HEATER_ZONE_2_PIN 19                     // P0.19
-#define HEATER_ZONE_3_PIN 20                     // P0.20
+#define HEATER_ZONE_0_PIN 20                     // P1.01 VALVE ZONE
+#define HEATER_ZONE_1_PIN 19                     // P1.02
+#define HEATER_ZONE_2_PIN 34                     // P0.19 AMP ZONE
+#define HEATER_ZONE_3_PIN 33                     // P0.20
 #else
 #define BUTTON_INPUT_PIN  38
 #define HEATER_ZONE_0_PIN 33                     // P1.01

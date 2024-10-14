@@ -222,13 +222,18 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   }
 
 #if VERBOSE_PID
+  char w_buff[100];
   if (cycle_one_running) {
-    send_debug_log_message("Valve Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_0_temp, valve_pid_1.out);
-    send_debug_log_message("Amplification Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_2_temp, amp_pid_1.out);
+    sprintf(w_buff, "V Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_0_temp, valve_pid_1.out);
+    send_debug_log_message(w_buff);
+    sprintf(w_buff, "A Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_2_temp, amp_pid_1.out);
+    send_debug_log_message(w_buff);
   }
   if (cycle_two_running) {
-    send_debug_log_message("Valve Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_0_temp, valve_pid_2.out);
-    send_debug_log_message("Amplification Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_2_temp, amp_pid_2.out);
+    sprintf(w_buff, "V Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_0_temp, valve_pid_1.out);
+    send_debug_log_message(w_buff);
+    sprintf(w_buff, "A Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_2_temp, amp_pid_1.out);
+    send_debug_log_message(w_buff);
   }
 #endif
 #endif
@@ -258,13 +263,13 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
       // Send stop heater to sensors task
       pm_heater_run = false;
       starting_run = false;
-      handle_cycle1_stopstart_heater(pm_heater_run);
+      handle_cycle_one_stopstart_heater(pm_heater_run);
     } else {
       starting_run = true;
       pm_heater_run = true;
       powerModuleResetHeaterPIDs();
       // Send starting heater to sensors task
-      handle_cycle1_stopstart_heater(pm_heater_run);
+      handle_cycle_one_stopstart_heater(pm_heater_run);
     }
   } else if (heaterRxMessage.cycleSelect = CYCLE_TWO) {
     cycle_two_running = heaterRxMessage.cycleEnabled;
@@ -285,11 +290,11 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
 
       // Send stop heater to sensors task
       pm_heater_run = false;
-      handle_cycle2_stopstart_heater(pm_heater_run);
+      handle_cycle_two_stopstart_heater(pm_heater_run);
     } else {
       pm_heater_run = true;
       powerModuleResetHeaterPIDs();
-      handle_cycle2_stopstart_heater(pm_heater_run);
+      handle_cycle_two_stopstart_heater(pm_heater_run);
     }
   }
 #endif
