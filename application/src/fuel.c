@@ -150,10 +150,18 @@ static fuel_gauge_errors_t fuelGauge_writeRegister(uint8_t reg,
   writeBuffer[1] = (value >> 8);     //MSB of value
 
   current_op_type = fg_operation;
+#ifdef SAMPLE_PREP_BOARD
 #if SAMPLE_PREP_REV_B 
   err_code = xUtil_TWI_Write(i2c_interface_system, MAX17263_FUELGAUGE_ADDRESS, reg, writeBuffer, 2);
 #elif SAMPLE_PREP_REV_A 
   err_code = xUtil_TWI_Write(i2c_interface_sensors, MAX17263_FUELGAUGE_ADDRESS, reg, writeBuffer, 2);
+#endif
+#else 
+#if POWER_MODULE_REV_B 
+  err_code = xUtil_TWI_Write(i2c_interface_system, MAX17263_FUELGAUGE_ADDRESS, reg, writeBuffer, 2);
+#elif POWER_MODULE_REV_A 
+  err_code = xUtil_TWI_Write(i2c_interface_sensors, MAX17263_FUELGAUGE_ADDRESS, reg, writeBuffer, 2);
+#endif
 #endif
 
   if (err_code != NRF_SUCCESS) {
@@ -187,10 +195,18 @@ static fuel_gauge_errors_t fuelGauge_readRegister(uint8_t reg, fuel_gauge_intern
   uint32_t err_code;
 
   current_op_type = fg_operation;
+#ifdef SAMPLE_PREP_BOARD
 #if SAMPLE_PREP_REV_B 
   err_code = xUtil_TWI_Read(i2c_interface_system, MAX17263_FUELGAUGE_ADDRESS, reg, &readBuffer.readData[0], 2); //acquire data
 #elif SAMPLE_PREP_REV_A
   err_code = xUtil_TWI_Read(i2c_interface_sensors, MAX17263_FUELGAUGE_ADDRESS, reg, &readBuffer.readData[0], 2); //acquire data
+#endif
+#else 
+#if POWER_MODULE_REV_B 
+  err_code = xUtil_TWI_Read(i2c_interface_system, MAX17263_FUELGAUGE_ADDRESS, reg, &readBuffer.readData[0], 2); //acquire data
+#elif POWER_MODULE_REV_A 
+  err_code = xUtil_TWI_Read(i2c_interface_sensors, MAX17263_FUELGAUGE_ADDRESS, reg, &readBuffer.readData[0], 2); //acquire data
+#endif
 #endif
 
   if (err_code != NRF_SUCCESS) {

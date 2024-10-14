@@ -60,8 +60,8 @@ void init_pwms(void) {
   pwm0_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
   //1 Channel PWM, 10kHz, Active High, Motor Control Pin */
   app_pwm_config_t pwm2_cfg = APP_PWM_DEFAULT_CONFIG_2CH(5000L, HEATER_ZONE_2_PIN, HEATER_ZONE_3_PIN);
-  pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_LOW;
-  pwm2_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_LOW;
+  pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
+  pwm2_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
 #endif
 
   /* Initalize with configurations */

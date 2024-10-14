@@ -255,16 +255,6 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       num = strcmp(val, "true");
       parameters->min_run_zone_temp_en = num ? false : true;
       break;
-    case MMDDYY:
-      parameters->mmddyy = parse_int(val, DEFAULT_DATE);
-      break;
-    case HHMMSS:
-      parameters->hhmmss = parse_int(val, DEFAULT_TIME);
-      break;
-    case SET_DATE_TIME:
-      num = strcmp(val, "true");
-      parameters->set_date_time = num ? false : true;
-      break;
 #ifndef SAMPLE_PREP_BOARD
     case OPTICAL_DISTANCE:
       parameters->optical_distance = atoi(val);
@@ -418,7 +408,16 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       parameters->motor_stall_percent = parse_int(val, DEFAULT_MOTOR_STALL_PERCENTAGE);
       break;
 #endif
-
+    case MMDDYY:
+      parameters->mmddyy = parse_int(val, DEFAULT_DATE);
+      break;
+    case HHMMSS:
+      parameters->hhmmss = parse_int(val, DEFAULT_TIME);
+      break;
+    case SET_DATE_TIME:
+      num = strcmp(val, "true");
+      parameters->set_date_time = num ? false : true;
+      break;
     default:
       // Handle default case
       break;

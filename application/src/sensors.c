@@ -266,15 +266,8 @@ void runPowerModuleSensorCollection(void) {
     }
   }
   // GPIO Read for Hall Sensor
-  prev = switches.hal_triggered;
-  switches.hal_triggered = get_hal_triggered();
-  if (prev != switches.hal_triggered) {
-    if (switches.hal_triggered) {
-      send_debug_log_message("Hal sensor triggered!\r\n");
-    } else {
-      send_debug_log_message("Hal sensor no longer triggered!\r\n");
-    }
-  }
+  // No Hal Sensor, Force true
+  switches.hal_triggered = true;
 
   // Put Switch Data into queue
   xReturned = xQueueSend(main_switchQueue, (void *)&switches, 10);
@@ -330,9 +323,8 @@ void runSamplePrepSensorCollection(void) {
   int consecutive_failures = 0; // Counter for consecutive failures
 
   // GPIO Read for Hall Sensor
-#ifdef SAMPLE_PREP_BOARD
   prev = switches.hal_triggered;
-  if (nrf_gpio_pin_read(HAL_INPUT_PIN)) {
+  if (get_hal_triggered()) {
     switches.hal_triggered = false;
   } else {
     switches.hal_triggered = true;
@@ -344,49 +336,49 @@ void runSamplePrepSensorCollection(void) {
       send_debug_log_message("Hal sensor no longer triggered!\r\n");
     }
   }
-#else 
-  // No Hal sensor on Power Module, force it true
-  switches.hal_triggered = true;
-#endif
 
-    // Array to store temperature samples
-    float temp_samples[6];
-    float temp;
+  // ADC Read for Optical Sensors
+  // No optical sensor, force true
+  switches.optical_tiggered = true;
 
-    // Collect 10 temperature samples
-    for (int i = 0; i < 6; i++) {
-        bool readTempSuccess = readTemp(heat_zone_3, &temp);
-        if (readTempSuccess) {
-            temp_samples[i] = temp;
-            consecutive_failures = 0; // Reset the failure counter on success
-        } else {
-            consecutive_failures++; // Increment failure counter
-            send_debug_log_message("Failed to read temperature sample!\r\n");
-            if (consecutive_failures > 4) {
-                heaterMsg.readTempFailed = true;
-                send_debug_log_message("Temperature reading failed more than 6 times in a row!\r\n");
-                return; // Exit early if we have more than 6 consecutive failures
-            }
-        }
-        //vTaskDelay(pdMS_TO_TICKS(10)); // Optional delay between samples
-    }
+  // Array to store temperature samples
+  float temp_samples[6];
+  float temp;
 
-    // Sort the temperature samples (bubble sort for simplicity)
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 5 - i; j++) {
-            if (temp_samples[j] > temp_samples[j + 1]) {
-                float temp_swap = temp_samples[j];
-                temp_samples[j] = temp_samples[j + 1];
-                temp_samples[j + 1] = temp_swap;
-            }
-        }
-    }
+  // Collect 10 temperature samples
+  for (int i = 0; i < 6; i++) {
+      bool readTempSuccess = readTemp(heat_zone_3, &temp);
+      if (readTempSuccess) {
+          temp_samples[i] = temp;
+          consecutive_failures = 0; // Reset the failure counter on success
+      } else {
+          consecutive_failures++; // Increment failure counter
+          send_debug_log_message("Failed to read temperature sample!\r\n");
+          if (consecutive_failures > 4) {
+              heaterMsg.readTempFailed = true;
+              send_debug_log_message("Temperature reading failed more than 6 times in a row!\r\n");
+              return; // Exit early if we have more than 6 consecutive failures
+          }
+      }
+      //vTaskDelay(pdMS_TO_TICKS(10)); // Optional delay between samples
+  }
 
-    // Calculate the average of the middle 3 values (indexes 3, 4, 5 after sorting)
-    float avg_temp = (temp_samples[2] + temp_samples[3]) / 2.0;
+  // Sort the temperature samples (bubble sort for simplicity)
+  for (int i = 0; i < 5; i++) {
+      for (int j = 0; j < 5 - i; j++) {
+          if (temp_samples[j] > temp_samples[j + 1]) {
+              float temp_swap = temp_samples[j];
+              temp_samples[j] = temp_samples[j + 1];
+              temp_samples[j + 1] = temp_swap;
+          }
+      }
+  }
 
-    // Update the temperature reading with the averaged value
-    temperatures.heat_zone_3_temp = avg_temp;
+  // Calculate the average of the middle 3 values (indexes 3, 4, 5 after sorting)
+  float avg_temp = (temp_samples[2] + temp_samples[3]) / 2.0;
+
+  // Update the temperature reading with the averaged value
+  temperatures.heat_zone_3_temp = avg_temp;
 
   // Put Switch Data into queue
   xReturned = xQueueSend(main_switchQueue, (void *)&switches, 10);

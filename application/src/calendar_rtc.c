@@ -50,11 +50,20 @@ bool calendar_get_time(calendar_time_t *now) {
 
 #if USE_CALENDAR_CHIP
   // Get the Time and Date from the calendar chip
+#ifdef SAMPLE_PREP_BOARD
 #if SAMPLE_PREP_REV_A
   ret = xUtil_TWI_Read(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
 #elif SAMPLE_PREP_REV_B
   ret = xUtil_TWI_Read(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
 #endif
+#else
+#if POWER_MODULE_REV_A
+  ret = xUtil_TWI_Read(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
+#elif POWER_MODULE_REV_B
+  ret = xUtil_TWI_Read(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
+#endif
+#endif
+
   if (ret) {
     send_debug_log_message("Unable to i2c communicate with calendar chip!");
     return false;
@@ -99,10 +108,18 @@ bool calendar_set_time(calendar_time_t *now) {
   buff[6] = calendar_encode(now->month);
   buff[7] = calendar_encode(now->year);
 
+#ifdef SAMPLE_PREP_BOARD
 #if SAMPLE_PREP_REV_A
   ret = xUtil_TWI_Write_Single(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 8);
 #elif SAMPLE_PREP_REV_B
   ret = xUtil_TWI_Write_Single(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 8);
+#endif
+#else
+#if POWER_MODULE_REV_A
+  ret = xUtil_TWI_Read(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
+#elif POWER_MODULE_REV_B
+  ret = xUtil_TWI_Read(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
+#endif
 #endif
 
   if (ret) {

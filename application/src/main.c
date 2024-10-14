@@ -237,8 +237,8 @@ void set_startup_enables(void) {
   /* POWER MODULE BOARD */
 #if POWER_MODULE_REV_A
   // Turn off boost for heaters
-  nrf_gpio_cfg_output(HEATER_PWR_EN);
-  nrf_gpio_pin_clear(HEATER_PWR_EN); 
+  //nrf_gpio_cfg_output(HEATER_PWR_EN);
+  //nrf_gpio_pin_clear(HEATER_PWR_EN); 
   // LED driver enable
   nrf_gpio_cfg_output(LED_DRV_EN);
   nrf_gpio_pin_set(LED_DRV_EN);
@@ -337,7 +337,9 @@ void clear_enables(void) {
 void init_peripherals(void) {
   // Full Peripheral Initalizations
   init_adc();
+#ifdef SAMPLE_PREP_BOARD
   init_motor_gpio();
+#endif
   init_pwms();
   vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_100k);
   vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_100k);
@@ -360,7 +362,9 @@ void uninit_peripherals(void) {
   vUninit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN);
   vUninit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN);
   uninit_pwms();
+#ifdef SAMPLE_PREP_BOARD
   uninit_motor_gpio();
+#endif
   uninit_adc();
 }
 
@@ -1155,7 +1159,7 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask,
 *
 *   Application entry point.
 */
- int main(void) {
+int main(void) {
   BaseType_t xReturned;
   ret_code_t err_code;
   FRESULT res;
