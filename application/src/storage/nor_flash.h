@@ -17,7 +17,7 @@
 #include "../heater/heater.h"
 #include "../naatos_config.h"
 
-#if SAMPLE_PREP_REV_B
+#if SAMPLE_PREP_REV_B || POWER_MODULE_REV_B
 /**
  * @brief  QSPI block device definition
  */

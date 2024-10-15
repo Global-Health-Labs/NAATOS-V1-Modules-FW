@@ -9,8 +9,23 @@
 #include "nor_flash.h"
 #include "../naatos_config.h"
 
+#ifdef SAMPLE_PREP_BOARD
+#if SAMPLE_PREP_REV_A
 #define USE_SD_CARD     1
 #define USE_NOR_FLASH   0
+#else
+#define USE_SD_CARD     0
+#define USE_NOR_FLASH   1
+#endif
+#else
+#if POWER_MODULE_REV_A
+#define USE_SD_CARD     1
+#define USE_NOR_FLASH   0
+#else
+#define USE_SD_CARD     0
+#define USE_NOR_FLASH   1
+#endif
+#endif
 
 #if (!USE_SD_CARD && !USE_NOR_FLASH)
 #define USE_NOR_FLASH   1
@@ -25,8 +40,8 @@
 #define CSV_HEADER "Time,HeaterTemp,HeaterPWM,MotorSpeed,MotorPWM,Battery,Event\r\n"
 #define CSV_HEADER_SIZE 61
 #else
-#define CSV_HEADER "Time,ValveTemp,ValvePWM,Amp0Temp,Amp0PWM,Amp1Temp,Amp1PWM,Amp2Temp,Amp2PWM,Batt,Event\r\n"
-#define CSV_HEADER_SIZE 86
+#define CSV_HEADER "Time,ValveTemp,ValvePWM,AmpTemp,AmpPWM,Batt,Event\r\n"
+#define CSV_HEADER_SIZE 53
 #endif
 
 #if USE_SD_CARD

@@ -118,7 +118,13 @@ static led_driver_errors_t led_driver_writeRegisterBlocking(uint8_t *buf, uint8_
 }
 
 void led_driver_init(void) {
+#if !POWER_MODULE_REV_B
   nrf_gpio_cfg_output(LED_DRV_EN);
+#else 
+  nrf_gpio_cfg_output(TOP_LED_DRV_EN);
+  nrf_gpio_cfg_output(FRONT_LED_DRV_EN);
+#endif
+  
   enable_led_driver(false);
   for (int i = 0; i < 100; i++) {
     asm volatile("nop");
@@ -405,12 +411,22 @@ led_driver_errors_t led_driver_set_channel_animation_flash_fast(led_driver_led_s
 
 void enable_led_driver(bool enable) {
   if (enable) {
+#if !POWER_MODULE_REV_B
     nrf_gpio_pin_set(LED_DRV_EN);
     uint8_t shutdown_buf[2] = {LED_DRIVER_SHUTDOWN_REG, 0x01};
     led_driver_writeRegisterBlocking(shutdown_buf, 2);
+#else 
+    nrf_gpio_pin_set(TOP_LED_DRV_EN);
+    nrf_gpio_pin_set(FRONT_LED_DRV_EN);
+#endif
   } else {
+#if !POWER_MODULE_REV_B
     uint8_t shutdown_buf[2] = {LED_DRIVER_SHUTDOWN_REG, 0x00};
     led_driver_writeRegisterBlocking(shutdown_buf, 2);
     nrf_gpio_pin_clear(LED_DRV_EN);
+#else
+    nrf_gpio_pin_clear(TOP_LED_DRV_EN);
+    nrf_gpio_pin_clear(FRONT_LED_DRV_EN);
+#endif
   }
 }

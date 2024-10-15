@@ -198,7 +198,8 @@ void normalize_pwm_data(log_data_message_t *rxLogMsg) {
   rxLogMsg->temperature_data.heat_zone_2_pwm = normalize(rxLogMsg->temperature_data.heat_zone_2_pwm, 0, MAX_MOTOR_PID, 0.0, 100.0);
   rxLogMsg->temperature_data.heat_zone_3_pwm = normalize(rxLogMsg->temperature_data.heat_zone_3_pwm, 0, DEFAULT_MAX_HEATER_PID, 0.0, 100.0);
 #else
-
+  rxLogMsg->temperature_data.heat_zone_0_pwm = normalize(rxLogMsg->temperature_data.heat_zone_0_pwm, 0, DEFAULT_MAX_VALVE_PID, 0.0, 100.0);
+  rxLogMsg->temperature_data.heat_zone_2_pwm = normalize(rxLogMsg->temperature_data.heat_zone_2_pwm, 0, DEFAULT_MAX_AMP_PID, 0.0, 100.0);
 #endif
 }
 

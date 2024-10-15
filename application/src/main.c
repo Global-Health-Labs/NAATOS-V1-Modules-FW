@@ -237,8 +237,8 @@ void set_startup_enables(void) {
   /* POWER MODULE BOARD */
 #if POWER_MODULE_REV_A
   // Turn off boost for heaters
-  //nrf_gpio_cfg_output(HEATER_PWR_EN);
-  //nrf_gpio_pin_clear(HEATER_PWR_EN); 
+  nrf_gpio_cfg_output(HEATER_PWR_EN);
+  nrf_gpio_pin_clear(HEATER_PWR_EN); 
   // LED driver enable
   nrf_gpio_cfg_output(LED_DRV_EN);
   nrf_gpio_pin_set(LED_DRV_EN);

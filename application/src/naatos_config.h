@@ -57,7 +57,7 @@
 #define SPI_SD_SS_PIN 12 /* P0.12 */
 
 /* QSPI Pins */
-#if SAMPLE_PREP_REV_B
+#if SAMPLE_PREP_REV_B || POWER_MODULE_REV_B
 #define QSPI_IO0_PIN  5   /* P0.05 REVB*/ 
 #define QSPI_IO1_PIN  6   /* P0.06 REVB*/
 #define QSPI_IO2_PIN  7   /* P0.07 REVB*/

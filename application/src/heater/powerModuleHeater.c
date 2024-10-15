@@ -22,6 +22,13 @@ bool cycle_two_running = false;
 bool starting_run = true;
 
 temperature_data_t pm_local_temp_data;
+uint32_t p_samp_log_index = 0;
+uint32_t p_samp_log_max = 0;
+
+static log_data_message_t logMsg = {
+    .data_type = TEMPERATURE_DATA,
+    .event_data = NULL,
+    .temperature_data = NULL};
 
 void handle_cycle_two_stopstart_heater(bool heating) {
 #ifndef SAMPLE_PREP_BOARD
@@ -65,6 +72,13 @@ void handle_cycle_two_stopstart_heater(bool heating) {
   if (xReturned != pdPASS) {
     send_debug_log_message("heater: Unable to send stop to pwmRxQueue.");
   }
+
+  // Set the last sample based on config
+  if (use_default_configuration_parameters) {
+    p_samp_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE);
+  } else {
+    p_samp_log_max = (config.logging_rate / config.sample_rate);
+  }
 #endif
 }
 
@@ -80,7 +94,12 @@ void handle_cycle_one_stopstart_heater(bool heating) {
     //nrf_gpio_pin_set(HEATER_PWR_EN);
     //vTaskDelay(pdMS_TO_TICKS(400));
   } else {
+#if POWER_MODULE_REV_A
     nrf_gpio_pin_clear(HEATER_PWR_EN);
+#else 
+    nrf_gpio_pin_clear(VALVE_PWR_EN);
+    nrf_gpio_pin_clear(AMP_PWR_EN);
+#endif
   }
 
   SensorRxQueueMsg_t msg;
@@ -113,6 +132,13 @@ void handle_cycle_one_stopstart_heater(bool heating) {
   xReturned = xQueueSend(pwmRxQueue, &pwmMsg, 0);
   if (xReturned != pdPASS) {
     send_debug_log_message("heater: Unable to send stop to pwmRxQueue.");
+  }
+
+  // Set the last sample based on config
+  if (use_default_configuration_parameters) {
+    p_samp_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE);
+  } else {
+    p_samp_log_max = (config.logging_rate / config.sample_rate);
   }
 #endif
 }
@@ -236,6 +262,33 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     send_debug_log_message(w_buff);
   }
 #endif
+
+  logMsg.temperature_data.heat_zone_1_temp = temperature_data.heat_zone_1_temp;
+  logMsg.temperature_data.heat_zone_2_temp = temperature_data.heat_zone_2_temp;
+  logMsg.temperature_data.heat_zone_3_temp = temperature_data.heat_zone_3_temp;
+  logMsg.temperature_data.heat_zone_0_temp = temperature_data.heat_zone_0_temp;
+  logMsg.temperature_data.heat_zone_1_pwm = pm_h_pwm_data.heat_zone_1_pwm;
+  logMsg.temperature_data.heat_zone_2_pwm = pm_h_pwm_data.heat_zone_2_pwm;
+  logMsg.temperature_data.heat_zone_3_pwm = pm_h_pwm_data.heat_zone_3_pwm;
+  logMsg.temperature_data.heat_zone_0_pwm = pm_h_pwm_data.heat_zone_0_pwm; 
+
+  logMsg.data_type = UART_DATA;
+  // Send the Log message
+  xReturned = xQueueSend(logger_logMessageQueue, (void *)&logMsg, 0);
+  if (xReturned != pdPASS) {
+    send_debug_log_message("SENSORS_TASK: Unable to send log message to logger_logMessageQueue.");
+  }
+
+  p_samp_log_index++;
+  if (p_samp_log_index > p_samp_log_max) {
+    logMsg.data_type = TEMPERATURE_DATA;
+    p_samp_log_index = 0;
+    // Send the Log message
+    xReturned = xQueueSend(logger_logMessageQueue, (void *)&logMsg, 0);
+    if (xReturned != pdPASS) {
+      send_debug_log_message("SENSORS_TASK: Unable to send log message to logger_logMessageQueue.");
+    }
+  }
 #endif
 }
 

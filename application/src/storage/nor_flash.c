@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if SAMPLE_PREP_REV_B
+#if SAMPLE_PREP_REV_B || POWER_MODULE_REV_B
 
 /* NOR Flash Variables */
 static FATFS fs;

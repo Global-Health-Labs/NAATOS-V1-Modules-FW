@@ -4,34 +4,26 @@ void powerModuleGetLogFileName(const char *_logFileName, calendar_time_t time) {
 }
 
 uint32_t powerModuleConstructSensorDataLogLine(char *logLineBuffer, calendar_time_t time, log_data_message_t log_message, int battery_percent) {
-  return sprintf(logLineBuffer, "%02d:%02d:%02d,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%d, \r\n",
+  return sprintf(logLineBuffer, "%02d:%02d:%02d,%0.2f,%0.2f,%0.2f,%0.2f,%d, \r\n",
       time.hour,
       time.minute,
       time.second,
       log_message.temperature_data.heat_zone_0_temp,
       log_message.temperature_data.heat_zone_0_pwm,
-      log_message.temperature_data.heat_zone_1_temp,
-      log_message.temperature_data.heat_zone_1_pwm,
       log_message.temperature_data.heat_zone_2_temp,
       log_message.temperature_data.heat_zone_2_pwm,
-      log_message.temperature_data.heat_zone_3_temp,
-      log_message.temperature_data.heat_zone_3_pwm,
       battery_percent);
 }
 
 uint32_t powerModuleConstructEventDataLogLine(char *logLineBuffer, calendar_time_t time, log_data_message_t log_message, int battery_percent) {
-  return sprintf(logLineBuffer, "%02d:%02d:%02d,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n",
+  return sprintf(logLineBuffer, "%02d:%02d:%02d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%s\n",
       time.hour,
       time.minute,
       time.second,
       log_message.temperature_data.heat_zone_0_temp,
       log_message.temperature_data.heat_zone_0_pwm,
-      log_message.temperature_data.heat_zone_1_temp,
-      log_message.temperature_data.heat_zone_1_pwm,
       log_message.temperature_data.heat_zone_2_temp,
       log_message.temperature_data.heat_zone_2_pwm,
-      log_message.temperature_data.heat_zone_3_temp,
-      log_message.temperature_data.heat_zone_3_pwm,
       battery_percent,
       log_message.event_data.message);
 }
