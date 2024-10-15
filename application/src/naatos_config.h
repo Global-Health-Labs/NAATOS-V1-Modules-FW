@@ -6,8 +6,8 @@
 #include <stdint.h>
 
 /*Define this when building sample prep only otherwise comment out*/
-#define SAMPLE_PREP_BOARD
-//#define POWER_MODULE_BOARD
+//#define SAMPLE_PREP_BOARD
+#define POWER_MODULE_BOARD
 
 #ifdef SAMPLE_PREP_BOARD
 #define SAMPLE_PREP_REV_A 1

@@ -117,12 +117,75 @@ static led_driver_errors_t led_driver_writeRegisterBlocking(uint8_t *buf, uint8_
   return led_driver_success;
 }
 
+#ifdef POWER_MODULE_BOARD
+#if POWER_MODULE_REVB
+static bool alt_driverIsBusy = false;
+static alt_led_driver_internal_op_type_t alt_current_op_type = led_driver_init_read_op;
+
+static alt_led_driver_opDoneCallback_t savedUserCallback = NULL;
+
+static uint8_t alt_writeBuffer = 0;
+static led_driver_init_op_read_buffer_t alt_readBuffer = {0};
+static i2c_status_t alt_initOpOutcome = i2c_success;
+static bool alt_conversionStarted = false;
+static uint8_t alt_channel_read_buffer;
+static uint8_t alt_led_target;
+static uint8_t alt_led_ctrl_reg_1_en_channels = 0b00000000;
+static uint8_t alt_led_ctrl_reg_2_en_channels = 0b000;
+
+static uint8_t alt_led_ramp_mode_reg_val = 0x00;
+
+static led_driver_errors_t led_alt_driver_readRegister(uint8_t reg, uint8_t *p_data, led_driver_internal_op_type_t led_driver_operation, led_driver_opDoneCallback_t cb);
+static led_driver_errors_t led_alt_driver_writeRegister(uint8_t *buf,
+    uint8_t len,
+    led_driver_internal_op_type_t led_operation,
+    led_driver_opDoneCallback_t cb);
+
+static led_driver_errors_t led_alt_driver_writeRegister(uint8_t *buf,
+    uint8_t len,
+    led_driver_internal_op_type_t led_operation,
+    led_driver_opDoneCallback_t cb) {
+  if (driverIsBusy) {
+    return led_driver_busy;
+  }
+
+  alt_driverIsBusy = true;
+  uint32_t err_code;
+  uint8_t reg = buf[0];
+
+  alt_current_op_type = led_operation;
+
+  err_code = xUtil_TWI_Write_Single(i2c_interface_sensors, IS31FL3199_ADDR_low, reg, buf, 2); //acquire data
+
+  if (err_code != NRF_SUCCESS) {
+    driverIsBusy = false;
+    if (err_code == NRF_ERROR_BUSY) {
+      return led_driver_busy;
+    }
+    return led_driver_i2c_error;
+  }
+  alt_driverIsBusy = false;
+  return led_driver_success;
+}
+
+// Used for init only, do not make public
+static led_driver_errors_t led_alt_driver_writeRegisterBlocking(uint8_t *buf, uint8_t len) {
+  led_driver_errors_t led_driverError = led_driver_writeRegister(buf, len, led_driver_reg_write_op, NULL);
+
+  if (led_driverError != led_driver_success) {
+    return led_driverError;
+  }
+  return led_driver_success;
+}
+
+#endif
+#endif
+
 void led_driver_init(void) {
 #if !POWER_MODULE_REV_B
   nrf_gpio_cfg_output(LED_DRV_EN);
 #else 
   nrf_gpio_cfg_output(TOP_LED_DRV_EN);
-  nrf_gpio_cfg_output(FRONT_LED_DRV_EN);
 #endif
   
   enable_led_driver(false);
@@ -235,9 +298,6 @@ led_driver_errors_t led_driver_disable_channel(led_driver_led_selection led_sele
   if (err_code != led_driver_success) {
     return led_driver_i2c_error;
   }
-  if (err_code != led_driver_success) {
-    return led_driver_i2c_error;
-  }
   return led_driver_success;
 }
 
@@ -266,9 +326,6 @@ led_driver_errors_t led_driver_set_leds_off(led_driver_led_selection led_selecti
   uint8_t ramp_write_buf[2] = {LED_DRIVER_RAMP_MODE_REG, led_ramp_mode_reg_val};
   led_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
 
-  //uint8_t led_off_buf[3] = {LED_DRIVER_CTRL_REG_1, 0x00};
-  //led_driver_writeRegister(led_off_buf, 2, write_reg, cb);
-
   return led_driver_i2c_error;
 }
 
@@ -290,22 +347,26 @@ led_driver_errors_t led_driver_set_channel_animation_flashing(led_driver_led_sel
   uint8_t t13_update_addr = 0x1A + led_selection;
   uint8_t t13_update_value = 0b00100111;
   uint8_t t13_write_buf[2] = {t13_update_addr, t13_update_value};
-  led_driver_writeRegister(t13_write_buf, 1, write_reg, NULL);
+  err_code = led_driver_writeRegister(t13_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
 
   // Shorten off time for flashing
   uint8_t t4_update_addr = 0x1D + led_selection * 3 + color;
   uint8_t t4_update_value = 0x02;
   uint8_t t4_write_buf[2] = {t4_update_addr, t4_update_value};
-  led_driver_writeRegister(t4_write_buf, 1, write_reg, NULL);
+  err_code = led_driver_writeRegister(t4_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
 
   // time update reg
   uint8_t time_update_write_buf[2] = {LED_DRIVER_TIME_UPDATE_REG, 0x00};
-  led_driver_writeRegister(time_update_write_buf, 1, write_reg, NULL);
+  err_code = led_driver_writeRegister(time_update_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
 
   // ramp mode reg turn holds off
   led_ramp_mode_reg_val &= ~(1 << led_selection + 4);
   uint8_t ramp_write_buf[2] = {LED_DRIVER_RAMP_MODE_REG, led_ramp_mode_reg_val};
-  led_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
+  err_code = led_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
 }
 
 led_driver_errors_t led_driver_set_channel_animation_breathing(led_driver_led_selection led_selection, led_color color, bool enable, led_driver_opDoneCallback_t cb) {
@@ -345,41 +406,38 @@ led_driver_errors_t led_driver_set_channel_animation_breathing(led_driver_led_se
 }
 
 led_driver_errors_t led_driver_disable_animation(led_driver_led_selection led_selection, led_color color, led_driver_opDoneCallback_t cb) {
-    led_driver_errors_t err_code;
+  led_driver_errors_t err_code;
 
-    // Step 1: Disable any possible animations in timing registers
-    uint8_t t13_update_addr = 0x1A + led_selection;
-    uint8_t t13_update_value = 0x00;  // Disable rise/fall times
-    uint8_t t13_write_buf[2] = {t13_update_addr, t13_update_value};
-    err_code = led_driver_writeRegister(t13_write_buf, 1, write_reg, NULL);
-    if (err_code != led_driver_success) return err_code;
+  // Step 1: Disable any possible animations in timing registers
+  uint8_t t13_update_addr = 0x1A + led_selection;
+  uint8_t t13_update_value = 0x00;  // Disable rise/fall times
+  uint8_t t13_write_buf[2] = {t13_update_addr, t13_update_value};
+  err_code = led_driver_writeRegister(t13_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
 
-    uint8_t t4_update_addr = 0x1D + led_selection * 3 + color;
-    uint8_t t4_update_value = 0x00;  // Clear any custom off time
-    uint8_t t4_write_buf[2] = {t4_update_addr, t4_update_value};
-    err_code = led_driver_writeRegister(t4_write_buf, 1, write_reg, NULL);
-    if (err_code != led_driver_success) return err_code;
+  uint8_t t4_update_addr = 0x1D + led_selection * 3 + color;
+  uint8_t t4_update_value = 0x00;  // Clear any custom off time
+  uint8_t t4_write_buf[2] = {t4_update_addr, t4_update_value};
+  err_code = led_driver_writeRegister(t4_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
 
-    // Apply time update
-    uint8_t time_update_write_buf[2] = {LED_DRIVER_TIME_UPDATE_REG, 0x00};
-    err_code = led_driver_writeRegister(time_update_write_buf, 1, write_reg, NULL);
-    if (err_code != led_driver_success) return err_code;
+  // Apply time update
+  uint8_t time_update_write_buf[2] = {LED_DRIVER_TIME_UPDATE_REG, 0x00};
+  err_code = led_driver_writeRegister(time_update_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
 
-    // Step 2: Reset PWM and clear any animation modes
-    uint8_t pwm_update_addr = 0x0A + led_selection * 3 + color;  // Direct PWM control
-    uint8_t pwm_update_value = 0x00;  // Set PWM to 0 (or 0xFF for steady on)
-    uint8_t pwm_write_buf[2] = {pwm_update_addr, pwm_update_value};
-    err_code = led_driver_writeRegister(pwm_write_buf, 1, write_reg, NULL);
-    if (err_code != led_driver_success) return err_code;
+  // Step 2: Reset PWM and clear any animation modes
+  uint8_t pwm_update_addr = 0x0A + led_selection * 3 + color;  // Direct PWM control
+  uint8_t pwm_update_value = 0x00;  // Set PWM to 0 (or 0xFF for steady on)
+  uint8_t pwm_write_buf[2] = {pwm_update_addr, pwm_update_value};
+  err_code = led_driver_writeRegister(pwm_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
 
-    // Step 3: Disable ramp mode
-    led_ramp_mode_reg_val &= ~(1 << (led_selection + 4));
-    uint8_t ramp_write_buf[2] = {LED_DRIVER_RAMP_MODE_REG, led_ramp_mode_reg_val};
-    err_code = led_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
-    if (err_code != led_driver_success) return err_code;
-
-
-
+  // Step 3: Disable ramp mode
+  led_ramp_mode_reg_val &= ~(1 << (led_selection + 4));
+  uint8_t ramp_write_buf[2] = {LED_DRIVER_RAMP_MODE_REG, led_ramp_mode_reg_val};
+  err_code = led_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
 
   return led_driver_success;
 }
@@ -391,22 +449,28 @@ led_driver_errors_t led_driver_set_channel_animation_flash_fast(led_driver_led_s
   uint8_t t13_update_addr = 0x1A + led_selection;
   uint8_t t13_update_value = 0b00010111;
   uint8_t t13_write_buf[2] = {t13_update_addr, t13_update_value};
-  led_driver_writeRegister(t13_write_buf, 1, write_reg, NULL);
+  err_code = led_driver_writeRegister(t13_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
 
   // Shorten off time for flashing
   uint8_t t4_update_addr = 0x1D + led_selection * 3 + color;
   uint8_t t4_update_value = 0x01;
   uint8_t t4_write_buf[2] = {t4_update_addr, t4_update_value};
-  led_driver_writeRegister(t4_write_buf, 1, write_reg, NULL);
+  err_code = led_driver_writeRegister(t4_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
 
   // time update reg
   uint8_t time_update_write_buf[2] = {LED_DRIVER_TIME_UPDATE_REG, 0x00};
-  led_driver_writeRegister(time_update_write_buf, 1, write_reg, NULL);
+  err_code = led_driver_writeRegister(time_update_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
 
   // ramp mode reg turn holds off
   led_ramp_mode_reg_val &= ~(1 << led_selection + 4);
   uint8_t ramp_write_buf[2] = {LED_DRIVER_RAMP_MODE_REG, led_ramp_mode_reg_val};
-  led_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
+  err_code = led_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
+
+  return err_code;
 }
 
 void enable_led_driver(bool enable) {
@@ -417,7 +481,6 @@ void enable_led_driver(bool enable) {
     led_driver_writeRegisterBlocking(shutdown_buf, 2);
 #else 
     nrf_gpio_pin_set(TOP_LED_DRV_EN);
-    nrf_gpio_pin_set(FRONT_LED_DRV_EN);
 #endif
   } else {
 #if !POWER_MODULE_REV_B
@@ -426,7 +489,314 @@ void enable_led_driver(bool enable) {
     nrf_gpio_pin_clear(LED_DRV_EN);
 #else
     nrf_gpio_pin_clear(TOP_LED_DRV_EN);
-    nrf_gpio_pin_clear(FRONT_LED_DRV_EN);
 #endif
   }
 }
+
+#ifdef POWER_MODULE_BOARD
+#if POWER_MODULE_REVB
+void enable_led_alt_driver(bool enable) {
+  if (enable) {
+    nrf_gpio_pin_set(FRONT_LED_DRV_EN);
+  } else {
+    nrf_gpio_pin_clear(FRONT_LED_DRV_EN);
+  }
+}
+
+void led_alt_driver_init(void) {
+  nrf_gpio_cfg_output(FRONT_LED_DRV_EN);
+  
+  enable_alt_led_driver(false);
+  for (int i = 0; i < 100; i++) {
+    asm volatile("nop");
+  }
+  enable_alt_led_driver(true);
+
+  // Set LED current to 20mA
+  uint8_t led_drv_current_buf[2] = {LED_DRIVER_CONFIG_REG_2, LED_CURRENT_30MA};
+  led_alt_driver_writeRegisterBlocking(led_drv_current_buf, 2);
+
+  // Set green power LED on
+  //uint8_t led_on_buf[3] = {LED_DRIVER_CTRL_REG_1, 0x20};
+  //led_driver_writeRegisterBlocking(led_on_buf, 3);
+
+  //Set all LEDs off
+  uint8_t led_off_buf[3] = {LED_DRIVER_CTRL_REG_1, 0x00};
+  led_alt_driver_writeRegisterBlocking(led_off_buf, 2);
+
+  // Set one shot mode
+  uint8_t one_shot_buf[2] = {LED_DRIVER_CONFIG_REG_1, 0x70};
+  led_alt_driver_writeRegisterBlocking(one_shot_buf, 2);
+
+  //PWM data
+  uint8_t pwm_buf[2];
+  pwm_buf[1] = 0xFF;
+  for (int i = 0x07; i <= 0x0C; i++) {
+    pwm_buf[0] = i;
+    led_alt_driver_writeRegisterBlocking(pwm_buf, 2);
+  }
+
+  // update pwm
+  uint8_t update_pwm_buf[2] = {LED_DRIVER_DATA_UPDATE_REG, 0x00};
+  led_alt_driver_writeRegisterBlocking(update_pwm_buf, 2);
+
+  //T0 data
+  uint8_t t0_buf[2];
+  t0_buf[1] = 0x00;
+  for (int j = 0x11; j <= 0x16; j++) {
+    t0_buf[0] = j;
+    led_alt_driver_writeRegisterBlocking(t0_buf, 2);
+    //t0_buf[1] = t0_buf[1] + 1;
+  }
+
+  //T1-T3 data
+  uint8_t t13_buf[2];
+  t13_buf[1] = 0xa0;
+  for (int k = 0x1a; k <= 0x1b; k++) {
+    t13_buf[0] = k;
+    led_alt_driver_writeRegisterBlocking(t13_buf, 2);
+  }
+
+  //T4 data
+  uint8_t t4_buf[2];
+  t4_buf[1] = 0x02;
+  for (int m = 0x1d; m <= 0x22; m++) {
+    t4_buf[0] = m;
+    led_alt_driver_writeRegisterBlocking(t4_buf, 2);
+  }
+
+  uint8_t time_update_buf[2] = {LED_DRIVER_TIME_UPDATE_REG, 0x00};
+  led_alt_driver_writeRegisterBlocking(time_update_buf, 2);
+
+  uint8_t ramp_mode_buf[2] = {LED_DRIVER_RAMP_MODE_REG, 0b00110000};
+  led_alt_driver_writeRegisterBlocking(ramp_mode_buf, 2);
+
+  //led_driver_enable_channel(LED1, blue, NULL);
+  //led_driver_set_channel_animation_flashing(LED1, blue, true, NULL);
+
+  led_alt_driver_writeRegisterBlocking(one_shot_buf, 2);
+}
+
+void led_alt_driver_uninit(void) {
+  // Disable LED Driver
+  enable_alt_led_driver(false);
+  // Should be all we have to do. The LED will be shutdown when going into sleep mode
+  // by turning the LED_DRV_EN pill low.
+}
+
+led_driver_errors_t led_alt_driver_set_rgb(led_driver_led_selection led_selection, led_color color, uint8_t pwm, led_driver_opDoneCallback_t cb) {
+  led_driver_errors_t err_code;
+  err_code = led_alt_driver_enable_channel(led_selection, color, cb);
+  if (err_code != led_driver_success) {
+    return led_driver_busy;
+  }
+
+  uint8_t target_addr = 0x07 + led_selection * 3 + color;
+  uint8_t led_i2c_write_buf[2] = {target_addr, pwm};
+  led_alt_driver_writeRegister(led_i2c_write_buf, 2, led_driver_set_pwm_op, cb);
+
+  uint8_t pwm_update_buf[2] = {LED_DRIVER_DATA_UPDATE_REG, 0x00};
+  led_alt_driver_writeRegister(pwm_update_buf, 2, led_driver_update_pwm_op, savedUserCallback);
+  if (err_code != led_driver_success) {
+    return led_driver_i2c_error;
+  }
+}
+
+led_driver_errors_t led_alt_driver_enable_channel(led_driver_led_selection led_selection, led_color color, led_driver_opDoneCallback_t cb) {
+  led_driver_errors_t err_code;
+  uint8_t target_addr = LED_DRIVER_CTRL_REG_1;
+  uint8_t en_channels = alt_led_ctrl_reg_1_en_channels;
+  alt_led_ctrl_reg_1_en_channels |= led_pos_bms[led_selection * 3 + color];
+  en_channels = alt_led_ctrl_reg_1_en_channels;
+
+  uint8_t led_i2c_write_buf[2] = {target_addr, en_channels};
+  err_code = led_alt_driver_writeRegister(led_i2c_write_buf, 2, led_driver_en_channel_op, cb);
+  if (err_code != led_driver_success) {
+    return led_driver_i2c_error;
+  }
+  uint8_t pwm_update_buf[2] = {LED_DRIVER_DATA_UPDATE_REG, 0x00};
+  led_alt_driver_writeRegister(pwm_update_buf, 2, led_driver_update_pwm_op, savedUserCallback);
+  if (err_code != led_driver_success) {
+    return led_driver_i2c_error;
+  }
+  return led_driver_success;
+}
+
+led_driver_errors_t led_alt_driver_disable_channel(led_driver_led_selection led_selection, led_color color, led_driver_opDoneCallback_t cb) {
+  led_driver_errors_t err_code;
+  uint8_t target_addr = LED_DRIVER_CTRL_REG_1;
+  uint8_t en_channels = alt_led_ctrl_reg_1_en_channels;
+  alt_led_ctrl_reg_1_en_channels &= ~led_pos_bms[led_selection * 3 + color];
+  en_channels = alt_led_ctrl_reg_1_en_channels;
+
+  uint8_t led_i2c_write_buf[2] = {target_addr, en_channels};
+  err_code = led_alt_driver_writeRegister(led_i2c_write_buf, 2, led_driver_en_channel_op, cb);
+  if (err_code != led_driver_success) {
+    return led_driver_i2c_error;
+  }
+  return led_driver_success;
+}
+
+led_driver_errors_t led_alt_driver_set_leds_off(led_driver_led_selection led_selection, led_driver_opDoneCallback_t cb) {
+  // ramp mode reg, 0x70 == hold on T2 ON
+  alt_led_ramp_mode_reg_val |= 1 << led_selection + 4;
+  uint8_t ramp_write_buf[2] = {LED_DRIVER_RAMP_MODE_REG, alt_led_ramp_mode_reg_val};
+  led_alt_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
+
+  return led_driver_i2c_error;
+}
+
+led_driver_errors_t led_alt_driver_set_channel_animation_solid(led_driver_led_selection led_selection, led_color color, bool enable, led_driver_opDoneCallback_t cb) {
+  led_driver_errors_t err_code;
+  // ramp mode reg, 0x70 == hold on T2 ON
+  alt_led_ramp_mode_reg_val |= 1 << led_selection + 4;
+  uint8_t ramp_write_buf[2] = {LED_DRIVER_RAMP_MODE_REG, alt_led_ramp_mode_reg_val};
+  led_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
+
+  return led_driver_success;
+}
+
+led_driver_errors_t led_alt_driver_set_channel_animation_flashing(led_driver_led_selection led_selection, led_color color, bool enable, led_driver_opDoneCallback_t cb) {
+  led_driver_errors_t err_code;
+
+  // A = 7 for 0.1ms rise/fall time, B = 2, ~0.5 second flash
+  uint8_t t13_update_addr = 0x1A + led_selection;
+  uint8_t t13_update_value = 0b00100111;
+  uint8_t t13_write_buf[2] = {t13_update_addr, t13_update_value};
+  err_code = led_alt_driver_writeRegister(t13_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) {
+    return err_code;
+  }
+
+  // Shorten off time for flashing
+  uint8_t t4_update_addr = 0x1D + led_selection * 3 + color;
+  uint8_t t4_update_value = 0x02;
+  uint8_t t4_write_buf[2] = {t4_update_addr, t4_update_value};
+  err_code = led_alt_driver_writeRegister(t4_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) {
+    return err_code;
+  }
+
+  // time update reg
+  uint8_t time_update_write_buf[2] = {LED_DRIVER_TIME_UPDATE_REG, 0x00};
+  err_code = led_alt_driver_writeRegister(time_update_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) {
+    return err_code;
+  }
+
+  // ramp mode reg turn holds off
+  alt_led_ramp_mode_reg_val &= ~(1 << led_selection + 4);
+  uint8_t ramp_write_buf[2] = {LED_DRIVER_RAMP_MODE_REG, alt_led_ramp_mode_reg_val};
+  err_code = led_alt_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) {
+    return err_code;
+  }
+  return err_code;
+}
+
+led_driver_errors_t led_alt_driver_set_channel_animation_breathing(led_driver_led_selection led_selection, led_color color, bool enable, led_driver_opDoneCallback_t cb) {
+  led_driver_errors_t err_code;
+  // A = 0 for 260ms rise/fall time, B = 2, DT = 1
+  uint8_t t13_update_addr = 0x1A + led_selection;
+  uint8_t t13_update_value = 0b00110010;
+  uint8_t t13_write_buf[2] = {t13_update_addr, t13_update_value};
+  err_code = led_alt_driver_writeRegister(t13_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) {
+    return err_code;
+  }
+
+  // Extend off time for breathing
+  uint8_t t4_update_addr = 0x1D + led_selection * 3 + color;
+  uint8_t t4_update_value = 0x04;
+  uint8_t t4_write_buf[2] = {t4_update_addr, t4_update_value};
+  err_code = led_alt_driver_writeRegister(t4_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) {
+    return err_code;
+  }
+  // time update reg
+  uint8_t time_update_write_buf[2] = {LED_DRIVER_TIME_UPDATE_REG, 0x00};
+  err_code = led_alt_driver_writeRegister(time_update_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) {
+    return err_code;
+  }
+  // ramp mode reg turn holds off
+  alt_led_ramp_mode_reg_val &= ~(1 << led_selection + 4);
+  uint8_t ramp_write_buf[2] = {LED_DRIVER_RAMP_MODE_REG, alt_led_ramp_mode_reg_val};
+  err_code = led_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) {
+    return err_code;
+  }
+
+  return led_driver_success;
+}
+
+led_driver_errors_t led_alt_driver_disable_animation(led_driver_led_selection led_selection, led_color color, led_driver_opDoneCallback_t cb) {
+  led_driver_errors_t err_code;
+
+  // Step 1: Disable any possible animations in timing registers
+  uint8_t t13_update_addr = 0x1A + led_selection;
+  uint8_t t13_update_value = 0x00;  // Disable rise/fall times
+  uint8_t t13_write_buf[2] = {t13_update_addr, t13_update_value};
+  err_code = led_alt_driver_writeRegister(t13_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
+
+  uint8_t t4_update_addr = 0x1D + led_selection * 3 + color;
+  uint8_t t4_update_value = 0x00;  // Clear any custom off time
+  uint8_t t4_write_buf[2] = {t4_update_addr, t4_update_value};
+  err_code = led_alt_driver_writeRegister(t4_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
+
+  // Apply time update
+  uint8_t time_update_write_buf[2] = {LED_DRIVER_TIME_UPDATE_REG, 0x00};
+  err_code = led_alt_driver_writeRegister(time_update_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
+
+  // Step 2: Reset PWM and clear any animation modes
+  uint8_t pwm_update_addr = 0x0A + led_selection * 3 + color;  // Direct PWM control
+  uint8_t pwm_update_value = 0x00;  // Set PWM to 0 (or 0xFF for steady on)
+  uint8_t pwm_write_buf[2] = {pwm_update_addr, pwm_update_value};
+  err_code = led_alt_driver_writeRegister(pwm_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
+
+  // Step 3: Disable ramp mode
+  alt_led_ramp_mode_reg_val &= ~(1 << (led_selection + 4));
+  uint8_t ramp_write_buf[2] = {LED_DRIVER_RAMP_MODE_REG, alt_led_ramp_mode_reg_val};
+  err_code = led_alt_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
+
+  return led_driver_success;
+}
+
+led_driver_errors_t led_alt_driver_set_channel_animation_flash_fast(led_driver_led_selection led_selection, led_color color, bool enable, led_driver_opDoneCallback_t cb) {
+  led_driver_errors_t err_code;
+
+  // A = 7 for 0.1ms rise/fall time, B = 2, ~0.5 second flash
+  uint8_t t13_update_addr = 0x1A + led_selection;
+  uint8_t t13_update_value = 0b00010111;
+  uint8_t t13_write_buf[2] = {t13_update_addr, t13_update_value};
+  err_code = led_alt_driver_writeRegister(t13_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
+
+  // Shorten off time for flashing
+  uint8_t t4_update_addr = 0x1D + led_selection * 3 + color;
+  uint8_t t4_update_value = 0x01;
+  uint8_t t4_write_buf[2] = {t4_update_addr, t4_update_value};
+  err_code = led_alt_driver_writeRegister(t4_write_buf, 1, write_reg, NULL);
+   if (err_code != led_driver_success) return err_code;
+
+  // time update reg
+  uint8_t time_update_write_buf[2] = {LED_DRIVER_TIME_UPDATE_REG, 0x00};
+  err_code = led_alt_driver_writeRegister(time_update_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
+
+  // ramp mode reg turn holds off
+  led_ramp_mode_reg_val &= ~(1 << led_selection + 4);
+  uint8_t ramp_write_buf[2] = {LED_DRIVER_RAMP_MODE_REG, led_ramp_mode_reg_val};
+  err_code = led_alt_driver_writeRegister(ramp_write_buf, 1, write_reg, NULL);
+  if (err_code != led_driver_success) return err_code;
+
+  return err_code;
+}
+
+#endif
+#endif
