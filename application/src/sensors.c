@@ -324,10 +324,10 @@ void runSamplePrepSensorCollection(void) {
 
   // GPIO Read for Hall Sensor
   prev = switches.hal_triggered;
-  if (false/*get_hal_triggered()*/) {
-    switches.hal_triggered = false;
-  } else {
+  if (get_hal_triggered()) {
     switches.hal_triggered = true;
+  } else {
+    switches.hal_triggered = false;
   }
   if (prev != switches.hal_triggered) {
     if (switches.hal_triggered) {
