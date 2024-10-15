@@ -404,8 +404,15 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       num = strcmp(val, "true");
       parameters->run_heater_2 = num ? false : true;
       break;
+    case HAL_SENSOR_THRESH:
+      parameters->hal_sensor_thresh = parse_double(val, DEFAULT_HAL_SENSOR_THRESHOLD);
+      break;
     case MOTOR_STALL_PERCENT:
       parameters->motor_stall_percent = parse_int(val, DEFAULT_MOTOR_STALL_PERCENTAGE);
+      break;
+    case MOTOR_STALL_ENABLE:
+      num = strcmp(val, "true");
+      parameters->motor_stall_en = num ? false : true;
       break;
 #endif
     case MMDDYY:
@@ -853,6 +860,12 @@ FRESULT check_for_config_file(void) {
   }
   // Write Motor Stall Percentage
   configBufferSize = sprintf(configBuffer, "motor_stall_percentage:%d\n", DEFAULT_MOTOR_STALL_PERCENTAGE);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Motor Stall Enable
+  configBufferSize = sprintf(configBuffer, "motor_stall_en:%s\n", DEFAULT_MOTOR_STALL_ENABLE ? "true" : "false");
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;

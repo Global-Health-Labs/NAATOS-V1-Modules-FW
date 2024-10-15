@@ -31,7 +31,7 @@ bool get_hal_triggered(void) {
   nrfx_saadc_sample_convert(HAL_CHANNEL, &adc_val);
   // Convert to a voltage
   hal_v = get_adc_voltage(adc_val);
-  printf("hal_v: %0.2f\r\n", adc_val);
+  //printf("hal_v: %0.2f\r\n", adc_val);
   // Check thresholds
   // Voltage idles at 1V and changes +/- 45 mV/mT depending on polarity of magnetic feild
   //    0V-2V

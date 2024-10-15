@@ -398,10 +398,10 @@ void handleSampleMotorDataRx(int motor_speed) {
     h_pwm_data.heat_zone_2_pwm = pwmData.heat_zone_2_pwm;
     last_motor_speed = motor_speed;
 
-    if (motor_speed >= config.motor_setpoint_1 && !use_default_configuration_parameters) {
+    if (motor_speed >= config.motor_setpoint_1 && !use_default_configuration_parameters && config.motor_stall_en) {
       motorReachedSpeed = true;
     }
-    else if (motor_speed >= MOTOR_SETPOINT_1 && use_default_configuration_parameters) {
+    else if (motor_speed >= MOTOR_SETPOINT_1 && use_default_configuration_parameters && config.motor_stall_en) {
       motorReachedSpeed = true;
     }
 

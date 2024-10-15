@@ -6,8 +6,8 @@
 #include <stdint.h>
 
 /*Define this when building sample prep only otherwise comment out*/
-//#define SAMPLE_PREP_BOARD
-#define POWER_MODULE_BOARD
+#define SAMPLE_PREP_BOARD
+//#define POWER_MODULE_BOARD
 
 #ifdef SAMPLE_PREP_BOARD
 #define SAMPLE_PREP_REV_A 1
@@ -175,6 +175,7 @@
 #define DEFAULT_MAX_HEATER_PID 70
 #define DEFAULT_HAL_SENSOR_THRESHOLD  0.75f
 #define DEFAULT_MOTOR_STALL_PERCENTAGE  20 
+#define DEFAULT_MOTOR_STALL_ENABLE  true
 
 #define MAX_MOTOR_PID 150
 
@@ -683,6 +684,7 @@ typedef struct {
   bool run_heater_2;
   float hal_sensor_thresh;
   int motor_stall_percent;
+  bool motor_stall_en;
   int mmddyy;
   int hhmmss;
   bool set_date_time;

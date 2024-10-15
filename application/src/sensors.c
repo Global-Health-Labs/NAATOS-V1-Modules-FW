@@ -319,12 +319,12 @@ void runSamplePrepSensorCollection(void) {
   HeaterRxQueueMsg_t heaterMsg;
   bool readTempSuccess = false;
   heaterMsg.readTempFailed = false;
-  bool prev;
+  bool prev = false;
   int consecutive_failures = 0; // Counter for consecutive failures
 
   // GPIO Read for Hall Sensor
   prev = switches.hal_triggered;
-  if (get_hal_triggered()) {
+  if (false/*get_hal_triggered()*/) {
     switches.hal_triggered = false;
   } else {
     switches.hal_triggered = true;
