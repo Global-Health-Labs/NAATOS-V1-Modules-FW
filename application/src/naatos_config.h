@@ -176,7 +176,7 @@
 #define DEFAULT_HAL_SENSOR_THRESHOLD  0.75f
 #define DEFAULT_MOTOR_STALL_PERCENTAGE  20 
 #define DEFAULT_MOTOR_STALL_ENABLE  true
-
+#define DEFAULT_DEBUG_TO_COM_ENABLE true
 #define MAX_MOTOR_PID 150
 
 #else
@@ -199,6 +199,7 @@
 #define OPTICAL_TRIG_THRES 800
 #define DEFAULT_MAX_AMP_PID 150
 #define DEFAULT_MAX_VALVE_PID 150
+#define DEFAULT_DEBUG_TO_COM_ENABLE true
 #endif
 
 #define DEFAULT_DATE 100124                // Oct. 1 2024
@@ -629,6 +630,7 @@ typedef struct {
   float alert_timeout_time_s;
   float min_run_zone_temp;
   bool min_run_zone_temp_en;
+  bool debug_to_com_en;
 #ifndef SAMPLE_PREP_BOARD  
   uint16_t optical_distance;
   uint16_t min_wait_time_after_cycle_s;

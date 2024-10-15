@@ -170,8 +170,10 @@ void logger_task(void *pvParameters) {
     }
     case UART_DATA: {
       normalize_pwm_data(&rxLogMsg);
-      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, battery_percent);
-      write_to_com(logFileLine, logFileLineSize);
+      //if (config.debug_to_com_en) { Not sure if this is considered debug statement or not, going to keep it printing to com for now
+        logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, battery_percent);
+        write_to_com(logFileLine, logFileLineSize);
+      //}
       break;
     }
     case LOGGER_LOG_DEBUG_EVENT:
@@ -189,9 +191,6 @@ float normalize(float value, float min_old_range, float max_old_range, float min
 }
 
 void normalize_pwm_data(log_data_message_t *rxLogMsg) {
-  //DEFAULT_MAX_HEATER_PID
-  //MAX_MOTOR_PID
-
 #ifdef SAMPLE_PREP_BOARD
   rxLogMsg->temperature_data.heat_zone_0_pwm = normalize(rxLogMsg->temperature_data.heat_zone_0_pwm, 0, DEFAULT_MAX_HEATER_PID, 0.0, 100.0);
   rxLogMsg->temperature_data.heat_zone_1_pwm = normalize(rxLogMsg->temperature_data.heat_zone_1_pwm, 0, DEFAULT_MAX_HEATER_PID, 0.0, 100.0);
@@ -251,21 +250,23 @@ void send_debug_log_message(char *message) {
   if (!usb_started) {
     return;
   }
+  
+  if (config.debug_to_com_en) {
+    log_event_t event_info = {
+        .event = SAMPLE_UNKNOWN};
 
-  log_event_t event_info = {
-      .event = SAMPLE_UNKNOWN};
+    strncpy(event_info.message, tmp_msg, sizeof(event_info.message) - 1);
+    event_info.message[sizeof(event_info.message) - 1] = '\0';  // Ensure null termination
 
-  strncpy(event_info.message, tmp_msg, sizeof(event_info.message) - 1);
-  event_info.message[sizeof(event_info.message) - 1] = '\0';  // Ensure null termination
+    log_data_message_t log_message = {
+        .data_type = LOGGER_LOG_DEBUG_EVENT,
+        .temperature_data = NULL,
+        .event_data = event_info};
 
-  log_data_message_t log_message = {
-      .data_type = LOGGER_LOG_DEBUG_EVENT,
-      .temperature_data = NULL,
-      .event_data = event_info};
-
-  BaseType_t xReturned = xQueueSend(logger_logMessageQueue, &log_message, 0);
-  if (xReturned != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send debug log message.");
+    BaseType_t xReturned = xQueueSend(logger_logMessageQueue, &log_message, 0);
+    if (xReturned != pdPASS) {
+      send_debug_log_message("MAIN_TASK: Unable to send debug log message.");
+    }
   }
 }
 

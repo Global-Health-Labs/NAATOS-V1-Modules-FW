@@ -255,6 +255,10 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       num = strcmp(val, "true");
       parameters->min_run_zone_temp_en = num ? false : true;
       break;
+    case DEBUG_TO_COM_EN:
+      num = strcmp(val, "true");
+      parameters->debug_to_com_en = num ? false : true;
+      break;
 #ifndef SAMPLE_PREP_BOARD
     case OPTICAL_DISTANCE:
       parameters->optical_distance = atoi(val);
@@ -537,6 +541,13 @@ FRESULT check_for_config_file(void) {
   
   // Write Minimum Zone Temperature Enable
   configBufferSize = sprintf(configBuffer, "min_run_zone_temp_en:%s\n", DEFAULT_MIN_RUN_ZONE_TEMP_EN ? "true" : "false");
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  
+  // Write Debug Statements to COM Port Enable
+  configBufferSize = sprintf(configBuffer, "debug_to_com_en:%s\n", DEFAULT_DEBUG_TO_COM_ENABLE ? "true" : "false");
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
