@@ -37,6 +37,22 @@ void handle_cycle_two_stopstart_heater(bool heating) {
   if (cycle_two_running && !heating)
     return;
 
+  if (heating) {
+#if POWER_MODULE_REV_A
+    nrf_gpio_pin_set(HEATER_PWR_EN);
+#else 
+    nrf_gpio_pin_set(VALVE_PWR_EN);
+    nrf_gpio_pin_set(AMP_PWR_EN);
+#endif
+  } else {
+#if POWER_MODULE_REV_A
+    nrf_gpio_pin_clear(HEATER_PWR_EN);
+#else 
+    nrf_gpio_pin_clear(VALVE_PWR_EN);
+    nrf_gpio_pin_clear(AMP_PWR_EN);
+#endif
+  }
+
   SensorRxQueueMsg_t msg;
   msg.type = SENSOR_MSG_HEATER_STATE;
   msg.heaterRunning = heating;
@@ -91,8 +107,12 @@ void handle_cycle_one_stopstart_heater(bool heating) {
     return;
 
   if (heating) {
-    //nrf_gpio_pin_set(HEATER_PWR_EN);
-    //vTaskDelay(pdMS_TO_TICKS(400));
+#if POWER_MODULE_REV_A
+    nrf_gpio_pin_set(HEATER_PWR_EN);
+#else 
+    nrf_gpio_pin_set(VALVE_PWR_EN);
+    nrf_gpio_pin_set(AMP_PWR_EN);
+#endif
   } else {
 #if POWER_MODULE_REV_A
     nrf_gpio_pin_clear(HEATER_PWR_EN);

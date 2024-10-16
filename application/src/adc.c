@@ -9,6 +9,7 @@ bool get_optical_triggered(void) {
   nrf_saadc_value_t adc_val;
   // Start adc sample conversion and get value
   nrfx_saadc_sample_convert(OPTICAL_CHANNEL, &adc_val);
+  //printf("adc_val: %d\r\n", adc_val);
   // Check to see if adc value is below threshold
   if (use_default_configuration_parameters) {
     if (adc_val < OPTICAL_TRIG_THRES)
