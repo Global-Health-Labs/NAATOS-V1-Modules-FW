@@ -228,3 +228,125 @@ void updateLedState(LEDEvent_e event, bool active) {
     send_debug_log_message("SENSORS: Unable to send usb suspend accept from usb_recvUsbWaitAcceptQueue");
   }
 }
+
+#ifdef POWER_MODULE_BOARD
+#if POWER_MODULE_REVB
+led_color alt_led1_current_color = blue;
+led_color alt_led2_current_color = blue;
+
+/* ALT LED 1 */
+void set_alt_led1_green_solid(void) {
+#if ENABLE_LEDS
+  led_alt_driver_disable_channel(LED1, alt_led1_current_color, NULL);
+  led_alt_driver_enable_channel(LED1, green, NULL);
+  led_alt_driver_set_channel_animation_solid(LED1, green, true, NULL);
+  alt_led1_current_color = green;
+#endif
+}
+
+void set_alt_led1_green_breathe(void) {
+#if ENABLE_LEDS
+  led_alt_driver_disable_channel(LED1, alt_led1_current_color, NULL);
+  led_alt_driver_enable_channel(LED1, green, NULL);
+  led_alt_driver_set_channel_animation_breathing(LED1, green, true, NULL);
+  alt_led1_current_color = green;
+#endif
+}
+
+void set_alt_led1_blue_slow_blink(void) {
+#if ENABLE_LEDS
+  led_alt_driver_disable_channel(LED1, alt_led1_current_color, NULL);
+  led_alt_driver_enable_channel(LED1, blue, NULL);
+  led_alt_driver_set_channel_animation_flashing(LED1, blue, true, NULL);
+  alt_led1_current_color = blue;
+#endif
+}
+
+void set_alt_led1_red_slow_blink(void) {
+#if ENABLE_LEDS
+  led_alt_driver_disable_channel(LED1, alt_led1_current_color, NULL);
+  led_alt_driver_enable_channel(LED1, red, NULL);
+  led_alt_driver_set_channel_animation_flashing(LED1, red, true, NULL);
+  alt_led1_current_color = red;
+#endif
+}
+
+void set_alt_led1_red_fast_blink(void) {
+#if ENABLE_LEDS
+  led_alt_driver_disable_channel(LED1, alt_led1_current_color, NULL);
+  led_alt_driver_enable_channel(LED1, red, NULL);
+  led_alt_driver_set_channel_animation_flashing(LED1, red, true, NULL);
+  alt_led1_current_color = red;
+#endif
+}
+
+void set_alt_led1_red_solid(void) {
+#if ENABLE_LEDS
+#endif
+}
+
+/* ALT LED 2 */
+void set_alt_led2_red_slow_blink(void) {
+#if ENABLE_LEDS
+  led_alt_driver_disable_channel(LED2, alt_led2_current_color, NULL);
+  led_alt_driver_enable_channel(LED2, red, NULL);
+  led_alt_driver_set_channel_animation_flashing(LED2, red, true, NULL);
+  alt_led2_current_color = red;
+#endif
+}
+
+void set_alt_led2_red_fast_blink(void) {
+#if ENABLE_LEDS
+  led_alt_driver_disable_channel(LED2, alt_led2_current_color, NULL);
+  led_alt_driver_enable_channel(LED2, red, NULL);
+  led_alt_driver_set_channel_animation_flashing(LED2, red, true, NULL);
+  alt_led2_current_color = red;
+#endif
+}
+
+void set_alt_led2_green_solid(void) {
+#if ENABLE_LEDS
+  led_alt_driver_disable_channel(LED2, alt_led2_current_color, NULL);
+  led_alt_driver_disable_channel(LED2, red, NULL);
+  led_alt_driver_disable_channel(LED2, green, NULL);
+  led_alt_driver_disable_channel(LED2, blue, NULL);
+  led_alt_driver_enable_channel(LED2, green, NULL);
+  led_alt_driver_set_channel_animation_solid(LED2, green, true, NULL);
+  alt_led2_current_color = green;
+#endif
+}
+
+void set_alt_led1_blue_breathe(void) {
+#if ENABLE_LEDS
+  led_alt_driver_disable_channel(LED1, alt_led1_current_color, NULL);
+  led_alt_driver_enable_channel(LED1, blue, NULL);
+  led_alt_driver_set_channel_animation_breathing(LED1, blue, true, NULL);
+  alt_led1_current_color = blue;
+#endif
+}
+
+void set_alt_led2_blue_breathe(void) {
+#if ENABLE_LEDS
+  led_alt_driver_disable_channel(LED2, alt_led2_current_color, NULL);
+  led_alt_driver_enable_channel(LED2, blue, NULL);
+  led_alt_driver_set_channel_animation_breathing(LED2, blue, true, NULL);
+  alt_led2_current_color = blue;
+#endif
+}
+
+void turn_off_alt_led2_blue_animation(void) {
+#if ENABLE_LEDS
+  led_alt_driver_disable_channel(LED2, alt_led2_current_color, NULL);
+  led_alt_driver_disable_animation(LED2, alt_led2_current_color, NULL);
+#endif
+}
+
+void turn_off_alt_led_channels(void) {
+#if ENABLE_LEDS
+  led_alt_driver_disable_channel(LED2, alt_led1_current_color, NULL);
+  led_alt_driver_disable_channel(LED1, alt_led1_current_color, NULL);
+#endif
+}
+
+#endif
+#endif
