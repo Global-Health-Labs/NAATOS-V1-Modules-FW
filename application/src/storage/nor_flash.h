@@ -65,3 +65,4 @@ void uninit_nor_flash(void);
 FRESULT mount_nor_flash(void);
 FRESULT unmount_nor_flash(void);
 void nor_flash_list_contents(void);
+void nor_flash_fatfs_mkfs(void);
