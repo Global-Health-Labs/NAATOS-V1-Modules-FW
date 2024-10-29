@@ -236,6 +236,8 @@ static fuel_gauge_errors_t fuelGauge_readRegisterBlocking(uint8_t reg, uint16_t 
 }
 
 fuel_gauge_errors_t fuelGauge_init(void) {
+  return fuel_gauge_success;
+
   /******************************************************************************************************
     Fuel Gauge Init
     ******************************************************************************************************/
@@ -366,6 +368,8 @@ fuel_gauge_errors_t fuelGauge_init(void) {
 }
 
 uint8_t fuelGauge_getSOC(fuelGauge_opDoneCallback_t cb) {
+  return 100;
+
   fuelGauge_readRegister(MAX17263_FG_REG_REPSOC, fg_get_soc, cb);
   uint8_t battPercent = readBuffer.readData[1];
   if (battPercent < 0) {

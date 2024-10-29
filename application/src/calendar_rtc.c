@@ -22,7 +22,7 @@ DWORD get_fattime(void) {
       .month = 0,
       .year = 0};
 
-  if (calendar_get_time(&now)) {
+  if (false /*calendar_get_time(&now)*/) {
     // Assume the 'year' is offset from 2000, e.g., 24 for 2024
     DWORD fattime = ((DWORD)(now.year + 20) << 25) // Year since 1980 (20 + 20 = 2024)
                     | ((DWORD)now.month << 21)     // Month (1–12)
