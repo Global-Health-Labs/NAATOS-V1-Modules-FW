@@ -209,7 +209,7 @@
 #define DEFAULT_CYCLES_COMPLETE_DELAY_S 10
 
 /* Device Debug Parameters */
-#define USE_CALENDAR_CHIP 1
+#define USE_CALENDAR_CHIP 0
 #define VERBOSE_PID 1
 
 /* Log Event Messages */

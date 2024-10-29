@@ -289,9 +289,8 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
 #if VERBOSE_HEATING
     char tmp[150];
-    sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f", 
-                  temperature_data.heat_zone_0_temp, temperature_data.heat_zone_1_temp, temperature_data.heat_zone_2_temp, temperature_data.heat_zone_3_temp, 
-                  h_pwm_data.heat_zone_0_pwm, h_pwm_data.heat_zone_1_pwm, h_pwm_data.heat_zone_2_pwm, h_pwm_data.heat_zone_3_pwm);
+    sprintf(tmp, "Heater: %0.2f; PWM: %0.2f", 
+                  temperature_data.heat_zone_3_temp, h_pwm_data.heat_zone_3_pwm);
     send_debug_log_message(tmp);
 #endif
 
