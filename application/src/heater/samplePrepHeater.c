@@ -463,11 +463,11 @@ void handleSampleMotorDataRx(int motor_speed) {
 #endif
 
     if (!use_default_configuration_parameters) {
-      if (motor_speed < (config.motor_setpoint_2 - ((float)config.motor_setpoint_2 * ((float)config.motor_stall_percent / 100.0 )))) {
+      if (motorReachedSpeed && motor_speed < (config.motor_setpoint_2 - ((float)config.motor_setpoint_2 * ((float)config.motor_stall_percent / 100.0 )))) {
         motorStalled = true;
       }
     } else {
-      if (motor_speed < (MOTOR_SETPOINT_2 - ((float)MOTOR_SETPOINT_2 * ((float)DEFAULT_MOTOR_STALL_PERCENTAGE / 100.0 )))) {
+      if (motorReachedSpeed && motor_speed < (MOTOR_SETPOINT_2 - ((float)MOTOR_SETPOINT_2 * ((float)DEFAULT_MOTOR_STALL_PERCENTAGE / 100.0 )))) {
         motorStalled = true;
       } 
     } 
@@ -508,6 +508,7 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
       // Send stop heater to sensors task
       heater_run = false;
       starting_sample_prep_run = false;
+      motorReachedSpeed = false; // clear motor speed reached
       handle_cycle1_stopstart_heater(heater_run);
     } else {
       starting_sample_prep_run = true;
@@ -532,6 +533,7 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
 
       // Send stop heater to sensors task
       heater_run = false;
+      motorReachedSpeed = false; // clear motor speed reached
       handle_cycle2_stopstart_heater(heater_run);
     } else {
       heater_run = true;
