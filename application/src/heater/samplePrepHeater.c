@@ -118,11 +118,14 @@ void handle_cycle1_stopstart_heater(bool heating) {
   // Handle case where valve zone is on already, dont want to send stop
   if (heater_cycle2_running && !heating)
     return;
-
-  if (!heating) { //need to stop supply before stopping pwm
+  
+  // need to stop supply before stopping pwm
+  if (!heating && !config.run_motor_2 && !use_default_configuration_parameters) { 
     nrf_gpio_pin_clear(MOTOR_PWR_EN);
   }
-
+  else if (!heating && DEFAULT_RUN_MOTOR_2 && use_default_configuration_parameters) {
+    nrf_gpio_pin_clear(MOTOR_PWR_EN);
+  }
   SensorRxQueueMsg_t msg;
   msg.type = SENSOR_MSG_HEATER_STATE;
   msg.heaterRunning = heating;
@@ -501,8 +504,13 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
           .heat_zone_2_pwm = 0,
           .heat_zone_3_pwm = 0};
       updateDutyCycles(pwmData);
-
-      nrf_gpio_pin_clear(MOTOR_PWR_EN);
+      
+      if (!config.run_motor_2 && !use_default_configuration_parameters) {
+        nrf_gpio_pin_clear(MOTOR_PWR_EN);
+      }
+      else if (!DEFAULT_RUN_MOTOR_2 && use_default_configuration_parameters) {
+        nrf_gpio_pin_clear(MOTOR_PWR_EN);
+      }
       vTaskDelay(pdMS_TO_TICKS(200));
       updateDutyCycles(pwmData);
       // Send stop heater to sensors task
