@@ -177,7 +177,7 @@
 #define DEFAULT_MOTOR_STALL_PERCENTAGE  20 
 #define DEFAULT_MOTOR_STALL_ENABLE  true
 #define DEFAULT_DEBUG_TO_COM_ENABLE true
-#define MAX_MOTOR_PID 150
+#define MAX_MOTOR_PID 100
 
 #else
 #define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
@@ -197,8 +197,8 @@
 #define DEFAULT_VALID_TIMEOUT_S 3600.0 // 1 hour
 #define DEFAULT_RECOVERY_THRES 40      // Percent
 #define OPTICAL_TRIG_THRES 800
-#define DEFAULT_MAX_AMP_PID 150
-#define DEFAULT_MAX_VALVE_PID 150
+#define DEFAULT_MAX_AMP_PID 100
+#define DEFAULT_MAX_VALVE_PID 100
 #define DEFAULT_DEBUG_TO_COM_ENABLE true
 #endif
 
@@ -209,7 +209,7 @@
 #define DEFAULT_CYCLES_COMPLETE_DELAY_S 10
 
 /* Device Debug Parameters */
-#define USE_CALENDAR_CHIP 0
+#define USE_CALENDAR_CHIP 1
 #define VERBOSE_PID 1
 
 /* Log Event Messages */
