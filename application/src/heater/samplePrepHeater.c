@@ -105,8 +105,10 @@ void handle_cycle2_stopstart_heater(bool heating) {
   // Set the last sample based on config
   if (use_default_configuration_parameters) {
     samp_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE);
+    heater2SetPoint = DEFAULT_HEATER_SETPOINT;
   } else {
     samp_log_max = (config.logging_rate / config.sample_rate);
+    heater2SetPoint = config.heater_setpoint_2;
   }
 #endif
 }
@@ -176,8 +178,10 @@ void handle_cycle1_stopstart_heater(bool heating) {
   // Set the last sample based on config
   if (use_default_configuration_parameters) {
     samp_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE);
+    heater1SetPoint = DEFAULT_HEATER_SETPOINT;
   } else {
     samp_log_max = (config.logging_rate / config.sample_rate);
+    heater1SetPoint = config.heater_setpoint_1;
   }
 #endif
 }
