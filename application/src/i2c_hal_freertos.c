@@ -33,7 +33,7 @@ void i2c_error_recovery(i2c_interface_selection_t interface) {
   nrf_gpio_cfg(twi_configs[interface].scl, // pin_number
       NRF_GPIO_PIN_DIR_OUTPUT,             // Input.
       NRF_GPIO_PIN_INPUT_DISCONNECT,       // Connect input buffer.
-      NRF_GPIO_PIN_PULLUP,                 // Pin pull-up resistor disabled.
+      NRF_GPIO_PIN_PULLUP,                 // Pin pull-up resistor 
       NRF_GPIO_PIN_H0D1,                   // Standard '0', standard '1'.
       //NRF_GPIO_PIN_S0S1,
       NRF_GPIO_PIN_NOSENSE // Pin sense level disabled.
@@ -49,7 +49,7 @@ void i2c_error_recovery(i2c_interface_selection_t interface) {
   nrf_gpio_cfg(twi_configs[interface].scl, // pin_number
       NRF_GPIO_PIN_DIR_INPUT,              // Input.
       NRF_GPIO_PIN_INPUT_CONNECT,          // Connect input buffer.
-      NRF_GPIO_PIN_PULLUP,                 // Pin pull-up resistor disabled.
+      NRF_GPIO_PIN_PULLUP,                 // Pin pull-up resistor
       NRF_GPIO_PIN_H0D1,                   // Standard '0', standard '1'.
       //NRF_GPIO_PIN_S0S1,
       NRF_GPIO_PIN_NOSENSE // Pin sense level disabled.
