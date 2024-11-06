@@ -160,6 +160,7 @@
 #define DEFAULT_RECOVERY_THRES 20      // Percent
 #define OPTICAL_TRIG_THRES 800
 #define DEFAULT_HEATER_SETPOINT 95.0 // Sample prep only
+#define DEFAULT_RAMP_SETPOINT 100.0
 #define MOTOR_SETPOINT_1 3900
 #define MOTOR_SETPOINT_2 3900
 #define DEFAULT_RUN_MOTOR_1 false
@@ -662,6 +663,7 @@ typedef struct {
   bool ramp_to_temp_before_start_cycle_2;
   float ramp_to_temp_c1_timeout;
   float ramp_to_temp_c2_timeout;
+  float heater_ramp_setpoint;
   float heater_setpoint_1;
   float heater_setpoint_2;
   float heater_max_temp;
