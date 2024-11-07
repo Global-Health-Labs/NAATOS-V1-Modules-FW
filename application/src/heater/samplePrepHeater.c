@@ -250,22 +250,29 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   if (heater_cycle1_running) {
     // Update Heater Zone 3 PID loop with new temperatures
     if (config.run_heater_1) {
-      pid_controller_compute(&heater_pid_1, temperature_data.heat_zone_3_temp);
-      if (rampToTemp && (temperature_data.heat_zone_3_temp >= heater1SetPoint)) {
-        xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
-        if (xReturned != pdPASS) {
-          send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
+      if (rampToTemp) {
+        if ((temperature_data.heat_zone_3_temp >= config.heater_ramp_setpoint)) {
+          xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
+          if (xReturned != pdPASS) {
+            send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
+          }
+          rampToTemp = false;
         }
-        rampToTemp = false;
+        else {
+          heater_pid_1.out = 100; // Full 100 PWM until we reach out heater ramp setpoint, then use PID
+        }
+      }
+      else {
+        pid_controller_compute(&heater_pid_1, temperature_data.heat_zone_3_temp);
       }
     }
 
     temperature_pwm_data_t pwmData = {
-        .heat_zone_0_pwm = 0,
-        .heat_zone_1_pwm = 0,
-        .sample_prep_heater_pwm = heater_pid_1.out,
-        .heat_zone_2_pwm = 0,
-        .heat_zone_3_pwm = heater_pid_1.out};
+          .heat_zone_0_pwm = 0,
+          .heat_zone_1_pwm = 0,
+          .sample_prep_heater_pwm = heater_pid_1.out,
+          .heat_zone_2_pwm = 0,
+          .heat_zone_3_pwm = heater_pid_1.out};
 
     // Update Heater Zone 3 PWM with PID output
     h_pwm_data.heat_zone_0_pwm = pwmData.heat_zone_0_pwm;
@@ -291,13 +298,20 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   if (heater_cycle2_running) { //AMP 1 will be used for motor
     // Update Heater Zone 3 PID loop with new temperatures
     if (config.run_heater_2) {
-      pid_controller_compute(&heater_pid_2, temperature_data.heat_zone_3_temp);
-      if (rampToTemp && (temperature_data.heat_zone_3_temp >= heater2SetPoint)) {
-        xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
-        if (xReturned != pdPASS) {
-          send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
+      if (rampToTemp) {
+        if (rampToTemp && (temperature_data.heat_zone_3_temp >= config.heater_ramp_setpoint)) {
+          xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
+          if (xReturned != pdPASS) {
+            send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
+          }
+          rampToTemp = false;
         }
-        rampToTemp = false;
+        else {
+          heater_pid_2.out = 100; // Full 100 PWM until we reach out heater ramp setpoint, then use PID
+        }
+      }
+      else {
+        pid_controller_compute(&heater_pid_2, temperature_data.heat_zone_3_temp);
       }
     }
 
