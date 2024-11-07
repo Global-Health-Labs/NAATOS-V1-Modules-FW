@@ -412,6 +412,21 @@ void main_task(void *pvParameters) {
   uint32_t main_wdt_end_time = pdMS_TO_TICKS(1000);
   uint32_t main_wdt_time_left = 0;
 
+  // GHL SHORT-CIRCUIT FOR BOARD TESTING
+  // initial wait
+  vTaskDelay(pdMS_TO_TICKS(100)); // wait 10 mS
+
+  // individual sub-tests follow
+
+
+  #if 1
+      nrf_gpio_pin_set(HEATER_PWR_EN); // turn on boost for heaters
+      vTaskDelay(pdMS_TO_TICKS(100)); // wait 100mS
+      nrf_gpio_pin_clear(HEATER_PWR_EN); // turn OFF boost for heaters
+  #endif
+
+  // GHL END SHORT-CIRCUIT FOR BOARD TESTING
+
   create_tasks();
 
   // Main State Loop
