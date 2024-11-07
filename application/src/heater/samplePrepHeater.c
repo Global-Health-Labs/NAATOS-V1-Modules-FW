@@ -155,7 +155,7 @@ void handle_cycle1_stopstart_heater(bool heating) {
 
   if (heating) {
     nrf_gpio_pin_set(MOTOR_PWR_EN);
-    //nrf_gpio_pin_set(HEATER_PWR_EN);
+    nrf_gpio_pin_set(HEATER_PWR_EN);
   }
 
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
@@ -250,20 +250,15 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   if (heater_cycle1_running) {
     // Update Heater Zone 3 PID loop with new temperatures
     if (config.run_heater_1) {
+      pid_controller_compute(&heater_pid_1, temperature_data.heat_zone_3_temp);
       if (rampToTemp) {
-        if ((temperature_data.heat_zone_3_temp >= config.heater_ramp_setpoint)) {
+        if ((temperature_data.heat_zone_3_temp >= config.heater_setpoint_1)) {
           xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
           if (xReturned != pdPASS) {
             send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
           }
           rampToTemp = false;
         }
-        else {
-          heater_pid_1.out = 100; // Full 100 PWM until we reach out heater ramp setpoint, then use PID
-        }
-      }
-      else {
-        pid_controller_compute(&heater_pid_1, temperature_data.heat_zone_3_temp);
       }
     }
 
@@ -298,20 +293,15 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   if (heater_cycle2_running) { //AMP 1 will be used for motor
     // Update Heater Zone 3 PID loop with new temperatures
     if (config.run_heater_2) {
+      pid_controller_compute(&heater_pid_2, temperature_data.heat_zone_3_temp);
       if (rampToTemp) {
-        if (rampToTemp && (temperature_data.heat_zone_3_temp >= config.heater_ramp_setpoint)) {
+        if (rampToTemp && (temperature_data.heat_zone_3_temp >= config.heater_setpoint_2)) {
           xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
           if (xReturned != pdPASS) {
             send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
           }
           rampToTemp = false;
         }
-        else {
-          heater_pid_2.out = 100; // Full 100 PWM until we reach out heater ramp setpoint, then use PID
-        }
-      }
-      else {
-        pid_controller_compute(&heater_pid_2, temperature_data.heat_zone_3_temp);
       }
     }
 

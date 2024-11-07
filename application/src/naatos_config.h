@@ -666,7 +666,6 @@ typedef struct {
   bool ramp_to_temp_before_start_cycle_2;
   float ramp_to_temp_c1_timeout;
   float ramp_to_temp_c2_timeout;
-  float heater_ramp_setpoint;
   float heater_setpoint_1;
   float heater_setpoint_2;
   float heater_max_temp;
