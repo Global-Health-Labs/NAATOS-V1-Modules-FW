@@ -34,9 +34,12 @@ void normalize_pwm_data(log_data_message_t *rxLogMsg);
 
 uint32_t constructDebugLogLine(char *logLineBuffer, char *message, calendar_time_t time);
 
-int battery_percent = 0;
+fuel_batt_info_t battery_info_recv = {
+  .batt_percent = 0,
+  .batt_voltage = 0.0
+};
 
-int getBatteryPercent(void) {
+fuel_batt_info_t getBatteryPercent(void) {
   BaseType_t xReturned;
   // Request the battery percentage from the bettery task
   xReturned = xQueueSend(batteryRxQueue, &batt_req_log, 0);
@@ -44,12 +47,12 @@ int getBatteryPercent(void) {
     send_debug_log_message("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.");
   }
   // Wait for response
-  xReturned = xQueueReceive(logger_recvBattPercentQueue, &battery_percent, portMAX_DELAY);
+  xReturned = xQueueReceive(logger_recvBattPercentQueue, &battery_info_recv, portMAX_DELAY);
   if (xReturned != pdPASS) {
     send_debug_log_message("LOG_TASK: Unable to get battery percentage from battery_requestPercentQueue.");
   }
 
-  return battery_percent;
+  return battery_info_recv;
 }
 
 // Puts log file name in char pointer
@@ -76,7 +79,10 @@ void logger_task(void *pvParameters) {
   char logFileLine[256];
   uint32_t logFileLineSize;
   FRESULT res;
-  int batteryPercent = 0;
+  fuel_batt_info_t battery_info = {
+    .batt_percent = 0,
+    .batt_voltage = 0.0
+  };
 
   log_data_message_t rxLogMsg;
 
@@ -111,11 +117,11 @@ void logger_task(void *pvParameters) {
         send_debug_log_message("LOG_TASK: Unable to retreive time!");
       }
 
-      batteryPercent = getBatteryPercent();
+      battery_info = getBatteryPercent();
 
       normalize_pwm_data(&rxLogMsg);
 
-      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, batteryPercent);
+      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, battery_info.batt_percent);
       last_temp_message = rxLogMsg;
 
       // Check UART Only
@@ -135,13 +141,13 @@ void logger_task(void *pvParameters) {
         send_debug_log_message("LOG_TASK: Unable to retreive time!");
       }
 
-      batteryPercent = getBatteryPercent();
+      battery_info = getBatteryPercent();
 
       normalize_pwm_data(&rxLogMsg);
 
       last_temp_message.event_data = rxLogMsg.event_data;
 
-      logFileLineSize = loggerInterface->constructEventDataLogLine(logFileLine, time, last_temp_message, batteryPercent);
+      logFileLineSize = loggerInterface->constructEventDataLogLine(logFileLine, time, last_temp_message, battery_info.batt_percent);
       if (rxLogMsg.event_data.event == SAMPLE_CYCLE_TWO_ENDED ||
           rxLogMsg.event_data.event == SAMPLE_INTERRUPTED ||
           rxLogMsg.event_data.event == SAMPLE_TEMPS_NOT_STABALIZED ||
@@ -171,7 +177,7 @@ void logger_task(void *pvParameters) {
     case UART_DATA: {
       normalize_pwm_data(&rxLogMsg);
       //if (config.debug_to_com_en) { Not sure if this is considered debug statement or not, going to keep it printing to com for now
-        logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, battery_percent);
+        logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, battery_info.batt_percent);
         write_to_com(logFileLine, logFileLineSize);
       //}
       break;

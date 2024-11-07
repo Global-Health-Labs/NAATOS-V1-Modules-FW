@@ -179,6 +179,7 @@
 #define DEFAULT_MOTOR_STALL_PERCENTAGE  20 
 #define DEFAULT_MOTOR_STALL_ENABLE  true
 #define DEFAULT_DEBUG_TO_COM_ENABLE true
+#define DEFAULT_LOW_POWER_THRESH_V  3.20f
 #define MAX_MOTOR_PID 100
 
 #else
@@ -625,6 +626,7 @@ typedef struct {
   float cycle_1_run_time_s;
   float cycle_2_run_time_s;
   uint16_t low_power_threshold;
+  float low_power_thresh_v;
   uint16_t recovery_power_thresh;
   float sample_valid_timeout_s;
   int sample_complete_delay_s;

@@ -1032,7 +1032,7 @@ void create_tasks() {
 */
 void create_queues() {
   // Main Task Queues
-  main_batteryDataQueue = xQueueCreate(5, sizeof(int));
+  main_batteryDataQueue = xQueueCreate(5, sizeof(fuel_batt_info_t));
   if (main_batteryDataQueue == NULL)
     send_debug_log_message("Unable to create main_batteryDataQueue queue");
 

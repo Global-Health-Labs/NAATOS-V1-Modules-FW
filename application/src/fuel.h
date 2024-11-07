@@ -118,6 +118,11 @@ typedef struct {
   fuel_gauge_data_t data;
 } fuel_gauge_callback_data_t;
 
+typedef struct {
+  int batt_percent;
+  float batt_voltage;
+} fuel_batt_info_t;
+
 typedef void (*fuelGauge_opDoneCallback_t)(fuel_gauge_errors_t outcome, fuel_gauge_callback_data_t *p_data);
 
 //fuelgauge has a seperate I2C address and 16 bit registers

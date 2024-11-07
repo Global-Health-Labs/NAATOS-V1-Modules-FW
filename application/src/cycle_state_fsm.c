@@ -14,7 +14,10 @@ button_update_t buttonData = {.event = NONE};
 uint32_t start_time = 0;
 uint32_t end_time = 0;
 uint32_t time_left = 0;
-int percent_recv = 0;
+fuel_batt_info_t batt_info_recv =  {
+  .batt_percent = 0,
+  .batt_voltage = 0
+};
 
 MainStateErrorQueueMsg_t main_err_msg;
 volatile bool runThrough = true;
@@ -56,15 +59,18 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       }
 
       // Check for Battery Data in Battery Queue
-      if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(1000)) == pdPASS) {
-        /*if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
-          updateLedState(LED_DECLINE, true);
-          exitInfo = CYCLE_ERROR_POWER_LOW;
-          runThrough = true;
-          next_state = EXIT_CYCLE;
-          break;
+      if (xQueueReceive(main_batteryDataQueue, &batt_info_recv, pdMS_TO_TICKS(1000)) == pdPASS) {
+        if ((batt_info_recv.batt_percent < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) ||
+            (!use_default_configuration_parameters && batt_info_recv.batt_percent < config.low_power_threshold)) {
+          if ((batt_info_recv.batt_voltage < DEFAULT_LOW_POWER_THRESH_V && use_default_configuration_parameters) || 
+              (batt_info_recv.batt_voltage < config.low_power_thresh_v && !use_default_configuration_parameters)) {
+            updateLedState(LED_DECLINE, true);
+            exitInfo = CYCLE_ERROR_POWER_LOW;
+            runThrough = true;
+            next_state = EXIT_CYCLE;
+            break;
+          }
         }
-        */
       }
 
       updateLedState(LED_RUN, true);
@@ -439,7 +445,7 @@ void handle_exit_notifications(void) {
     break;
 
   case CYCLE_ERROR_POWER_LOW:
-    sprintf(exitString, "%s%d", RECOVERY_BATT, percent_recv);
+    sprintf(exitString, "%s%d", RECOVERY_BATT, batt_info_recv.batt_percent);
     eventType = SAMPLE_RECOVERY_BATT;
     break;
 
