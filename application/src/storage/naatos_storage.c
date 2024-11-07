@@ -380,6 +380,10 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case MOTOR_KD_1:
       parameters->motor_kd_1 = parse_double(val, M_KD);
       break;
+    case MOTOR_SWTICH_CCW_CW:
+      num = strcmp(val, "true");
+      parameters->switch_motor_ccw_cw = num ? false : true;
+      break;
     case _MOTOR_SETPOINT_1:
       parameters->motor_setpoint_1 = parse_int(val, MOTOR_SETPOINT_1);
       break;
@@ -815,6 +819,12 @@ FRESULT check_for_config_file(void) {
   }
   // Write Motor 1 Kd
   configBufferSize = sprintf(configBuffer, "motor_kd_1:%0.3f\n", M_KD);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Motor Switch CCW CW
+  configBufferSize = sprintf(configBuffer, "motor_switch_ccw_cw:%s\n", DEFAULT_MOTOR_SWTICH_CCW_CW ? "true" : "false");
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;

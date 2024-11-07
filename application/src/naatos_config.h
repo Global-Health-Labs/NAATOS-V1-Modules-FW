@@ -160,20 +160,21 @@
 #define DEFAULT_RECOVERY_THRES 20      // Percent
 #define OPTICAL_TRIG_THRES 800
 #define DEFAULT_HEATER_SETPOINT 95.0 // Sample prep only
-#define DEFAULT_RAMP_SETPOINT 100.0
+#define DEFAULT_RAMP_SETPOINT 95.0
 #define MOTOR_SETPOINT_1 3900
 #define MOTOR_SETPOINT_2 3900
 #define DEFAULT_RUN_MOTOR_1 false
 #define DEFAULT_RUN_HEATER_1 true
 #define DEFAULT_RUN_MOTOR_2 true
 #define DEFAULT_RUN_HEATER_2 true
+#define DEFAULT_MOTOR_SWTICH_CCW_CW  false
 #define DEFAULT_CYCLE_1_RUNTIME 120.0
 #define DEFAULT_CYCLE_2_RUNTIME 240.0
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_1 true
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_2 false
 #define DEFAULT_RAMP_TO_TEMP_TIMEOUT 600.0 // 10min
 #define DEFAULT_MOTOR_SPEED_PWM 71
-#define DEFAULT_MAX_HEATER_PID 70
+#define DEFAULT_MAX_HEATER_PID 100
 #define DEFAULT_HAL_SENSOR_THRESHOLD  0.75f
 #define DEFAULT_MOTOR_STALL_PERCENTAGE  20 
 #define DEFAULT_MOTOR_STALL_ENABLE  true
@@ -676,6 +677,7 @@ typedef struct {
   float motor_kp_1;
   float motor_ki_1;
   float motor_kd_1;
+  bool switch_motor_ccw_cw;
   uint16_t motor_setpoint_1;
   float motor_kp_2;
   float motor_ki_2;

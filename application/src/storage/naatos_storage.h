@@ -127,6 +127,7 @@ typedef enum {
   MOTOR_KP_1,
   MOTOR_KI_1,
   MOTOR_KD_1,
+  MOTOR_SWTICH_CCW_CW,
   _MOTOR_SETPOINT_1,
   MOTOR_KP_2,
   MOTOR_KI_2,
