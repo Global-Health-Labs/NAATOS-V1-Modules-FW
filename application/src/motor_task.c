@@ -13,6 +13,8 @@ static long double moving_avg_speed = 0.0;
 
 static long double motorSpeed = 0.0;
 
+static bool motor_ccw = false;
+
 bool motorRunning = false;
 
 TimerHandle_t sensorMotorTimer;
@@ -56,6 +58,17 @@ void motorTask(void *pvParameters) {
       switch (motorRxMessage.type) {
          case MOTOR_MSG_HEATER_STATE: {
           motorRunning = motorRxMessage.motorRunning;
+          // Switch the ccw line to switch between ccw and cw
+          if (motorRunning) {
+            if (motor_ccw) {
+              nrf_gpio_pin_clear(MOTOR_CWCCW);
+              motor_ccw = false;
+            }
+            else {
+              nrf_gpio_pin_set(MOTOR_CWCCW);
+              motor_ccw = true;
+            }
+          }
           send_debug_log_message("start/stop motor");
           break;
          }
