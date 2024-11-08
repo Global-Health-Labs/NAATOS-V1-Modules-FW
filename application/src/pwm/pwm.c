@@ -222,3 +222,36 @@ void pwm_task(void *pvParameters) {
     }
   }
 }
+
+
+
+
+
+
+void ghl_pwm_manual_set_channel(uint8_t zone, app_pwm_duty_t dutycycle) {
+  
+  //app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty);
+
+  if (!pwmEnabled) {
+    app_pwm_enable(&PWM0);
+    app_pwm_enable(&PWM2);
+    pwmEnabled = true;
+  }
+  ret_code_t ret;
+
+  switch(zone)  {
+    case 0:
+      //if (!pwmEnabled) {
+      //  app_pwm_enable(&PWM0);
+      //}
+      ret = app_pwm_channel_duty_set(&PWM0, 0, dutycycle);
+      break;
+    case 1:
+      //if (!pwmEnabled) {
+      //  app_pwm_enable(&PWM0);
+      //}
+      ret = app_pwm_channel_duty_set(&PWM0, 1, dutycycle);
+      break;
+  }
+}
+

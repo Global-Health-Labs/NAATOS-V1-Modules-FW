@@ -24,4 +24,6 @@ void uninit_pwms(void);
 void pwm_task(void *pvParameters);
 void updateDutyCycles(temperature_pwm_data_t pwmData);
 
+void ghl_pwm_manual_set_channel(uint8_t zone, uint16_t dutycycle);
+
 #endif

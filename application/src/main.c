@@ -414,15 +414,30 @@ void main_task(void *pvParameters) {
 
   // GHL SHORT-CIRCUIT FOR BOARD TESTING
   // initial wait
-  vTaskDelay(pdMS_TO_TICKS(100)); // wait 10 mS
+  vTaskDelay(pdMS_TO_TICKS(10)); // wait 10 mS
 
   // individual sub-tests follow
 
 
-  #if 1
+  #if 0
       nrf_gpio_pin_set(HEATER_PWR_EN); // turn on boost for heaters
       vTaskDelay(pdMS_TO_TICKS(100)); // wait 100mS
       nrf_gpio_pin_clear(HEATER_PWR_EN); // turn OFF boost for heaters
+  #endif
+
+  #if 1
+      // GHL BOOST OFF TEST
+      ghl_pwm_manual_set_channel(1,50);   // heater PWM 50% duty cycle
+      vTaskDelay(pdMS_TO_TICKS(50));      // wait 50ms
+      ghl_pwm_manual_set_channel(1,0);    // heater PWM 0% duty cycle
+
+      // GHL BOOST ON TEST
+      nrf_gpio_pin_set(HEATER_PWR_EN);    // turn ON boost for heaters
+      vTaskDelay(pdMS_TO_TICKS(10));      // wait 10ms
+      ghl_pwm_manual_set_channel(1,50);   // heater PWM 50% duty cycle
+      vTaskDelay(pdMS_TO_TICKS(50));      // wait 50ms
+      nrf_gpio_pin_clear(HEATER_PWR_EN);  // turn OFF boost for heaters
+      ghl_pwm_manual_set_channel(1,0);    // heater PWM 0% duty cycle
   #endif
 
   // GHL END SHORT-CIRCUIT FOR BOARD TESTING
