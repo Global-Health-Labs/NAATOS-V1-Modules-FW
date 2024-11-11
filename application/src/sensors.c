@@ -65,9 +65,9 @@ void startSensorTempTimer(void) {
   TickType_t sampleRateTicks;
 
   if (use_default_configuration_parameters) {
-    sampleRateTicks = pdMS_TO_TICKS((DEFAULT_SAMPLE_RATE * 1000.0) - (12.0 * 4.0) + 1.0);
+    sampleRateTicks = pdMS_TO_TICKS((DEFAULT_SAMPLE_RATE * 1000.0));
   } else {
-    sampleRateTicks = pdMS_TO_TICKS((config.sample_rate * 1000.0) - (12.0 * 4.0) + 1.0);
+    sampleRateTicks = pdMS_TO_TICKS((config.sample_rate * 1000.0));
   }
 
   if (xTimerChangePeriod(sensorTempTimer, sampleRateTicks, 100) != pdPASS) {
@@ -126,9 +126,9 @@ void sensors_task(void *pvParameters) {
   SensorRxQueueMsg_t sensorRxMessage;
 
   if (use_default_configuration_parameters) {
-    sampleRateTicks = pdMS_TO_TICKS((DEFAULT_SAMPLE_RATE * 1000.0) - (12.0 * 4.0) + 1.0);
+    sampleRateTicks = pdMS_TO_TICKS((DEFAULT_SAMPLE_RATE * 1000.0) - 12.0);
   } else {
-    sampleRateTicks = pdMS_TO_TICKS((config.sample_rate * 1000.0) - (12.0 * 4.0) + 1.0);
+    sampleRateTicks = pdMS_TO_TICKS((config.sample_rate * 1000.0) - 12.0);
   }
 
 #ifdef SAMPLE_PREP_BOARD
