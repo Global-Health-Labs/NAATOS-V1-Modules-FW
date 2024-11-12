@@ -460,7 +460,7 @@ void handle_exit_notifications(void) {
     break;
 
   case CYCLE_ERROR_OVER_TEMP:
-    sprintf(exitString, "%s: %d", SAMPLE_OVER_TEMP, over_temp_data.heat_zone_1_temp);
+    sprintf(exitString, "%s: %d", SAMPLE_OVER_TEMPERATURE, over_temp_data.heat_zone_1_temp);
     eventType = SAMPLE_OVER_TEMP;
     //exit_event_info.message = exitString;
     //exit_log_message.event_data = exit_event_info;

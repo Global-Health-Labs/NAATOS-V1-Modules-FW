@@ -234,6 +234,7 @@
 #define HALL_SENSOR_BRAKE_MSG "HALL sensor interrupted."
 #define SAMPLE_I2C_READ_ERROR_MSG "I2C sensor read error"
 #define SAMPLE_MOTOR_STALLED_ERROR_MSG "Motor stalled detected."
+#define SAMPLE_OVER_TEMPERATURE "Sample over temperature error"
 
 #define USB_SUSPEND_TASKS_TIME 15000
 
