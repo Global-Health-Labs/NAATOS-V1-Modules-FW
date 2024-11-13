@@ -455,7 +455,8 @@ void main_task(void *pvParameters) {
         }
 
         updateLedState(LED_WAKEUP, true);
-        updateLedState(LED_RUN, false);
+        updateLedState(LED_RUN_MOTOR, false);
+        updateLedState(LED_RUN_HEATER, false);
         updateLedState(LED_STANDBY, true);
         updateLedState(LED_COMPLETE, false);
         sendWdtMain(true);
@@ -474,6 +475,17 @@ void main_task(void *pvParameters) {
 
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(100)) == pdPASS) {
+        // Set the variable LED from the battery percentage
+        led_power_level_t l_powerLevel = getCurrentPowerLevel();
+        if (percent_recv >= LED_POWER_LEVEL_HIGH_THRESH && l_powerLevel != led_pl_high) {
+          updateLedStatePowerLevel(LED_STANDBY, true, led_pl_high);
+        }
+        else if (percent_recv < LED_POWER_LEVEL_HIGH_THRESH && percent_recv >= config.low_power_threshold && l_powerLevel != led_pl_medium) {
+          updateLedStatePowerLevel(LED_STANDBY, true, led_pl_medium);
+        }
+        else if (percent_recv < config.low_power_threshold && l_powerLevel != led_pl_low) {
+          //updateLedStatePowerLevel(LED_STANDBY, true, led_pl_low);
+        }
 #if ENABLE_LOW_POWER_MODE
         if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
              next_state = MAIN_SLEEP;
@@ -534,7 +546,8 @@ void main_task(void *pvParameters) {
         if (buttonData.event == OFF_EVENT && usb_conn_status) {
           next_state = MAIN_FILE;
           sendWdtMain(false);
-          updateLedState(LED_RUN, false);
+          updateLedState(LED_RUN_MOTOR, false);
+          updateLedState(LED_RUN_HEATER, false);
           updateLedState(LED_STANDBY, false);
           updateLedState(LED_USB_MSC_STARTING, true);
           send_usb_change(USB_MSC_CDC_ACM);
@@ -598,7 +611,7 @@ void main_task(void *pvParameters) {
       if (last_state != main_state) {
         reset_cycle_state_machine();
         updateLedState(LED_STANDBY, false);
-        updateLedState(LED_RUN, true);
+        updateLedState(LED_RUN_HEATER, true);
       }
 
       main_wdt_time_left = pdTICKS_TO_MS(xTaskGetTickCount() - main_wdt_start_time);
@@ -629,7 +642,8 @@ void main_task(void *pvParameters) {
       if (last_state != main_state) {
         char tmp[50];
         updateLedState(LED_WAKEUP, true);
-        updateLedState(LED_RUN, false);
+        updateLedState(LED_RUN_MOTOR, false);
+        updateLedState(LED_RUN_HEATER, false);
         updateLedState(LED_STANDBY, true);
         updateLedState(LED_COMPLETE, false);
         a_t_start = xTaskGetTickCount();
@@ -650,7 +664,8 @@ void main_task(void *pvParameters) {
       if (xTaskGetTickCount() >= (a_t_start + alert_timeout_ticks)) {
         updateLedState(LED_CLEAR_ALL_ERROR, true);
         updateLedState(LED_WAKEUP, true);
-        updateLedState(LED_RUN, false);
+        updateLedState(LED_RUN_MOTOR, false);
+        updateLedState(LED_RUN_HEATER, false);
         updateLedState(LED_STANDBY, true);
         updateLedState(LED_COMPLETE, false);
         next_state = MAIN_STANDBY;
@@ -1106,7 +1121,7 @@ void create_queues() {
   }
 
   // Logger Task Queues
-  logger_recvBattPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(int));
+  logger_recvBattPercentQueue = xQueueCreate(QUEUE_SIZE, sizeof(fuel_batt_info_t));
   if (logger_recvBattPercentQueue == NULL)
     send_debug_log_message("Unable to create logger_recvBattPercentQueue queue");
 

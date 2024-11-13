@@ -560,7 +560,8 @@ typedef enum {
   LED_WAKEUP,
   LED_CHARGING,
   LED_STANDBY,
-  LED_RUN,
+  LED_RUN_HEATER,
+  LED_RUN_MOTOR,
   LED_DECLINE,
   LED_ABORT,
   LED_COMPLETE,
@@ -570,9 +571,15 @@ typedef enum {
   LED_CLEAR_ALL_ERROR
 } LEDEvent_e;
 
+typedef enum {
+  led_pl_high,
+  led_pl_medium,
+  led_pl_low
+} led_power_level_t;
+
 typedef struct {
   LEDEvent_e type;
-  int chargeLevel;
+  led_power_level_t powerLevel;
   bool active;
 } LEDRxQueueMsg_t;
 

@@ -9,6 +9,8 @@
 
 #define ENABLE_LEDS 1
 
+#define LED_POWER_LEVEL_HIGH_THRESH   75
+
 /*
   When an event triggers an LED change it must eventually clear that change.
   A decision tree on what LEDS should be blinking at any given time will be
@@ -20,7 +22,8 @@ typedef struct {
   bool wakeupCondition;
   bool batteryCharging;
   bool standbyCondition;
-  bool runCondition;
+  bool runConditionHeater;
+  bool runConditionMotor;
   bool testDecline;
   bool testAbort;
   bool testComplete;
@@ -38,12 +41,16 @@ void set_led1_red_slow_blink(void);
 void set_led1_red_fast_blink(void);
 void set_led1_red_solid(void);
 void set_led1_blue_breathe(void);
-
+void set_led2_white_solid(void);
+void set_led2_yellow_solid(void);
 void set_led2_red_slow_blink(void);
 void set_led2_red_fast_blink(void);
 void set_led2_green_solid(void);
+void set_led2_red_solid(void);
 void set_led2_blue_breathe(void);
 void turn_off_led_channels(void);
+void set_led1_green_fast_blink(void);
 void updateLedState(LEDEvent_e event, bool active);
-
+void updateLedStatePowerLevel(LEDEvent_e event, bool active, led_power_level_t led_pl);
+led_power_level_t getCurrentPowerLevel(void);
 void turn_off_led2_blue_animation(void);

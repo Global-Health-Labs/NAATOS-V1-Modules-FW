@@ -121,7 +121,7 @@ void logger_task(void *pvParameters) {
 
       normalize_pwm_data(&rxLogMsg);
 
-      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, battery_info.batt_percent);
+      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, battery_info.batt_percent, battery_info.batt_voltage);
       last_temp_message = rxLogMsg;
 
       // Check UART Only
@@ -147,7 +147,7 @@ void logger_task(void *pvParameters) {
 
       last_temp_message.event_data = rxLogMsg.event_data;
 
-      logFileLineSize = loggerInterface->constructEventDataLogLine(logFileLine, time, last_temp_message, battery_info.batt_percent);
+      logFileLineSize = loggerInterface->constructEventDataLogLine(logFileLine, time, last_temp_message, battery_info.batt_percent, battery_info.batt_voltage);
       if (rxLogMsg.event_data.event == SAMPLE_CYCLE_TWO_ENDED ||
           rxLogMsg.event_data.event == SAMPLE_INTERRUPTED ||
           rxLogMsg.event_data.event == SAMPLE_TEMPS_NOT_STABALIZED ||
@@ -177,7 +177,7 @@ void logger_task(void *pvParameters) {
     case UART_DATA: {
       normalize_pwm_data(&rxLogMsg);
       //if (config.debug_to_com_en) { Not sure if this is considered debug statement or not, going to keep it printing to com for now
-        logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, battery_info.batt_percent);
+        logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, battery_info.batt_percent, battery_info.batt_voltage);
         write_to_com(logFileLine, logFileLineSize);
       //}
       break;
