@@ -44,6 +44,11 @@ bool needs_response = false;
 bool usb_conn_updated = false;
 bool com_port_open = false;
 
+// COM port reception
+#define COM_PORT_RXBUF_SIZE 64
+char COM_PORT_RXBUF[COM_PORT_RXBUF_SIZE];
+char* COM_PORT_RXBUF_PTR = &COM_PORT_RXBUF[0];
+
 // Timers
 TimerHandle_t usbTimer;
 TimerHandle_t compositeUsbTimer;
@@ -174,6 +179,7 @@ void cdc_acm_user_ev_handler(app_usbd_class_inst_t const *p_inst,
     break;
   }
   case APP_USBD_CDC_ACM_USER_EVT_PORT_CLOSE:
+    send_debug_log_message("COM port closed.");
     com_port_open = false;
     break;
   case APP_USBD_CDC_ACM_USER_EVT_TX_DONE:
@@ -183,16 +189,51 @@ void cdc_acm_user_ev_handler(app_usbd_class_inst_t const *p_inst,
     char tmp[128];
     sprintf(tmp, "Bytes waiting: %d", app_usbd_cdc_acm_bytes_stored(p_cdc_acm));
     send_debug_log_message(tmp);
+
     do {
       //Get amount of data transfered
       size_t size = app_usbd_cdc_acm_rx_size(p_cdc_acm);
-      sprintf(tmp, "RX: size: %lu char: %c", size, m_rx_buffer[0]);
-      send_debug_log_message(tmp);
+
+      //sprintf(tmp, "RX: size: %lu char: %c", size, m_rx_buffer[0]);
+      //send_debug_log_message(tmp);
+
+      // GHL: place byte in our special comport receive buffer
+      *COM_PORT_RXBUF_PTR = m_rx_buffer[0];
+      COM_PORT_RXBUF_PTR++;
+      *COM_PORT_RXBUF_PTR = '\0';
+      if(strlen(COM_PORT_RXBUF)>(COM_PORT_RXBUF_SIZE-4)) {
+        send_debug_log_message("COM port RX linebuffer is filling up be careful...");
+      }
+
       // Fetch data until internal buffer is empty
       ret = app_usbd_cdc_acm_read(&m_app_cdc_acm,
           m_rx_buffer,
           READ_SIZE);
     } while (ret == NRF_SUCCESS);
+
+    //sprintf(tmp, "End ACM_USER_EVT_RX_DONE: final rxbuf=%s", COM_PORT_RXBUF);
+    //send_debug_log_message(tmp);
+
+    // GHL: Send to Logger task where the message line will be parsed and acted-upon there
+
+    // prepare logMessageQueue item
+    log_event_t logEventData;
+    strncpy(logEventData.message, COM_PORT_RXBUF, 50);    // copy our temporary com_port_buffer string to logger event data message
+    log_data_message_t logMsg = {
+        .data_type = LOGGER_USB_CDC_UART_RECEIVE,
+        .event_data = logEventData,
+    };
+    
+    // submit into queue
+    BaseType_t xReturned;
+    xReturned = xQueueSend(logger_logMessageQueue, &logMsg, 0);
+    if (xReturned != pdPASS) {
+      send_debug_log_message("USB_CDC: Unable to send USB COM PORT line data to LOGGER queue.");
+    }
+
+    // reset our pointer back to beginning
+    COM_PORT_RXBUF_PTR = COM_PORT_RXBUF;
+    COM_PORT_RXBUF[0] = '\0';
     break;
   }
   default:
