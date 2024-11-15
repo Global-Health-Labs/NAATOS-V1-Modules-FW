@@ -105,7 +105,7 @@ void handle_cycle2_stopstart_heater(bool heating) {
   // Set the last sample based on config
   if (use_default_configuration_parameters) {
     samp_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE);
-    heater2SetPoint = DEFAULT_HEATER_SETPOINT;
+    heater2SetPoint = DEFAULT_HEATER_SETPOINT_2;
   } else {
     samp_log_max = (config.logging_rate / config.sample_rate);
     heater2SetPoint = config.heater_setpoint_2;
@@ -178,7 +178,7 @@ void handle_cycle1_stopstart_heater(bool heating) {
   // Set the last sample based on config
   if (use_default_configuration_parameters) {
     samp_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE);
-    heater1SetPoint = DEFAULT_HEATER_SETPOINT;
+    heater1SetPoint = DEFAULT_HEATER_SETPOINT_1;
   } else {
     samp_log_max = (config.logging_rate / config.sample_rate);
     heater1SetPoint = config.heater_setpoint_1;
@@ -190,7 +190,7 @@ void samplePrepResetHeaterPIDs(void) {
 #ifdef SAMPLE_PREP_BOARD
   // Create PID Controllers
   if (use_default_configuration_parameters) {
-    pid_controller_init(&heater_pid_1, DEFAULT_HEATER_SETPOINT, H_KP, H_KI, H_KD, DEFAULT_MAX_HEATER_PID);
+    pid_controller_init(&heater_pid_1, DEFAULT_HEATER_SETPOINT_1, H_KP_1, H_KI_1, H_KD_1, DEFAULT_MAX_HEATER_PID);
     pid_controller_init(&motor_pid_1, MOTOR_SETPOINT_1, M_KP, M_KI, M_KD, 100);
   } else {
     pid_controller_init(&heater_pid_1, config.heater_setpoint_1, config.heater_kp_1, config.heater_ki_1, config.heater_kd_1, config.max_heater_pid_pwm);
@@ -198,7 +198,7 @@ void samplePrepResetHeaterPIDs(void) {
   }
   // Create PID Controllers
   if (use_default_configuration_parameters) {
-    pid_controller_init(&heater_pid_2, DEFAULT_HEATER_SETPOINT, H_KP, H_KI, H_KD, DEFAULT_MAX_HEATER_PID);
+    pid_controller_init(&heater_pid_2, DEFAULT_HEATER_SETPOINT_2, H_KP_2, H_KI_2, H_KD_2, DEFAULT_MAX_HEATER_PID);
     pid_controller_init(&motor_pid_2, MOTOR_SETPOINT_2, M_KP, M_KI, M_KD, 100);
   } else {
     pid_controller_init(&heater_pid_2, config.heater_setpoint_2, config.heater_kp_2, config.heater_ki_2, config.heater_kd_2, config.max_heater_pid_pwm);

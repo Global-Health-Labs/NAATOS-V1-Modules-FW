@@ -345,31 +345,31 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       parameters->ramp_to_temp_c2_timeout = parse_double(val, DEFAULT_RAMP_TO_TEMP_TIMEOUT);
       break;
     case HEATER_SETPOINT_1_C:
-      parameters->heater_setpoint_1 = parse_double(val, DEFAULT_HEATER_SETPOINT);
+      parameters->heater_setpoint_1 = parse_double(val, DEFAULT_HEATER_SETPOINT_1);
       break;
     case HEATER_SETPOINT_2_C:
-      parameters->heater_setpoint_2 = parse_double(val, DEFAULT_HEATER_SETPOINT);
+      parameters->heater_setpoint_2 = parse_double(val, DEFAULT_HEATER_SETPOINT_2);
       break;
     case HEATER_MAX_TEMP_C:
       parameters->heater_max_temp = parse_double(val, DEFAULT_MAX_TEMP);
       break;
     case HEATER_KP_1:
-      parameters->heater_kp_1 = parse_double(val, H_KP);
+      parameters->heater_kp_1 = parse_double(val, H_KP_1);
       break;
     case HEATER_KI_1:
-      parameters->heater_ki_1 = parse_double(val, H_KI);
+      parameters->heater_ki_1 = parse_double(val, H_KI_1);
       break;
     case HEATER_KD_1:
-      parameters->heater_kd_1 = parse_double(val, H_KD);
+      parameters->heater_kd_1 = parse_double(val, H_KD_1);
       break;
     case HEATER_KP_2:
-      parameters->heater_kp_2 = parse_double(val, H_KP);
+      parameters->heater_kp_2 = parse_double(val, H_KP_2);
       break;
     case HEATER_KI_2:
-      parameters->heater_ki_2 = parse_double(val, H_KI);
+      parameters->heater_ki_2 = parse_double(val, H_KI_2);
       break;
     case HEATER_KD_2:
-      parameters->heater_kd_2 = parse_double(val, H_KD);
+      parameters->heater_kd_2 = parse_double(val, H_KD_2);
       break;
     case MOTOR_KP_1:
       parameters->motor_kp_1 = parse_double(val, M_KP);
@@ -752,12 +752,12 @@ FRESULT check_for_config_file(void) {
   }
 
   // Write heater Zone Setpoint
-  configBufferSize = sprintf(configBuffer, "heater_setpoint_1:%0.2f\n", DEFAULT_HEATER_SETPOINT);
+  configBufferSize = sprintf(configBuffer, "heater_setpoint_1:%0.2f\n", DEFAULT_HEATER_SETPOINT_1);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
-  configBufferSize = sprintf(configBuffer, "heater_setpoint_2:%0.2f\n", DEFAULT_HEATER_SETPOINT);
+  configBufferSize = sprintf(configBuffer, "heater_setpoint_2:%0.2f\n", DEFAULT_HEATER_SETPOINT_2);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -770,37 +770,37 @@ FRESULT check_for_config_file(void) {
   }
 
   // Write Heater 1 Kp
-  configBufferSize = sprintf(configBuffer, "heater_kp_1:%0.3f\n", H_KP);
+  configBufferSize = sprintf(configBuffer, "heater_kp_1:%0.3f\n", H_KP_1);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
   // Write Heater 1 Ki
-  configBufferSize = sprintf(configBuffer, "heater_ki_1:%0.3f\n", H_KI);
+  configBufferSize = sprintf(configBuffer, "heater_ki_1:%0.3f\n", H_KI_1);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
   // Write Heater 1 Kd
-  configBufferSize = sprintf(configBuffer, "heater_kd_1:%0.3f\n", H_KD);
+  configBufferSize = sprintf(configBuffer, "heater_kd_1:%0.3f\n", H_KD_1);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
   // Write Heater 2 Kp
-  configBufferSize = sprintf(configBuffer, "heater_kp_2:%0.3f\n", H_KP);
+  configBufferSize = sprintf(configBuffer, "heater_kp_2:%0.3f\n", H_KP_2);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
   // Write Heater 2 Ki
-  configBufferSize = sprintf(configBuffer, "heater_ki_2:%0.3f\n", H_KI);
+  configBufferSize = sprintf(configBuffer, "heater_ki_2:%0.3f\n", H_KI_2);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
   // Write Heater 2 Kd
-  configBufferSize = sprintf(configBuffer, "heater_kd_2:%0.3f\n", H_KD);
+  configBufferSize = sprintf(configBuffer, "heater_kd_2:%0.3f\n", H_KD_2);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
