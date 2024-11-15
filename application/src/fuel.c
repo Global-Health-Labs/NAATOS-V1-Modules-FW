@@ -304,7 +304,7 @@ fuel_gauge_errors_t fuelGauge_init(void) {
     if (opError != fuel_gauge_success) {
       return opError;
     }
-    opError = fuelGauge_writeRegisterBlocking(MAX17263_FG_REG_VEMPTY, 0x9661); //empty cell voltage = 3.0v, recovery = 3.88
+    opError = fuelGauge_writeRegisterBlocking(MAX17263_FG_REG_VEMPTY, 0x7080); //empty cell voltage = 2.25v, recovery = 3.88
     if (opError != fuel_gauge_success) {
       return opError;
     }
