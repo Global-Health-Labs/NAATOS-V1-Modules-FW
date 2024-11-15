@@ -182,6 +182,7 @@
 #define DEFAULT_DEBUG_TO_COM_ENABLE true
 #define DEFAULT_LOW_POWER_THRESH_V  3.20f
 #define MAX_MOTOR_PID 100
+#define DEFAULT_HEATER_STOP_BEFORE_MOTOR_TIME_S   10
 
 #else
 #define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
@@ -678,6 +679,7 @@ typedef struct {
   float heater_setpoint_1;
   float heater_setpoint_2;
   float heater_max_temp;
+  uint16_t heater_stop_before_motor_time_s;
   float heater_kp_1;
   float heater_ki_1;
   float heater_kd_1;

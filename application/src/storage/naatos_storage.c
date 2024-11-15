@@ -353,6 +353,9 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case HEATER_MAX_TEMP_C:
       parameters->heater_max_temp = parse_double(val, DEFAULT_MAX_TEMP);
       break;
+    case HEATER_STOP_BEFORE_MOTOR_TIME_S:
+      parameters->heater_stop_before_motor_time_s = parse_int(val, DEFAULT_HEATER_STOP_BEFORE_MOTOR_TIME_S);
+      break;
     case HEATER_KP_1:
       parameters->heater_kp_1 = parse_double(val, H_KP_1);
       break;
@@ -764,6 +767,13 @@ FRESULT check_for_config_file(void) {
   }
   // Write Heater Max Temperature
   configBufferSize = sprintf(configBuffer, "heater_max_temp:%0.2f\n", DEFAULT_MAX_TEMP);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Write Heater Stop Before Motor Time (Seconds)
+  configBufferSize = sprintf(configBuffer, "heater_stop_before_motor_s:%d\n", DEFAULT_HEATER_STOP_BEFORE_MOTOR_TIME_S);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
