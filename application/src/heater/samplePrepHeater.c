@@ -493,9 +493,6 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
           .heat_zone_2_pwm = 0,
           .heat_zone_3_pwm = 0};
       updateDutyCycles(pwmData);
-       
-      // Stop the heater 5 seconds before the 
-      vTaskDelay(pdMS_TO_TICKS(config.heater_stop_before_motor_time_s * 1000));
       
       if (!config.run_motor_2 && !use_default_configuration_parameters) {
         nrf_gpio_pin_clear(MOTOR_PWR_EN);
@@ -506,10 +503,10 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
       vTaskDelay(pdMS_TO_TICKS(200));
       updateDutyCycles(pwmData);
       // Send stop heater to sensors task
-      handle_cycle1_stopstart_heater(heater_run);
       heater_run = false;
       starting_sample_prep_run = false;
       motorReachedSpeed = false; // clear motor speed reached
+      handle_cycle1_stopstart_heater(heater_run);
     } else {
       starting_sample_prep_run = true;
       heater_run = true;
