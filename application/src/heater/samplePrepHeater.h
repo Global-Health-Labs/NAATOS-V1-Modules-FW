@@ -10,9 +10,13 @@
 #define M_KI 0.0005
 #define M_KD 0.002
 
-#define H_KP 2.0
-#define H_KI 0.010
-#define H_KD 0.0
+#define H_KP_1 4.5
+#define H_KI_1 60.0
+#define H_KD_1 120.0
+
+#define H_KP_2 4.5
+#define H_KI_2 7.5
+#define H_KD_2 0.0
 
 #define VERBOSE_HEATING 0
 #define VERBOSE_MOTOR   0
