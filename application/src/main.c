@@ -378,7 +378,7 @@ void main_task(void *pvParameters) {
   BaseType_t xReturned;
   uint8_t queue_size;
   sensor_switches_t switch_data = {.optical_tiggered = false};
-  int percent_recv;
+  fuel_batt_info_t batt_info_recv;
   button_update_t buttonData = {.event = NONE};
   bool hal_triggered = false, optical_triggered = false;
   bool error_during_run = false;
@@ -474,17 +474,19 @@ void main_task(void *pvParameters) {
 
 
       // Check for Battery Data in Battery Queue
-      if (xQueueReceive(main_batteryDataQueue, &percent_recv, pdMS_TO_TICKS(100)) == pdPASS) {
+      if (xQueueReceive(main_batteryDataQueue, &batt_info_recv, pdMS_TO_TICKS(100)) == pdPASS) {
         // Set the variable LED from the battery percentage
         led_power_level_t l_powerLevel = getCurrentPowerLevel();
-        if (percent_recv >= LED_POWER_LEVEL_HIGH_THRESH && l_powerLevel != led_pl_high) {
+        float min_starting_voltage = MIN_BATTERY_VOLTAGE * (1.0 + ((float)config.low_power_threshold / 100.0));
+        if (batt_info_recv.batt_percent >= LED_POWER_LEVEL_HIGH_THRESH && l_powerLevel != led_pl_high) {
           updateLedStatePowerLevel(LED_STANDBY, true, led_pl_high);
         }
-        else if (percent_recv < LED_POWER_LEVEL_HIGH_THRESH && percent_recv >= config.low_power_threshold && l_powerLevel != led_pl_medium) {
+        else if (((batt_info_recv.batt_percent < LED_POWER_LEVEL_HIGH_THRESH && batt_info_recv.batt_percent >= config.low_power_threshold) || 
+                  (batt_info_recv.batt_voltage >= min_starting_voltage)) && l_powerLevel != led_pl_medium) {
           updateLedStatePowerLevel(LED_STANDBY, true, led_pl_medium);
         }
-        else if (percent_recv < config.low_power_threshold && l_powerLevel != led_pl_low) {
-          //updateLedStatePowerLevel(LED_STANDBY, true, led_pl_low);
+        else if ((batt_info_recv.batt_percent < config.low_power_threshold && batt_info_recv.batt_voltage < min_starting_voltage ) && l_powerLevel != led_pl_low) {
+          updateLedStatePowerLevel(LED_STANDBY, true, led_pl_low);
         }
 #if ENABLE_LOW_POWER_MODE
         if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
