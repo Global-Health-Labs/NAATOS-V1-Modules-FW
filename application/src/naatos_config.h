@@ -537,7 +537,8 @@ typedef enum {
   TEMPERATURE_DATA,
   EVENT_DATA,
   UART_DATA,
-  LOGGER_LOG_DEBUG_EVENT
+  LOGGER_LOG_DEBUG_EVENT,
+  LOGGER_USB_CDC_UART_RECEIVE
 } log_data_type_t;
 
 // Log Message
