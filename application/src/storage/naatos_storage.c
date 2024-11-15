@@ -236,9 +236,6 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case LOW_POWER_THRESHOLD:
       parameters->low_power_threshold = parse_int(val, DEFAULT_LOW_POWER_THRESHOLD);
       break;
-    case LOW_POWER_THRESHOLD_V:
-      parameters->low_power_thresh_v = parse_double(val, DEFAULT_LOW_POWER_THRESH_V);
-      break;
     case RECOVERY_POWER_THRESHOLD:
       parameters->recovery_power_thresh = parse_int(val, DEFAULT_RECOVERY_THRES);
       break;
@@ -506,13 +503,6 @@ FRESULT check_for_config_file(void) {
 
   // Write Low Power Threshold
   configBufferSize = sprintf(configBuffer, "low_power_threshold:%d\n", DEFAULT_LOW_POWER_THRESHOLD);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Low Power Threshold Voltage
-  configBufferSize = sprintf(configBuffer, "low_power_threshold_v:%0.2f\n", DEFAULT_LOW_POWER_THRESH_V);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
