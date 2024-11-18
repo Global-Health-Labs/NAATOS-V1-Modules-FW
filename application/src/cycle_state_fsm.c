@@ -356,7 +356,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
     case CYCLE_2_MOTOR_STOP_WAIT: {
       if (last_state != current_state) {
-        send_debug_log_message("MOTOR STOP WAIT!!!");
+        char w_buff[100];
+        sprintf(w_buff, "Delaying motor turn off for %d seconds", config.motor_end_wait_time_s);
+        send_debug_log_message(w_buff);
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
           end_time = ((DEFAULT_MOTOR_WAIT_TIME_S)*1000);
@@ -372,8 +374,6 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         MotorRxQueueMsg_t motorMsg;
         motorMsg.type = MOTOR_MSG_HEATER_STATE;
         motorMsg.motorRunning = false;
-
-        send_debug_log_message("MOTOR STOP WAIT DONE!!!");
         
         // stop motor PID
         xReturned = xQueueSend(heaterRxQueue, &stop_cycle_two_zone_motor, 0);
