@@ -459,6 +459,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
 
 FRESULT check_for_config_file(void) {
   FRESULT res;
+  DIR dir;
   char configBuffer[50];
   uint32_t configBufferSize;
   uint32_t b_written;
@@ -468,7 +469,45 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
+
   // Try to create new naatos_config.txt
+  res = f_open(&file, NAATOS_CONFIG_FILE, FA_CREATE_NEW | FA_WRITE);
+  if (res == FR_EXIST) {
+    // Return that it already exists
+    return res;
+  }
+
+  // Open the directory for reading
+  res = f_opendir(&dir, ".");
+  if (res != FR_OK) {
+      return res;  // Error opening directory
+  }
+
+  // Delete Old Config Files if they are present
+  while (1) {
+    res = f_readdir(&dir, &fno);  // Read a directory entry
+    if (res != FR_OK || fno.fname[0] == 0) {
+      break;  // no More files or Error
+    }
+    
+    // Skip "." and ".." entries
+    if (fno.fname[0] == '.' && (fno.fname[1] == '\0' || (fno.fname[1] == '.' && fno.fname[2] == '\0'))) {
+        continue;
+    }
+
+    // If it's a file, delete it
+    if (!(fno.fattrib & AM_DIR)) {
+      res = f_unlink(fno.fname);  // Delete the file
+      if (res != FR_OK) {
+          return res;  // Return error if file couldn't be deleted
+      }
+    }   
+    
+  }
+
+  f_closedir(&dir);
+
+  // Create new naatos_config.txt
   res = f_open(&file, NAATOS_CONFIG_FILE, FA_CREATE_NEW | FA_WRITE);
   if (res == FR_EXIST) {
     // Return that it already exists
