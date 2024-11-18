@@ -16,6 +16,10 @@ const HeaterRxQueueMsg_t stop_cycle_two_zone_heating = {
     .type = HEATER_MSG_ZONE_STATE,
     .cycleSelect = CYCLE_TWO,
     .cycleEnabled = false};
+const HeaterRxQueueMsg_t stop_cycle_two_zone_motor = {
+    .type = HEATER_MSG_MOTOR_STATE,
+    .cycleSelect = CYCLE_TWO,
+    .cycleEnabled = false};
 
 // Log Event Constants
 const log_event_t start_event = {

@@ -341,6 +341,9 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case RAMP_TO_TEMP_C2_TIMEOUT:
       parameters->ramp_to_temp_c2_timeout = parse_double(val, DEFAULT_RAMP_TO_TEMP_TIMEOUT);
       break;
+    case MOTOR_END_WAIT_TIME_S:
+      parameters->motor_end_wait_time_s = parse_int(val, DEFAULT_MOTOR_WAIT_TIME_S);
+      break;
     case HEATER_SETPOINT_1_C:
       parameters->heater_setpoint_1 = parse_double(val, DEFAULT_HEATER_SETPOINT_1);
       break;
@@ -736,6 +739,13 @@ FRESULT check_for_config_file(void) {
   }
 
   configBufferSize = sprintf(configBuffer, "ramp_to_temp_timeout_c2:%0.2f\n", DEFAULT_RAMP_TO_TEMP_TIMEOUT);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Write Motor End Wait Time (Seconds)
+  configBufferSize = sprintf(configBuffer, "motor_end_wait_time_s:%d\n", DEFAULT_MOTOR_WAIT_TIME_S);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;

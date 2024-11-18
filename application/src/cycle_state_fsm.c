@@ -317,7 +317,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       time_left = (xTaskGetTickCount() - start_time);
 
       if (time_left >= end_time) {
-        next_state = CYCLE_COMPLETE_DELAY;
+        next_state = CYCLE_2_MOTOR_STOP_WAIT;
         end_cycle_2();
         break;
       }
@@ -351,6 +351,67 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         next_state = EXIT_CYCLE;
         break;
       }
+      break;
+    }
+
+    case CYCLE_2_MOTOR_STOP_WAIT: {
+      if (last_state != current_state) {
+        send_debug_log_message("MOTOR STOP WAIT!!!");
+        start_time = xTaskGetTickCount();
+        if (use_default_configuration_parameters) {
+          end_time = ((DEFAULT_MOTOR_WAIT_TIME_S)*1000);
+        } else {
+          end_time = ((config.motor_end_wait_time_s) * 1000);
+        }
+      }
+
+      time_left = (xTaskGetTickCount() - start_time);
+
+      if (time_left >= end_time) {
+        // Turn off the motor
+        MotorRxQueueMsg_t motorMsg;
+        motorMsg.type = MOTOR_MSG_HEATER_STATE;
+        motorMsg.motorRunning = false;
+
+        send_debug_log_message("MOTOR STOP WAIT DONE!!!");
+        
+        // stop motor PID
+        xReturned = xQueueSend(heaterRxQueue, &stop_cycle_two_zone_motor, 0);
+        if (xReturned != pdPASS) {
+          send_debug_log_message("MAIN_TASK: Unable to send stop valve zone request.\r\n");
+        }
+
+        // Stop motor enable
+        xReturned = xQueueSend(motorRxQueue, &motorMsg, 10);
+        if (xReturned != pdPASS) {
+          send_debug_log_message("HEATER_TASK: Unable to send heater state to motorRxQueue.");
+        }
+        next_state = CYCLE_SAMPLE_VALID_HOLD;
+      }
+
+      // Get Switch data
+      xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
+      if (limitSwitchFreed(switch_data)) {
+        end_cycle_2();
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_SENSOR_BREAK;
+        runThrough = true;
+        next_state = EXIT_CYCLE;
+        break;
+      }
+      
+      // Handle Button data in this state
+      buttonData.event = NONE;
+      xQueueReceive(button_mainStateQueue, &buttonData, 0);
+      //TODO test also including off_event
+      if (buttonData.event == ON_EVENT /*|| buttonData.even == OFF_EVENT*/) {
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_BUTTON_EXIT;
+        runThrough = true;
+        next_state = EXIT_CYCLE;
+        break;
+      }
+
       break;
     }
 

@@ -472,7 +472,6 @@ void main_task(void *pvParameters) {
         send_debug_log_message("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.");
       }
 
-
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &batt_info_recv, pdMS_TO_TICKS(100)) == pdPASS) {
         // Set the variable LED from the battery percentage
@@ -481,11 +480,11 @@ void main_task(void *pvParameters) {
         if (batt_info_recv.batt_percent >= LED_POWER_LEVEL_HIGH_THRESH && l_powerLevel != led_pl_high) {
           updateLedStatePowerLevel(LED_STANDBY, true, led_pl_high);
         }
-        else if (((batt_info_recv.batt_percent < LED_POWER_LEVEL_HIGH_THRESH && batt_info_recv.batt_percent >= config.low_power_threshold) || 
+        else if (((batt_info_recv.batt_percent < LED_POWER_LEVEL_HIGH_THRESH && batt_info_recv.batt_percent >= config.low_power_threshold) && 
                   (batt_info_recv.batt_voltage >= min_starting_voltage)) && l_powerLevel != led_pl_medium) {
           updateLedStatePowerLevel(LED_STANDBY, true, led_pl_medium);
         }
-        else if ((batt_info_recv.batt_percent < config.low_power_threshold && batt_info_recv.batt_voltage < min_starting_voltage ) && l_powerLevel != led_pl_low) {
+        else if ((batt_info_recv.batt_percent < config.low_power_threshold || batt_info_recv.batt_voltage < min_starting_voltage ) && l_powerLevel != led_pl_low) {
           updateLedStatePowerLevel(LED_STANDBY, true, led_pl_low);
         }
 #if ENABLE_LOW_POWER_MODE

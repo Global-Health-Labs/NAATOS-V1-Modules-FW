@@ -183,6 +183,7 @@
 #define MAX_MOTOR_PID 100
 #define MIN_BATTERY_VOLTAGE 2.25
 #define DEFAULT_LOW_POWER_THRESH_V 2.7
+#define DEFAULT_MOTOR_WAIT_TIME_S 10
 
 #else
 #define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
@@ -512,6 +513,7 @@ typedef enum {
   HEATER_MSG_CONFIG_UPDATED,
   HEATER_MSG_WDT_UPDATE,
   HEATER_MSG_TEMPERATURE_DATA_ERROR,
+  HEATER_MSG_MOTOR_STATE
 } HeaterRxQueueType_t;
 
 typedef struct {
@@ -675,6 +677,7 @@ typedef struct {
   bool ramp_to_temp_before_start_cycle_2;
   float ramp_to_temp_c1_timeout;
   float ramp_to_temp_c2_timeout;
+  uint16_t motor_end_wait_time_s;
   float heater_setpoint_1;
   float heater_setpoint_2;
   float heater_max_temp;
