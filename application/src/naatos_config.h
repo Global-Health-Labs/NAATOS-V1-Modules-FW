@@ -304,7 +304,8 @@ typedef enum {
   SAMPLE_I2C_READ_ERROR,
   SAMPLE_CANT_READ_CONFIG,
   SAMPLE_MOTOR_STALLED,
-  SAMPLE_UNKNOWN
+  SAMPLE_UNKNOWN,
+  SAMPLE_BATTERY_LOW,
   // Add more events here
 } event_t;
 

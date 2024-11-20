@@ -382,7 +382,8 @@ void main_task(void *pvParameters) {
   button_update_t buttonData = {.event = NONE};
   bool hal_triggered = false, optical_triggered = false;
   bool error_during_run = false;
-  bool over_temp;
+  bool over_temp = false;
+  bool loggedLowPowerOnce = false;
   uint32_t start_time = 0, end_time = 0, a_t_start = 0;
   uint32_t alert_timeout_ticks;
   bool usb_conn_status = false;
@@ -461,6 +462,7 @@ void main_task(void *pvParameters) {
         updateLedState(LED_COMPLETE, false);
         sendWdtMain(true);
         start_time = xTaskGetTickCount();
+        loggedLowPowerOnce = false;
       }
 
       hal_triggered = false;
@@ -485,6 +487,17 @@ void main_task(void *pvParameters) {
           updateLedStatePowerLevel(LED_STANDBY, true, led_pl_medium);
         }
         else if ((batt_info_recv.batt_percent < config.low_power_threshold || batt_info_recv.batt_voltage < min_starting_voltage ) && l_powerLevel != led_pl_low) {
+
+          if(!loggedLowPowerOnce) {
+            loggedLowPowerOnce = true;
+            xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
+            if (xReturned != pdPASS) {
+              send_debug_log_message("MAIN_TASK: Unable to send log start\r\n");
+            }
+
+             send_event_log_message(SAMPLE_BATTERY_LOW, "Battery LOW \r\n");
+          }
+
           updateLedStatePowerLevel(LED_STANDBY, true, led_pl_low);
         }
 #if ENABLE_LOW_POWER_MODE
