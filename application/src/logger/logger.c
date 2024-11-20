@@ -36,7 +36,8 @@ uint32_t constructDebugLogLine(char *logLineBuffer, char *message, calendar_time
 
 fuel_batt_info_t battery_info_recv = {
   .batt_percent = 0,
-  .batt_voltage = 0.0
+  .batt_voltage = 0.0,
+  .batt_temp = 0.0
 };
 
 fuel_batt_info_t getBatteryPercent(void) {
@@ -81,7 +82,8 @@ void logger_task(void *pvParameters) {
   FRESULT res;
   fuel_batt_info_t battery_info = {
     .batt_percent = 0,
-    .batt_voltage = 0.0
+    .batt_voltage = 0.0,
+    .batt_temp = 0.0
   };
 
   log_data_message_t rxLogMsg;
@@ -121,7 +123,7 @@ void logger_task(void *pvParameters) {
 
       normalize_pwm_data(&rxLogMsg);
 
-      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, battery_info.batt_percent, battery_info.batt_voltage);
+      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, battery_info.batt_percent, battery_info.batt_voltage, battery_info.batt_temp);
       last_temp_message = rxLogMsg;
 
       // Check UART Only
@@ -147,7 +149,7 @@ void logger_task(void *pvParameters) {
 
       last_temp_message.event_data = rxLogMsg.event_data;
 
-      logFileLineSize = loggerInterface->constructEventDataLogLine(logFileLine, time, last_temp_message, battery_info.batt_percent, battery_info.batt_voltage);
+      logFileLineSize = loggerInterface->constructEventDataLogLine(logFileLine, time, last_temp_message, battery_info.batt_percent, battery_info.batt_voltage, battery_info.batt_temp);
       if (rxLogMsg.event_data.event == SAMPLE_CYCLE_TWO_ENDED ||
           rxLogMsg.event_data.event == SAMPLE_INTERRUPTED ||
           rxLogMsg.event_data.event == SAMPLE_TEMPS_NOT_STABALIZED ||
@@ -177,7 +179,7 @@ void logger_task(void *pvParameters) {
     case UART_DATA: {
       normalize_pwm_data(&rxLogMsg);
       //if (config.debug_to_com_en) { Not sure if this is considered debug statement or not, going to keep it printing to com for now
-        logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, battery_info.batt_percent, battery_info.batt_voltage);
+        logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, battery_info.batt_percent, battery_info.batt_voltage, battery_info.batt_temp);
         write_to_com(logFileLine, logFileLineSize);
       //}
       break;

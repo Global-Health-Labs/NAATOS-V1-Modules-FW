@@ -309,7 +309,8 @@ fuel_gauge_errors_t fuelGauge_init(void) {
       return opError;
     }
 
-    opError = fuelGauge_writeRegisterBlocking(MAX17263_FG_REG_CONFIG, 0x2200); //Disable external thermistor
+    //opError = fuelGauge_writeRegisterBlocking(MAX17263_FG_REG_CONFIG, 0x2200); //Disable external thermistor
+    opError = fuelGauge_writeRegisterBlocking(MAX17263_FG_REG_CONFIG, 0xA210); // Enable external t hermistor
     if (opError != fuel_gauge_success) {
       return opError;
     }
@@ -428,4 +429,13 @@ fuel_gauge_errors_t fuelGauge_saveParams(fuelGauge_opDoneCallback_t cb) {
   savedUserCallback = cb;
 
   return fuelGauge_readRegister(0x38, fg_save_params, NULL); //Read RCOMP0
+}
+
+
+double fuelGauge_getBattTemperature(fuelGauge_opDoneCallback_t cb) {
+   fuelGauge_readRegister(MAX17263_FG_REG_TEMP, fg_get_batt_voltage, cb);
+  uint16_t regVal = readBuffer.readData[0];
+  regVal += (uint16_t)readBuffer.readData[1] << 8;
+  float tempRegVal = regVal;
+  return round(tempRegVal);
 }

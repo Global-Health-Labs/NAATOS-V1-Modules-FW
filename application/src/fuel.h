@@ -121,6 +121,7 @@ typedef struct {
 typedef struct {
   int batt_percent;
   float batt_voltage;
+  float batt_temp;
 } fuel_batt_info_t;
 
 typedef void (*fuelGauge_opDoneCallback_t)(fuel_gauge_errors_t outcome, fuel_gauge_callback_data_t *p_data);
@@ -131,6 +132,7 @@ uint8_t fuelGauge_getSOC(fuelGauge_opDoneCallback_t cb); //returns battery charg
 double fuelGauge_getBattVoltage(fuelGauge_opDoneCallback_t cb);
 double fuelGauge_getRepCap(fuelGauge_opDoneCallback_t cb);      //capacity remaining in mAh
 double fuelGauge_getBattCurrent(fuelGauge_opDoneCallback_t cb); //returns in mA
+double fuelGauge_getBattTemperature(fuelGauge_opDoneCallback_t cb); //returns in C
 
 fuel_gauge_errors_t fuelGauge_loadParams(fram_fuel_gauge_params_t *p_params, fuelGauge_opDoneCallback_t cb);
 fuel_gauge_errors_t fuelGauge_saveParams(fuelGauge_opDoneCallback_t cb);

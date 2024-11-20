@@ -206,6 +206,8 @@
       </folder>
       <file file_name="../src/motor_task.c" />
       <file file_name="../src/motor_task.h" />
+      <file file_name="../src/charger_driver.h" />
+      <file file_name="../src/charger_driver.c" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../sdk/external/segger_rtt/SEGGER_RTT.c" />
