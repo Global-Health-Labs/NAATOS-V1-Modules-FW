@@ -41,6 +41,7 @@ SDK Version: 17.1
 #include "timers.h"
 #include "usb.h"
 #include "watchdog.h"
+#include "charger_driver.h"
 
 #include "core_cm4.h"
 
@@ -343,6 +344,12 @@ void init_peripherals(void) {
   init_pwms();
   vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_100k);
   vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_100k);
+
+  while(!pd_eeprom_init_complete()){
+  }
+
+  setup_charger();
+
 #if ENABLE_LEDS
   led_driver_init();
 #endif
@@ -398,7 +405,7 @@ void main_task(void *pvParameters) {
 
   // Set Start up state to standby
   main_state_t main_state = MAIN_SLEEP;
-  main_state_t next_state = MAIN_STANDBY;
+  main_state_t next_state = MAIN_INIT_CHARGER;
   main_state_t last_state = MAIN_SLEEP;
   int i = 0;
 
@@ -421,6 +428,13 @@ void main_task(void *pvParameters) {
     main_state = next_state;
 
     switch (main_state) {
+
+    case MAIN_INIT_CHARGER: {
+      if(pd_eeprom_init_complete()){
+        setup_charger();
+        next_state = MAIN_STANDBY;
+      }
+    }
     // In Standby State
     case MAIN_STANDBY:
       if (last_state != main_state) {

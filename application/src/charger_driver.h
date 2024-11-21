@@ -6,7 +6,7 @@
 #define TPS25750_I2C_ADDRESS 0x23
 #define BOOT_STATUS_REGISTER 0x2D
 #define BQ25792_ADDR 0x6B
-#define APP_MODE 0x41505020 // ASCII for 'APP '
+#define APP_MODE 0x04415050 // ASCII for 'APP '
 #define MODE_REGISTER 0x03
 
 #define CMD1_REGISTER 0x08        // Command register
@@ -20,11 +20,12 @@ uint32_t read_pd_register(uint8_t reg);
 
 bool pd_eeprom_init_complete();
 
-int pd_controller_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint16_t value);
+int pd_controller_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint16_t value); //TODO currently will only work for 1byte registers
 
 
 int setup_charger();
 
+int read_charger_register(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint8_t length);
 
 
- 
+int test_read_reg();

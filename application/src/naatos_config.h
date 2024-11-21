@@ -5,7 +5,7 @@
 #include "task.h"
 #include <stdint.h>
 
-#define VERSION "2.0b"
+#define VERSION "2.1b"
 
 /*Define this when building sample prep only otherwise comment out*/
 #define SAMPLE_PREP_BOARD
@@ -245,6 +245,8 @@
 
 /* Main States */
 typedef enum {
+  MAIN_INIT_CHARGER,
+  MAIN_INIT_CHARGER_BUSY,
   MAIN_STANDBY,
   MAIN_RUNNING,
   MAIN_FILE,

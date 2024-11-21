@@ -4,7 +4,7 @@
 #include "../naatos_config.h"
 #include "../naatos_queues.h"
 #include "../storage/naatos_storage.h"
-#include "../fuel.h""
+#include "../fuel.h"
 
 void set_log_level();
 void send_start_log_message();
