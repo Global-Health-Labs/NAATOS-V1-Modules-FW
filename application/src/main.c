@@ -405,7 +405,7 @@ void main_task(void *pvParameters) {
 
   // Set Start up state to standby
   main_state_t main_state = MAIN_SLEEP;
-  main_state_t next_state = MAIN_INIT_CHARGER;
+  main_state_t next_state = MAIN_STANDBY;
   main_state_t last_state = MAIN_SLEEP;
   int i = 0;
 
@@ -428,13 +428,6 @@ void main_task(void *pvParameters) {
     main_state = next_state;
 
     switch (main_state) {
-
-    case MAIN_INIT_CHARGER: {
-      if(pd_eeprom_init_complete()){
-        setup_charger();
-        next_state = MAIN_STANDBY;
-      }
-    }
     // In Standby State
     case MAIN_STANDBY:
       if (last_state != main_state) {
