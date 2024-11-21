@@ -16,7 +16,8 @@ uint32_t end_time = 0;
 uint32_t time_left = 0;
 fuel_batt_info_t batt_info_recv =  {
   .batt_percent = 0,
-  .batt_voltage = 0
+  .batt_voltage = 0,
+  .batt_temp = 0,
 };
 
 MainStateErrorQueueMsg_t main_err_msg;
@@ -31,6 +32,20 @@ void reset_cycle_state_machine(void) {
   current_state = VALIDATE_INIT_CONDITIONS;
   next_state = VALIDATE_INIT_CONDITIONS;
   exitInfo = CYCLE_RUNNING;
+}
+
+cycle_state_t handleBatteryMessage() {
+  xReturned = xQueueSend(batteryRxQueue, &batt_req, 0);
+  if (xReturned != pdPASS) {
+    send_debug_log_message("LOG_TASK: Unable to send battery percentage request to batteryRxQueue.\r\n");
+  }
+
+  if (xQueueReceive(main_batteryDataQueue, &batt_info_recv, pdMS_TO_TICKS(0)) == pdPASS) {
+    if(batt_info_recv.batt_temp >= 59.0) {
+      return EXIT_CYCLE;
+    }
+  }
+  return current_state;
 }
 
 cycle_state_exit_t run_cycle_state_machine(void) {
@@ -138,6 +153,16 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       bool setReachedRx = false;
       xReturned = xQueueReceive(main_setPointReached, &setReachedRx, 0);
 
+      
+      next_state = handleBatteryMessage();
+      if(next_state == EXIT_CYCLE){
+        end_cycle_1();
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_OVER_TEMP_BATTERY;
+        runThrough = true;
+        break;
+      }
+
       if (setReachedRx) {
         xReturned = xQueueSend(logger_logMessageQueue, &ramp_to_temp_complete_log_msg, 0);
         if (xReturned != pdPASS) {
@@ -192,6 +217,15 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         } else {
           end_time = (config.cycle_1_run_time_s) * configTICK_RATE_HZ;
         }
+      }
+
+      next_state = handleBatteryMessage();
+      if(next_state == EXIT_CYCLE){
+        end_cycle_1();
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_OVER_TEMP_BATTERY;
+        runThrough = true;
+        break;
       }
 
       time_left = xTaskGetTickCount() - start_time;
@@ -261,9 +295,18 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       break;
     }
 
-    case CYCLE_2_RAMP_TO_TEMP:
+    case CYCLE_2_RAMP_TO_TEMP:{
       // Ramp to the required temperature for cycle 1
       time_left = (xTaskGetTickCount() - start_time);
+
+      next_state = handleBatteryMessage();
+      if(next_state == EXIT_CYCLE){
+        end_cycle_2();
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_OVER_TEMP_BATTERY;
+        runThrough = true;
+        break;
+      }
 
       bool setReachedRx = false;
       xReturned = xQueueReceive(main_setPointReached, &setReachedRx, 0);
@@ -311,6 +354,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       }
 
       break;
+    }
 
     case CYCLE_2_TIMER: {
       if (last_state != current_state) {
@@ -320,6 +364,15 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         } else {
           end_time = ((config.cycle_2_run_time_s) * configTICK_RATE_HZ);
         }
+      }
+
+      next_state = handleBatteryMessage();
+      if(next_state == EXIT_CYCLE){
+        end_cycle_2();
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_OVER_TEMP_BATTERY;
+        runThrough = true;
+        break;
       }
 
       time_left = (xTaskGetTickCount() - start_time);
@@ -373,6 +426,15 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         } else {
           end_time = ((config.motor_end_wait_time_s) * 1000);
         }
+      }
+
+      next_state = handleBatteryMessage();
+      if(next_state == EXIT_CYCLE){
+        end_cycle_2();
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_OVER_TEMP_BATTERY;
+        runThrough = true;
+        break;
       }
 
       time_left = (xTaskGetTickCount() - start_time);
@@ -431,6 +493,14 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         } else {
           end_time = ((config.sample_complete_delay_s) * 1000);
         }
+      }
+
+      next_state = handleBatteryMessage();
+      if(next_state == EXIT_CYCLE){
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_OVER_TEMP_BATTERY;
+        runThrough = true;
+        break;
       }
 
       time_left = (xTaskGetTickCount() - start_time);
@@ -549,7 +619,7 @@ void handle_exit_notifications(void) {
 
   case CYCLE_ERROR_OVER_TEMP_BATTERY:
     eventType = SAMPLE_BATTERY_OVERTEMP;
-    sprintf(exitString, "%s%d", SAMPLE_BATTERY_OVER_TEMP, batt_info_recv.batt_temp);
+    sprintf(exitString, "%s%f", SAMPLE_BATTERY_OVER_TEMP, batt_info_recv.batt_temp);
     break;
 
   case CYCLE_ERROR_OVER_TEMP:

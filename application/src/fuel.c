@@ -437,5 +437,5 @@ double fuelGauge_getBattTemperature(fuelGauge_opDoneCallback_t cb) {
   uint16_t regVal = readBuffer.readData[0];
   regVal += (uint16_t)readBuffer.readData[1] << 8;
   float tempRegVal = regVal;
-  return round(tempRegVal/256.0);
+  return tempRegVal/256.0;
 }

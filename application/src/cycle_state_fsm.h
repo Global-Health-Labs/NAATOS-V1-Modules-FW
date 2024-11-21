@@ -96,3 +96,6 @@ bool limitSwitchFreed(sensor_switches_t data);
 void handle_exit_notifications(void);
 
 cycle_state_t handleMainErrorMessage();
+
+cycle_state_t handleBatteryMessage();
+
