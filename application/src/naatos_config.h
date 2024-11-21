@@ -241,6 +241,7 @@
 #define SAMPLE_MOTOR_STALLED_ERROR_MSG "Motor stalled detected."
 #define SAMPLE_OVER_TEMPERATURE "Sample over temperature error"
 #define SAMPLE_BATTERY_OVER_TEMP "Battery over temperature error:"
+#define SAMPLE_LOW_BATTERY_STRING "Battery is too low to start cycle: "
 
 #define USB_SUSPEND_TASKS_TIME 15000
 

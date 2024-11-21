@@ -156,6 +156,8 @@ void create_tasks(void);
 void send_usb_change(usb_command_t cmd);
 void reset_and_enter_dfu(void);
 
+char exitBatteryOvrTempString[256];
+
 xTaskHandle get_usb_task_handle(void) {
   return usbTaskHandle;
 }
@@ -391,6 +393,7 @@ void main_task(void *pvParameters) {
   bool error_during_run = false;
   bool over_temp = false;
   bool loggedLowPowerOnce = false;
+  bool loggedBatteyrOverTempOnce = false;
   uint32_t start_time = 0, end_time = 0, a_t_start = 0;
   uint32_t alert_timeout_ticks;
   bool usb_conn_status = false;
@@ -470,6 +473,7 @@ void main_task(void *pvParameters) {
         sendWdtMain(true);
         start_time = xTaskGetTickCount();
         loggedLowPowerOnce = false;
+        loggedBatteyrOverTempOnce = false;
       }
 
       hal_triggered = false;
@@ -501,10 +505,25 @@ void main_task(void *pvParameters) {
             if (xReturned != pdPASS) {
               send_debug_log_message("MAIN_TASK: Unable to send log start\r\n");
             }
-             send_event_log_message(SAMPLE_BATTERY_LOW, "Battery LOW \r\n");
+             sprintf(exitBatteryOvrTempString, "%s%f", SAMPLE_LOW_BATTERY_STRING, batt_info_recv.batt_percent);
+             send_event_log_message(SAMPLE_BATTERY_LOW, exitBatteryOvrTempString);
           }
           updateLedStatePowerLevel(LED_STANDBY, true, led_pl_low);
         }
+
+
+        if(batt_info_recv.batt_temp >= 59.0) {
+          if(!loggedBatteyrOverTempOnce) {
+            loggedBatteyrOverTempOnce = true;
+            xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
+            if (xReturned != pdPASS) {
+              send_debug_log_message("MAIN_TASK: Unable to send log start\r\n");
+            }
+             sprintf(exitBatteryOvrTempString, "%s%f", SAMPLE_BATTERY_OVER_TEMP, batt_info_recv.batt_temp);
+             send_event_log_message(SAMPLE_BATTERY_OVERTEMP, exitBatteryOvrTempString);
+          }
+        }
+
 #if ENABLE_LOW_POWER_MODE
         if ((percent_recv < DEFAULT_LOW_POWER_THRESHOLD && use_default_configuration_parameters) || (!use_default_configuration_parameters && percent_recv < config.low_power_threshold)) {
              next_state = MAIN_SLEEP;
