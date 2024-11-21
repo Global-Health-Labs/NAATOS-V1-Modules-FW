@@ -240,6 +240,7 @@
 #define SAMPLE_I2C_READ_ERROR_MSG "I2C sensor read error"
 #define SAMPLE_MOTOR_STALLED_ERROR_MSG "Motor stalled detected."
 #define SAMPLE_OVER_TEMPERATURE "Sample over temperature error"
+#define SAMPLE_BATTERY_OVER_TEMP "Battery over temperature error:"
 
 #define USB_SUSPEND_TASKS_TIME 15000
 
@@ -308,6 +309,7 @@ typedef enum {
   SAMPLE_MOTOR_STALLED,
   SAMPLE_UNKNOWN,
   SAMPLE_BATTERY_LOW,
+  SAMPLE_BATTERY_OVERTEMP,
   // Add more events here
 } event_t;
 

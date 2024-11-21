@@ -72,6 +72,14 @@ cycle_state_exit_t run_cycle_state_machine(void) {
             break;
           }
         }
+
+        if(batt_info_recv.batt_temp >= 59.0) {
+          updateLedState(LED_DECLINE, true);
+          exitInfo = CYCLE_ERROR_OVER_TEMP_BATTERY;
+          runThrough = true;
+          next_state = EXIT_CYCLE;
+          break;
+        }
       }
 
       next_state = START_CYCLE_1;
@@ -537,6 +545,11 @@ void handle_exit_notifications(void) {
   case CYCLE_ERROR_BUTTON_EXIT:
     eventType = SAMPLE_BUTTON_CANCEL;
     sprintf(exitString, "Cycle cancled via button click.");
+    break;
+
+  case CYCLE_ERROR_OVER_TEMP_BATTERY:
+    eventType = SAMPLE_BATTERY_OVERTEMP;
+    sprintf(exitString, "%s%d", SAMPLE_BATTERY_OVER_TEMP, batt_info_recv.batt_temp);
     break;
 
   case CYCLE_ERROR_OVER_TEMP:

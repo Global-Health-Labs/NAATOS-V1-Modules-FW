@@ -501,10 +501,8 @@ void main_task(void *pvParameters) {
             if (xReturned != pdPASS) {
               send_debug_log_message("MAIN_TASK: Unable to send log start\r\n");
             }
-
              send_event_log_message(SAMPLE_BATTERY_LOW, "Battery LOW \r\n");
           }
-
           updateLedStatePowerLevel(LED_STANDBY, true, led_pl_low);
         }
 #if ENABLE_LOW_POWER_MODE
