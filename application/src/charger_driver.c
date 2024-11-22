@@ -74,7 +74,7 @@ int pd_controller_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint16_t value
 
 int setup_charger() {
   pd_controller_i2c_write(BQ25792_ADDR, 0x0F, 0xA2);  // FIX FOR CCG BOARDS, SETS 0x0F TO DEFAULT
-  pd_controller_i2c_write(BQ25792_ADDR, REG0E_Timer_Control, 0x35); // Keep all defaults but disable EN_CHG_TMR
+  pd_controller_i2c_write(BQ25792_ADDR, REG0E_Timer_Control, 0x05); // Keep all defaults but disable EN_CHG_TMR, EN_TRICHG_TMR, EN_PRECHG_TMR
 }
 
 int read_charger_register(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint8_t length) {
