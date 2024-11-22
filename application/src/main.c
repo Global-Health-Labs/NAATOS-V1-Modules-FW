@@ -619,7 +619,12 @@ void main_task(void *pvParameters) {
 
 #ifdef SAMPLE_PREP_BOARD
       // Check if we can go to RUN state
-      if (hal_triggered && buttonData.event == ON_EVENT && !error_during_run) {
+      if ( ((hal_triggered && buttonData.event == ON_EVENT) ) && !error_during_run) {
+        next_state = MAIN_RUNNING;
+        // Delay
+        vTaskDelay(100);
+      }
+      if ( ((pdTICKS_TO_MS(xTaskGetTickCount() - end_time)>60000)) && !error_during_run) {
         next_state = MAIN_RUNNING;
         // Delay
         vTaskDelay(100);
@@ -663,6 +668,7 @@ void main_task(void *pvParameters) {
       cycle_state_exit_t cycle_exit_info = run_cycle_state_machine();
 
       if (cycle_exit_info == CYCLE_COMPLETE) {
+        end_time = xTaskGetTickCount();
         next_state = MAIN_STANDBY;
         break;
       }
@@ -671,6 +677,7 @@ void main_task(void *pvParameters) {
         next_state = MAIN_RUNNING;
       } else {
         next_state = MAIN_ALERT;
+        end_time = xTaskGetTickCount();
       }
 
       break;
