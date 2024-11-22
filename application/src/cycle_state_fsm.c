@@ -570,6 +570,27 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     }
 
     case EXIT_CYCLE:
+      /* Confirm motor is turned off might not be if we exit early due to end cycle not calling this for cycle 2 */
+      if (last_state != current_state) {
+        // Turn off the motor
+        MotorRxQueueMsg_t motorMsg;
+        motorMsg.type = MOTOR_MSG_HEATER_STATE;
+        motorMsg.motorRunning = false;
+      
+        // stop motor PID
+        xReturned = xQueueSend(heaterRxQueue, &stop_cycle_two_zone_motor, 0);
+        if (xReturned != pdPASS) {
+          send_debug_log_message("MAIN_TASK: Unable to send stop valve zone request.\r\n");
+        }
+
+        // Stop motor enable
+        xReturned = xQueueSend(motorRxQueue, &motorMsg, 10);
+        if (xReturned != pdPASS) {
+          send_debug_log_message("HEATER_TASK: Unable to send heater state to motorRxQueue.");
+        }
+        next_state = CYCLE_SAMPLE_VALID_HOLD;
+      }
+
       runThrough = false;
       // Perform exit operations
       // Cleanup or final actions
