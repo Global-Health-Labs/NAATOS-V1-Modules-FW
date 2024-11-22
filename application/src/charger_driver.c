@@ -23,14 +23,14 @@ bool pd_eeprom_init_complete() {
 }
 
 int pd_controller_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint16_t value) { //TODO currently will only work for 1byte registers
-  uint8_t data[9];
+  uint8_t data[8];
   uint8_t rxData[7];
 
   // Prepare the I2Cw command
   data[0] = DATA1_REGISTER;
   data[1] = 5; //length
   data[2] = slave_addr;
-  data[3] = 0x03;
+  data[3] = 0x02;
 
   // Load the target slave address and data
   data[4] = 0x00;
@@ -73,6 +73,7 @@ int pd_controller_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint16_t value
 }
 
 int setup_charger() {
+  pd_controller_i2c_write(BQ25792_ADDR, 0x0F, 0xA2);  // FIX FOR CCG BOARDS, SETS 0x0F TO DEFAULT
   pd_controller_i2c_write(BQ25792_ADDR, REG0E_Timer_Control, 0x35); // Keep all defaults but disable EN_CHG_TMR
 }
 
@@ -128,6 +129,6 @@ int read_charger_register(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, u
 int test_read_reg() {
   uint8_t data[1];
   read_charger_register(BQ25792_ADDR, REG0E_Timer_Control, data, 1);
-
+  read_charger_register(BQ25792_ADDR, 0x0F, data, 1);
   return 0;
 }
