@@ -662,6 +662,20 @@ void main_task(void *pvParameters) {
 
       cycle_state_exit_t cycle_exit_info = run_cycle_state_machine();
 
+      // Check if USB State needs to be updated
+      if (xQueueReceive(main_usbConnRecvQueue, &usb_conn_status, 0) == pdPASS) {
+        usb_needs_update = true;
+      }
+
+      if (usb_needs_update) {
+        if (usb_conn_status) {
+          updateLedState(LED_CHARGING, true);
+        } else if (!usb_conn_status) {
+          updateLedState(LED_CHARGING, false);
+        }
+        usb_needs_update = false;
+      }
+
       if (cycle_exit_info == CYCLE_COMPLETE) {
         next_state = MAIN_STANDBY;
         break;
