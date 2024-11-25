@@ -1103,7 +1103,7 @@ void create_queues() {
   if (main_batteryDataQueue == NULL)
     send_debug_log_message("Unable to create main_batteryDataQueue queue");
 
-  main_switchQueue = xQueueCreate(10, sizeof(sensor_switches_t));
+  main_switchQueue = xQueueCreate(QUEUE_SIZE, sizeof(sensor_switches_t));
   if (main_switchQueue == NULL)
     send_debug_log_message("Unable to create main_switchQueue queue");
 
