@@ -489,7 +489,8 @@ void main_task(void *pvParameters) {
       if (xQueueReceive(main_batteryDataQueue, &batt_info_recv, pdMS_TO_TICKS(100)) == pdPASS) {
         // Set the variable LED from the battery percentage
         led_power_level_t l_powerLevel = getCurrentPowerLevel();
-        float min_starting_voltage = MIN_BATTERY_VOLTAGE * (1.0 + ((float)config.low_power_threshold / 100.0));
+        float min_starting_voltage = MIN_BATTERY_VOLTAGE + ((MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE) * ((float)config.low_power_threshold / 100.0));
+
         if (batt_info_recv.batt_percent >= LED_POWER_LEVEL_HIGH_THRESH && l_powerLevel != led_pl_high) {
           updateLedStatePowerLevel(LED_STANDBY, true, led_pl_high);
         }
@@ -498,7 +499,6 @@ void main_task(void *pvParameters) {
           updateLedStatePowerLevel(LED_STANDBY, true, led_pl_medium);
         }
         else if ((batt_info_recv.batt_percent < config.low_power_threshold || batt_info_recv.batt_voltage < min_starting_voltage ) && l_powerLevel != led_pl_low) {
-
           if(!loggedLowPowerOnce) {
             loggedLowPowerOnce = true;
             xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
