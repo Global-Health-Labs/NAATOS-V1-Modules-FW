@@ -5,6 +5,7 @@
 #include "naatos_config.h"
 #include "naatos_queues.h"
 #include "stdbool.h"
+#include "logger/logger.h"
 #include <stdint.h>
 
 #define ENABLE_LEDS 1

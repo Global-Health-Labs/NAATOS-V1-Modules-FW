@@ -6,6 +6,7 @@ led_color led2_current_color = blue;
 xQueueHandle ledRxQueue;
 
 static LEDFlags_t ledFlags;
+bool first_run_through = true;
 
 int powerLevel = 100;
 led_power_level_t led_power_level = led_pl_high;
@@ -36,9 +37,13 @@ void handleLedState(LEDRxQueueMsg_t ledMsg) {
     ledFlags.wakeupCondition = ledMsg.active;
     break;
   case LED_CHARGING:
+    if (ledFlags.batteryCharging == ledMsg.active) {
+      return;
+    }
     ledFlags.batteryCharging = ledMsg.active;
     break;
   case LED_STANDBY:
+    first_run_through = true;
     ledFlags.standbyCondition = ledMsg.active;
     led_power_level = ledMsg.powerLevel;
     break;

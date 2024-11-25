@@ -649,7 +649,6 @@ void main_task(void *pvParameters) {
       if (last_state != main_state) {
         reset_cycle_state_machine();
         updateLedState(LED_STANDBY, false);
-        updateLedState(LED_RUN_HEATER, true);
       }
 
       main_wdt_time_left = pdTICKS_TO_MS(xTaskGetTickCount() - main_wdt_start_time);
