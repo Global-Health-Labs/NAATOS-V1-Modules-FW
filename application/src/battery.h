@@ -5,5 +5,6 @@
 #include "naatos_config.h"
 #include "naatos_queues.h"
 #include "queue.h"
+#include "logger/logger.h"
 
 void battery_task(void *pvParameters);

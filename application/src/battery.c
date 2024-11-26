@@ -103,11 +103,9 @@ void battery_task(void *pvParameters) {
         char tmp[100];
         // I2C Fuel Gauge read
         batt_info.batt_percent = fuelGauge_getSOC(NULL);
-        vTaskDelay(pdMS_TO_TICKS(25));
-        batt_info.batt_voltage = (((float)fuelGauge_getBattVoltage(NULL)) / 1000.0);
-        vTaskDelay(pdMS_TO_TICKS(25));
+        batt_info.batt_voltage = (((float)fuelGauge_getBattVoltage(NULL)) / 1000.0f);
+        vTaskDelay(pdMS_TO_TICKS(5));
         batt_info.batt_temp = (float)fuelGauge_getBattTemperature(NULL);
-        vTaskDelay(pdMS_TO_TICKS(25));
         if (batteryRxMessage.sendTo == BATTERY_MSG_SOC_MAIN) {
           xReturned = xQueueSend(main_batteryDataQueue, (void *)&batt_info, 1000); // TODO: Probably want to send full BMS information instead
           if (xReturned != pdPASS) {

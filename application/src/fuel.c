@@ -367,7 +367,7 @@ fuel_gauge_errors_t fuelGauge_init(void) {
 }
 
 uint8_t fuelGauge_getSOC(fuelGauge_opDoneCallback_t cb) {
-  fuelGauge_readRegister(MAX17263_FG_REG_REPSOC, fg_get_soc, cb);
+  while (fuelGauge_readRegister(MAX17263_FG_REG_REPSOC, fg_get_soc, cb) == fuel_gauge_busy);
   uint8_t battPercent = readBuffer.readData[1];
   if (battPercent < 0) {
     battPercent = 0;
@@ -376,7 +376,7 @@ uint8_t fuelGauge_getSOC(fuelGauge_opDoneCallback_t cb) {
 }
 
 double fuelGauge_getBattVoltage(fuelGauge_opDoneCallback_t cb) {
-  fuelGauge_readRegister(MAX17263_FG_REG_VCELL, fg_get_batt_voltage, cb);
+  while (fuelGauge_readRegister(MAX17263_FG_REG_VCELL, fg_get_batt_voltage, cb) == fuel_gauge_busy);
   uint16_t regVal = readBuffer.readData[0];
   regVal += (uint16_t)readBuffer.readData[1] << 8;
   float tempRegVal = regVal;
@@ -433,7 +433,7 @@ fuel_gauge_errors_t fuelGauge_saveParams(fuelGauge_opDoneCallback_t cb) {
 
 
 double fuelGauge_getBattTemperature(fuelGauge_opDoneCallback_t cb) {
-  fuelGauge_readRegister(MAX17263_FG_REG_TEMP, fg_get_batt_voltage, cb);
+  while (fuelGauge_readRegister(MAX17263_FG_REG_TEMP, fg_get_batt_voltage, cb) == fuel_gauge_busy);
   uint16_t regVal = readBuffer.readData[0];
   regVal += (uint16_t)readBuffer.readData[1] << 8;
   float tempRegVal = regVal;

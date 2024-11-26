@@ -77,7 +77,7 @@ bool calendar_get_time(calendar_time_t *now) {
   now->week_day = calendar_decode(buff[4] & ~0xF8);
   now->month = calendar_decode(buff[5] & ~0xE0);
   now->year = calendar_decode(buff[6]);
-
+  
   return ~(buff[0] & 0x80);
 #else
   now->second = 59;
@@ -242,24 +242,24 @@ bool calendar_set_time_helper(void) {
   //calendar_stop();
   calendar_set_time(&now);
 
-  send_debug_log_message("Requested time  M: %d D: %d Y:%d h: %d m: %d s: %d",
-      now.month,
-      now.day,
-      now.year,
-      now.hour,
-      now.minute,
-      now.second);
+  //send_debug_log_message("Requested time  M: %d D: %d Y:%d h: %d m: %d s: %d",
+   //   now.month,
+   //   now.day,
+   //   now.year,
+    //  now.hour,
+    //  now.minute,
+    //  now.second);
 
   //calendar_start();
   calendar_get_time(&now);
 
-  send_debug_log_message("Read back time  M: %d D: %d Y:%d h: %d m: %d s: %d",
-      now.month,
-      now.day,
-      now.year,
-      now.hour,
-      now.minute,
-      now.second);
+  //send_debug_log_message("Read back time  M: %d D: %d Y:%d h: %d m: %d s: %d",
+  //    now.month,
+  //    now.day,
+  //    now.year,
+   //   now.hour,
+   //   now.minute,
+   //   now.second);
 
   return true;
 }

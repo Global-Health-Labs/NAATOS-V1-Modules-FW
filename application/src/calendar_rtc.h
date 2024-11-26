@@ -3,6 +3,7 @@
 
 #include "i2c_hal_freertos.h"
 #include "naatos_config.h"
+#include "logger/logger.h"
 #include <stdint.h>
 
 #define PCF85_S_ADDR 0x51

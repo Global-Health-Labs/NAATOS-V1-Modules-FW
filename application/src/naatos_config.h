@@ -43,7 +43,7 @@
 
 /* Battery Parameters */
 #define ENABLE_LOW_POWER_MODE 0
-#define DEFAULT_LOW_POWER_THRESHOLD 20
+#define DEFAULT_LOW_POWER_THRESHOLD 46
 
 /*------------COMMON PIN CONFIGS------------*/
 /* I2C Pins */
