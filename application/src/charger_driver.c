@@ -128,7 +128,6 @@ int setup_charger() {
   pd_controller_i2c_write(BQ25792_ADDR, 0x12, 0x04);                // Disable BATFET LDO mode in precharge state (disables minimum system voltage regulation)
   pd_controller_i2c_write(BQ25792_ADDR, 0x08, 0x03);                // Set BAT LOWV to the lowest % so that charger avoids precharge
   pd_controller_i2c_write16(BQ25792_ADDR, 0x03, 0x01F4);            // Set charge current limit to maximum of 5A (500 * 10mA = 0x01F4), 9-bit register
-  test_read_reg();
 }
 
 int read_charger_register(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint8_t length) {
