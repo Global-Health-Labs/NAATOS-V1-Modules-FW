@@ -107,7 +107,7 @@ void handleLedState(LEDRxQueueMsg_t ledMsg) {
         else if (led_power_level == led_pl_medium) {
           set_led2_yellow_solid();
         }
-        else {
+        else if (led_power_level == led_pl_low){
           set_led2_red_solid();
         }
       }
