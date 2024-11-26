@@ -5,7 +5,7 @@
 #include "task.h"
 #include <stdint.h>
 
-#define VERSION "2.2b"
+#define VERSION "2.3b"
 
 /*Define this when building sample prep only otherwise comment out*/
 #define SAMPLE_PREP_BOARD
