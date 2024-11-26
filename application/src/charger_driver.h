@@ -22,6 +22,7 @@ bool pd_eeprom_init_complete();
 
 int pd_controller_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint16_t value); //TODO currently will only work for 1byte registers
 
+int pd_controller_i2c_write16(uint8_t slave_addr, uint8_t reg_addr, uint16_t value);
 
 int setup_charger();
 

@@ -72,9 +72,63 @@ int pd_controller_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint16_t value
   return 0;
 }
 
+int pd_controller_i2c_write16(uint8_t slave_addr, uint8_t reg_addr, uint16_t value) { //TODO currently will only work for 1byte registers
+  uint8_t data[8];
+  uint8_t rxData[7];
+
+  // Prepare the I2Cw command
+  data[0] = DATA1_REGISTER;
+  data[1] = 6; //length
+  data[2] = slave_addr;
+  data[3] = 0x03;
+
+  // Load the target slave address and data
+  data[4] = 0x00;
+  data[5] = reg_addr;          // Target I2C slave address (battery charger)
+  data[6] = (uint8_t)(value >> 8); 
+  data[7] = (uint8_t)(value & 0xFF);
+
+
+  ret_code_t ret = xUtil_TWI_Write_Single(i2c_interface_sensors, TPS25750_I2C_ADDRESS, DATA1_REGISTER, data, 8);
+
+  if (ret) {
+    printf("fail write\r\n");
+    send_debug_log_message("Unable to i2c communicate with pd chip!");
+    return -1;
+  }
+
+   ret = xUtil_TWI_Read( i2c_interface_sensors, TPS25750_I2C_ADDRESS, DATA1_REGISTER, rxData, 6);
+
+  // Prepare data to write
+  uint8_t value_data[7];
+  value_data[0] = CMD1_REGISTER;
+  value_data[1] = 4; // length
+  value_data[2] = 0x49;
+  value_data[3] = 0x32;
+  value_data[4] = 0x43;
+  value_data[5] = 0x77;
+
+
+  ret = xUtil_TWI_Write_Single(i2c_interface_sensors, TPS25750_I2C_ADDRESS, CMD1_REGISTER, value_data, 6);
+
+  if (ret) {
+    send_debug_log_message("Error writing data to Data1 on PD!");
+    return -1;
+  }
+
+   ret = xUtil_TWI_Read( i2c_interface_sensors, TPS25750_I2C_ADDRESS, CMD1_REGISTER, rxData, 4);
+
+
+  return 0;
+}
+
 int setup_charger() {
-  pd_controller_i2c_write(BQ25792_ADDR, 0x0F, 0xA2);  // FIX FOR CCG BOARDS, SETS 0x0F TO DEFAULT
+  pd_controller_i2c_write(BQ25792_ADDR, 0x0F, 0xA2);                // FIX FOR CCG BOARDS, SETS 0x0F TO DEFAULT
   pd_controller_i2c_write(BQ25792_ADDR, REG0E_Timer_Control, 0x05); // Keep all defaults but disable EN_CHG_TMR, EN_TRICHG_TMR, EN_PRECHG_TMR
+  pd_controller_i2c_write(BQ25792_ADDR, 0x12, 0x04);                // Disable BATFET LDO mode in precharge state (disables minimum system voltage regulation)
+  pd_controller_i2c_write(BQ25792_ADDR, 0x08, 0x03);                // Set BAT LOWV to the lowest % so that charger avoids precharge
+  pd_controller_i2c_write16(BQ25792_ADDR, 0x03, 0x01F4);            // Set charge current limit to maximum of 5A (500 * 10mA = 0x01F4), 9-bit register
+  test_read_reg();
 }
 
 int read_charger_register(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint8_t length) {
@@ -87,7 +141,7 @@ int read_charger_register(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, u
   cmd[1] = 6; //length
   cmd[2] = slave_addr;
   cmd[3] = reg_addr;
-  cmd[4] = 1;          // size of device register
+  cmd[4] = length;          // size of device register
 
 
   ret_code_t ret = xUtil_TWI_Write_Single(i2c_interface_sensors, TPS25750_I2C_ADDRESS, DATA1_REGISTER, cmd, 5);
@@ -116,7 +170,7 @@ int read_charger_register(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, u
 
   //TODO need a delay here
 
-  ret = xUtil_TWI_Read( i2c_interface_sensors, TPS25750_I2C_ADDRESS, DATA1_REGISTER, data, 3);
+  ret = xUtil_TWI_Read( i2c_interface_sensors, TPS25750_I2C_ADDRESS, DATA1_REGISTER, data, 2 + length);
 
 
   if(ret) {
@@ -127,8 +181,11 @@ int read_charger_register(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, u
 }
 
 int test_read_reg() {
-  uint8_t data[1];
-  read_charger_register(BQ25792_ADDR, REG0E_Timer_Control, data, 1);
+  uint8_t data[2];
   read_charger_register(BQ25792_ADDR, 0x0F, data, 1);
+  read_charger_register(BQ25792_ADDR, REG0E_Timer_Control, data, 1);
+  read_charger_register(BQ25792_ADDR, 0x12, data, 1);
+  read_charger_register(BQ25792_ADDR, 0x08, data, 1);
+  read_charger_register(BQ25792_ADDR, 0x03, data, 2);
   return 0;
 }
