@@ -346,12 +346,6 @@ void init_peripherals(void) {
   init_pwms();
   vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_100k);
   vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_100k);
-
-  while(!pd_eeprom_init_complete()){
-  }
-
-  setup_charger();
-
 #if ENABLE_LEDS
   led_driver_init();
 #endif
@@ -405,6 +399,12 @@ void main_task(void *pvParameters) {
       .type = BATTERY_SOC_REQUEST,
       .sendTo = BATTERY_MSG_SOC_MAIN};
   BaseType_t xHigherPriorityTaskWoken = pdTRUE;
+
+  // Initalize the charger in here after 1 second to avoid 
+  // issues with charging when the kill switch is off
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  while(!pd_eeprom_init_complete());
+  setup_charger();
 
   // Set Start up state to standby
   main_state_t main_state = MAIN_SLEEP;
@@ -1240,7 +1240,7 @@ int main(void) {
   while (!nrf_drv_clock_lfclk_is_running()) {
     // Just waiting
   }
-  
+
   // Enable Lines 
   set_startup_enables();  
   // Init Peripherals
