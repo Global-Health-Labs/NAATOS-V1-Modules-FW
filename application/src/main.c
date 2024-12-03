@@ -490,15 +490,17 @@ void main_task(void *pvParameters) {
         // Set the variable LED from the battery percentage
         led_power_level_t l_powerLevel = getCurrentPowerLevel();
         float min_starting_voltage = MIN_BATTERY_VOLTAGE + ((MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE) * ((float)config.low_power_threshold / 100.0));
+        float white_starting_voltage = MIN_BATTERY_VOLTAGE + ((MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE) * ((float)LED_POWER_LEVEL_HIGH_THRESH / 100.0));
 
-        if (batt_info_recv.batt_percent >= LED_POWER_LEVEL_HIGH_THRESH && l_powerLevel != led_pl_high) {
-          updateLedStatePowerLevel(LED_STANDBY, true, led_pl_high);
+        if ((batt_info_recv.batt_voltage >= white_starting_voltage) && l_powerLevel != led_pl_high) {
+          if (!usb_started)
+            updateLedStatePowerLevel(LED_STANDBY, true, led_pl_high);
         }
-        else if (((batt_info_recv.batt_percent < LED_POWER_LEVEL_HIGH_THRESH && batt_info_recv.batt_percent >= config.low_power_threshold) && 
-                  (batt_info_recv.batt_voltage >= min_starting_voltage)) && l_powerLevel != led_pl_medium) {
-          updateLedStatePowerLevel(LED_STANDBY, true, led_pl_medium);
+        else if ((batt_info_recv.batt_voltage < white_starting_voltage) && (batt_info_recv.batt_voltage >= min_starting_voltage) && l_powerLevel != led_pl_medium) {
+          if (!usb_started)
+            updateLedStatePowerLevel(LED_STANDBY, true, led_pl_medium);
         }
-        else if ((batt_info_recv.batt_percent < config.low_power_threshold || batt_info_recv.batt_voltage < min_starting_voltage ) && l_powerLevel != led_pl_low) {
+        else if ((batt_info_recv.batt_voltage < min_starting_voltage) && l_powerLevel != led_pl_low) {
           if(!loggedLowPowerOnce) {
             loggedLowPowerOnce = true;
             xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
@@ -508,7 +510,9 @@ void main_task(void *pvParameters) {
              sprintf(exitBatteryOvrTempString, "%s%f", SAMPLE_LOW_BATTERY_STRING, batt_info_recv.batt_percent);
              send_event_log_message(SAMPLE_BATTERY_LOW, exitBatteryOvrTempString);
           }
-          updateLedStatePowerLevel(LED_STANDBY, true, led_pl_low);
+
+          if (!usb_started)
+            updateLedStatePowerLevel(LED_STANDBY, true, led_pl_low);
         }
 
 

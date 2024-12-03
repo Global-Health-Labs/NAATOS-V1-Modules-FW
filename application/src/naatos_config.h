@@ -5,7 +5,7 @@
 #include "task.h"
 #include <stdint.h>
 
-#define VERSION "2.3b"
+#define VERSION "2.4b"
 
 /*Define this when building sample prep only otherwise comment out*/
 #define SAMPLE_PREP_BOARD
@@ -211,9 +211,9 @@
 #define DEFAULT_DEBUG_TO_COM_ENABLE true
 #endif
 
-#define DEFAULT_DATE 100124                // Oct. 1 2024
+#define DEFAULT_DATE 120324                // Dec. 3 2024
 #define DEFAULT_TIME 120000                // 12 pm
-#define DEFAULT_SET_TIME false
+#define DEFAULT_SET_TIME true
 
 #define DEFAULT_CYCLES_COMPLETE_DELAY_S 10
 
