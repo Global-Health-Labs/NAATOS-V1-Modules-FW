@@ -492,11 +492,15 @@ void main_task(void *pvParameters) {
         float min_starting_voltage = MIN_BATTERY_VOLTAGE + ((MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE) * ((float)config.low_power_threshold / 100.0));
         float white_starting_voltage = MIN_BATTERY_VOLTAGE + ((MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE) * ((float)LED_POWER_LEVEL_HIGH_THRESH / 100.0));
 
-        if ((batt_info_recv.batt_voltage >= white_starting_voltage) && l_powerLevel != led_pl_high) {
+        if (l_powerLevel != led_pl_high && 
+           ((batt_info_recv.batt_voltage >= white_starting_voltage && l_powerLevel != led_pl_medium) ||
+            (batt_info_recv.batt_voltage >= white_starting_voltage + (0.01f) && l_powerLevel == led_pl_medium)) {
           if (!usb_started)
             updateLedStatePowerLevel(LED_STANDBY, true, led_pl_high);
         }
-        else if ((batt_info_recv.batt_voltage < white_starting_voltage) && (batt_info_recv.batt_voltage >= min_starting_voltage) && l_powerLevel != led_pl_medium) {
+        else if (l_powerLevel != led_pl_medium && 
+                (((batt_info_recv.batt_voltage < white_starting_voltage) && (batt_info_recv.batt_voltage >= min_starting_voltage) && l_powerLevel != led_pl_low ) || 
+                 ((batt_info_recv.batt_voltage < white_starting_voltage) && (batt_info_recv.batt_voltage >= min_starting_voltage + 0.01)) && l_powerLevel == led_pl_low )) {
           if (!usb_started)
             updateLedStatePowerLevel(LED_STANDBY, true, led_pl_medium);
         }
