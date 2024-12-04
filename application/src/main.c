@@ -393,6 +393,7 @@ void main_task(void *pvParameters) {
   bool usb_conn_status = false;
   bool usb_needs_update = false;
   bool wake_up = false;
+  bool power_on_log_created = false;
   int mainWatchDogKickCount = 0;
   char w_buff[100];
   const BatteryRxQueueMsg_t batt_req = {
@@ -487,6 +488,20 @@ void main_task(void *pvParameters) {
 
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &batt_info_recv, pdMS_TO_TICKS(100)) == pdPASS) {
+        // Create the Power on log if we have not yet
+        if (!power_on_log_created && !usb_started) {
+          power_on_log_created = true;
+          xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
+          if (xReturned != pdPASS) {
+            send_debug_log_message("MAIN_TASK: Unable to send log start\r\n");
+          }
+          sprintf(exitBatteryOvrTempString, "%s%0.02f", POWER_ON_STRING, batt_info_recv.batt_voltage);
+          send_event_log_message(SAMPLE_BATTERY_OVERTEMP, exitBatteryOvrTempString);
+        }
+        else if (!power_on_log_created && usb_started) {
+          power_on_log_created = true;
+        }
+
         // Set the variable LED from the battery percentage
         led_power_level_t l_powerLevel = getCurrentPowerLevel();
         float min_starting_voltage = MIN_BATTERY_VOLTAGE + ((MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE) * ((float)config.low_power_threshold / 100.0));
