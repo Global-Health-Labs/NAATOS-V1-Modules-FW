@@ -159,7 +159,7 @@
 #define DEFAULT_MIN_RUN_ZONE_TEMP_EN false
 #define DEFAULT_ALERT_TIMEOUT_S 3.0    // Seconds
 #define DEFAULT_VALID_TIMEOUT_S 3600.0 // 1 hour
-#define DEFAULT_RECOVERY_THRES 20      // Percent
+#define DEFAULT_RECOVERY_THRES 47      // Percent
 #define OPTICAL_TRIG_THRES 800
 #define DEFAULT_HEATER_SETPOINT_1 91.0 // Sample prep only
 #define DEFAULT_HEATER_SETPOINT_2 96.0 // Sample prep only
@@ -243,7 +243,7 @@
 #define SAMPLE_OVER_TEMPERATURE "Sample over temperature error"
 #define SAMPLE_BATTERY_OVER_TEMP "Battery over temperature error:"
 #define SAMPLE_LOW_BATTERY_STRING "Battery is too low to start cycle: "
-#define POWER_ON_STRING "Sample preperation unit powered on, starting battery voltage: "
+#define POWER_ON_STRING "Sample preperation unit powered on. Starting battery voltage: "
 #define USB_SUSPEND_TASKS_TIME 15000
 
 /* Main States */
@@ -721,3 +721,4 @@ typedef struct {
 /* Configuration Parameters Variables */
 extern bool use_default_configuration_parameters;
 extern naatos_config_parameters config;
+extern bool batt_recovering;

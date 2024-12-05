@@ -75,8 +75,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &batt_info_recv, pdMS_TO_TICKS(1000)) == pdPASS) {
-        float min_starting_voltage = MIN_BATTERY_VOLTAGE + ((MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE) * ((float)config.low_power_threshold / 100.0));
-        if (batt_info_recv.batt_voltage < min_starting_voltage) {
+        if (!batt_recovering) {
           updateLedState(LED_DECLINE, true);
           exitInfo = CYCLE_ERROR_POWER_LOW;
           runThrough = true;
