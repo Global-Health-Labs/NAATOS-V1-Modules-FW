@@ -75,7 +75,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &batt_info_recv, pdMS_TO_TICKS(1000)) == pdPASS) {
-        if (!batt_recovering) {
+        if (batt_recovering) {
           updateLedState(LED_DECLINE, true);
           exitInfo = CYCLE_ERROR_POWER_LOW;
           runThrough = true;
