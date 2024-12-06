@@ -14,7 +14,7 @@ void watchdog_init(void) {
 
   nrf_drv_wdt_config_t config = NRF_DRV_WDT_DEAFULT_CONFIG;
   config.behaviour = NRF_WDT_BEHAVIOUR_RUN_SLEEP_HALT; // Ensure this behaviour is supported
-  config.reload_value = 1000; //6000;                          // 12 seconds
+  config.reload_value = 1000; 
   err_code = nrf_drv_wdt_init(&config, wdt_event_handler);
   APP_ERROR_CHECK(err_code);
 

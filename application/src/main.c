@@ -837,6 +837,14 @@ void main_task(void *pvParameters) {
         }
         usb_needs_update = false;
       }
+      else if (!usb_started) {
+        buttonData.event = NONE;
+        updateLedState(LED_USB_MSC_STARTING, false);
+        next_state = MAIN_STANDBY;
+        send_usb_change(USB_CDC_ACM);
+        sendWatchdogKickFromTask(MAIN, false);
+      }
+
       vTaskDelay(pdMS_TO_TICKS(100));
       break;
 
