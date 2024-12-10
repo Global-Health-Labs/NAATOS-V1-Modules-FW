@@ -8,8 +8,8 @@
 #define VERSION "2.6b"
 
 /*Define this when building sample prep only otherwise comment out*/
-#define SAMPLE_PREP_BOARD
-//#define POWER_MODULE_BOARD
+//#define SAMPLE_PREP_BOARD
+#define POWER_MODULE_BOARD
 
 #ifdef SAMPLE_PREP_BOARD
 #define SAMPLE_PREP_REV_A 0
@@ -20,8 +20,8 @@
 #endif
 
 #ifdef POWER_MODULE_BOARD
-#define POWER_MODULE_REV_A  1
-#define POWER_MODULE_REV_B  0
+#define POWER_MODULE_REV_A  0
+#define POWER_MODULE_REV_B  1
 #if POWER_MODULE_REV_A == 1 && POWER_MODULE_REV_B ==1
 #define POWER_MODULE_REV_B  1
 #endif 
@@ -209,6 +209,8 @@
 #define DEFAULT_MAX_AMP_PID 100
 #define DEFAULT_MAX_VALVE_PID 100
 #define DEFAULT_DEBUG_TO_COM_ENABLE true
+#define MIN_BATTERY_VOLTAGE 2.90
+#define MAX_BATTERY_VOLTAGE 4.20
 #endif
 
 #define DEFAULT_DATE 120324                // Dec. 3 2024

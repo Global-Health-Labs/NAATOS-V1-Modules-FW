@@ -113,6 +113,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         break;
       }
 
+#ifdef SAMPLE_PREP_BOARD
       // Set LEDs
       if (config.run_heater_1) {
         updateLedState(LED_RUN_HEATER, true);
@@ -123,7 +124,6 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         updateLedState(LED_RUN_HEATER, false);
       }
 
-#ifdef SAMPLE_PREP_BOARD
       if (config.ramp_to_temp_before_start_cycle_1 && config.run_heater_1) {
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
@@ -136,6 +136,8 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         next_state = CYCLE_1_TIMER;
       }
 #else
+      updateLedState(LED_RUN_HEATER, false);
+
       next_state = CYCLE_1_TIMER;
 #endif
       break;
@@ -373,7 +375,11 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       time_left = (xTaskGetTickCount() - start_time);
 
       if (time_left >= end_time) {
+#ifdef SAMPLE_PREP_BOARD
         next_state = CYCLE_2_MOTOR_STOP_WAIT;
+#else
+        next_state = CYCLE_COMPLETE_DELAY;
+#endif
         end_cycle_2();
         break;
       }
@@ -410,6 +416,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       break;
     }
 
+#ifdef SAMPLE_PREP_BOARD
     case CYCLE_2_MOTOR_STOP_WAIT: {
       if (last_state != current_state) {
         char w_buff[100];
@@ -479,6 +486,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       break;
     }
+#endif
 
     case CYCLE_COMPLETE_DELAY: {
       if (last_state != current_state) {
@@ -567,6 +575,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     case EXIT_CYCLE:
       /* Confirm motor is turned off might not be if we exit early due to end cycle not calling this for cycle 2 */
       if (last_state != current_state) {
+#ifdef SAMPLE_PREP_BOARD
         // Turn off the motor
         MotorRxQueueMsg_t motorMsg;
         motorMsg.type = MOTOR_MSG_HEATER_STATE;
@@ -583,6 +592,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         if (xReturned != pdPASS) {
           send_debug_log_message("HEATER_TASK: Unable to send heater state to motorRxQueue.");
         }
+#endif
         next_state = CYCLE_SAMPLE_VALID_HOLD;
       }
 

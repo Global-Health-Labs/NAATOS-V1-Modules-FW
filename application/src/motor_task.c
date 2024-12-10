@@ -4,6 +4,8 @@
 #include "timers.h"
 #include "logger/logger.h"
 
+#ifdef SAMPLE_PREP_BOARD
+
 static const nrf_drv_timer_t *p_counter1;
 static uint32_t motor_speed_read_t1 = 0;
 static uint32_t motor_speed_read_t2;
@@ -197,3 +199,5 @@ void handleMotorConfigUpdated(void) {
     startSensorMotorTimer();
   }
 }
+
+#endif

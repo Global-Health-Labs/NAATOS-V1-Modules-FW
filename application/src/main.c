@@ -447,6 +447,7 @@ void main_task(void *pvParameters) {
           send_debug_log_message("MAIN: Unable to send sensor wakeup to sensorRxQueue.");
         }
 
+#ifdef SAMPLE_PREP_BOARD
         MotorRxQueueMsg_t motorMsg;
         motorMsg.type = MOTOR_MSG_WAKEUP;
 
@@ -454,6 +455,7 @@ void main_task(void *pvParameters) {
         if (xReturned != pdPASS) {
           send_debug_log_message("MAIN: Unable to send sensor wakeup to motorRxQueue.");
         }
+#endif
 
         read_sd_and_notify_tasks();
         // Get the alert timeout
@@ -726,7 +728,7 @@ void main_task(void *pvParameters) {
         updateLedState(LED_STANDBY, true);
         updateLedState(LED_COMPLETE, false);
         a_t_start = xTaskGetTickCount();
-        sprintf(tmp, "MAIN_TASK: Alert Timeout - %dms", pdTICKS_TO_MS(alert_timeout_ticks));\
+        sprintf(tmp, "MAIN_TASK: Alert Timeout - %dms", pdTICKS_TO_MS(alert_timeout_ticks));
         send_debug_log_message(tmp);
       }
 
@@ -1115,6 +1117,7 @@ void create_tasks() {
     send_debug_log_message(buff);
     vTaskDelete(ledTaskHandle);
   }
+  #ifdef SAMPLE_PREP_BOARD
   // Motor Task
   xReturned = xTaskCreate(motorTask, "MotorTask", 1024, NULL, 0, &motorTaskHandle);
   if (xReturned != pdPASS) {
@@ -1123,7 +1126,7 @@ void create_tasks() {
     send_debug_log_message(buff);
     vTaskDelete(ledTaskHandle);
   }
-  
+  #endif
 }
 
 /*********************************************************************
@@ -1241,11 +1244,12 @@ void create_queues() {
   if (main_setPointReached == NULL) {
     send_debug_log_message("Unable to create main_setPointReached queue");
   }
-
+#ifdef SAMPLE_PREP_BOARD
   motorRxQueue = xQueueCreate(10, sizeof(MotorRxQueueMsg_t));
   if (motorRxQueue == NULL) {
     send_debug_log_message("Unable to create motorRxQueue queue");
   }
+#endif
 }
 
 // Stack Overflow detection.
