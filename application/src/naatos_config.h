@@ -5,11 +5,11 @@
 #include "task.h"
 #include <stdint.h>
 
-#define VERSION "2.6b"
+#define VERSION "2.7b"
 
 /*Define this when building sample prep only otherwise comment out*/
-//#define SAMPLE_PREP_BOARD
-#define POWER_MODULE_BOARD
+#define SAMPLE_PREP_BOARD
+//#define POWER_MODULE_BOARD
 
 #ifdef SAMPLE_PREP_BOARD
 #define SAMPLE_PREP_REV_A 0
@@ -161,8 +161,8 @@
 #define DEFAULT_VALID_TIMEOUT_S 3600.0 // 1 hour
 #define DEFAULT_RECOVERY_THRES 47      // Percent
 #define OPTICAL_TRIG_THRES 800
-#define DEFAULT_HEATER_SETPOINT_1 91.0 // Sample prep only
-#define DEFAULT_HEATER_SETPOINT_2 96.0 // Sample prep only
+#define DEFAULT_HEATER_SETPOINT_1 93.5 // Sample prep only
+#define DEFAULT_HEATER_SETPOINT_2 93.5 // Sample prep only
 #define DEFAULT_RAMP_SETPOINT 95.0
 #define MOTOR_SETPOINT_1 3900
 #define MOTOR_SETPOINT_2 3900
@@ -171,7 +171,7 @@
 #define DEFAULT_RUN_MOTOR_2 true
 #define DEFAULT_RUN_HEATER_2 true
 #define DEFAULT_MOTOR_SWTICH_CCW_CW  false
-#define DEFAULT_CYCLE_1_RUNTIME 120.0
+#define DEFAULT_CYCLE_1_RUNTIME 240.0
 #define DEFAULT_CYCLE_2_RUNTIME 240.0
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_1 true
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_2 false
@@ -186,7 +186,7 @@
 #define MIN_BATTERY_VOLTAGE 2.90
 #define MAX_BATTERY_VOLTAGE 4.20
 #define DEFAULT_LOW_POWER_THRESH_V 2.7
-#define DEFAULT_MOTOR_WAIT_TIME_S 10
+#define DEFAULT_MOTOR_WAIT_TIME_S 0
 
 #else
 #define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
@@ -213,9 +213,9 @@
 #define MAX_BATTERY_VOLTAGE 4.20
 #endif
 
-#define DEFAULT_DATE 120324                // Dec. 3 2024
-#define DEFAULT_TIME 120000                // 12 pm
-#define DEFAULT_SET_TIME true
+#define DEFAULT_DATE 100124                
+#define DEFAULT_TIME 120000                
+#define DEFAULT_SET_TIME false
 
 #define DEFAULT_CYCLES_COMPLETE_DELAY_S 10
 

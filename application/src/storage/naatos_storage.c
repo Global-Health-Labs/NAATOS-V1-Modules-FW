@@ -851,7 +851,7 @@ FRESULT check_for_config_file(void) {
     return res;
   }
   // Write Motor 1 Ki
-  configBufferSize = sprintf(configBuffer, "motor_ki_1:%0.3f\n", M_KI);
+  configBufferSize = sprintf(configBuffer, "motor_ki_1:%0.4f\n", M_KI);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -881,7 +881,7 @@ FRESULT check_for_config_file(void) {
     return res;
   }
   // Write Motor 2 Ki
-  configBufferSize = sprintf(configBuffer, "motor_ki_2:%0.3f\n", M_KI);
+  configBufferSize = sprintf(configBuffer, "motor_ki_2:%0.4f\n", M_KI);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;

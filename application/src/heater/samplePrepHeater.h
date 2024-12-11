@@ -6,17 +6,17 @@
 #include "heaterInterface.h"
 
 //-------- Sample Prep Defualt PID Configs ----------
-#define M_KP 0.006
+#define M_KP 0.005
 #define M_KI 0.0005
-#define M_KD 0.002
+#define M_KD 0.020
 
-#define H_KP_1 4.5
-#define H_KI_1 60.0
-#define H_KD_1 120.0
+#define H_KP_1 20.0
+#define H_KI_1 0.05
+#define H_KD_1 50.0
 
-#define H_KP_2 4.5
-#define H_KI_2 7.5
-#define H_KD_2 0.0
+#define H_KP_2 20.0
+#define H_KI_2 0.05
+#define H_KD_2 50.0
 
 #define VERBOSE_HEATING 0
 #define VERBOSE_MOTOR   0

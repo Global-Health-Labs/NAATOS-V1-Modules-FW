@@ -408,6 +408,15 @@ void main_task(void *pvParameters) {
   while(!pd_eeprom_init_complete());
   setup_charger();
 
+  // See if we are resetting the file system
+  bool button_pressed  = !(nrf_gpio_pin_read(BUTTON_INPUT_PIN));
+  if (button_pressed && !usb_started) {
+    unmount_storage();
+    nor_flash_fatfs_mkfs();
+    create_naatos_directories();
+    get_naatos_configuration_parameters(&config);
+  }
+
   // Set Start up state to standby
   main_state_t main_state = MAIN_SLEEP;
   main_state_t next_state = MAIN_STANDBY;
