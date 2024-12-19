@@ -8,8 +8,8 @@
 #define VERSION "2.7b"
 
 /*Define this when building sample prep only otherwise comment out*/
-#define SAMPLE_PREP_BOARD
-//#define POWER_MODULE_BOARD
+//#define SAMPLE_PREP_BOARD
+#define POWER_MODULE_BOARD
 
 #ifdef SAMPLE_PREP_BOARD
 #define SAMPLE_PREP_REV_A 0
@@ -109,7 +109,7 @@
 #define HAL_INPUT_PIN NRF_GPIO_PIN_MAP(0, 2)
 #define BUTTON_INPUT_PIN  38
 #else 
-#ifdef POWER_MODULE_REV_A
+#if POWER_MODULE_REV_A
 #define BUTTON_INPUT_PIN  44                     // USES TP1 on REVA
 #define HEATER_ZONE_0_PIN 20                     // P1.01 VALVE ZONE
 #define HEATER_ZONE_1_PIN 19                     // P1.02
@@ -117,10 +117,10 @@
 #define HEATER_ZONE_3_PIN 33                     // P0.20
 #else
 #define BUTTON_INPUT_PIN  38
-#define HEATER_ZONE_0_PIN 33                     // P1.01
-#define HEATER_ZONE_1_PIN 34                     // P1.02
-#define HEATER_ZONE_2_PIN 19                     // P0.19
-#define HEATER_ZONE_3_PIN 20                     // P0.20
+#define HEATER_ZONE_0_PIN 27                     // P1.01 -> Valve Zone
+#define HEATER_ZONE_1_PIN 9                      // P1.02
+#define HEATER_ZONE_2_PIN 33                     // P0.19 -> Amplification Zone
+#define HEATER_ZONE_3_PIN 10                     // P0.20
 #endif
 #endif
 
@@ -679,6 +679,10 @@ typedef struct {
   float amp_kp_2;
   float amp_ki_2;
   float amp_kd_2;
+  bool run_amp_cycle_1;
+  bool run_amp_cycle_2;
+  bool run_valve_cycle_1;
+  bool run_valve_cycle_2;
   int mmddyy;
   int hhmmss;
   bool set_date_time;

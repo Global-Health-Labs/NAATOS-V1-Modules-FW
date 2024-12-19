@@ -14,8 +14,10 @@ temperature_pwm_data_t pm_h_pwm_data = {
     .heat_zone_3_pwm = 0,
     .sample_prep_heater_pwm = 0};
 
-bool pm_greater_than_max = false;
-bool pm_heater_run = false;
+bool pm_amp_greater_than_max = false;
+bool pm_amp_heater_running = false;
+bool pm_valve_greater_than_max = false;
+bool pm_valve_heater_running = false;
 
 bool cycle_one_running = false;
 bool cycle_two_running = false;
@@ -30,60 +32,54 @@ static log_data_message_t logMsg = {
     .event_data = NULL,
     .temperature_data = NULL};
 
-void handle_cycle_two_stopstart_heater(bool heating) {
+void handle_cycle_two_stopstart_heater(bool amp_heating, bool valve_heating) {
 #ifndef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
 
-  if (cycle_two_running && !heating)
+  if (cycle_one_running && !amp_heating && !valve_heating)
     return;
 
-  if (heating) {
-#if POWER_MODULE_REV_A
-    nrf_gpio_pin_set(HEATER_PWR_EN);
-#else 
-    nrf_gpio_pin_set(VALVE_PWR_EN);
+  if (amp_heating) {
     nrf_gpio_pin_set(AMP_PWR_EN);
-#endif
   } else {
-#if POWER_MODULE_REV_A
-    nrf_gpio_pin_clear(HEATER_PWR_EN);
-#else 
-    nrf_gpio_pin_clear(VALVE_PWR_EN);
     nrf_gpio_pin_clear(AMP_PWR_EN);
-#endif
   }
 
+  if (valve_heating) {
+    nrf_gpio_pin_set(VALVE_PWR_EN);
+  } else {
+    nrf_gpio_pin_clear(VALVE_PWR_EN);
+  }
+  
+  // Send the heater status
   SensorRxQueueMsg_t msg;
   msg.type = SENSOR_MSG_HEATER_STATE;
-  msg.heaterRunning = heating;
-
-  // Send the heater status
+  msg.heaterRunning = false;
+  if (amp_heating || valve_heating) {
+    msg.heaterRunning = true;
+  }
   xReturned = xQueueSend(sensorRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
     send_debug_log_message("HEATER_TASK: Unable to send heater state to sensorRxQueue.");
   }
-
+  
+  // Update the watchdog status
   watchdog_time_update_t wdtUpdate = {
       .taskName = HEATER,
       .valid = false};
-  wdtUpdate.valid = heating;
-
+  if (amp_heating || valve_heating) {
+    wdtUpdate.valid = true;
+  }
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
   if (xReturned != pdPASS) {
     send_debug_log_message("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task");
   }
-
-  if (!heating) {
-    send_debug_log_message("Sent valve heater stop");
-  }
-
+  
+  // Respond to heater change
   PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_DISABLE};
-
-  if (heating) {
+  if (amp_heating || valve_heating) {
     pwmMsg.type = PWM_MSG_ENABLE;
   }
-
-  // Respond to heater change
   xReturned = xQueueSend(pwmRxQueue, &pwmMsg, 0);
   if (xReturned != pdPASS) {
     send_debug_log_message("heater: Unable to send stop to pwmRxQueue.");
@@ -98,57 +94,54 @@ void handle_cycle_two_stopstart_heater(bool heating) {
 #endif
 }
 
-void handle_cycle_one_stopstart_heater(bool heating) {
+void handle_cycle_one_stopstart_heater(bool amp_heating, bool valve_heating) {
 #ifndef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
 
-  // Handle case where valve zone is on already, dont want to send stop
-  if (cycle_one_running && !heating)
+  if (cycle_one_running && !amp_heating && !valve_heating)
     return;
 
-  if (heating) {
-#if POWER_MODULE_REV_A
-    nrf_gpio_pin_set(HEATER_PWR_EN);
-#else 
-    nrf_gpio_pin_set(VALVE_PWR_EN);
+  if (amp_heating) {
     nrf_gpio_pin_set(AMP_PWR_EN);
-#endif
   } else {
-#if POWER_MODULE_REV_A
-    nrf_gpio_pin_clear(HEATER_PWR_EN);
-#else 
-    nrf_gpio_pin_clear(VALVE_PWR_EN);
     nrf_gpio_pin_clear(AMP_PWR_EN);
-#endif
   }
 
+  if (valve_heating) {
+    nrf_gpio_pin_set(VALVE_PWR_EN);
+  } else {
+    nrf_gpio_pin_clear(VALVE_PWR_EN);
+  }
+  
+  // Send the heater status
   SensorRxQueueMsg_t msg;
   msg.type = SENSOR_MSG_HEATER_STATE;
-  msg.heaterRunning = heating;
-
-  // Send the heater status
+  msg.heaterRunning = false;
+  if (amp_heating || valve_heating) {
+    msg.heaterRunning = true;
+  }
   xReturned = xQueueSend(sensorRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
     send_debug_log_message("HEATER_TASK: Unable to send heater state to sensorRxQueue.");
   }
-
+  
+  // Update the watchdog status
   watchdog_time_update_t wdtUpdate = {
       .taskName = HEATER,
       .valid = false};
-  wdtUpdate.valid = heating;
-
+  if (amp_heating || valve_heating) {
+    wdtUpdate.valid = true;
+  }
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
   if (xReturned != pdPASS) {
     send_debug_log_message("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task");
   }
-
+  
+  // Respond to heater change
   PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_DISABLE};
-
-  if (heating) {
+  if (amp_heating || valve_heating) {
     pwmMsg.type = PWM_MSG_ENABLE;
   }
-
-  // Respond to heater change
   xReturned = xQueueSend(pwmRxQueue, &pwmMsg, 0);
   if (xReturned != pdPASS) {
     send_debug_log_message("heater: Unable to send stop to pwmRxQueue.");
@@ -171,7 +164,7 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   // Ensure temperatures are below the minimum run zone temperature
   if (config.min_run_zone_temp_en) {
     if (starting_run &&
-        (temperature_data.heat_zone_0_temp > config.min_run_zone_temp || // TODO: Implement defaults
+        (temperature_data.heat_zone_0_temp > config.min_run_zone_temp || 
             temperature_data.heat_zone_1_temp > config.min_run_zone_temp ||
             temperature_data.heat_zone_2_temp > config.min_run_zone_temp ||
             temperature_data.heat_zone_3_temp > config.min_run_zone_temp)) {
@@ -183,7 +176,7 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
       }
       return;
     } else if (starting_run &&
-               (temperature_data.heat_zone_0_temp <= config.min_run_zone_temp && // TODO: Implement defaults
+               (temperature_data.heat_zone_0_temp <= config.min_run_zone_temp && 
                    temperature_data.heat_zone_1_temp <= config.min_run_zone_temp &&
                    temperature_data.heat_zone_2_temp <= config.min_run_zone_temp &&
                    temperature_data.heat_zone_3_temp <= config.min_run_zone_temp)) {
@@ -224,10 +217,10 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     pm_h_pwm_data.heat_zone_3_pwm = pwmData.heat_zone_3_pwm;
     // Ensure that the temperatures are not greater than the max temperatures allowed
     if (config.amp_max_temp < temperature_data.heat_zone_2_temp || temperature_data.heat_zone_2_temp < 0) {
-      pm_greater_than_max = true;
+      pm_amp_greater_than_max = true;
     }
     if (config.valve_max_temp < temperature_data.heat_zone_0_temp || temperature_data.heat_zone_0_temp < 0) {
-      pm_greater_than_max = true;
+      pm_valve_greater_than_max = true;
     }
   }
   if (cycle_two_running) {
@@ -250,21 +243,21 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     pm_h_pwm_data.heat_zone_3_pwm = pwmData.heat_zone_3_pwm;
     // Ensure that the temperatures are not greater than the max temperatures allowed
     if (config.amp_max_temp < temperature_data.heat_zone_2_temp || temperature_data.heat_zone_2_temp < 0) {
-      pm_greater_than_max = true;
+      pm_amp_greater_than_max = true;
     }
     if (config.valve_max_temp < temperature_data.heat_zone_0_temp || temperature_data.heat_zone_0_temp < 0) {
-      pm_greater_than_max = true;
+      pm_valve_greater_than_max = true;
     }
   }
 
   // Handle being greater than the maximum temperature
-  if (pm_greater_than_max) {
+  if (pm_amp_greater_than_max || pm_valve_greater_than_max) {
+    bool msg = true;
     // Send alert message to main task
-    xReturned = xQueueSend(main_runErrorQueue, &pm_greater_than_max, 0);
+    xReturned = xQueueSend(main_runErrorQueue, &msg, 0);
     if (xReturned != pdPASS) {
       send_debug_log_message("HEATER_TASK: Unable to send run error for greater than max temp to main_runErrorQueue.");
     }
-    pm_greater_than_max = false;
   }
 
 #if VERBOSE_PID
@@ -276,9 +269,9 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     send_debug_log_message(w_buff);
   }
   if (cycle_two_running) {
-    sprintf(w_buff, "V Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_0_temp, valve_pid_1.out);
+    sprintf(w_buff, "V Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_0_temp, valve_pid_2.out);
     send_debug_log_message(w_buff);
-    sprintf(w_buff, "A Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_2_temp, amp_pid_1.out);
+    sprintf(w_buff, "A Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_2_temp, amp_pid_2.out);
     send_debug_log_message(w_buff);
   }
 #endif
@@ -334,15 +327,17 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
       pid_controller_init(&amp_pid_1, config.amp_setpoint_1, config.amp_kp_1, config.amp_ki_1, config.amp_kd_1, config.max_amp_pid_pwm);
 
       // Send stop heater to sensors task
-      pm_heater_run = false;
+      pm_amp_heater_running = false;
+      pm_valve_heater_running = false;
       starting_run = false;
-      handle_cycle_one_stopstart_heater(pm_heater_run);
+      handle_cycle_one_stopstart_heater(pm_amp_heater_running, pm_valve_heater_running);
     } else {
       starting_run = true;
-      pm_heater_run = true;
+      pm_amp_heater_running = config.run_amp_cycle_1;
+      pm_valve_heater_running = config.run_valve_cycle_1;
       powerModuleResetHeaterPIDs();
       // Send starting heater to sensors task
-      handle_cycle_one_stopstart_heater(pm_heater_run);
+      handle_cycle_one_stopstart_heater(pm_amp_heater_running, pm_valve_heater_running);
     }
   } else if (heaterRxMessage.cycleSelect = CYCLE_TWO) {
     cycle_two_running = heaterRxMessage.cycleEnabled;
@@ -362,12 +357,14 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
       pid_controller_init(&amp_pid_2, config.amp_setpoint_2, config.amp_kp_2, config.amp_ki_2, config.amp_kd_2, config.max_amp_pid_pwm);
 
       // Send stop heater to sensors task
-      pm_heater_run = false;
-      handle_cycle_two_stopstart_heater(pm_heater_run);
+      pm_amp_heater_running = false;
+      pm_valve_heater_running = false;
+      handle_cycle_two_stopstart_heater(pm_amp_heater_running, pm_valve_heater_running);
     } else {
-      pm_heater_run = true;
+      pm_amp_heater_running = config.run_amp_cycle_2;
+      pm_valve_heater_running = config.run_valve_cycle_2;
       powerModuleResetHeaterPIDs();
-      handle_cycle_two_stopstart_heater(pm_heater_run);
+      handle_cycle_two_stopstart_heater(pm_amp_heater_running, pm_valve_heater_running);
     }
   }
 #endif
@@ -399,7 +396,7 @@ temperature_pwm_data_t getPowerModulePwmData(void) {
 }
 
 bool getPowerModuleOverTempStatus(void) {
-  return pm_greater_than_max;
+  return (pm_valve_greater_than_max || pm_amp_greater_than_max);
 }
 
 temperature_data_t getPowerModuleOverTempData(void) {
@@ -407,5 +404,5 @@ temperature_data_t getPowerModuleOverTempData(void) {
 }
 
 bool getPowerModuleHeaterRunningStatus(void) {
-  return pm_heater_run;
+  return (pm_amp_heater_running || pm_valve_heater_running);
 }
