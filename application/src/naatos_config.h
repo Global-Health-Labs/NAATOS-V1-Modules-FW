@@ -211,6 +211,10 @@
 #define DEFAULT_DEBUG_TO_COM_ENABLE true
 #define MIN_BATTERY_VOLTAGE 2.90
 #define MAX_BATTERY_VOLTAGE 4.20
+#define DEFAULT_RUN_AMP_CYCLE_1 true
+#define DEFAULT_RUN_AMP_CYCLE_2 true
+#define DEFAULT_RUN_VALVE_CYCLE_1 false
+#define DEFAULT_RUN_VALVE_CYCLE_2 true
 #endif
 
 #define DEFAULT_DATE 100124                

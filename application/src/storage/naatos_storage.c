@@ -323,6 +323,18 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case AMP_KD_2:
       parameters->amp_kd_2 = atof(val);
       break;
+    case RUN_AMP_CYCLE_1:
+      parameters->run_amp_cycle_1 = num ? false : true;
+      break;
+    case RUN_AMP_CYCLE_2:
+      parameters->run_amp_cycle_2 = num ? false : true;
+      break;
+    case RUN_VALVE_CYCLE_1:
+      parameters->run_valve_cycle_1 = num ? false : true;
+      break;
+    case RUN_VALVE_CYCLE_2:
+      parameters->run_valve_cycle_2 = num ? false : true;
+      break;
 #else
     case MAX_HEATER_PID_PWM:
       parameters->max_heater_pid_pwm = parse_int(val, DEFAULT_MAX_HEATER_PID);
@@ -751,6 +763,35 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
+
+  // Write Run Amplification Cycle 1
+  configBufferSize = sprintf(configBuffer, "run_amp_cycle_1:%s\n", DEFAULT_RUN_AMP_CYCLE_1 ? "true" : "false");
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Write Run Amplification Cycle 2
+  configBufferSize = sprintf(configBuffer, "run_amp_cycle_2:%s\n", DEFAULT_RUN_AMP_CYCLE_2 ? "true" : "false");
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Write Run Valve Cycle 1
+  configBufferSize = sprintf(configBuffer, "run_valve_cycle_1:%s\n", DEFAULT_RUN_VALVE_CYCLE_1 ? "true" : "false");
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Write Run Valve Cycle 2
+  configBufferSize = sprintf(configBuffer, "run_valve_cycle_2:%s\n", DEFAULT_RUN_VALVE_CYCLE_2 ? "true" : "false");
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
 #else
   // Write Max Heater PID PWM
   configBufferSize = sprintf(configBuffer, "max_heater_pid_pwm:%d\n", DEFAULT_MAX_HEATER_PID);
