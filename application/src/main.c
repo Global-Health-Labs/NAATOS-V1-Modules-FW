@@ -114,7 +114,11 @@ naatos_config_parameters config = {
     .valve_kp_2 = 0,
     .amp_kp_2 = 0,
     .amp_ki_2 = 0,
-    .amp_kd_2 = 0};
+    .amp_kd_2 = 0,
+    .run_amp_cycle_1 = false, 
+    .run_amp_cycle_2 = false,
+    .run_valve_cycle_1 = false,
+    .run_valve_cycle_2 = false};
 #else
 naatos_config_parameters config = {
     .logging_rate = 0,
@@ -665,7 +669,7 @@ void main_task(void *pvParameters) {
       }
 #else
       // Check if we can go to RUN state
-      if (hal_triggered && optical_triggered && !error_during_run) {
+      if (optical_triggered && !error_during_run) {
         next_state = MAIN_RUNNING;
         // Delay
         vTaskDelay(100);
