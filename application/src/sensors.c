@@ -266,8 +266,8 @@ void runPowerModuleSensorCollection(void) {
     }
   }
   // GPIO Read for Hall Sensor
-  // No Hal Sensor, Force true
-  switches.hal_triggered = true;
+  // No Hal Sensor
+  switches.hal_triggered = false;
 
   // Put Switch Data into queue
   xReturned = xQueueSend(main_switchQueue, (void *)&switches, 10);
@@ -284,11 +284,8 @@ void runPowerModuleSensorCollection(void) {
       heaterMsg.readTempFailed = true;
     }
 
-    // I2C Read for Heater Zone 1
-    readTempSuccess = readTemp(heat_zone_1, &temperatures.heat_zone_1_temp);
-    if (!readTempSuccess) {
-      heaterMsg.readTempFailed = true;
-    }
+    // I2C Read for Heater Zone 1, Not Connected
+    temperatures.heat_zone_1_temp = 0.0;
 
     // I2C Read for Heater Zone 2
     readTempSuccess = readTemp(heat_zone_2, &temperatures.heat_zone_2_temp);
@@ -296,11 +293,8 @@ void runPowerModuleSensorCollection(void) {
       heaterMsg.readTempFailed = true;
     }
 
-    // I2C Read for Heater Zone 3
-    readTempSuccess = readTemp(heat_zone_3, &temperatures.heat_zone_3_temp);
-    if (!readTempSuccess) {
-      heaterMsg.readTempFailed = true;
-    }
+    // I2C Read for Heater Zone 3, Not Connected
+    temperatures.heat_zone_3_temp = 0.0;
 
     heaterMsg.type = HEATER_MSG_TEMPERATURE_DATA;
     heaterMsg.tempData = temperatures;

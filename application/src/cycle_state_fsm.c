@@ -701,7 +701,7 @@ bool limitSwitchFreed(sensor_switches_t data) {
 #ifdef SAMPLE_PREP_BOARD
   returnValue = !data.hal_triggered;
 #else
-  returnValue = !data.hal_triggered || !data.optical_tiggered;
+  returnValue = !data.optical_tiggered;
 #endif
 }
 
