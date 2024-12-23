@@ -92,6 +92,17 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         }
       }
 
+      // Get Switch data
+      xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
+      if (limitSwitchFreed(switch_data)) {
+        end_cycle_1();
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_SENSOR_BREAK;
+        runThrough = true;
+        next_state = EXIT_CYCLE;
+        break;
+      }
+
       next_state = START_CYCLE_1;
 
       break;

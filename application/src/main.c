@@ -662,7 +662,7 @@ void main_task(void *pvParameters) {
 
 #ifdef SAMPLE_PREP_BOARD
       // Check if we can go to RUN state
-      if (hal_triggered && buttonData.event == ON_EVENT && !error_during_run) {
+      if (/*hal_triggered && */buttonData.event == ON_EVENT && !error_during_run) {
         next_state = MAIN_RUNNING;
         // Delay
         vTaskDelay(100);
