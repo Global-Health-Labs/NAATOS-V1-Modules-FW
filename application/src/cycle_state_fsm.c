@@ -646,7 +646,11 @@ void handle_exit_notifications(void) {
 
   case CYCLE_ERROR_SENSOR_BREAK:
     eventType = SAMPLE_HAL_CANCEL;
-    sprintf(exitString, HALL_SENSOR_BRAKE_MSG);
+#ifdef SAMPLE_PREP_BOARD
+      sprintf(exitString, HALL_SENSOR_BRAKE_MSG);
+#else
+      sprintf(exitString, OPTICAL_SENSOR_BRAKE_MSG);
+#endif
     break;
 
   case CYCLE_ERROR_BUTTON_EXIT:

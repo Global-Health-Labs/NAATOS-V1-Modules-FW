@@ -246,6 +246,7 @@
 #define SAMPLE_VALID_TIMEOUT_MSG "Sample is no longer valid due to timeout."
 #define UNKNOWN_ERROR_MESSAGE "An unknown error has occured."
 #define HALL_SENSOR_BRAKE_MSG "HALL sensor interrupted."
+#define OPTICAL_SENSOR_BRAKE_MSG "Optical sensor interrupted."
 #define SAMPLE_I2C_READ_ERROR_MSG "I2C sensor read error"
 #define SAMPLE_MOTOR_STALLED_ERROR_MSG "Motor stalled detected."
 #define SAMPLE_OVER_TEMPERATURE "Sample over temperature error"
