@@ -63,8 +63,8 @@ void init_adc(void) {
 
 #ifndef SAMPLE_PREP_BOARD
   // Create channel configuration and assign it defualt values
-  // Create the config to be on AIN0 (P0.03) as an input and single ended
-  nrf_saadc_channel_config_t channel_config = NRFX_SAADC_DEFAULT_CHANNEL_CONFIG_SE(NRF_SAADC_INPUT_AIN1);
+  // Create the config to be on AIN0 (P0.02) as an input and single ended
+  nrf_saadc_channel_config_t channel_config = NRFX_SAADC_DEFAULT_CHANNEL_CONFIG_SE(NRF_SAADC_INPUT_AIN0);
 
   // Initalize saadc
   err = nrf_drv_saadc_init(NULL, saadc_callback_handler);

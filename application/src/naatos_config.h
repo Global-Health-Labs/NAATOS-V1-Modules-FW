@@ -8,8 +8,8 @@
 #define VERSION "2.7b"
 
 /*Define this when building sample prep only otherwise comment out*/
-#define SAMPLE_PREP_BOARD
-//#define POWER_MODULE_BOARD
+//#define SAMPLE_PREP_BOARD
+#define POWER_MODULE_BOARD
 
 #ifdef SAMPLE_PREP_BOARD
 #define SAMPLE_PREP_REV_A 0
@@ -96,6 +96,8 @@
 #define FRONT_LED_DRV_EN  37
 #define VALVE_PWR_EN      20
 #define AMP_PWR_EN        21
+#define SENSORS_PWR_EN    39    // Sensors Power Enable
+#define PD_3V3_EN         34    // USB PD 3v3 Enable
 #endif
 #endif
 

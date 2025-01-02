@@ -88,7 +88,7 @@ static tsys01_errors_t tsys01_writeRegister(sensor_selection_t sensor, uint8_t r
 #else 
   switch (sensor) {
   case heat_zone_0:
-    interface = i2c_interface_system;
+    interface = i2c_interface_sensors;
     slave_addr = TSYS01_ADDR_ALT;
     break;
   case heat_zone_1:
@@ -97,7 +97,7 @@ static tsys01_errors_t tsys01_writeRegister(sensor_selection_t sensor, uint8_t r
     break;
   case heat_zone_2:
     interface = i2c_interface_sensors;
-    slave_addr = TSYS01_ADDR_ALT;
+    slave_addr = TSYS01_ADDR;
     break;
   case heat_zone_3:
     interface = i2c_interface_sensors;
@@ -175,7 +175,7 @@ static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t re
 #else 
   switch (sensor) {
   case heat_zone_0:
-    interface = i2c_interface_system;
+    interface = i2c_interface_sensors;
     slave_addr = TSYS01_ADDR_ALT;
     break;
   case heat_zone_1:
@@ -184,7 +184,7 @@ static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t re
     break;
   case heat_zone_2:
     interface = i2c_interface_sensors;
-    slave_addr = TSYS01_ADDR_ALT;
+    slave_addr = TSYS01_ADDR;
     break;
   case heat_zone_3:
     interface = i2c_interface_sensors;

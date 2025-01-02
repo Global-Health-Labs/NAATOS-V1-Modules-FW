@@ -18,7 +18,7 @@ uint32_t read_pd_register(uint8_t reg) {
 bool pd_eeprom_init_complete() {
   uint32_t mode;
   mode = read_pd_register(MODE_REGISTER);
-  printf("mode:%u", mode);
+  printf("PD mode:%u\n", mode);
   return mode == APP_MODE;
 }
 

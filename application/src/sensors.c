@@ -97,9 +97,7 @@ void samplePrepSensorTaskSetup(void) {
 
 void powerModuleSensorTaskSetup(void) {
   tsys01_err = tsys01_getCalibrationValues(heat_zone_0);
-  tsys01_err = tsys01_getCalibrationValues(heat_zone_1);
   tsys01_err = tsys01_getCalibrationValues(heat_zone_2);
-  tsys01_err = tsys01_getCalibrationValues(heat_zone_3);
   sensorTempTimer = xTimerCreate("SensorTempTimer", sampleRateTicks, pdTRUE, (void *)0, vSensorTempTimerCallback);
 }
 

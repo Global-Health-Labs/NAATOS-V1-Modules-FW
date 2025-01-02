@@ -257,9 +257,6 @@ void set_startup_enables(void) {
   nrf_gpio_cfg_output(SD_POWER_ENABLE);
   nrf_gpio_pin_set(SD_POWER_ENABLE);
 #elif POWER_MODULE_REV_B
-  // NOR Flash Enable
-  nrf_gpio_cfg_output(FLASH_PWR_EN);
-  nrf_gpio_pin_set(FLASH_PWR_EN);
   // Top LED driver enable
   nrf_gpio_cfg_output(TOP_LED_DRV_EN);
   nrf_gpio_pin_set(TOP_LED_DRV_EN);
@@ -272,6 +269,15 @@ void set_startup_enables(void) {
   // Turn off boost for amp heater
   nrf_gpio_cfg_output(AMP_PWR_EN);
   nrf_gpio_pin_clear(AMP_PWR_EN); 
+  // Sensors power enable
+  nrf_gpio_cfg_output(SENSORS_PWR_EN);
+  nrf_gpio_pin_set(SENSORS_PWR_EN);
+  // USB PD Controller Enable
+  nrf_gpio_cfg_output(PD_3V3_EN);
+  nrf_gpio_pin_set(PD_3V3_EN);
+  // NOR Flash Enable
+  nrf_gpio_cfg_output(FLASH_PWR_EN);
+  nrf_gpio_pin_set(FLASH_PWR_EN);
 #endif
 #endif
 }

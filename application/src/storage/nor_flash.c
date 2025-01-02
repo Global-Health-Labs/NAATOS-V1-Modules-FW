@@ -50,7 +50,6 @@ void init_nor_flash(void) {
     send_debug_log_message("Unable to mount NOR flash!");
     return;
   }
-  
 
   // Show contents
   nor_flash_list_contents();
