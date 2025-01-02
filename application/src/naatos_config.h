@@ -5,7 +5,7 @@
 #include "task.h"
 #include <stdint.h>
 
-#define VERSION "2.7b"
+#define VERSION "3.0"
 
 /*Define this when building sample prep only otherwise comment out*/
 //#define SAMPLE_PREP_BOARD
@@ -226,7 +226,7 @@
 #define DEFAULT_CYCLES_COMPLETE_DELAY_S 10
 
 /* Device Debug Parameters */
-#define VERBOSE_PID 1
+#define VERBOSE_PID 0
 
 /* Log Event Messages */
 #define START_EVENT_MSG "Sample Preperation Started."

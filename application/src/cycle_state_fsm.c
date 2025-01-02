@@ -147,7 +147,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         next_state = CYCLE_1_TIMER;
       }
 #else
-      updateLedState(LED_RUN_HEATER, false);
+      updateLedState(LED_RUN_HEATER, true);
 
       next_state = CYCLE_1_TIMER;
 #endif

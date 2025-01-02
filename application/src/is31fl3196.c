@@ -93,7 +93,7 @@ static led_driver_errors_t led_driver_writeRegister(uint8_t *buf,
 #ifdef SAMPLE_PREP_BOARD
   err_code = xUtil_TWI_Write_Single(i2c_interface_sensors, IS31FL3199_ADDR_low, reg, buf, 2); //acquire data
 #else
-  err_code = xUtil_TWI_Write_Single(i2c_interface_sensors, IS31FL3199_ADDR, reg, buf, 2); //acquire data
+  err_code = xUtil_TWI_Write_Single(i2c_interface_sensors, IS31FL3199_ADDR_low, reg, buf, 2); //acquire data (non-low is smaller leds)
 #endif
 
   if (err_code != NRF_SUCCESS) {
@@ -481,6 +481,8 @@ void enable_led_driver(bool enable) {
     led_driver_writeRegisterBlocking(shutdown_buf, 2);
 #else 
     nrf_gpio_pin_set(TOP_LED_DRV_EN);
+    uint8_t shutdown_buf[2] = {LED_DRIVER_SHUTDOWN_REG, 0x01};
+    led_driver_writeRegisterBlocking(shutdown_buf, 2);
 #endif
   } else {
 #if !POWER_MODULE_REV_B
@@ -488,6 +490,8 @@ void enable_led_driver(bool enable) {
     led_driver_writeRegisterBlocking(shutdown_buf, 2);
     nrf_gpio_pin_clear(LED_DRV_EN);
 #else
+    uint8_t shutdown_buf[2] = {LED_DRIVER_SHUTDOWN_REG, 0x00};
+    led_driver_writeRegisterBlocking(shutdown_buf, 2);
     nrf_gpio_pin_clear(TOP_LED_DRV_EN);
 #endif
   }
