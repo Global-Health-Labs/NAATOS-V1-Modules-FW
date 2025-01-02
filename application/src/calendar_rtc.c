@@ -118,7 +118,7 @@ bool calendar_set_time(calendar_time_t *now) {
 #if POWER_MODULE_REV_A
   ret = xUtil_TWI_Read(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
 #elif POWER_MODULE_REV_B
-  ret = xUtil_TWI_Read(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
+  ret = xUtil_TWI_Write_Single(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 8);
 #endif
 #endif
 
