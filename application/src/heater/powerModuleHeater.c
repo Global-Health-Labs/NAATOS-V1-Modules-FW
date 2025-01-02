@@ -199,9 +199,17 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   // Update PID and PWM
   if (cycle_one_running) {
     // Update Amplification PID loop with new temperatures
-    pid_controller_compute(&amp_pid_1, temperature_data.heat_zone_2_temp);
+    if (config.run_amp_cycle_1) { 
+      pid_controller_compute(&amp_pid_1, temperature_data.heat_zone_2_temp);
+    } else {
+      amp_pid_1.out = 0.0;
+    }
     // Update Valve PID loop with new temperatures
-    pid_controller_compute(&valve_pid_1, temperature_data.heat_zone_0_temp);
+    if (config.run_valve_cycle_1) {
+      pid_controller_compute(&valve_pid_1, temperature_data.heat_zone_0_temp);
+    } else {
+      valve_pid_1.out = 0.0;
+    }
 
     temperature_pwm_data_t pwmData = {
         .heat_zone_0_pwm = valve_pid_1.out, // Heat Zone 0 controls Valve
@@ -225,9 +233,17 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   }
   if (cycle_two_running) {
     // Update Amplification PID loop with new temperatures
-    pid_controller_compute(&amp_pid_2, temperature_data.heat_zone_2_temp);
+    if (config.run_amp_cycle_2) {
+      pid_controller_compute(&amp_pid_2, temperature_data.heat_zone_2_temp);
+    } else {
+      amp_pid_2.out = 0.0;
+    }
     // Update Valve PID loop with new temperatures
-    pid_controller_compute(&valve_pid_2, temperature_data.heat_zone_0_temp);
+    if (config.run_valve_cycle_2) {
+      pid_controller_compute(&valve_pid_2, temperature_data.heat_zone_0_temp);
+    } else {
+      valve_pid_2.out = 0.0;
+    }
 
     temperature_pwm_data_t pwmData = {
         .heat_zone_0_pwm = valve_pid_2.out,

@@ -324,15 +324,19 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       parameters->amp_kd_2 = atof(val);
       break;
     case RUN_AMP_CYCLE_1:
+      num = strcmp(val, "true");
       parameters->run_amp_cycle_1 = num ? false : true;
       break;
     case RUN_AMP_CYCLE_2:
+      num = strcmp(val, "true");  
       parameters->run_amp_cycle_2 = num ? false : true;
       break;
     case RUN_VALVE_CYCLE_1:
+      num = strcmp(val, "true");
       parameters->run_valve_cycle_1 = num ? false : true;
       break;
     case RUN_VALVE_CYCLE_2:
+      num = strcmp(val, "true");
       parameters->run_valve_cycle_2 = num ? false : true;
       break;
 #else
