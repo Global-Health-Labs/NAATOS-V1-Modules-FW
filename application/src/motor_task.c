@@ -165,7 +165,9 @@ double readMotorSpeed(void) {
   //Convert pulse count to rotational speed
   //double motor_speed_rpm = (1000 * 60 * ((double)pulse_count / (double)delta_t)) / 9; //Old motor
   double motor_speed_rpm = (1000 * 60 * ((double)pulse_count / (double)delta_t)) / 6; //New motor
-  //send_debug_log_message("Motor speed: %f\r\n", motor_speed_rpm);
+  //char msg[256];
+  //sprintf(msg, "Motor speed: %f\r\n", motor_speed_rpm);
+  //send_debug_log_message(msg);
 
   //Clear the counter, update variable for tracking elapsed time
   nrf_drv_timer_clear(p_counter1);
