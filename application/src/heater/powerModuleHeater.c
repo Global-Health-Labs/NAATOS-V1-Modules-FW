@@ -46,9 +46,9 @@ void handle_cycle_two_stopstart_heater(bool amp_heating, bool valve_heating) {
   }
 
   if (valve_heating) {
-    nrf_gpio_pin_set(VALVE_PWR_EN);
+    enable_valve_boost();
   } else {
-    nrf_gpio_pin_clear(VALVE_PWR_EN);
+    disable_valve_boost();
   }
   
   // Send the heater status
@@ -108,10 +108,11 @@ void handle_cycle_one_stopstart_heater(bool amp_heating, bool valve_heating) {
   }
 
   if (valve_heating) {
-    nrf_gpio_pin_set(VALVE_PWR_EN);
+    enable_valve_boost();
   } else {
-    nrf_gpio_pin_clear(VALVE_PWR_EN);
+    disable_valve_boost();
   }
+
   
   // Send the heater status
   SensorRxQueueMsg_t msg;

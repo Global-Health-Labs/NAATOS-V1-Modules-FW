@@ -277,7 +277,9 @@ void runPowerModuleSensorCollection(void) {
     bool readTempSuccess = false;
     heaterMsg.readTempFailed = false;
     // I2C Read for Heater Zone 0
+    disable_valve_boost();
     readTempSuccess = readTemp(heat_zone_0, &temperatures.heat_zone_0_temp);
+    enable_valve_boost();
     if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }
@@ -286,7 +288,9 @@ void runPowerModuleSensorCollection(void) {
     temperatures.heat_zone_1_temp = 0.0;
 
     // I2C Read for Heater Zone 2
+    disable_valve_boost();
     readTempSuccess = readTemp(heat_zone_2, &temperatures.heat_zone_2_temp);
+    enable_valve_boost();
     if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }

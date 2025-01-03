@@ -4,6 +4,7 @@
 #include "../pid.h"
 #include "../pwm/pwm.h"
 #include "heaterInterface.h"
+#include "../tps55288.h"
 
 //-------- Power Module Defualt PID Configs ----------
 #define V_KP_1 2.250

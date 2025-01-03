@@ -42,6 +42,7 @@ SDK Version: 17.1
 #include "usb.h"
 #include "watchdog.h"
 #include "charger_driver.h"
+#include "tps55288.h"
 
 #include "core_cm4.h"
 
@@ -265,7 +266,7 @@ void set_startup_enables(void) {
   nrf_gpio_pin_set(FRONT_LED_DRV_EN);
   // Turn off boost for Valve heater
   nrf_gpio_cfg_output(VALVE_PWR_EN);
-  nrf_gpio_pin_clear(VALVE_PWR_EN); 
+  nrf_gpio_pin_set(VALVE_PWR_EN); 
   // Turn off boost for amp heater
   nrf_gpio_cfg_output(AMP_PWR_EN);
   nrf_gpio_pin_clear(AMP_PWR_EN); 
@@ -363,6 +364,7 @@ void init_peripherals(void) {
   fuelGauge_init();
   init_naatos_storage();
   button_init();
+  valve_zone_set_6v();
 }
 
 void uninit_peripherals(void) {
