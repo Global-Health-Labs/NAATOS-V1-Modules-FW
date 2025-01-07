@@ -1309,7 +1309,7 @@ int main(void) {
   // Other Initalizations
   nrf_drv_gpiote_init();
   setup_uart_semaphore();
-
+  
   // Get the configuration parameters
   res = get_naatos_configuration_parameters(&config);
   if (res != FR_OK) {
