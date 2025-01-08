@@ -354,6 +354,8 @@ void init_peripherals(void) {
   init_adc();
 #ifdef SAMPLE_PREP_BOARD
   init_motor_gpio();
+#else
+  valve_zone_set_6v();
 #endif
   init_pwms();
   vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_100k);
@@ -364,7 +366,6 @@ void init_peripherals(void) {
   fuelGauge_init();
   init_naatos_storage();
   button_init();
-  valve_zone_set_6v();
 }
 
 void uninit_peripherals(void) {

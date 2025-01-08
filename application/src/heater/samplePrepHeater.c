@@ -443,7 +443,6 @@ void handleSampleMotorDataRx(int motor_speed) {
     if (config.run_motor_2) {
       pid_controller_compute(&motor_pid_2, motor_speed);
       pwmData.heat_zone_2_pwm = motor_pid_2.out;
-      pwmData.heat_zone_2_pwm = 50;
     }
 
     h_pwm_data.heat_zone_2_pwm = pwmData.heat_zone_2_pwm;
