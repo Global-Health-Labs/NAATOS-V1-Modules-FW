@@ -3,8 +3,13 @@
 #include "../usb.h"
 #include "timers.h"
 
-const MainStateErrorQueueMsg_t motor_stall_err_msg = {
-  .errType = ERR_MOTOR_STALLED,
+const MainStateErrorQueueMsg_t motor_stall_percent_err_msg = {
+  .errType = ERR_MOTOR_STALLED_PERCENT,
+  .overTempData = NULL
+};
+
+const MainStateErrorQueueMsg_t motor_stall_pwm_err_msg = {
+  .errType = ERR_MOTOR_STALLED_PWM,
   .overTempData = NULL
 };
 
@@ -24,7 +29,8 @@ bool h_pwm_req = false;
 bool greater_than_max = false;
 bool heater_run = false;
 bool rampToTemp = false;
-bool motorStalled = false;
+bool motorStalledPercent = false;
+bool motorStalledPWM = false;
 bool motorReachedSpeed = false;
 int last_motor_speed = 0;
 
@@ -410,27 +416,37 @@ void handleSampleMotorDataRx(int motor_speed) {
 
     if (!use_default_configuration_parameters) {
       if (motorReachedSpeed && motor_speed < (config.motor_setpoint_1 - ((float)config.motor_setpoint_1 * ((float)config.motor_stall_percent / 100.0 )))) {
-        motorStalled = true;
+        motorStalledPercent = true;
         motorReachedSpeed = false;
       }
     } else {
       if (motorReachedSpeed && motor_speed < (MOTOR_SETPOINT_1 - ((float)MOTOR_SETPOINT_1 * ((float)DEFAULT_MOTOR_STALL_PERCENTAGE / 100.0 )))) {
-        motorStalled = true;
+        motorStalledPercent = true;
         motorReachedSpeed = false;
       } 
     }
 
+    if (motorReachedSpeed && motor_pid_1.out >= config.motor_stall_pwm) {
+      motorStalledPWM = true;
+      motorReachedSpeed = false;
+    }
+
     updateDutyCycles(pwmData);
     
-    if (motorStalled) {
+    if (motorStalledPercent || motorStalledPWM) {
       // Set LEDs
       updateLedState(LED_ABORT, true);
       // Send alert message to main task
-      xReturned = xQueueSend(main_runErrorQueue, &motor_stall_err_msg, 0);
+      if (motorStalledPercent) {
+        xReturned = xQueueSend(main_runErrorQueue, &motor_stall_percent_err_msg, 0);
+      } else {
+        xReturned = xQueueSend(main_runErrorQueue, &motor_stall_pwm_err_msg, 0);
+      }
       if (xReturned != pdPASS) {
         send_debug_log_message("HEATER_TASK: Unable to send run error for motor stalled to main_runErrorQueue.");
       }
-      motorStalled = false;
+      motorStalledPWM = false;
+      motorStalledPercent = false;
     }
 
   } else if (motor_cycle2_running) {
@@ -462,23 +478,35 @@ void handleSampleMotorDataRx(int motor_speed) {
 
     if (!use_default_configuration_parameters) {
       if (motorReachedSpeed && motor_speed < (config.motor_setpoint_2 - ((float)config.motor_setpoint_2 * ((float)config.motor_stall_percent / 100.0 )))) {
-        motorStalled = true;
+        motorStalledPercent = true;
+        motorReachedSpeed = false;
       }
     } else {
       if (motorReachedSpeed && motor_speed < (MOTOR_SETPOINT_2 - ((float)MOTOR_SETPOINT_2 * ((float)DEFAULT_MOTOR_STALL_PERCENTAGE / 100.0 )))) {
-        motorStalled = true;
+        motorStalledPercent = true;
+        motorReachedSpeed = false;
       } 
     } 
 
+    if (motorReachedSpeed && motor_pid_1.out >= config.motor_stall_pwm) {
+      motorStalledPWM = true;
+      motorReachedSpeed = false;
+    }
+
     updateDutyCycles(pwmData);
 
-    if (motorStalled) {
+    if (motorStalledPWM || motorStalledPercent) {
       // Send alert message to main task
-      xReturned = xQueueSend(main_runErrorQueue, &motor_stall_err_msg, 0);
+      if (motorStalledPercent) {
+        xReturned = xQueueSend(main_runErrorQueue, &motor_stall_percent_err_msg, 0);
+      } else {
+        xReturned = xQueueSend(main_runErrorQueue, &motor_stall_pwm_err_msg, 0);
+      }
       if (xReturned != pdPASS) {
         send_debug_log_message("HEATER_TASK: Unable to send run error for motor stalled to main_runErrorQueue.");
       }
-      motorStalled = false;
+      motorStalledPWM = false;
+      motorStalledPercent = false;
     }
   }
   #endif

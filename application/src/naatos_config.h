@@ -8,8 +8,8 @@
 #define VERSION "3.0"
 
 /*Define this when building sample prep only otherwise comment out*/
-//#define SAMPLE_PREP_BOARD
-#define POWER_MODULE_BOARD
+#define SAMPLE_PREP_BOARD
+//#define POWER_MODULE_BOARD
 
 #ifdef SAMPLE_PREP_BOARD
 #define SAMPLE_PREP_REV_A 0
@@ -189,7 +189,7 @@
 #define MAX_BATTERY_VOLTAGE 4.20
 #define DEFAULT_LOW_POWER_THRESH_V 2.7
 #define DEFAULT_MOTOR_WAIT_TIME_S 0
-
+#define DEFAULT_MOTOR_STALL_PWM   62.0
 #else
 #define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
 #define DEFAULT_LOGGING_RATE 5.000
@@ -248,7 +248,8 @@
 #define HALL_SENSOR_BRAKE_MSG "HALL sensor interrupted."
 #define OPTICAL_SENSOR_BRAKE_MSG "Optical sensor interrupted."
 #define SAMPLE_I2C_READ_ERROR_MSG "I2C sensor read error"
-#define SAMPLE_MOTOR_STALLED_ERROR_MSG "Motor stalled detected."
+#define SAMPLE_MOTOR_STALLED_PERCENT_ERROR_MSG "Motor stalled detected due to drop in motor speed."
+#define SAMPLE_MOTOR_STALLED_PWM_ERROR_MSG "Motor stalled detected due to an increase in PWM."
 #define SAMPLE_OVER_TEMPERATURE "Sample over temperature error"
 #define SAMPLE_BATTERY_OVER_TEMP "Battery over temperature error:"
 #define SAMPLE_LOW_BATTERY_STRING "Battery is too low to start cycle: "
@@ -317,7 +318,8 @@ typedef enum {
   SAMPLE_INVALID_TIMEOUT,
   SAMPLE_I2C_READ_ERROR,
   SAMPLE_CANT_READ_CONFIG,
-  SAMPLE_MOTOR_STALLED,
+  SAMPLE_MOTOR_STALLED_PERCENT,
+  SAMPLE_MOTOR_STALLED_PWM,
   SAMPLE_UNKNOWN,
   SAMPLE_BATTERY_LOW,
   SAMPLE_BATTERY_OVERTEMP,
@@ -629,7 +631,8 @@ typedef struct {
 typedef enum {
   ERR_TEMP_SENSOR_READ,
   ERR_OVERTEMP_EVENT,
-  ERR_MOTOR_STALLED
+  ERR_MOTOR_STALLED_PERCENT,
+  ERR_MOTOR_STALLED_PWM,
 } MainStateErrorNotification_t;
 
 typedef struct {
@@ -724,6 +727,7 @@ typedef struct {
   bool run_heater_2;
   float hal_sensor_thresh;
   int motor_stall_percent;
+  float motor_stall_pwm;
   bool motor_stall_en;
   int mmddyy;
   int hhmmss;

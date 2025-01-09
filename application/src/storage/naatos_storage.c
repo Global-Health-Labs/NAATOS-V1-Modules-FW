@@ -437,6 +437,9 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case MOTOR_STALL_PERCENT:
       parameters->motor_stall_percent = parse_int(val, DEFAULT_MOTOR_STALL_PERCENTAGE);
       break;
+    case MOTOR_STALL_PWM:
+      parameters->motor_stall_pwm = parse_double(val, DEFAULT_MOTOR_STALL_PWM);
+      break;  
     case MOTOR_STALL_ENABLE:
       num = strcmp(val, "true");
       parameters->motor_stall_en = num ? false : true;
@@ -975,6 +978,12 @@ FRESULT check_for_config_file(void) {
   }
   // Write Motor Stall Percentage
   configBufferSize = sprintf(configBuffer, "motor_stall_percentage:%d\n", DEFAULT_MOTOR_STALL_PERCENTAGE);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+  // Write Motor Stall PWM
+  configBufferSize = sprintf(configBuffer, "motor_stall_pwm:%0.2f\n", DEFAULT_MOTOR_STALL_PWM);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
