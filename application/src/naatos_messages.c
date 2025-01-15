@@ -1,5 +1,9 @@
 #include "naatos_messages.h"
 // Zone Request Constants
+const HeaterRxQueueMsg_t run_cycle_zero_zone_heating = {
+    .type = HEATER_MSG_ZONE_STATE,
+    .cycleSelect = CYCLE_ZERO,
+    .cycleEnabled = true};  //GHL
 const HeaterRxQueueMsg_t run_cycle_one_zone_heating = {
     .type = HEATER_MSG_ZONE_STATE,
     .cycleSelect = CYCLE_ONE,
@@ -8,6 +12,10 @@ const HeaterRxQueueMsg_t run_cycle_two_zone_heating = {
     .type = HEATER_MSG_ZONE_STATE,
     .cycleSelect = CYCLE_TWO,
     .cycleEnabled = true};
+const HeaterRxQueueMsg_t stop_cycle_zero_zone_heating = {
+    .type = HEATER_MSG_ZONE_STATE,
+    .cycleSelect = CYCLE_ZERO,
+    .cycleEnabled = false}; //GHL
 const HeaterRxQueueMsg_t stop_cycle_one_zone_heating = {
     .type = HEATER_MSG_ZONE_STATE,
     .cycleSelect = CYCLE_ONE,
@@ -73,6 +81,7 @@ const log_data_message_t interrupt_opt_log_msg = {
     .data_type = EVENT_DATA,
     .temperature_data = NULL,
     .event_data = interrupt_opt_event};
+
 const log_event_t cycle_two_start_event = {
     .event = SAMPLE_CYCLE_TWO_STARTED,
     .message = CYCLE_TWO_START_MSG};
@@ -87,6 +96,22 @@ const log_data_message_t cycle_two_stop_log_msg = {
     .data_type = EVENT_DATA,
     .temperature_data = NULL,
     .event_data = cycle_two_stop_event};
+
+const log_event_t cycle_zero_start_event = {
+    .event = SAMPLE_CYCLE_ONE_STARTED,
+    .message = CYCLE_ZERO_START_MSG};
+const log_data_message_t cycle_zero_start_log_msg = {
+    .data_type = EVENT_DATA,
+    .temperature_data = NULL,
+    .event_data = cycle_zero_start_event};
+const log_event_t cycle_zero_stop_event = {
+    .event = SAMPLE_CYCLE_ZERO_ENDED,
+    .message = CYCLE_ZERO_END_MSG};
+const log_data_message_t cycle_zero_stop_log_msg = {
+    .data_type = EVENT_DATA,
+    .temperature_data = NULL,
+    .event_data = cycle_zero_stop_event};
+
 const log_event_t cycle_one_start_event = {
     .event = SAMPLE_CYCLE_ONE_STARTED,
     .message = CYCLE_ONE_START_MSG};
@@ -101,6 +126,21 @@ const log_data_message_t cycle_one_stop_log_msg = {
     .data_type = EVENT_DATA,
     .temperature_data = NULL,
     .event_data = cycle_one_stop_event};
+
+const log_event_t cycle_three_start_event = {
+    .event = SAMPLE_CYCLE_THREE_STARTED,
+    .message = CYCLE_THREE_START_MSG};
+const log_data_message_t cycle_three_start_log_msg = {
+    .data_type = EVENT_DATA,
+    .temperature_data = NULL,
+    .event_data = cycle_three_start_event};
+const log_event_t cycle_three_stop_event = {
+    .event = SAMPLE_CYCLE_THREE_ENDED,
+    .message = CYCLE_THREE_STOP_MSG};
+const log_data_message_t cycle_three_stop_log_msg = {
+    .data_type = EVENT_DATA,
+    .temperature_data = NULL,
+    .event_data = cycle_three_stop_event};
 
 const log_event_t ramp_to_temp_complete_event = {
     .event = SAMPLE_RAMP_TO_TEMP_REACHED,

@@ -163,8 +163,9 @@
 #define DEFAULT_VALID_TIMEOUT_S 3600.0 // 1 hour
 #define DEFAULT_RECOVERY_THRES 47      // Percent
 #define OPTICAL_TRIG_THRES 800
-#define DEFAULT_HEATER_SETPOINT_1 93.5 // Sample prep only
-#define DEFAULT_HEATER_SETPOINT_2 93.5 // Sample prep only
+#define DEFAULT_HEATER_SETPOINT_0 115.0 // Sample prep only
+#define DEFAULT_HEATER_SETPOINT_1 93.5  // Sample prep only
+#define DEFAULT_HEATER_SETPOINT_2 93.5  // Sample prep only
 #define DEFAULT_RAMP_SETPOINT 95.0
 #define MOTOR_SETPOINT_1 3900
 #define MOTOR_SETPOINT_2 3900
@@ -173,8 +174,10 @@
 #define DEFAULT_RUN_MOTOR_2 true
 #define DEFAULT_RUN_HEATER_2 true
 #define DEFAULT_MOTOR_SWTICH_CCW_CW  false
-#define DEFAULT_CYCLE_1_RUNTIME 240.0
-#define DEFAULT_CYCLE_2_RUNTIME 240.0
+#define DEFAULT_CYCLE_0_RUNTIME 51.0
+#define DEFAULT_CYCLE_1_RUNTIME 120.0
+#define DEFAULT_CYCLE_2_RUNTIME 19.0
+#define DEFAULT_CYCLE_3_RUNTIME 180.0
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_1 true
 #define DEFAULT_RAMP_TO_TEMP_BEFORE_START_2 false
 #define DEFAULT_RAMP_TO_TEMP_TIMEOUT 600.0 // 10min
@@ -233,10 +236,14 @@
 #define STOP_EVENT_MSG "Sample Preperation Completed."
 #define INTERRUPT_HAL_EVENT_MSG "Sample Preperation Interrupted. Cover Removed."
 #define INTERRUPT_OPT_EVENT_MSG "Sample Preperation Interrupted. Sample Removed."
+#define CYCLE_ZERO_START_MSG "Cycle 0 Started."
+#define CYCLE_ZERO_END_MSG "Cycle 0 Stopped."
 #define CYCLE_ONE_START_MSG "Cycle 1 Started."
 #define CYCLE_ONE_END_MSG "Cycle 1 Stopped."
 #define CYCLE_TWO_START_MSG "Cycle 2 Started."
 #define CYCLE_TWO_STOP_MSG "Cycle 2 Stopped."
+#define CYCLE_THREE_START_MSG "Cycle 3 Started."
+#define CYCLE_THREE_STOP_MSG "Cycle 3 Stopped."
 #define TEMPS_NOT_STABLE "Zone Temperatures are not below the minimum run temperature. Aborting run."
 #define RECOVERY_BATT "Battery Percentage lower than the recovery threshold. Charge Battery!: "
 #define OVER_TEMP_MSG "A Zone went over its maximum temperature. Run stopped."
@@ -288,8 +295,10 @@ typedef enum {
 
 // Cycle Identification Enum
 typedef enum {
+  CYCLE_ZERO,
   CYCLE_ONE,
-  CYCLE_TWO
+  CYCLE_TWO,
+  CYCLE_THREE
 } cycle_t;
 
 // Type of update message being sent to usb queue
@@ -304,10 +313,14 @@ typedef enum {
   SAMPLE_INTERRUPTED,
   SAMPLE_BUTTON_CANCEL,
   SAMPLE_HAL_CANCEL,
+  SAMPLE_CYCLE_ZERO_STARTED,
+  SAMPLE_CYCLE_ZERO_ENDED,
   SAMPLE_CYCLE_ONE_STARTED,
   SAMPLE_CYCLE_ONE_ENDED,
   SAMPLE_CYCLE_TWO_STARTED,
   SAMPLE_CYCLE_TWO_ENDED,
+  SAMPLE_CYCLE_THREE_STARTED,
+  SAMPLE_CYCLE_THREE_ENDED,
   SAMPLE_TEMPS_NOT_STABALIZED,
   SAMPLE_RECOVERY_BATT,
   SAMPLE_OVER_TEMP,
@@ -656,8 +669,10 @@ extern xTaskHandle buttonTaskHandle;
 typedef struct {
   float sample_rate;
   float logging_rate;
+  float cycle_0_run_time_s;
   float cycle_1_run_time_s;
   float cycle_2_run_time_s;
+  float cycle_3_run_time_s;
   uint16_t low_power_threshold;
   uint16_t recovery_power_thresh;
   float sample_valid_timeout_s;
@@ -703,6 +718,7 @@ typedef struct {
   float ramp_to_temp_c1_timeout;
   float ramp_to_temp_c2_timeout;
   uint16_t motor_end_wait_time_s;
+  float heater_setpoint_0;
   float heater_setpoint_1;
   float heater_setpoint_2;
   float heater_max_temp;

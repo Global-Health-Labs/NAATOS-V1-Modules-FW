@@ -227,11 +227,17 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case LOGGING_RATE:
       parameters->logging_rate = parse_double(val, DEFAULT_LOGGING_RATE);
       break;
+    case CYCLE_ZERO_RUN_TIME:
+      parameters->cycle_0_run_time_s = atoi(val);
+      break;
     case CYCLE_ONE_RUN_TIME:
       parameters->cycle_1_run_time_s = atoi(val);
       break;
     case CYCLE_TWO_RUN_TIME:
       parameters->cycle_2_run_time_s = atoi(val);
+      break;
+    case CYCLE_THREE_RUN_TIME:
+      parameters->cycle_3_run_time_s = atoi(val);
       break;
     case LOW_POWER_THRESHOLD:
       parameters->low_power_threshold = parse_int(val, DEFAULT_LOW_POWER_THRESHOLD);
@@ -359,6 +365,9 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       break;
     case MOTOR_END_WAIT_TIME_S:
       parameters->motor_end_wait_time_s = parse_int(val, DEFAULT_MOTOR_WAIT_TIME_S);
+      break;
+    case HEATER_SETPOINT_0_C:
+      parameters->heater_setpoint_0 = parse_double(val, DEFAULT_HEATER_SETPOINT_0);
       break;
     case HEATER_SETPOINT_1_C:
       parameters->heater_setpoint_1 = parse_double(val, DEFAULT_HEATER_SETPOINT_1);
@@ -548,6 +557,13 @@ FRESULT check_for_config_file(void) {
     return res;
   }
 
+  // Write cycle 0 run time 
+  configBufferSize = sprintf(configBuffer, "cycle_0_run_time_s:%0.2f\n", DEFAULT_CYCLE_0_RUNTIME);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
   // Write cycle 1 run time 
   configBufferSize = sprintf(configBuffer, "cycle_1_run_time_s:%0.2f\n", DEFAULT_CYCLE_1_RUNTIME);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
@@ -557,6 +573,13 @@ FRESULT check_for_config_file(void) {
 
   // Write cycle 2 run time 
   configBufferSize = sprintf(configBuffer, "cycle_2_run_time_s:%0.2f\n", DEFAULT_CYCLE_2_RUNTIME);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Write cycle 3 run time 
+  configBufferSize = sprintf(configBuffer, "cycle_3_run_time_s:%0.2f\n", DEFAULT_CYCLE_3_RUNTIME);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -839,6 +862,11 @@ FRESULT check_for_config_file(void) {
   }
 
   // Write heater Zone Setpoint
+  configBufferSize = sprintf(configBuffer, "heater_setpoint_0:%0.2f\n", DEFAULT_HEATER_SETPOINT_0);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
   configBufferSize = sprintf(configBuffer, "heater_setpoint_1:%0.2f\n", DEFAULT_HEATER_SETPOINT_1);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
