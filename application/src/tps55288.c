@@ -64,7 +64,7 @@ bool valve_zone_set_6v(void) {
 // Enable/Disable the boost
 bool enable_valve_boost(void) {
   bool ret = true;
-  uint8_t data = 0b10000000;
+  uint8_t data = 0b10000011;
 
   // Enable output
   i2c_status_t status = tps55288_write_reg8(0x06, &data);
@@ -93,7 +93,7 @@ bool enable_valve_boost(void) {
 
 bool disable_valve_boost(void){
   bool ret = true;
-  uint8_t data = 0b00000000;
+  uint8_t data = 0b00000011;
 
   // Enable output
   i2c_status_t status = tps55288_write_reg8(0x06, &data);

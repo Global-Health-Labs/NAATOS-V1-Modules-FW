@@ -222,3 +222,11 @@ void pwm_task(void *pvParameters) {
     }
   }
 }
+
+void ghl_manual_pwm(int channel, app_pwm_duty_t duty)  {
+  if(channel==0)  {
+    app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, duty);
+  } else if(channel=2)  {
+    app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_2_CHANNEL, duty);
+  }
+}

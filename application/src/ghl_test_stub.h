@@ -1,0 +1,1 @@
+void ghl_read_all_temperature_sensors_in_loop_and_printf();

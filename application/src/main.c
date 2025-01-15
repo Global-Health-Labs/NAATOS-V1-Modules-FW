@@ -43,6 +43,7 @@ SDK Version: 17.1
 #include "watchdog.h"
 #include "charger_driver.h"
 #include "tps55288.h"
+#include "ghl_test_stub.h"
 
 #include "core_cm4.h"
 
@@ -447,6 +448,122 @@ void main_task(void *pvParameters) {
   uint32_t main_wdt_start_time = 0;
   uint32_t main_wdt_end_time = pdMS_TO_TICKS(1000);
   uint32_t main_wdt_time_left = 0;
+
+  /*
+  =================GHL TEST SECTION=====================
+  */
+  #if 0
+  enable_valve_boost();
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  disable_valve_boost();
+  #endif
+
+
+
+  //enable_valve_boost();
+  //vTaskDelay(pdMS_TO_TICKS(500));
+  //ghl_manual_pwm(0,50);
+  //vTaskDelay(pdMS_TO_TICKS(250));
+  //ghl_manual_pwm(0,0);
+  //vTaskDelay(pdMS_TO_TICKS(250));
+  //disable_valve_boost();
+
+  #if 0
+  tsys01_getCalibrationValues(0);
+  tsys01_getCalibrationValues(2);
+
+  printf("\nSTEP1 - pre \n");
+  ghl_read_all_temperature_sensors_in_loop_and_printf();
+
+  printf("\nSTEP2 - valve SMPS on, no load \n");
+  enable_valve_boost();
+  vTaskDelay(pdMS_TO_TICKS(300));
+  ghl_read_all_temperature_sensors_in_loop_and_printf();
+
+  printf("\nSTEP3 - valve SMPS on, 25 duty \n");
+  ghl_manual_pwm(0,25);
+  ghl_read_all_temperature_sensors_in_loop_and_printf();
+
+  printf("\nSTEP4 - valve SMPS on, 0 duty \n");
+  ghl_manual_pwm(0,0);
+  vTaskDelay(pdMS_TO_TICKS(100));
+  ghl_read_all_temperature_sensors_in_loop_and_printf();
+
+  printf("\nSTEP5 - post (valve SMPS off) \n");
+  disable_valve_boost();
+  ghl_read_all_temperature_sensors_in_loop_and_printf();
+  #endif
+
+  #if 0
+  tsys01_getCalibrationValues(0);
+  tsys01_getCalibrationValues(2);
+
+  printf("\nGHL TEST - pre \n");
+  ghl_read_all_temperature_sensors_in_loop_and_printf();
+
+  enable_valve_boost();
+  printf("\nGHL TEST - valve SMPS on, 5 duty \n");
+  ghl_manual_pwm(0,5);
+  ghl_read_all_temperature_sensors_in_loop_and_printf();
+  printf("\nGHL TEST - start read #2 \n");
+  ghl_read_all_temperature_sensors_in_loop_and_printf();
+  printf("\nGHL TEST - start read #3 \n");
+  ghl_read_all_temperature_sensors_in_loop_and_printf();
+  printf("\nGHL TEST - start read #4 \n");
+  ghl_read_all_temperature_sensors_in_loop_and_printf();
+
+  printf("\nGHL TEST - post (valve SMPS off) \n");
+  disable_valve_boost();
+  ghl_manual_pwm(0,0);
+  ghl_read_all_temperature_sensors_in_loop_and_printf();
+  #endif
+
+  #if 1
+  tsys01_getCalibrationValues(0);
+  tsys01_getCalibrationValues(2);
+
+  printf("\nSTEP1 - pre \n");
+  ghl_read_all_temperature_sensors_in_loop_and_printf();
+
+  printf("\nSTEP2 - valve SMPS on, no load \n");
+  enable_valve_boost();
+  vTaskDelay(pdMS_TO_TICKS(300));
+  ghl_read_all_temperature_sensors_in_loop_and_printf();
+
+  printf("\nSTEP3 - valve SMPS on, 25 duty, toggle enable/disable 2x after read \n");
+  ghl_manual_pwm(0,25);
+  ghl_read_all_temperature_sensors_in_loop_and_printf();
+  nrf_gpio_pin_clear(VALVE_PWR_EN);
+  vTaskDelay(pdMS_TO_TICKS(100));
+  nrf_gpio_pin_set(VALVE_PWR_EN);
+  vTaskDelay(pdMS_TO_TICKS(100));
+  nrf_gpio_pin_clear(VALVE_PWR_EN);
+  vTaskDelay(pdMS_TO_TICKS(100));
+  nrf_gpio_pin_set(VALVE_PWR_EN);
+  vTaskDelay(pdMS_TO_TICKS(100));
+
+  printf("\nSTEP4 - valve SMPS on, 0 duty \n");
+  ghl_manual_pwm(0,0);
+  //vTaskDelay(pdMS_TO_TICKS(100));
+  ghl_read_all_temperature_sensors_in_loop_and_printf();
+
+  printf("\nSTEP5 - post (valve SMPS off) \n");
+  disable_valve_boost();
+  ghl_read_all_temperature_sensors_in_loop_and_printf();
+  #endif
+
+  /*
+  =================END GHL TEST SECTION=====================
+  */
 
   create_tasks();
 
