@@ -517,129 +517,84 @@ void handleSampleMotorDataRx(int motor_speed) {
   BaseType_t xReturned;
   char tmp[100];
 
-  if (heater_cycle1_running) {
-    temperature_pwm_data_t pwmData = {
-        .heat_zone_0_pwm = 0,
-        .heat_zone_1_pwm = heater_pid_1.out,
-        .heat_zone_2_pwm = 0,
-        .heat_zone_3_pwm = 0};
+  float this_motor_setpoint;
+  bool this_run_motor;
+  pid_controller_t* this_pid_motor;
+  pid_controller_t* this_pid_temp;
 
-    if (config.run_motor_1) {
-      pid_controller_compute(&motor_pid_1, motor_speed);
-      pwmData.heat_zone_2_pwm = motor_pid_1.out;
+  // SET VALUES AND POINTERS FOR THE CYCLE WE'RE ON
+  if(heater_cycle1_running) {
+    this_pid_temp = &heater_pid_1;    
+    this_pid_motor = &motor_pid_1;
+    this_run_motor = config.run_motor_1;
+    if( use_default_configuration_parameters )  {
+      this_motor_setpoint = MOTOR_SETPOINT_1;
+    } else{
+      this_motor_setpoint = config.motor_setpoint_1;
     }
-
-    h_pwm_data.heat_zone_2_pwm = pwmData.heat_zone_2_pwm;
-    last_motor_speed = motor_speed;
-
-    if (motor_speed >= config.motor_setpoint_1 && !use_default_configuration_parameters && config.motor_stall_en) {
-      motorReachedSpeed = true;
-    }
-    else if (motor_speed >= MOTOR_SETPOINT_1 && use_default_configuration_parameters && config.motor_stall_en) {
-      motorReachedSpeed = true;
-    }
-
-#if VERBOSE_MOTOR
-  sprintf(tmp, "Motor Speed: %d rpm; Motor PWM: %0.2f", motor_speed, pwmData.heat_zone_2_pwm);
-  send_debug_log_message(tmp);
-#endif
-
-    if (!use_default_configuration_parameters) {
-      if (motorReachedSpeed && motor_speed < (config.motor_setpoint_1 - ((float)config.motor_setpoint_1 * ((float)config.motor_stall_percent / 100.0 )))) {
-        motorStalledPercent = true;
-        motorReachedSpeed = false;
-      }
-    } else {
-      if (motorReachedSpeed && motor_speed < (MOTOR_SETPOINT_1 - ((float)MOTOR_SETPOINT_1 * ((float)DEFAULT_MOTOR_STALL_PERCENTAGE / 100.0 )))) {
-        motorStalledPercent = true;
-        motorReachedSpeed = false;
-      } 
-    }
-
-    if (motorReachedSpeed && motor_pid_1.out >= config.motor_stall_pwm) {
-      motorStalledPWM = true;
-      motorReachedSpeed = false;
-    }
-
-    updateDutyCycles(pwmData);
-    
-    if (motorStalledPercent || motorStalledPWM) {
-      // Set LEDs
-      updateLedState(LED_ABORT, true);
-      // Send alert message to main task
-      if (motorStalledPercent) {
-        xReturned = xQueueSend(main_runErrorQueue, &motor_stall_percent_err_msg, 0);
-      } else {
-        xReturned = xQueueSend(main_runErrorQueue, &motor_stall_pwm_err_msg, 0);
-      }
-      if (xReturned != pdPASS) {
-        send_debug_log_message("HEATER_TASK: Unable to send run error for motor stalled to main_runErrorQueue.");
-      }
-      motorStalledPWM = false;
-      motorStalledPercent = false;
-    }
-
-  } else if (motor_cycle2_running) {
-    temperature_pwm_data_t pwmData = {
-        .heat_zone_0_pwm = 0,
-        .heat_zone_1_pwm = heater_pid_2.out,
-        .heat_zone_2_pwm = 0,
-        .heat_zone_3_pwm = 0};
-
-    if (config.run_motor_2) {
-      pid_controller_compute(&motor_pid_2, motor_speed);
-      pwmData.heat_zone_2_pwm = motor_pid_2.out;
-    }
-
-    h_pwm_data.heat_zone_2_pwm = pwmData.heat_zone_2_pwm;
-    last_motor_speed = motor_speed;
-
-    if (motor_speed >= config.motor_setpoint_1 && !use_default_configuration_parameters) {
-      motorReachedSpeed = true;
-    }
-    else if (motor_speed >= MOTOR_SETPOINT_1 && use_default_configuration_parameters) {
-      motorReachedSpeed = true;
-    }
-
-#if VERBOSE_MOTOR
-  sprintf(tmp, "Motor Speed: %d rpm; Motor PWM: %0.2f", motor_speed, pwmData.heat_zone_2_pwm);
-  send_debug_log_message(tmp);
-#endif
-
-    if (!use_default_configuration_parameters) {
-      if (motorReachedSpeed && motor_speed < (config.motor_setpoint_2 - ((float)config.motor_setpoint_2 * ((float)config.motor_stall_percent / 100.0 )))) {
-        motorStalledPercent = true;
-        motorReachedSpeed = false;
-      }
-    } else {
-      if (motorReachedSpeed && motor_speed < (MOTOR_SETPOINT_2 - ((float)MOTOR_SETPOINT_2 * ((float)DEFAULT_MOTOR_STALL_PERCENTAGE / 100.0 )))) {
-        motorStalledPercent = true;
-        motorReachedSpeed = false;
-      } 
-    } 
-
-    if (motorReachedSpeed && motor_pid_1.out >= config.motor_stall_pwm) {
-      motorStalledPWM = true;
-      motorReachedSpeed = false;
-    }
-
-    updateDutyCycles(pwmData);
-
-    if (motorStalledPWM || motorStalledPercent) {
-      // Send alert message to main task
-      if (motorStalledPercent) {
-        xReturned = xQueueSend(main_runErrorQueue, &motor_stall_percent_err_msg, 0);
-      } else {
-        xReturned = xQueueSend(main_runErrorQueue, &motor_stall_pwm_err_msg, 0);
-      }
-      if (xReturned != pdPASS) {
-        send_debug_log_message("HEATER_TASK: Unable to send run error for motor stalled to main_runErrorQueue.");
-      }
-      motorStalledPWM = false;
-      motorStalledPercent = false;
+  } else if(heater_cycle2_running) {
+    this_pid_temp = &heater_pid_2;    
+    this_pid_motor = &motor_pid_2;
+    this_run_motor = config.run_motor_2;
+    if( use_default_configuration_parameters )  {
+      this_motor_setpoint = MOTOR_SETPOINT_2;
+    } else{
+      this_motor_setpoint = config.motor_setpoint_2;
     }
   }
+
+  // CONSOLIDATED OLD CODE FROM LIAM
+  temperature_pwm_data_t pwmData = {
+    .heat_zone_0_pwm = 0,
+    //.heat_zone_1_pwm = heater_pid_2.out,
+    .heat_zone_1_pwm = this_pid_temp->out,
+    .heat_zone_2_pwm = 0,
+    .heat_zone_3_pwm = 0
+  };
+
+  if (this_run_motor) {
+    pid_controller_compute(this_pid_motor, motor_speed);
+    pwmData.heat_zone_2_pwm = this_pid_motor->out;
+  }
+
+  h_pwm_data.heat_zone_2_pwm = pwmData.heat_zone_2_pwm;
+  last_motor_speed = motor_speed;
+
+  if (motor_speed >= this_motor_setpoint) {
+    motorReachedSpeed = true;
+  }
+
+  #if VERBOSE_MOTOR
+  sprintf(tmp, "Motor Speed: %d rpm; Motor PWM: %0.2f", motor_speed, pwmData.heat_zone_2_pwm);
+  send_debug_log_message(tmp);
   #endif
+
+  if( motorReachedSpeed && motor_speed<(this_motor_setpoint-((float) this_motor_setpoint * ((float)config.motor_stall_percent / 100.0 ))) ) {
+    motorStalledPercent = true;
+    motorReachedSpeed = false;
+  }
+
+  if (motorReachedSpeed && (this_pid_motor->out > config.motor_stall_pwm)) {
+    motorStalledPWM = true;
+    motorReachedSpeed = false;
+  }
+
+  updateDutyCycles(pwmData);
+
+  if (motorStalledPWM || motorStalledPercent) {
+    // Send alert message to main task
+    if (motorStalledPercent) {
+      xReturned = xQueueSend(main_runErrorQueue, &motor_stall_percent_err_msg, 0);
+    } else {
+      xReturned = xQueueSend(main_runErrorQueue, &motor_stall_pwm_err_msg, 0);
+    }
+    if (xReturned != pdPASS) {
+      send_debug_log_message("HEATER_TASK: Unable to send run error for motor stalled to main_runErrorQueue.");
+    }
+    motorStalledPWM = false;
+    motorStalledPercent = false;
+  }
+#endif
 }
 
 void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
