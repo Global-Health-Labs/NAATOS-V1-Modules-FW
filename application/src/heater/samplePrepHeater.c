@@ -363,10 +363,10 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
     temperature_pwm_data_t pwmData = {
           .heat_zone_0_pwm = 0,
-          .heat_zone_1_pwm = 0,
+          .heat_zone_1_pwm = heater_pid_0.out,        //<--- heat_zone_1 makes it actually work!!
           .sample_prep_heater_pwm = heater_pid_0.out,
           .heat_zone_2_pwm = 0,
-          .heat_zone_3_pwm = heater_pid_0.out};
+          .heat_zone_3_pwm = heater_pid_0.out};       //<--- but heat_zone 3 is the only one logged!!
 
     // Update Heater Zone 3 PWM with PID output
     h_pwm_data.heat_zone_0_pwm = pwmData.heat_zone_0_pwm;
@@ -406,7 +406,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
     temperature_pwm_data_t pwmData = {
           .heat_zone_0_pwm = 0,
-          .heat_zone_1_pwm = 0,
+          .heat_zone_1_pwm = heater_pid_1.out,
           .sample_prep_heater_pwm = heater_pid_1.out,
           .heat_zone_2_pwm = 0,
           .heat_zone_3_pwm = heater_pid_1.out};
@@ -449,7 +449,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
     temperature_pwm_data_t pwmData = {
         .heat_zone_0_pwm = 0,
-        .heat_zone_1_pwm = 0,
+        .heat_zone_1_pwm = heater_pid_2.out,
         .heat_zone_2_pwm = 0,
         .heat_zone_3_pwm = heater_pid_2.out};
 

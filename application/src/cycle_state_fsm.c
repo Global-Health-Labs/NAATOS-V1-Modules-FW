@@ -192,7 +192,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
 
       if (limitSwitchFreed(switch_data)) {
-        end_cycle_1();
+        end_cycle_0();
         updateLedState(LED_ABORT, true);
         exitInfo = CYCLE_ERROR_SENSOR_BREAK;
         runThrough = true;
