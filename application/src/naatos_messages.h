@@ -4,9 +4,11 @@
 // Zone Request Constants
 extern const HeaterRxQueueMsg_t run_cycle_zero_zone_heating;
 extern const HeaterRxQueueMsg_t run_cycle_one_zone_heating;
+extern const HeaterRxQueueMsg_t run_cycle_one_b_zone_heating;
 extern const HeaterRxQueueMsg_t run_cycle_two_zone_heating;
 extern const HeaterRxQueueMsg_t stop_cycle_zero_zone_heating;
 extern const HeaterRxQueueMsg_t stop_cycle_one_zone_heating;
+extern const HeaterRxQueueMsg_t stop_cycle_one_b_zone_heating;
 extern const HeaterRxQueueMsg_t stop_cycle_two_zone_heating;
 extern const HeaterRxQueueMsg_t stop_cycle_two_zone_motor;
 
@@ -36,6 +38,11 @@ extern const log_event_t cycle_one_start_event;
 extern const log_data_message_t cycle_one_start_log_msg;
 extern const log_event_t cycle_one_stop_event;
 extern const log_data_message_t cycle_one_stop_log_msg;
+
+extern const log_event_t cycle_oneB_start_event;
+extern const log_data_message_t cycle_oneB_start_log_msg;
+extern const log_event_t cycle_oneB_stop_event;
+extern const log_data_message_t cycle_oneB_stop_log_msg;
 
 extern const log_event_t cycle_zero_start_event;
 extern const log_data_message_t cycle_zero_start_log_msg;

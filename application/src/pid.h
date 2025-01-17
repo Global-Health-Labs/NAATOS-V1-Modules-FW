@@ -26,6 +26,7 @@ typedef struct {
 } pid_controller_t;
 
 void pid_controller_init(pid_controller_t *pid, float setpoint, float k_p, float k_i, float k_d, int pid_max);
+void pid_controller_update(pid_controller_t *pid, float setpoint, float k_p, float k_i, float k_d);
 void pid_controller_compute(pid_controller_t *pid, float measurement);
 
 #endif

@@ -240,6 +240,8 @@
 #define CYCLE_ZERO_END_MSG "Cycle 0 Stopped."
 #define CYCLE_ONE_START_MSG "Cycle 1 Started."
 #define CYCLE_ONE_END_MSG "Cycle 1 Stopped."
+#define CYCLE_ONE_B_START_MSG "Cycle 1B Started."
+#define CYCLE_ONE_B_END_MSG "Cycle 1B Stopped."
 #define CYCLE_TWO_START_MSG "Cycle 2 Started."
 #define CYCLE_TWO_STOP_MSG "Cycle 2 Stopped."
 #define CYCLE_THREE_START_MSG "Cycle 3 Started."
@@ -297,8 +299,10 @@ typedef enum {
 typedef enum {
   CYCLE_ZERO,
   CYCLE_ONE,
+  CYCLE_ONE_B,
   CYCLE_TWO,
-  CYCLE_THREE
+
+  CYCLE_NONE    // default initial condition
 } cycle_t;
 
 // Type of update message being sent to usb queue
@@ -317,6 +321,8 @@ typedef enum {
   SAMPLE_CYCLE_ZERO_ENDED,
   SAMPLE_CYCLE_ONE_STARTED,
   SAMPLE_CYCLE_ONE_ENDED,
+  SAMPLE_CYCLE_ONE_B_STARTED,
+  SAMPLE_CYCLE_ONE_B_ENDED,
   SAMPLE_CYCLE_TWO_STARTED,
   SAMPLE_CYCLE_TWO_ENDED,
   SAMPLE_CYCLE_THREE_STARTED,

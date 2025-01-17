@@ -333,7 +333,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       time_left = xTaskGetTickCount() - start_time;
 
       if (time_left >= end_time) {
-        next_state = START_CYCLE_2;
+        next_state = START_CYCLE_1B;
         end_cycle_1();
         break;
       }
@@ -370,6 +370,103 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       break;
     }
+
+
+    case START_CYCLE_1B: {
+      begin_cycle_1b();
+
+#ifdef SAMPLE_PREP_BOARD
+      // Set LEDs
+      if (config.run_heater_1) {
+        updateLedState(LED_RUN_HEATER, true);
+        updateLedState(LED_RUN_MOTOR, false);
+      }
+      if (config.run_motor_2) {
+        updateLedState(LED_RUN_MOTOR, true);
+        updateLedState(LED_RUN_HEATER, false);
+      }
+
+      //if (config.ramp_to_temp_before_start_cycle_1 && config.run_heater_1) {
+      //  start_time = xTaskGetTickCount();
+      //  if (use_default_configuration_parameters) {
+      //    end_time = (DEFAULT_RAMP_TO_TEMP_TIMEOUT)*configTICK_RATE_HZ;
+      //  } else {
+      //    end_time = (config.ramp_to_temp_c1_timeout) * configTICK_RATE_HZ;
+      //  }
+      //  next_state = CYCLE_1_RAMP_TO_TEMP;
+      //} else {
+      //  next_state = CYCLE_1_TIMER;
+      //}
+      next_state = CYCLE_1B_TIMER;
+#else
+      updateLedState(LED_RUN_HEATER, true);
+
+      next_state = CYCLE_1_TIMER;
+#endif
+      break;
+    }
+
+
+    case CYCLE_1B_TIMER: {
+      if (last_state != current_state) {
+        start_time = xTaskGetTickCount();
+        if (use_default_configuration_parameters) {
+          end_time = (DEFAULT_CYCLE_2_RUNTIME)*configTICK_RATE_HZ;
+        } else {
+          end_time = (config.cycle_2_run_time_s) * configTICK_RATE_HZ;
+        }
+      }
+
+      next_state = handleBatteryMessage();
+      if(next_state == EXIT_CYCLE){
+        end_cycle_1b();
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_OVER_TEMP_BATTERY;
+        runThrough = true;
+        break;
+      }
+
+      time_left = xTaskGetTickCount() - start_time;
+
+      if (time_left >= end_time) {
+        next_state = START_CYCLE_2;
+        end_cycle_1b();
+        break;
+      }
+
+      if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
+        end_cycle_1b();
+        next_state = handleMainErrorMessage();
+        break;
+      }
+
+      // Get Switch data
+      xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
+
+      if (limitSwitchFreed(switch_data)) {
+        end_cycle_1b();
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_SENSOR_BREAK;
+        runThrough = true;
+        next_state = EXIT_CYCLE;
+        break;
+      }
+
+      buttonData.event = NONE;
+      xQueueReceive(button_mainStateQueue, &buttonData, 0);
+      //TODO test also including off_event
+      if (buttonData.event == ON_EVENT /*|| buttonData.even == OFF_EVENT*/) {
+        end_cycle_1b();
+        updateLedState(LED_ABORT, true);
+        exitInfo = CYCLE_ERROR_BUTTON_EXIT;
+        runThrough = true;
+        next_state = EXIT_CYCLE;
+        break;
+      }
+
+      break;
+    }
+
 
     case START_CYCLE_2: {
       begin_cycle_2();
@@ -463,9 +560,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (last_state != current_state) {
         start_time = xTaskGetTickCount();
         if (use_default_configuration_parameters) {
-          end_time = ((DEFAULT_CYCLE_2_RUNTIME)*configTICK_RATE_HZ);
+          end_time = ((DEFAULT_CYCLE_3_RUNTIME)*configTICK_RATE_HZ);
         } else {
-          end_time = ((config.cycle_2_run_time_s) * configTICK_RATE_HZ);
+          end_time = ((config.cycle_3_run_time_s) * configTICK_RATE_HZ);
         }
       }
 
@@ -871,6 +968,26 @@ void begin_cycle_1(void) {
   }
 }
 
+void begin_cycle_1b(void) {
+  BaseType_t xRet;
+  bool heat_conf = false;
+  // Send Start Cycle 1b to heater queue
+  xRet = xQueueSend(heaterRxQueue, &run_cycle_one_b_zone_heating, 0);
+  if (xRet != pdPASS) {
+    send_debug_log_message("MAIN_TASK: Unable to send run valve zone request.\r\n");
+  }
+  // Send Start Cycle Two Event to logging task
+  xRet = xQueueSend(logger_logMessageQueue, &cycle_oneB_start_log_msg, 0);
+  if (xRet != pdPASS) {
+    send_debug_log_message("MAIN_TASK: Unable to send start valve zone event to logging task.\r\n");
+  }
+  // Wait for run confirmation response
+  xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
+  if (xRet != pdPASS) {
+    send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
+  }
+}
+
 void begin_cycle_2(void) {
   BaseType_t xRet;
   bool heat_conf = false;
@@ -924,6 +1041,26 @@ void end_cycle_1(void) {
   }
   // Send stop valve Event to logging task
   xRet = xQueueSend(logger_logMessageQueue, &cycle_one_stop_log_msg, 0);
+  if (xRet != pdPASS) {
+    send_debug_log_message("MAIN_TASK: Unable to send stop valve zone event to logging task.\r\n");
+  }
+  // Wait for run confirmation response
+  xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
+  if (xRet != pdPASS) {
+    send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
+  }
+}
+
+void end_cycle_1b(void) {
+  BaseType_t xRet;
+  bool heat_conf = false;
+  // Send valve zone stop request
+  xRet = xQueueSend(heaterRxQueue, &stop_cycle_one_b_zone_heating, 0);
+  if (xRet != pdPASS) {
+    send_debug_log_message("MAIN_TASK: Unable to send stop valve zone request.\r\n");
+  }
+  // Send stop valve Event to logging task
+  xRet = xQueueSend(logger_logMessageQueue, &cycle_oneB_stop_log_msg, 0);
   if (xRet != pdPASS) {
     send_debug_log_message("MAIN_TASK: Unable to send stop valve zone event to logging task.\r\n");
   }
