@@ -412,7 +412,8 @@ void handle_cycle_stopstart_heater(bool heating) {
 
   SensorRxQueueMsg_t msg;
   msg.type = SENSOR_MSG_HEATER_STATE;
-  msg.heaterRunning = heating;
+  //msg.heaterRunning = heating;    // SG GHL (this has to be TRUE or else all logging will stop)
+  msg.heaterRunning = doWeRunHeaterInThisCycle() || doWeRunMotorInThisCycle();    // SG GHL (this has to be TRUE or else all logging will stop)
 
   // Send the heater status
   xReturned = xQueueSend(sensorRxQueue, &msg, 0);
@@ -574,6 +575,7 @@ void samplePrepResetHeaterPIDs(void) {
 
 void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 #ifdef SAMPLE_PREP_BOARD
+  //send_debug_log_message("HEATER_TASK: samplePrepHandleHeaterSensorDataRx()");
   BaseType_t xReturned;
   local_temp_data = temperature_data;
   // Ensure temperatures are below the minimum run zone temperature
@@ -1089,6 +1091,9 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
       fsm_cycle_last = fsm_cycle_current;
       fsm_cycle_current = CYCLE_NONE;
 
+      nrf_gpio_pin_clear(HEATER_PWR_EN);
+      send_debug_log_message("nrf_gpio_pin_clear(MOTOR_PWR_EN)");
+
       temperature_pwm_data_t pwmData = {
           .heat_zone_0_pwm = 0,
           .heat_zone_1_pwm = 0,
@@ -1102,6 +1107,8 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
       vTaskDelay(pdMS_TO_TICKS(200));
       nrf_gpio_pin_clear(MOTOR_PWR_EN);
       send_debug_log_message("nrf_gpio_pin_clear(MOTOR_PWR_EN)");
+
+      handle_cycle_stopstart_heater(false);
 
 
       motorReachedSpeed = false;
