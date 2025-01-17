@@ -428,6 +428,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       } else if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
         end_cycle_2();
         next_state = handleMainErrorMessage();
+        updateLedState(LED_ABORT, true);
         break;
       }
 
@@ -492,6 +493,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
         end_cycle_2();
         next_state = handleMainErrorMessage();
+        updateLedState(LED_ABORT, true);
         break;
       }
 
