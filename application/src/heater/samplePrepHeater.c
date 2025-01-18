@@ -416,7 +416,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   }
   #endif
 }
-
+static char tmp[100];
 void handleSampleMotorDataRx(int motor_speed) {
 #ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
@@ -497,17 +497,25 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
     // Set zones enabled
     switch(fsm_cycle_current) {
       case CYCLE_ZERO:
+        // INITIAL STATE
         starting_sample_prep_run = true;    // GHL: appears to be used throughout this code for something useful
-        rampToTemp = false;
+        rampToTemp = false;   // hardcoded
+
+        // initialize
+        last_motor_speed = 0;
+        h_pwm_data.heat_zone_0_pwm = 0;
+        h_pwm_data.heat_zone_1_pwm = 0;
+        h_pwm_data.heat_zone_2_pwm = 0;
+        h_pwm_data.heat_zone_3_pwm = 0;
         break;
       case CYCLE_ONE:
-        rampToTemp = false;
+        rampToTemp = false;   // hardcoded
         break;
       case CYCLE_ONE_B:
-        rampToTemp = false;
+        rampToTemp = false;   // hardcoded
         break;
       case CYCLE_TWO:
-        rampToTemp = false;
+        rampToTemp = false;   // hardcoded
         // STOP SIGNAL
         //if(cycle_enabled)
         //  rampToTemp = false;
@@ -713,27 +721,21 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
       fsm_cycle_last = fsm_cycle_current;
       fsm_cycle_current = CYCLE_NONE;
 
-      nrf_gpio_pin_clear(HEATER_PWR_EN);
-      send_debug_log_message("nrf_gpio_pin_clear(MOTOR_PWR_EN)");
 
-      temperature_pwm_data_t pwmData = {
-          .heat_zone_0_pwm = 0,
-          .heat_zone_1_pwm = 0,
-          .sample_prep_heater_pwm = 0,
-          .heat_zone_2_pwm = 0,
-          .heat_zone_3_pwm = 0};
-      updateDutyCycles(pwmData);
-      //motor_cycle2_running = false;
-      send_debug_log_message("heaterRxMessage.type == HEATER_MSG_MOTOR_STATE   should have set motor to off");
+      h_pwm_data.heat_zone_0_pwm = 0;
+      h_pwm_data.heat_zone_1_pwm = 0;
+      h_pwm_data.heat_zone_2_pwm = 0;
+      h_pwm_data.heat_zone_3_pwm = 0;
+      h_pwm_data.sample_prep_heater_pwm = 0;
 
-      vTaskDelay(pdMS_TO_TICKS(200));
-      nrf_gpio_pin_clear(MOTOR_PWR_EN);
-      send_debug_log_message("nrf_gpio_pin_clear(MOTOR_PWR_EN)");
+      
+      send_debug_log_message("heaterRxMessage.type == HEATER_MSG_MOTOR_STATE   handle_cycle_stopstart_heater(false) will now turn off, because CYCLE_NONE is active");
 
       handle_cycle_stopstart_heater(false);
 
 
       motorReachedSpeed = false;
+      last_motor_speed = 0;
 
       PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_DISABLE};
 
