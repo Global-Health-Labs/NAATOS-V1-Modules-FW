@@ -562,8 +562,15 @@ typedef struct {
   bool cycleEnabled;
   bool usbSuspend;
   bool heaterRunning;
-  double motorSpeed;
+  double motorSpeed;      // used by motor_task.c to report measured RPM, but also as a desired setpoint when type==HEATER_MSG_ZONE_STATE
   bool readTempFailed;
+  float tempSetpoint1;    // used to set desired setpoint when type==HEATER_MSG_ZONE_STATE
+  float H_KP;
+  float H_KI;
+  float H_KD;
+  float M_KP;
+  float M_KI;
+  float M_KD;
 } HeaterRxQueueMsg_t;
 
 typedef struct {

@@ -52,20 +52,10 @@
 typedef enum {
   VALIDATE_INIT_CONDITIONS,
 
-  START_CYCLE_0,
-  CYCLE_0_TIMER,
-
-  START_CYCLE_1,
-  CYCLE_1_RAMP_TO_TEMP,
-  CYCLE_1_TIMER,
-
-  START_CYCLE_1B,
-  CYCLE_1B_TIMER,
-
-  START_CYCLE_2,
-  CYCLE_2_RAMP_TO_TEMP,
-  CYCLE_2_TIMER,
-  CYCLE_2_MOTOR_STOP_WAIT,
+  CYCLE_RUNNING_A_START,
+  CYCLE_RUNNING_B_RAMP_TO_TEMP,
+  CYCLE_RUNNING_C_TIMER,
+  CYCLE_RUNNING_D_DONE,
 
   CYCLE_COMPLETE_DELAY,
   CYCLE_SAMPLE_VALID_HOLD,
@@ -107,7 +97,7 @@ bool limitSwitchFreed(sensor_switches_t data);
 
 void handle_exit_notifications(void);
 
-cycle_state_t handleMainErrorMessage();
+void handleMainErrorMessage();
 
 cycle_state_t handleBatteryMessage();
 
