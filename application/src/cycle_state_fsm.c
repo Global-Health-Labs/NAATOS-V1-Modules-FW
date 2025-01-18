@@ -579,7 +579,8 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       if (time_left >= end_time) {
 #ifdef SAMPLE_PREP_BOARD
-        next_state = CYCLE_2_MOTOR_STOP_WAIT;
+        next_state = CYCLE_SAMPLE_VALID_HOLD;
+        //next_state = EXIT_CYCLE;
 #else
         next_state = CYCLE_COMPLETE_DELAY;
 #endif
@@ -1013,62 +1014,62 @@ void begin_cycle_2(void) {
 void end_cycle_0(void) {
   BaseType_t xRet;
   bool heat_conf = false;
-  // Send stop cycle one message to heater queue
-  xRet = xQueueSend(heaterRxQueue, &stop_cycle_zero_zone_heating, 50);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send stop amplification zone request.\r\n");
-  }
+  //// Send stop cycle one message to heater queue
+  //xRet = xQueueSend(heaterRxQueue, &stop_cycle_zero_zone_heating, 50);
+  //if (xRet != pdPASS) {
+  //  send_debug_log_message("MAIN_TASK: Unable to send stop amplification zone request.\r\n");
+  //}
   // Send stop amplification Event to logging task
   xRet = xQueueSend(logger_logMessageQueue, &cycle_zero_stop_log_msg, 50);
   if (xRet != pdPASS) {
     send_debug_log_message("MAIN_TASK: Unable to send stop amplification zone event to logging task.\r\n");
   }
-  // Wait for run confirmation response
-  xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
-  }
+  //// Wait for run confirmation response
+  //xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
+  //if (xRet != pdPASS) {
+  //  send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
+  //}
 }
 
 //GHL NOTE: copied from end_cycle_2()
 void end_cycle_1(void) {
   BaseType_t xRet;
   bool heat_conf = false;
-  // Send valve zone stop request
-  xRet = xQueueSend(heaterRxQueue, &stop_cycle_one_zone_heating, 0);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send stop valve zone request.\r\n");
-  }
+  //// Send valve zone stop request
+  //xRet = xQueueSend(heaterRxQueue, &stop_cycle_one_zone_heating, 0);
+  //if (xRet != pdPASS) {
+  //  send_debug_log_message("MAIN_TASK: Unable to send stop valve zone request.\r\n");
+  //}
   // Send stop valve Event to logging task
   xRet = xQueueSend(logger_logMessageQueue, &cycle_one_stop_log_msg, 0);
   if (xRet != pdPASS) {
     send_debug_log_message("MAIN_TASK: Unable to send stop valve zone event to logging task.\r\n");
   }
-  // Wait for run confirmation response
-  xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
-  }
+  //// Wait for run confirmation response
+  //xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
+  //if (xRet != pdPASS) {
+  //  send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
+  //}
 }
 
 void end_cycle_1b(void) {
   BaseType_t xRet;
   bool heat_conf = false;
-  // Send valve zone stop request
-  xRet = xQueueSend(heaterRxQueue, &stop_cycle_one_b_zone_heating, 0);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send stop valve zone request.\r\n");
-  }
+  //// Send valve zone stop request
+  //xRet = xQueueSend(heaterRxQueue, &stop_cycle_one_b_zone_heating, 0);
+  //if (xRet != pdPASS) {
+  //  send_debug_log_message("MAIN_TASK: Unable to send stop valve zone request.\r\n");
+  //}
   // Send stop valve Event to logging task
   xRet = xQueueSend(logger_logMessageQueue, &cycle_oneB_stop_log_msg, 0);
   if (xRet != pdPASS) {
     send_debug_log_message("MAIN_TASK: Unable to send stop valve zone event to logging task.\r\n");
   }
-  // Wait for run confirmation response
-  xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
-  }
+  //// Wait for run confirmation response
+  //xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
+  //if (xRet != pdPASS) {
+  //  send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
+  //}
 }
 
 void end_cycle_2(void) {

@@ -409,11 +409,44 @@ void handle_cycle_stopstart_heater(bool heating) {
   //if( !doWeRunMotorInThisCycle() )  {
   //  nrf_gpio_pin_clear(MOTOR_PWR_EN);
   //}
+  bool heater_run = doWeRunHeaterInThisCycle();
+  bool motor_run = doWeRunMotorInThisCycle();
+
+  // Set heater parameters
+  if(heater_run != heater_running_now)  {
+    // heater state changed in this cycle
+    heater_running_last = heater_running_now;
+
+    if(heater_run) {
+      nrf_gpio_pin_set(HEATER_PWR_EN);
+      send_debug_log_message("nrf_gpio_pin_set(HEATER_PWR_EN)");
+    } else{
+      nrf_gpio_pin_clear(HEATER_PWR_EN);
+      send_debug_log_message("nrf_gpio_pin_clear(HEATER_PWR_EN)");
+    }
+  }
+  heater_running_now = heater_run;
+
+
+  // Set motor parameters
+  if(motor_run != motor_running_now)  {
+    // motor state changed in this cycle
+    motor_running_last = motor_running_now;
+    
+    if(motor_run) {
+      nrf_gpio_pin_set(MOTOR_PWR_EN);
+      send_debug_log_message("nrf_gpio_pin_set(MOTOR_PWR_EN)");
+    } else{
+      nrf_gpio_pin_clear(MOTOR_PWR_EN);
+      send_debug_log_message("nrf_gpio_pin_clear(MOTOR_PWR_EN)");
+    }
+  }
+  motor_running_now = motor_run;
 
   SensorRxQueueMsg_t msg;
   msg.type = SENSOR_MSG_HEATER_STATE;
   //msg.heaterRunning = heating;    // SG GHL (this has to be TRUE or else all logging will stop)
-  msg.heaterRunning = doWeRunHeaterInThisCycle() || doWeRunMotorInThisCycle();    // SG GHL (this has to be TRUE or else all logging will stop)
+  msg.heaterRunning = heater_run || motor_run;    // SG GHL (this has to be TRUE or else all logging will stop)
 
   // Send the heater status
   xReturned = xQueueSend(sensorRxQueue, &msg, 0);
@@ -423,12 +456,14 @@ void handle_cycle_stopstart_heater(bool heating) {
 
   MotorRxQueueMsg_t motorMsg;
   motorMsg.type = MOTOR_MSG_HEATER_STATE;
-  motorMsg.motorRunning = heating;
+  motorMsg.motorRunning = motor_running_now;
 
   // Send the motor status
-  xReturned = xQueueSend(motorRxQueue, &motorMsg, 10);
-  if (xReturned != pdPASS) {
-    send_debug_log_message("HEATER_TASK: Unable to send heater state to motorRxQueue.");
+  if(motor_running_now != motor_running_last) {
+    xReturned = xQueueSend(motorRxQueue, &motorMsg, 10);
+    if (xReturned != pdPASS) {
+      send_debug_log_message("HEATER_TASK: Unable to send to motorRxQueue.");
+    }
   }
 
   watchdog_time_update_t wdtUpdate = {
@@ -786,7 +821,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 void handleSampleMotorDataRx(int motor_speed) {
 #ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
-  char tmp[100];
+  //char tmp[100];
 
   float this_motor_setpoint;
   bool this_run_motor;
@@ -901,6 +936,10 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
         break;
       case CYCLE_TWO:
         rampToTemp = false;
+        // STOP SIGNAL
+        //if(cycle_enabled)
+        //  rampToTemp = false;
+        //  fsm_cycle_current = CYCLE_NONE;
         break;
       default:
         break;
@@ -912,42 +951,48 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
     if(fsm_cycle_current != heaterRxMessage.cycleSelect)
       fsm_cycle_last = fsm_cycle_current;
     fsm_cycle_current = heaterRxMessage.cycleSelect;
+    if(!cycle_enabled && (heaterRxMessage.cycleSelect == CYCLE_TWO)) {  // when STOP received for CYCLE_TWO, we are all done
+      // all cycle graceful termination criteria
+      rampToTemp = false;
+      fsm_cycle_current = CYCLE_NONE;
+      fsm_cycle_last = CYCLE_TWO;
+    }
     heater_run = doWeRunHeaterInThisCycle();
     motor_run = doWeRunMotorInThisCycle();
     sprintf(tmp,"samplePrepHandleHeaterZoneStateUpdate(): CYCLE_LAST=%d CYCLE_NOW=%d HEATER=%d MOTOR=%d",(uint8_t) fsm_cycle_last, (uint8_t) fsm_cycle_current, heater_run, motor_run);
     send_debug_log_message(tmp);
     
 
-    // Set heater parameters
-    if(heater_run != heater_running_now)  {
-      // heater state changed in this cycle
-      heater_running_last = heater_running_now;
+    //// Set heater parameters
+    //if(heater_run != heater_running_now)  {
+    //  // heater state changed in this cycle
+    //  heater_running_last = heater_running_now;
 
-      if(heater_run) {
-        nrf_gpio_pin_set(HEATER_PWR_EN);
-        send_debug_log_message("nrf_gpio_pin_set(HEATER_PWR_EN)");
-      } else{
-        nrf_gpio_pin_clear(HEATER_PWR_EN);
-        send_debug_log_message("nrf_gpio_pin_clear(HEATER_PWR_EN)");
-      }
-    }
-    heater_running_now = heater_run;
+    //  if(heater_run) {
+    //    nrf_gpio_pin_set(HEATER_PWR_EN);
+    //    send_debug_log_message("nrf_gpio_pin_set(HEATER_PWR_EN)");
+    //  } else{
+    //    nrf_gpio_pin_clear(HEATER_PWR_EN);
+    //    send_debug_log_message("nrf_gpio_pin_clear(HEATER_PWR_EN)");
+    //  }
+    //}
+    //heater_running_now = heater_run;
 
 
-    // Set motor parameters
-    if(motor_run != motor_running_now)  {
-      // motor state changed in this cycle
-      motor_running_last = motor_run;
+    //// Set motor parameters
+    //if(motor_run != motor_running_now)  {
+    //  // motor state changed in this cycle
+    //  motor_running_last = motor_run;
       
-      if(motor_run) {
-        nrf_gpio_pin_set(MOTOR_PWR_EN);
-        send_debug_log_message("nrf_gpio_pin_set(MOTOR_PWR_EN)");
-      } else{
-        nrf_gpio_pin_clear(MOTOR_PWR_EN);
-        send_debug_log_message("nrf_gpio_pin_clear(MOTOR_PWR_EN)");
-      }
-    }
-    motor_running_now = motor_run;
+    //  if(motor_run) {
+    //    nrf_gpio_pin_set(MOTOR_PWR_EN);
+    //    send_debug_log_message("nrf_gpio_pin_set(MOTOR_PWR_EN)");
+    //  } else{
+    //    nrf_gpio_pin_clear(MOTOR_PWR_EN);
+    //    send_debug_log_message("nrf_gpio_pin_clear(MOTOR_PWR_EN)");
+    //  }
+    //}
+    //motor_running_now = motor_run;
     motorReachedSpeed = false;
 
     // Send starting heater to sensors task
