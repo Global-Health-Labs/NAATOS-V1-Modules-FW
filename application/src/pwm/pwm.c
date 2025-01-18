@@ -203,6 +203,7 @@ void pwm_task(void *pvParameters) {
           app_pwm_disable(&PWM0);
           app_pwm_disable(&PWM2);
           pwmEnabled = false;
+          send_debug_log_message("PWM_MSG_DISABLE: and disabling");
         }
         break;
       }
@@ -212,6 +213,7 @@ void pwm_task(void *pvParameters) {
           app_pwm_enable(&PWM0);
           app_pwm_enable(&PWM2);
           pwmEnabled = true;
+          send_debug_log_message("PWM_MSG_ENABLE: and enabling");
         }
         break;
       }

@@ -481,10 +481,9 @@ void handle_cycle_stopstart_heater(bool heating) {
   if (xReturned != pdPASS) {
     send_debug_log_message("heater: Unable to send WDT update to watchdog_rxTimesQueue. in heater task");
   }
-
   PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_DISABLE};
 
-  if (heating) {
+  if (heater_run || motor_run) {
     pwmMsg.type = PWM_MSG_ENABLE;
   }
 
@@ -648,114 +647,28 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     starting_sample_prep_run = false;
   }
 
-  /*
+
   // Update PID and PWM
-  if (heater_cycle0_running) {
+  if (heater_running_now) { //AMP 1 will be used for motor
     // Update Heater Zone 3 PID loop with new temperatures
-    if (config.run_heater_1) {
-      pid_controller_compute(&heater_pid_0, temperature_data.heat_zone_3_temp);
-      if (rampToTemp) {
-        if ((temperature_data.heat_zone_3_temp >= config.heater_setpoint_0)) {
-          xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
-          if (xReturned != pdPASS) {
-            send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
-          }
-          rampToTemp = false;
+    //if (config.run_heater_2) {
+    pid_controller_compute(&heater_pid, temperature_data.heat_zone_3_temp);
+    if (rampToTemp) {
+      if (rampToTemp && (temperature_data.heat_zone_3_temp >= heater_pid.setpoint)) {
+        xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
+        if (xReturned != pdPASS) {
+          send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
         }
+        rampToTemp = false;
       }
     }
-
-    temperature_pwm_data_t pwmData = {
-          .heat_zone_0_pwm = 0,
-          .heat_zone_1_pwm = heater_pid_0.out,        //<--- heat_zone_1 makes it actually work!!
-          .sample_prep_heater_pwm = heater_pid_0.out,
-          .heat_zone_2_pwm = 0,
-          .heat_zone_3_pwm = heater_pid_0.out};       //<--- but heat_zone 3 is the only one logged!!
-
-    // Update Heater Zone 3 PWM with PID output
-    h_pwm_data.heat_zone_0_pwm = pwmData.heat_zone_0_pwm;
-    h_pwm_data.heat_zone_1_pwm = pwmData.heat_zone_1_pwm;
-    // Dont Heater Zone 2, its from the motor task
-    h_pwm_data.heat_zone_3_pwm = pwmData.heat_zone_3_pwm;
-
-    updateDutyCycles(h_pwm_data);
-
-#if VERBOSE_HEATING
-    char tmp[150];
-    sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f", 
-                  temperature_data.heat_zone_0_temp, temperature_data.heat_zone_1_temp, temperature_data.heat_zone_2_temp, temperature_data.heat_zone_3_temp, 
-                  h_pwm_data.heat_zone_0_pwm, h_pwm_data.heat_zone_1_pwm, h_pwm_data.heat_zone_2_pwm, h_pwm_data.heat_zone_3_pwm);
-    send_debug_log_message(tmp);
-#endif
-
-    if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0) {
-      greater_than_max = true;
-    }
-  }
-
-  if (heater_cycle1_running) {
-    // Update Heater Zone 3 PID loop with new temperatures
-    if (config.run_heater_1) {
-      pid_controller_compute(&heater_pid_1, temperature_data.heat_zone_3_temp);
-      if (rampToTemp) {
-        if ((temperature_data.heat_zone_3_temp >= config.heater_setpoint_1)) {
-          xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
-          if (xReturned != pdPASS) {
-            send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
-          }
-          rampToTemp = false;
-        }
-      }
-    }
-
-    temperature_pwm_data_t pwmData = {
-          .heat_zone_0_pwm = 0,
-          .heat_zone_1_pwm = heater_pid_1.out,
-          .sample_prep_heater_pwm = heater_pid_1.out,
-          .heat_zone_2_pwm = 0,
-          .heat_zone_3_pwm = heater_pid_1.out};
-
-    // Update Heater Zone 3 PWM with PID output
-    h_pwm_data.heat_zone_0_pwm = pwmData.heat_zone_0_pwm;
-    h_pwm_data.heat_zone_1_pwm = pwmData.heat_zone_1_pwm;
-    // Dont Heater Zone 2, its from the motor task
-    h_pwm_data.heat_zone_3_pwm = pwmData.heat_zone_3_pwm;
-
-    updateDutyCycles(h_pwm_data);
-
-#if VERBOSE_HEATING
-    char tmp[150];
-    sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f", 
-                  temperature_data.heat_zone_0_temp, temperature_data.heat_zone_1_temp, temperature_data.heat_zone_2_temp, temperature_data.heat_zone_3_temp, 
-                  h_pwm_data.heat_zone_0_pwm, h_pwm_data.heat_zone_1_pwm, h_pwm_data.heat_zone_2_pwm, h_pwm_data.heat_zone_3_pwm);
-    send_debug_log_message(tmp);
-#endif
-
-    if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0) {
-      greater_than_max = true;
-    }
-  }
-
-  if (heater_cycle2_running) { //AMP 1 will be used for motor
-    // Update Heater Zone 3 PID loop with new temperatures
-    if (config.run_heater_2) {
-      pid_controller_compute(&heater_pid_2, temperature_data.heat_zone_3_temp);
-      if (rampToTemp) {
-        if (rampToTemp && (temperature_data.heat_zone_3_temp >= config.heater_setpoint_2)) {
-          xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
-          if (xReturned != pdPASS) {
-            send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
-          }
-          rampToTemp = false;
-        }
-      }
-    }
+    //}
 
     temperature_pwm_data_t pwmData = {
         .heat_zone_0_pwm = 0,
-        .heat_zone_1_pwm = heater_pid_2.out,
+        .heat_zone_1_pwm = heater_pid.out,
         .heat_zone_2_pwm = 0,
-        .heat_zone_3_pwm = heater_pid_2.out};
+        .heat_zone_3_pwm = heater_pid.out};
 
     h_pwm_data.heat_zone_0_pwm = pwmData.heat_zone_0_pwm;
     h_pwm_data.heat_zone_1_pwm = pwmData.heat_zone_1_pwm;
@@ -775,6 +688,135 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
       greater_than_max = true;
     }
   }
+
+
+
+
+//  if (heater_cycle0_running) {
+//    // Update Heater Zone 3 PID loop with new temperatures
+//    if (config.run_heater_1) {
+//      pid_controller_compute(&heater_pid_0, temperature_data.heat_zone_3_temp);
+//      if (rampToTemp) {
+//        if ((temperature_data.heat_zone_3_temp >= config.heater_setpoint_0)) {
+//          xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
+//          if (xReturned != pdPASS) {
+//            send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
+//          }
+//          rampToTemp = false;
+//        }
+//      }
+//    }
+
+//    temperature_pwm_data_t pwmData = {
+//          .heat_zone_0_pwm = 0,
+//          .heat_zone_1_pwm = heater_pid_0.out,        //<--- heat_zone_1 makes it actually work!!
+//          .sample_prep_heater_pwm = heater_pid_0.out,
+//          .heat_zone_2_pwm = 0,
+//          .heat_zone_3_pwm = heater_pid_0.out};       //<--- but heat_zone 3 is the only one logged!!
+
+//    // Update Heater Zone 3 PWM with PID output
+//    h_pwm_data.heat_zone_0_pwm = pwmData.heat_zone_0_pwm;
+//    h_pwm_data.heat_zone_1_pwm = pwmData.heat_zone_1_pwm;
+//    // Dont Heater Zone 2, its from the motor task
+//    h_pwm_data.heat_zone_3_pwm = pwmData.heat_zone_3_pwm;
+
+//    updateDutyCycles(h_pwm_data);
+
+//#if VERBOSE_HEATING
+//    char tmp[150];
+//    sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f", 
+//                  temperature_data.heat_zone_0_temp, temperature_data.heat_zone_1_temp, temperature_data.heat_zone_2_temp, temperature_data.heat_zone_3_temp, 
+//                  h_pwm_data.heat_zone_0_pwm, h_pwm_data.heat_zone_1_pwm, h_pwm_data.heat_zone_2_pwm, h_pwm_data.heat_zone_3_pwm);
+//    send_debug_log_message(tmp);
+//#endif
+
+//    if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0) {
+//      greater_than_max = true;
+//    }
+//  }
+
+//  if (heater_cycle1_running) {
+//    // Update Heater Zone 3 PID loop with new temperatures
+//    if (config.run_heater_1) {
+//      pid_controller_compute(&heater_pid_1, temperature_data.heat_zone_3_temp);
+//      if (rampToTemp) {
+//        if ((temperature_data.heat_zone_3_temp >= config.heater_setpoint_1)) {
+//          xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
+//          if (xReturned != pdPASS) {
+//            send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
+//          }
+//          rampToTemp = false;
+//        }
+//      }
+//    }
+
+//    temperature_pwm_data_t pwmData = {
+//          .heat_zone_0_pwm = 0,
+//          .heat_zone_1_pwm = heater_pid_1.out,
+//          .sample_prep_heater_pwm = heater_pid_1.out,
+//          .heat_zone_2_pwm = 0,
+//          .heat_zone_3_pwm = heater_pid_1.out};
+
+//    // Update Heater Zone 3 PWM with PID output
+//    h_pwm_data.heat_zone_0_pwm = pwmData.heat_zone_0_pwm;
+//    h_pwm_data.heat_zone_1_pwm = pwmData.heat_zone_1_pwm;
+//    // Dont Heater Zone 2, its from the motor task
+//    h_pwm_data.heat_zone_3_pwm = pwmData.heat_zone_3_pwm;
+
+//    updateDutyCycles(h_pwm_data);
+
+//#if VERBOSE_HEATING
+//    char tmp[150];
+//    sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f", 
+//                  temperature_data.heat_zone_0_temp, temperature_data.heat_zone_1_temp, temperature_data.heat_zone_2_temp, temperature_data.heat_zone_3_temp, 
+//                  h_pwm_data.heat_zone_0_pwm, h_pwm_data.heat_zone_1_pwm, h_pwm_data.heat_zone_2_pwm, h_pwm_data.heat_zone_3_pwm);
+//    send_debug_log_message(tmp);
+//#endif
+
+//    if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0) {
+//      greater_than_max = true;
+//    }
+//  }
+
+//  if (heater_cycle2_running) { //AMP 1 will be used for motor
+//    // Update Heater Zone 3 PID loop with new temperatures
+//    if (config.run_heater_2) {
+//      pid_controller_compute(&heater_pid_2, temperature_data.heat_zone_3_temp);
+//      if (rampToTemp) {
+//        if (rampToTemp && (temperature_data.heat_zone_3_temp >= config.heater_setpoint_2)) {
+//          xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
+//          if (xReturned != pdPASS) {
+//            send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
+//          }
+//          rampToTemp = false;
+//        }
+//      }
+//    }
+
+//    temperature_pwm_data_t pwmData = {
+//        .heat_zone_0_pwm = 0,
+//        .heat_zone_1_pwm = heater_pid_2.out,
+//        .heat_zone_2_pwm = 0,
+//        .heat_zone_3_pwm = heater_pid_2.out};
+
+//    h_pwm_data.heat_zone_0_pwm = pwmData.heat_zone_0_pwm;
+//    h_pwm_data.heat_zone_1_pwm = pwmData.heat_zone_1_pwm;
+//    h_pwm_data.heat_zone_3_pwm = pwmData.heat_zone_3_pwm;
+
+//    updateDutyCycles(h_pwm_data);
+
+//#if VERBOSE_HEATING
+//    char tmp[150];
+//    sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f", 
+//                  temperature_data.heat_zone_0_temp, temperature_data.heat_zone_1_temp, temperature_data.heat_zone_2_temp, temperature_data.heat_zone_3_temp, 
+//                  h_pwm_data.heat_zone_0_pwm, h_pwm_data.heat_zone_1_pwm, h_pwm_data.heat_zone_2_pwm, h_pwm_data.heat_zone_3_pwm);
+//    send_debug_log_message(tmp);
+//#endif
+
+//    if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0) {
+//      greater_than_max = true;
+//    }
+//  }
 
   // Handle being greater than the maximum temperature
   if (greater_than_max) {
@@ -786,7 +828,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     greater_than_max = false;
   }
 
-  */
+
 
   logMsg.temperature_data.heat_zone_1_temp = temperature_data.heat_zone_1_temp;
   logMsg.temperature_data.heat_zone_2_temp = temperature_data.heat_zone_2_temp;
