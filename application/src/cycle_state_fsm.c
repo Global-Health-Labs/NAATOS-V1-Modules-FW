@@ -216,20 +216,22 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     }
 
     case CYCLE_RUNNING_A_START: {
-      if(cycle_now == CYCLE_NONE) {
-        sprintf(tmp,"FSM CYCLE_RUNNING_A_START - CYCLE=%d",(uint8_t) cycle_now);
-        send_debug_log_message(tmp);
-      }
+      //if(cycle_now == CYCLE_NONE) {
+      sprintf(tmp,"FSM CYCLE_RUNNING_A_START - CYCLE=%d",(uint8_t) cycle_now);
+      send_debug_log_message(tmp);
+      //}
 
       // Send start zone request
       heaterrxqueuemsg.type = HEATER_MSG_ZONE_STATE;
       heaterrxqueuemsg.cycleSelect = cycle_now;
       heaterrxqueuemsg.cycleEnabled = true;
 
+      heaterrxqueuemsg.heaterRunning = true;
       heaterrxqueuemsg.tempSetpoint1 = MY_H_SP;
       heaterrxqueuemsg.HEATER_KP = MY_H_KP;
       heaterrxqueuemsg.HEATER_KI = MY_H_KI;
       heaterrxqueuemsg.HEATER_KD = MY_H_KD;
+      heaterrxqueuemsg.rampToTemp = false;
 
       heaterrxqueuemsg.motorSpeed = MY_M_SP;
       heaterrxqueuemsg.MOTOR_KP = MY_M_KP;
@@ -298,6 +300,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     case CYCLE_RUNNING_C_TIMER: {
       if (last_state != current_state) {
         // First Time In This State
+        sprintf(tmp,"FSM CYCLE_RUNNING_C_TIMER - CYCLE=%d - first run",(uint8_t) cycle_now);
+        send_debug_log_message(tmp);
+
 
         // Set Timing
         start_time = xTaskGetTickCount();
@@ -386,7 +391,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     case CYCLE_RUNNING_D_DONE: {
       bool stop = true;
 
-      sprintf(tmp,"FSM CYCLE_RUNNING_D_DONE - CYCLE=%d",(uint8_t) cycle_now);
+      sprintf(tmp,"FSM CYCLE_RUNNING_D_DONE - CYCLE=%d EXITINFO=%d",(uint8_t) cycle_now, (uint8_t) exitInfo);
       send_debug_log_message(tmp);
 
       // Send Stop Cycle String message to logging task
@@ -434,23 +439,22 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if(stop)  {
         sprintf(tmp,"FSM CYCLE_RUNNING_D_DONE - Stop Decision");
         send_debug_log_message(tmp);
+
         // Send stop zone request
-        //heaterrxqueuemsg = {
-        //    .type = HEATER_MSG_ZONE_STATE,
-        //    .cycleSelect = cycle_now,
-        //    //.cycleEnabled = true,
-        //    .cycleEnabled = false,
+        heaterrxqueuemsg.type = HEATER_MSG_ZONE_STATE;
+        heaterrxqueuemsg.cycleSelect = cycle_now;
+        heaterrxqueuemsg.cycleEnabled = false;
 
-        //    //.tempSetpoint1 = MY_H_SP,
-        //    //.H_KP = MY_H_KP,
-        //    //.H_KI = MY_H_KI,
-        //    //.H_KD = MY_H_KD,
+        //heaterrxqueuemsg.tempSetpoint1 = MY_H_SP;
+        //heaterrxqueuemsg.HEATER_KP = MY_H_KP;
+        //heaterrxqueuemsg.HEATER_KI = MY_H_KI;
+        //heaterrxqueuemsg.HEATER_KD = MY_H_KD;
+        //heaterrxqueuemsg.rampToTemp = false;
 
-        //    //.motorSpeed = MY_M_SP,
-        //    //.M_KP = MY_M_KP,
-        //    //.M_KI = MY_M_KI,
-        //    //.M_KD = MY_M_KD,
-        //    };  //GHL
+        //heaterrxqueuemsg.motorSpeed = MY_M_SP;
+        //heaterrxqueuemsg.MOTOR_KP = MY_M_KP;
+        //heaterrxqueuemsg.MOTOR_KI = MY_M_KI;
+        //heaterrxqueuemsg.MOTOR_KD = MY_M_KD;
         xReturned = xQueueSend(heaterRxQueue, &heaterrxqueuemsg, 0);
         if (xReturned != pdPASS) {
           //send_debug_log_message("MAIN_TASK: Unable to send run amplification zone request.\n");

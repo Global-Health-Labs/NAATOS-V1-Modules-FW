@@ -571,6 +571,7 @@ typedef struct {
   float MOTOR_KP;
   float MOTOR_KI;
   float MOTOR_KD;
+  bool rampToTemp;
 } HeaterRxQueueMsg_t;
 
 typedef struct {

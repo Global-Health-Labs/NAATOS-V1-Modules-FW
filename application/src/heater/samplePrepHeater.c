@@ -14,15 +14,19 @@ const MainStateErrorQueueMsg_t motor_stall_pwm_err_msg = {
   .overTempData = NULL
 };
 
-cycle_t fsm_cycle_current = CYCLE_NONE;
-cycle_t fsm_cycle_last    = CYCLE_NONE;
+//cycle_t fsm_cycle_current = CYCLE_NONE;
+//cycle_t fsm_cycle_last    = CYCLE_NONE;
 
 bool heater_running_now = false;
 bool heater_running_last = false;
 bool motor_running_now = false;
 bool motor_running_last = false;
 
+bool rx_runmotor = false;
+bool rx_runheater = false;
 
+float MY_H_SP; float MY_H_KP; float MY_H_KI; float MY_H_KD;
+float MY_M_SP; float MY_M_KP; float MY_M_KI; float MY_M_KD;
 pid_controller_t heater_pid;
 //pid_controller_t heater_pid_0;
 //pid_controller_t heater_pid_1;
@@ -74,23 +78,11 @@ static log_data_message_t logMsg = {
     .temperature_data = NULL};
 
 bool doWeRunHeaterInThisCycle() {
-  switch(fsm_cycle_current) {
-    case CYCLE_ZERO:    return true;
-    case CYCLE_ONE:     return use_default_configuration_parameters ? DEFAULT_RUN_HEATER_1 : config.run_heater_1;
-    case CYCLE_ONE_B:   return use_default_configuration_parameters ? DEFAULT_RUN_HEATER_2 : config.run_heater_2;
-    case CYCLE_TWO:     return false;
-    default:            return false;
-  }
+  return rx_runheater;
 }
 
 bool doWeRunMotorInThisCycle() {
-  switch(fsm_cycle_current) {
-    case CYCLE_ZERO:    return false;
-    case CYCLE_ONE:     return use_default_configuration_parameters ? DEFAULT_RUN_MOTOR_1 : config.run_motor_1;
-    case CYCLE_ONE_B:   return use_default_configuration_parameters ? DEFAULT_RUN_MOTOR_2 : config.run_motor_2;
-    case CYCLE_TWO:     return use_default_configuration_parameters ? DEFAULT_RUN_MOTOR_2 : config.run_motor_2;
-    default:            return false;
-  }
+  return rx_runmotor;
 }
 
 
@@ -211,78 +203,15 @@ void handle_cycle_stopstart_heater(bool heating) {
 
 
 void samplePrepResetHeaterPIDs(void) {
-#ifdef SAMPLE_PREP_BOARD
-  float MY_H_SP; float MY_H_KP; float MY_H_KI; float MY_H_KD;
-  float MY_M_SP; float MY_M_KP; float MY_M_KI; float MY_M_KD;
+  pid_controller_init(&heater_pid, MY_H_SP, MY_H_KP, MY_H_KI, MY_H_KD, DEFAULT_MAX_HEATER_PID);
+  pid_controller_init(&motor_pid, MY_M_SP, MY_M_KP, MY_M_KI, MY_M_KD, MAX_MOTOR_PID);
+  send_debug_log_message("HEATER_TASK: samplePrepResetHeaterPIDs() PID INIT");
+}
 
-  switch(fsm_cycle_current) {
-    case CYCLE_ZERO:
-      MY_H_SP = use_default_configuration_parameters ? DEFAULT_HEATER_SETPOINT_0 : config.heater_setpoint_0;
-      MY_H_KP = use_default_configuration_parameters ? H_KP_1 : config.heater_kp_1;
-      MY_H_KI = use_default_configuration_parameters ? H_KI_1 : config.heater_ki_1;
-      MY_H_KD = use_default_configuration_parameters ? H_KD_1 : config.heater_kd_1;
-
-      MY_M_SP = use_default_configuration_parameters ? MOTOR_SETPOINT_1 : config.motor_setpoint_1;
-      MY_M_KP = use_default_configuration_parameters ? M_KP : config.motor_kp_1;
-      MY_M_KI = use_default_configuration_parameters ? M_KI : config.motor_ki_1;
-      MY_M_KD = use_default_configuration_parameters ? M_KD : config.motor_kd_1;
-      break;
-    case CYCLE_ONE:
-      MY_H_SP = use_default_configuration_parameters ? DEFAULT_HEATER_SETPOINT_1 : config.heater_setpoint_1;
-      MY_H_KP = use_default_configuration_parameters ? H_KP_1 : config.heater_kp_1;
-      MY_H_KI = use_default_configuration_parameters ? H_KI_1 : config.heater_ki_1;
-      MY_H_KD = use_default_configuration_parameters ? H_KD_1 : config.heater_kd_1;
-
-      MY_M_SP = use_default_configuration_parameters ? MOTOR_SETPOINT_1 : config.motor_setpoint_1;
-      MY_M_KP = use_default_configuration_parameters ? M_KP : config.motor_kp_1;
-      MY_M_KI = use_default_configuration_parameters ? M_KI : config.motor_ki_1;
-      MY_M_KD = use_default_configuration_parameters ? M_KD : config.motor_kd_1;
-      break;
-    case CYCLE_ONE_B:
-      MY_H_SP = use_default_configuration_parameters ? DEFAULT_HEATER_SETPOINT_1 : config.heater_setpoint_1;
-      MY_H_KP = use_default_configuration_parameters ? H_KP_2 : config.heater_kp_2;
-      MY_H_KI = use_default_configuration_parameters ? H_KI_2 : config.heater_ki_2;
-      MY_H_KD = use_default_configuration_parameters ? H_KD_2 : config.heater_kd_2;
-
-      MY_M_SP = use_default_configuration_parameters ? MOTOR_SETPOINT_1 : config.motor_setpoint_1;
-      MY_M_KP = use_default_configuration_parameters ? M_KP : config.motor_kp_1;
-      MY_M_KI = use_default_configuration_parameters ? M_KI : config.motor_ki_1;
-      MY_M_KD = use_default_configuration_parameters ? M_KD : config.motor_kd_1;
-      break;
-    case CYCLE_TWO:
-      MY_H_SP = 0;
-      MY_H_KP = use_default_configuration_parameters ? H_KP_2 : config.heater_kp_2;
-      MY_H_KI = use_default_configuration_parameters ? H_KI_2 : config.heater_ki_2;
-      MY_H_KD = use_default_configuration_parameters ? H_KD_2 : config.heater_kd_2;
-
-      MY_M_SP = use_default_configuration_parameters ? MOTOR_SETPOINT_2 : config.motor_setpoint_2;
-      MY_M_KP = use_default_configuration_parameters ? M_KP : config.motor_kp_2;
-      MY_M_KI = use_default_configuration_parameters ? M_KI : config.motor_ki_2;
-      MY_M_KD = use_default_configuration_parameters ? M_KD : config.motor_kd_2;
-      break;
-    default:
-      send_debug_log_message("HEATER_TASK: samplePrepResetHeaterPIDs() DEFAULT CASE1");
-      break;
-  }
-
-  switch(fsm_cycle_current) {
-    case CYCLE_ZERO:
-      pid_controller_init(&heater_pid, MY_H_SP, MY_H_KP, MY_H_KI, MY_H_KD, DEFAULT_MAX_HEATER_PID);
-      pid_controller_init(&motor_pid, MY_M_SP, MY_M_KP, MY_M_KI, MY_M_KD, MAX_MOTOR_PID);
-      send_debug_log_message("HEATER_TASK: samplePrepResetHeaterPIDs() PID INIT");
-      break;
-    case CYCLE_ONE:
-    case CYCLE_ONE_B:
-    case CYCLE_TWO:
-      pid_controller_update(&heater_pid, MY_H_SP, MY_H_KP, MY_H_KI, MY_H_KD);
-      pid_controller_update(&motor_pid, MY_M_SP, MY_M_KP, MY_M_KI, MY_M_KD);
-      send_debug_log_message("HEATER_TASK: samplePrepResetHeaterPIDs() PID UPDATE");
-      break;
-    default:
-      send_debug_log_message("HEATER_TASK: samplePrepResetHeaterPIDs() DEFAULT CASE2");
-      break;
-  }
-  #endif
+void samplePrepUpdateHeaterPIDs(void) {
+  pid_controller_update(&heater_pid, MY_H_SP, MY_H_KP, MY_H_KI, MY_H_KD);
+  pid_controller_update(&motor_pid, MY_M_SP, MY_M_KP, MY_M_KI, MY_M_KD);
+  send_debug_log_message("HEATER_TASK: samplePrepResetHeaterPIDs() PID UPDATE");
 }
 
 void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
@@ -327,52 +256,52 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
 
   // Update PID and PWM
-  if (heater_running_now) { //AMP 1 will be used for motor
-    // Update Heater Zone 3 PID loop with new temperatures
-    //if (config.run_heater_2) {
-    pid_controller_compute(&heater_pid, temperature_data.heat_zone_3_temp);
-    if (rampToTemp) {
-      if (rampToTemp && (temperature_data.heat_zone_3_temp >= heater_pid.setpoint)) {
-        xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
-        if (xReturned != pdPASS) {
-          send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
-        }
-        rampToTemp = false;
-      }
-    }
-    //}
+//  if (heater_running_now) { //AMP 1 will be used for motor
+//    // Update Heater Zone 3 PID loop with new temperatures
+//    //if (config.run_heater_2) {
+//    pid_controller_compute(&heater_pid, temperature_data.heat_zone_3_temp);
+//    if (rampToTemp) {
+//      if (rampToTemp && (temperature_data.heat_zone_3_temp >= heater_pid.setpoint)) {
+//        xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
+//        if (xReturned != pdPASS) {
+//          send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
+//        }
+//        rampToTemp = false;
+//      }
+//    }
+//    //}
 
-    temperature_pwm_data_t pwmData = {
-        .heat_zone_0_pwm = 0,
-        .heat_zone_1_pwm = heater_pid.out,
-        .heat_zone_2_pwm = 0,
-        .heat_zone_3_pwm = heater_pid.out};
+//    temperature_pwm_data_t pwmData = {
+//        .heat_zone_0_pwm = 0,
+//        .heat_zone_1_pwm = heater_pid.out,
+//        .heat_zone_2_pwm = 0,
+//        .heat_zone_3_pwm = heater_pid.out};
 
-    h_pwm_data.heat_zone_0_pwm = pwmData.heat_zone_0_pwm;
-    h_pwm_data.heat_zone_1_pwm = pwmData.heat_zone_1_pwm;
-    h_pwm_data.heat_zone_3_pwm = pwmData.heat_zone_3_pwm;
+//    h_pwm_data.heat_zone_0_pwm = pwmData.heat_zone_0_pwm;
+//    h_pwm_data.heat_zone_1_pwm = pwmData.heat_zone_1_pwm;
+//    h_pwm_data.heat_zone_3_pwm = pwmData.heat_zone_3_pwm;
 
-    updateDutyCycles(h_pwm_data);
+//    updateDutyCycles(h_pwm_data);
 
-#if VERBOSE_HEATING
-    char tmp[150];
-    sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f", 
-                  temperature_data.heat_zone_0_temp, temperature_data.heat_zone_1_temp, temperature_data.heat_zone_2_temp, temperature_data.heat_zone_3_temp, 
-                  h_pwm_data.heat_zone_0_pwm, h_pwm_data.heat_zone_1_pwm, h_pwm_data.heat_zone_2_pwm, h_pwm_data.heat_zone_3_pwm);
-    send_debug_log_message(tmp);
-#endif
+//#if VERBOSE_HEATING
+//    char tmp[150];
+//    sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f", 
+//                  temperature_data.heat_zone_0_temp, temperature_data.heat_zone_1_temp, temperature_data.heat_zone_2_temp, temperature_data.heat_zone_3_temp, 
+//                  h_pwm_data.heat_zone_0_pwm, h_pwm_data.heat_zone_1_pwm, h_pwm_data.heat_zone_2_pwm, h_pwm_data.heat_zone_3_pwm);
+//    send_debug_log_message(tmp);
+//#endif
 
-    if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0) {
-      greater_than_max = true;
-    }
-  } else{
+//    if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0) {
+//      greater_than_max = true;
+//    }
+//  } else{
     // HEATER SHOULDN'T BE RUNNING
     h_pwm_data.heat_zone_0_pwm = 0;
     h_pwm_data.heat_zone_1_pwm = 0;
     h_pwm_data.heat_zone_3_pwm = 0;
     // ch 2 is the motor
     updateDutyCycles(h_pwm_data);
-  }
+  //}
 
 
   // Handle being greater than the maximum temperature
@@ -432,12 +361,13 @@ void handleSampleMotorDataRx(int motor_speed) {
   //};
 
   // calculate pid
-  if (motor_running_now) {
-    pid_controller_compute(&motor_pid, motor_speed);
-    h_pwm_data.heat_zone_2_pwm = motor_pid.out;
-  } else{
-    h_pwm_data.heat_zone_2_pwm = 0; // no pwm the motor
-  }
+  //if (motor_running_now) {
+  //  pid_controller_compute(&motor_pid, motor_speed);
+  //  h_pwm_data.heat_zone_2_pwm = motor_pid.out;
+  //} else{
+  //  h_pwm_data.heat_zone_2_pwm = 0; // no pwm the motor
+  //}
+  h_pwm_data.heat_zone_2_pwm = 0; // no pwm the motor
 
   last_motor_speed = motor_speed;
 
@@ -482,7 +412,9 @@ void handleSampleMotorDataRx(int motor_speed) {
 void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
 #ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
-  bool cycle_enabled = heaterRxMessage.cycleEnabled;
+  
+  //bool cycle_enabled = heaterRxMessage.cycleEnabled;
+  
   bool heater_run = false;
   bool motor_run = false;
   char tmp[100];
@@ -495,56 +427,67 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
     //  return;
     
     // Set zones enabled
-    switch(fsm_cycle_current) {
-      case CYCLE_ZERO:
-        // INITIAL STATE
-        starting_sample_prep_run = true;    // GHL: appears to be used throughout this code for something useful
-        rampToTemp = false;   // hardcoded
+    if(heaterRxMessage.cycleEnabled) {
+      // BRING IN PARAMETERS FROM THE MESSAGE
+      rampToTemp = heaterRxMessage.rampToTemp;
+      rx_runheater = heaterRxMessage.heaterRunning;
+      MY_H_SP = heaterRxMessage.tempSetpoint1;
+      MY_H_KP = heaterRxMessage.HEATER_KP;
+      MY_H_KI = heaterRxMessage.HEATER_KI;
+      MY_H_KD = heaterRxMessage.HEATER_KD;
+      rx_runmotor = heaterRxMessage.motorSpeed>0;
+      MY_M_SP = heaterRxMessage.motorSpeed;
+      MY_M_KP = heaterRxMessage.MOTOR_KP;
+      MY_M_KI = heaterRxMessage.MOTOR_KI;
+      MY_M_KD = heaterRxMessage.MOTOR_KD;
 
-        // initialize
-        last_motor_speed = 0;
-        h_pwm_data.heat_zone_0_pwm = 0;
-        h_pwm_data.heat_zone_1_pwm = 0;
-        h_pwm_data.heat_zone_2_pwm = 0;
-        h_pwm_data.heat_zone_3_pwm = 0;
-        break;
-      case CYCLE_ONE:
-        rampToTemp = false;   // hardcoded
-        break;
-      case CYCLE_ONE_B:
-        rampToTemp = false;   // hardcoded
-        break;
-      case CYCLE_TWO:
-        rampToTemp = false;   // hardcoded
-        // STOP SIGNAL
-        //if(cycle_enabled)
-        //  rampToTemp = false;
-        //  fsm_cycle_current = CYCLE_NONE;
-        break;
-      default:
-        break;
-      //case CYCLE_ZERO:
-        //break;
+      // UPDATE EVERYTHING
+      switch(heaterRxMessage.cycleSelect) {
+        case CYCLE_ZERO:
+          // INITIAL STATE
+          starting_sample_prep_run = true;    // GHL: appears to be used throughout this code for something useful
+          //rampToTemp = false;   // hardcoded
+
+          // initialize
+          last_motor_speed = 0;
+          h_pwm_data.heat_zone_0_pwm = 0;
+          h_pwm_data.heat_zone_1_pwm = 0;
+          h_pwm_data.heat_zone_2_pwm = 0;
+          h_pwm_data.heat_zone_3_pwm = 0;
+
+          // PID UPDATE
+          samplePrepResetHeaterPIDs();
+          break;
+        default:
+          // PID UPDATE
+          samplePrepUpdateHeaterPIDs();
+          break;
+      }
+    } else{
+      // WE ARE SHUTTING DOWN
+      rx_runheater = false;
+      rx_runmotor = false;
     }
+
 
     // Set the cycle we are on
-    if(fsm_cycle_current != heaterRxMessage.cycleSelect)  {
-      fsm_cycle_last = fsm_cycle_current;
-    }
-    fsm_cycle_current = heaterRxMessage.cycleSelect;
-    if(fsm_cycle_current != fsm_cycle_last)  {
-      // cycle change has happened, which may contain new setpoints and PID's
-      samplePrepResetHeaterPIDs();
-    }
-    if(!cycle_enabled && (heaterRxMessage.cycleSelect == CYCLE_TWO)) {  // when STOP received for CYCLE_TWO, we are all done
-      // all cycle graceful termination criteria
-      rampToTemp = false;
-      fsm_cycle_current = CYCLE_NONE;
-      fsm_cycle_last = CYCLE_TWO;
-    }
+    //if(fsm_cycle_current != heaterRxMessage.cycleSelect)  {
+    //  fsm_cycle_last = fsm_cycle_current;
+    //}
+    //fsm_cycle_current = heaterRxMessage.cycleSelect;
+    //if(fsm_cycle_current != fsm_cycle_last)  {
+    //  // cycle change has happened, which may contain new setpoints and PID's
+    //  samplePrepResetHeaterPIDs();
+    //}
+    //if(!cycle_enabled && (heaterRxMessage.cycleSelect == CYCLE_TWO)) {  // when STOP received for CYCLE_TWO, we are all done
+    //  // all cycle graceful termination criteria
+    //  rampToTemp = false;
+    //  fsm_cycle_current = CYCLE_NONE;
+    //  fsm_cycle_last = CYCLE_TWO;
+    //}
     heater_run = doWeRunHeaterInThisCycle();
     motor_run = doWeRunMotorInThisCycle();
-    sprintf(tmp,"samplePrepHandleHeaterZoneStateUpdate(): CYCLE_LAST=%d CYCLE_NOW=%d HEATER=%d MOTOR=%d",(uint8_t) fsm_cycle_last, (uint8_t) fsm_cycle_current, heater_run, motor_run);
+    sprintf(tmp,"samplePrepHandleHeaterZoneStateUpdate(): HEATER=%d MOTOR=%d",heater_run, motor_run);
     send_debug_log_message(tmp);
     
 
@@ -718,8 +661,8 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
     //  }
     //}
   }  else if (heaterRxMessage.type == HEATER_MSG_MOTOR_STATE){
-      fsm_cycle_last = fsm_cycle_current;
-      fsm_cycle_current = CYCLE_NONE;
+      //fsm_cycle_last = fsm_cycle_current;
+      //fsm_cycle_current = CYCLE_NONE;
 
 
       h_pwm_data.heat_zone_0_pwm = 0;
