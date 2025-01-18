@@ -19,7 +19,7 @@ void pid_controller_init(pid_controller_t *pid, float setpoint, float k_p, float
 void pid_controller_update(pid_controller_t *pid, float setpoint, float k_p, float k_i, float k_d) {
   // Clear controller variables
   //pid->intergrator = 0.0f;
-  pid->prevMesurement = 0.0f;
+  //pid->prevMesurement = 0.0f;
   //pid->intergrator = 0.0f;
   //pid->out = 0.0f;
   // Set from parameters
@@ -29,7 +29,7 @@ void pid_controller_update(pid_controller_t *pid, float setpoint, float k_p, flo
   pid->k_d = k_d;
   // Set from defines
   //pid->lim_max = pid_max;
-  pid->lim_min = PID_LIM_MIN;
+  //pid->lim_min = PID_LIM_MIN;
 }
 
 void pid_controller_compute(pid_controller_t *pid, float measurement) {
