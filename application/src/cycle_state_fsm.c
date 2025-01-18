@@ -33,7 +33,7 @@ temperature_data_t over_temp_data;
 
 BaseType_t xReturned;
 
-bool doWeRunHeaterInThisCycle() {
+static bool doWeRunHeaterInThisCycle() {
   switch(cycle_now) {
     case CYCLE_ZERO:    return true;
     case CYCLE_ONE:     return use_default_configuration_parameters ? DEFAULT_RUN_HEATER_1 : config.run_heater_1;
@@ -43,7 +43,7 @@ bool doWeRunHeaterInThisCycle() {
   }
 }
 
-bool doWeRunMotorInThisCycle() {
+static bool doWeRunMotorInThisCycle() {
   switch(cycle_now) {
     case CYCLE_ZERO:    return false;
     case CYCLE_ONE:     return use_default_configuration_parameters ? DEFAULT_RUN_MOTOR_1 : config.run_motor_1;
@@ -102,7 +102,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     HeaterRxQueueMsg_t heaterrxqueuemsg;
     bool start_run;
 
-    switch(fsm_cycle_current) {
+    switch(cycle_now) {
       case CYCLE_ZERO:
         MY_H_SP = use_default_configuration_parameters ? DEFAULT_HEATER_SETPOINT_0 : config.heater_setpoint_0;
         MY_H_KP = use_default_configuration_parameters ? H_KP_1 : config.heater_kp_1;
@@ -114,7 +114,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         MY_M_KI = use_default_configuration_parameters ? M_KI : config.motor_ki_1;
         MY_M_KD = use_default_configuration_parameters ? M_KD : config.motor_kd_1;
 
-        MY_RAMP_TO_TEMP = use_default_configuration_parameters ? M_KD : config.ramp_to_temp_before_start_cycle_1
+        MY_RAMP_TO_TEMP = use_default_configuration_parameters ? M_KD : config.ramp_to_temp_before_start_cycle_1;
         break;
       case CYCLE_ONE:
         MY_H_SP = use_default_configuration_parameters ? DEFAULT_HEATER_SETPOINT_1 : config.heater_setpoint_1;
@@ -222,50 +222,45 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       }
 
       // Send start zone request
-      heaterrxqueuemsg = {
-          .type = HEATER_MSG_ZONE_STATE,
-          .cycleSelect = cycle_now,
-          .cycleEnabled = true,
+      heaterrxqueuemsg.type = HEATER_MSG_ZONE_STATE;
+      heaterrxqueuemsg.cycleSelect = cycle_now;
+      heaterrxqueuemsg.cycleEnabled = true;
 
-          .tempSetpoint1 = MY_H_SP,
-          .H_KP = MY_H_KP,
-          .H_KI = MY_H_KI,
-          .H_KD = MY_H_KD,
+      heaterrxqueuemsg.tempSetpoint1 = MY_H_SP;
+      heaterrxqueuemsg.HEATER_KP = MY_H_KP;
+      heaterrxqueuemsg.HEATER_KI = MY_H_KI;
+      heaterrxqueuemsg.HEATER_KD = MY_H_KD;
 
-          .motorSpeed = MY_M_SP,
-          .M_KP = MY_M_KP,
-          .M_KI = MY_M_KI,
-          .M_KD = MY_M_KD,
-          };  //GHL
-      xRet = xQueueSend(heaterRxQueue, &heaterrxqueuemsg, 0);
-      if (xRet != pdPASS) {
+      heaterrxqueuemsg.motorSpeed = MY_M_SP;
+      heaterrxqueuemsg.MOTOR_KP = MY_M_KP;
+      heaterrxqueuemsg.MOTOR_KI = MY_M_KI;
+      heaterrxqueuemsg.MOTOR_KD = MY_M_KD;
+      xReturned = xQueueSend(heaterRxQueue, &heaterrxqueuemsg, 0);
+      if (xReturned != pdPASS) {
         //send_debug_log_message("MAIN_TASK: Unable to send run amplification zone request.\n");
         send_debug_log_message("FSM CYCLE_RUNNING_A_START: GHL Unable to send heaterRxQueue.\n");
       }
 
 
       // Send Start Cycle String message to logging task
-      logevent = {
-          .event = SAMPLE_CYCLE_ONE_STARTED
-      };
+      logevent.event = SAMPLE_CYCLE_ONE_STARTED;
       sprintf(logevent.message, "Cycle %d started.",(uint8_t) cycle_now);
-      logdatamessage = {
-          .data_type = EVENT_DATA,
-          .temperature_data = NULL,
-          .event_data = logevent};
-      xRet = xQueueSend(logger_logMessageQueue, &logdatamessage, 0);
-      if (xRet != pdPASS) {
+      logdatamessage.data_type = EVENT_DATA;
+      //logdatamessage.temperature_data = NULL;
+      logdatamessage.event_data = logevent;
+      xReturned = xQueueSend(logger_logMessageQueue, &logdatamessage, 0);
+      if (xReturned != pdPASS) {
         send_debug_log_message("MAIN_TASK: GHL Unable to send to logger_logMessageQueue.\n");
       }
 
       // Wait for run confirmation response
-      xRet = xQueueReceive(main_runConfRespQueue, &start_run, portMAX_DELAY);
-      if (xRet != pdPASS) {
+      xReturned = xQueueReceive(main_runConfRespQueue, &start_run, portMAX_DELAY);
+      if (xReturned != pdPASS) {
         send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_runConfRespQueue queue.\n");
       }
       // Wait for run ok to start response
-      xRet = xQueueReceive(main_runRespQueue, &start_run, portMAX_DELAY);
-      if (xRet != pdPASS) {
+      xReturned = xQueueReceive(main_runRespQueue, &start_run, portMAX_DELAY);
+      if (xReturned != pdPASS) {
         send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
       }
 
@@ -295,6 +290,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     }
 
     case CYCLE_RUNNING_B_RAMP_TO_TEMP: {
+      // GHL TODO: implement
       next_state = CYCLE_RUNNING_C_TIMER;
       break;
     }
@@ -394,17 +390,14 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       send_debug_log_message(tmp);
 
       // Send Stop Cycle String message to logging task
-      logevent = {
-          .event = SAMPLE_CYCLE_ONE_ENDED
-      };
+      logevent.event = SAMPLE_CYCLE_ONE_ENDED;
       sprintf(logevent.message, "Cycle %d stopped.",(uint8_t) cycle_now);
-      logdatamessage = {
-          .data_type = EVENT_DATA,
-          .temperature_data = NULL,
-          .event_data = logevent};
-      xRet = xQueueSend(logger_logMessageQueue, &logdatamessage, 0);
-      if (xRet != pdPASS) {
-        send_debug_log_message("FSM: GHL Unable to send to logger_logMessageQueue.\n");
+      logdatamessage.data_type = EVENT_DATA;
+      //logdatamessage.temperature_data = NULL;
+      logdatamessage.event_data = logevent;
+      xReturned = xQueueSend(logger_logMessageQueue, &logdatamessage, 0);
+      if (xReturned != pdPASS) {
+        send_debug_log_message("MAIN_TASK: GHL Unable to send to logger_logMessageQueue.\n");
       }
 
       if(exitInfo == CYCLE_RUNNING) {
@@ -431,7 +424,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       } else{
         //---- EXCEPTION OR ERROR OCCURED WHILE RUNNING OR STARTING
-        sprintf(tmp,"FSM CYCLE_RUNNING_D_DONE - Exception Ocurred ExitInfo=%d",(uint8_t) exitInfo;
+        sprintf(tmp,"FSM CYCLE_RUNNING_D_DONE - Exception Ocurred ExitInfo=%d",(uint8_t) exitInfo);
         send_debug_log_message(tmp);
 
         updateLedState(LED_ABORT, true);
@@ -442,36 +435,36 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         sprintf(tmp,"FSM CYCLE_RUNNING_D_DONE - Stop Decision");
         send_debug_log_message(tmp);
         // Send stop zone request
-        heaterrxqueuemsg = {
-            .type = HEATER_MSG_ZONE_STATE,
-            .cycleSelect = cycle_now,
-            //.cycleEnabled = true,
-            .cycleEnabled = false,
+        //heaterrxqueuemsg = {
+        //    .type = HEATER_MSG_ZONE_STATE,
+        //    .cycleSelect = cycle_now,
+        //    //.cycleEnabled = true,
+        //    .cycleEnabled = false,
 
-            //.tempSetpoint1 = MY_H_SP,
-            //.H_KP = MY_H_KP,
-            //.H_KI = MY_H_KI,
-            //.H_KD = MY_H_KD,
+        //    //.tempSetpoint1 = MY_H_SP,
+        //    //.H_KP = MY_H_KP,
+        //    //.H_KI = MY_H_KI,
+        //    //.H_KD = MY_H_KD,
 
-            //.motorSpeed = MY_M_SP,
-            //.M_KP = MY_M_KP,
-            //.M_KI = MY_M_KI,
-            //.M_KD = MY_M_KD,
-            };  //GHL
-        xRet = xQueueSend(heaterRxQueue, &heaterrxqueuemsg, 0);
-        if (xRet != pdPASS) {
+        //    //.motorSpeed = MY_M_SP,
+        //    //.M_KP = MY_M_KP,
+        //    //.M_KI = MY_M_KI,
+        //    //.M_KD = MY_M_KD,
+        //    };  //GHL
+        xReturned = xQueueSend(heaterRxQueue, &heaterrxqueuemsg, 0);
+        if (xReturned != pdPASS) {
           //send_debug_log_message("MAIN_TASK: Unable to send run amplification zone request.\n");
           send_debug_log_message("FSM CYCLE_RUNNING_D_Done: GHL Unable to send heaterRxQueue.\n");
         }
 
         // Wait for run confirmation response
-        xRet = xQueueReceive(main_runConfRespQueue, &stop, portMAX_DELAY);
-        if (xRet != pdPASS) {
+        xReturned = xQueueReceive(main_runConfRespQueue, &stop, portMAX_DELAY);
+        if (xReturned != pdPASS) {
           send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_runConfRespQueue queue.\n");
         }
         // Wait for run ok to start response
-        xRet = xQueueReceive(main_runRespQueue, &stop, portMAX_DELAY);
-        if (xRet != pdPASS) {
+        xReturned = xQueueReceive(main_runRespQueue, &stop, portMAX_DELAY);
+        if (xReturned != pdPASS) {
           send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
         }
       }
