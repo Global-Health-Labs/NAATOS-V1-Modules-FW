@@ -687,6 +687,12 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0) {
       greater_than_max = true;
     }
+  } else{
+    // HEATER SHOULDN'T BE RUNNING
+    h_pwm_data.heat_zone_0_pwm = 0;
+    h_pwm_data.heat_zone_1_pwm = 0;
+    h_pwm_data.heat_zone_3_pwm = 0;
+    // ch 2 is the motor
   }
 
 
@@ -990,9 +996,14 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
     }
 
     // Set the cycle we are on
-    if(fsm_cycle_current != heaterRxMessage.cycleSelect)
+    if(fsm_cycle_current != heaterRxMessage.cycleSelect)  {
       fsm_cycle_last = fsm_cycle_current;
+    }
     fsm_cycle_current = heaterRxMessage.cycleSelect;
+    if(fsm_cycle_current != fsm_cycle_last)  {
+      // cycle change has happened
+      samplePrepResetHeaterPIDs();
+    }
     if(!cycle_enabled && (heaterRxMessage.cycleSelect == CYCLE_TWO)) {  // when STOP received for CYCLE_TWO, we are all done
       // all cycle graceful termination criteria
       rampToTemp = false;
