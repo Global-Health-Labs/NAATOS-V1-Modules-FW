@@ -35,7 +35,7 @@ BaseType_t xReturned;
 
 static bool doWeRunHeaterInThisCycle() {
   switch(cycle_now) {
-    case CYCLE_ZERO:    return true;
+    case CYCLE_ZERO:    return use_default_configuration_parameters ? DEFAULT_RUN_HEATER_1 : config.run_heater_1;
     case CYCLE_ONE:     return use_default_configuration_parameters ? DEFAULT_RUN_HEATER_1 : config.run_heater_1;
     case CYCLE_ONE_B:   return use_default_configuration_parameters ? DEFAULT_RUN_HEATER_2 : config.run_heater_2;
     case CYCLE_TWO:     return false;
@@ -45,7 +45,7 @@ static bool doWeRunHeaterInThisCycle() {
 
 static bool doWeRunMotorInThisCycle() {
   switch(cycle_now) {
-    case CYCLE_ZERO:    return false;
+    case CYCLE_ZERO:    false;
     case CYCLE_ONE:     return use_default_configuration_parameters ? DEFAULT_RUN_MOTOR_1 : config.run_motor_1;
     case CYCLE_ONE_B:   return use_default_configuration_parameters ? DEFAULT_RUN_MOTOR_2 : config.run_motor_2;
     case CYCLE_TWO:     return use_default_configuration_parameters ? DEFAULT_RUN_MOTOR_2 : config.run_motor_2;
@@ -53,14 +53,16 @@ static bool doWeRunMotorInThisCycle() {
   }
 }
 
-bool getCycleRuntime() {
+float getCycleRuntime() {
+  float runtime;
   switch(cycle_now) {
-    case CYCLE_ZERO:    return use_default_configuration_parameters ? DEFAULT_CYCLE_0_RUNTIME : config.cycle_0_run_time_s;
-    case CYCLE_ONE:     return use_default_configuration_parameters ? DEFAULT_CYCLE_1_RUNTIME : config.cycle_1_run_time_s;
-    case CYCLE_ONE_B:   return use_default_configuration_parameters ? DEFAULT_CYCLE_2_RUNTIME : config.cycle_2_run_time_s;
-    case CYCLE_TWO:     return use_default_configuration_parameters ? DEFAULT_CYCLE_3_RUNTIME : config.cycle_3_run_time_s;
-    default:            return false;
+    case CYCLE_ZERO:    runtime = use_default_configuration_parameters ? DEFAULT_CYCLE_0_RUNTIME : config.cycle_0_run_time_s; break;
+    case CYCLE_ONE:     runtime = use_default_configuration_parameters ? DEFAULT_CYCLE_1_RUNTIME : config.cycle_1_run_time_s; break;
+    case CYCLE_ONE_B:   runtime = use_default_configuration_parameters ? DEFAULT_CYCLE_2_RUNTIME : config.cycle_2_run_time_s; break;
+    case CYCLE_TWO:     runtime = use_default_configuration_parameters ? DEFAULT_CYCLE_3_RUNTIME : config.cycle_3_run_time_s; break;
+    default:            runtime = 6.0;  break;
   }
+  return runtime;
 }
 
 void reset_cycle_state_machine(void) {
@@ -88,18 +90,25 @@ cycle_state_t handleBatteryMessage() {
 cycle_state_exit_t run_cycle_state_machine(void) {
 
   float MY_H_SP; float MY_H_KP; float MY_H_KI; float MY_H_KD;
-  float MY_M_SP; float MY_M_KP; float MY_M_KI; float MY_M_KD;
+  uint16_t MY_M_SP; float MY_M_KP; float MY_M_KI; float MY_M_KD;
   bool MY_RAMP_TO_TEMP;
+
+  log_event_t logevent;
+  log_data_message_t logdatamessage;
+  HeaterRxQueueMsg_t heaterrxqueuemsg;
 
   runThrough = true;
   while (runThrough) {
     runThrough = false;
     last_state = current_state;
     current_state = next_state;
+    
+    if(last_state != current_state) {
+      sprintf(tmp,"FSM STATE %d -> %d",(uint8_t) last_state, (uint8_t) current_state);
+      send_debug_log_message(tmp);
+    }
 
-    log_event_t logevent;
-    log_data_message_t logdatamessage;
-    HeaterRxQueueMsg_t heaterrxqueuemsg;
+
     bool start_run;
 
     switch(cycle_now) {
@@ -109,7 +118,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         MY_H_KI = use_default_configuration_parameters ? H_KI_1 : config.heater_ki_1;
         MY_H_KD = use_default_configuration_parameters ? H_KD_1 : config.heater_kd_1;
 
-        MY_M_SP = use_default_configuration_parameters ? MOTOR_SETPOINT_1 : config.motor_setpoint_1;
+        MY_M_SP = 0;
         MY_M_KP = use_default_configuration_parameters ? M_KP : config.motor_kp_1;
         MY_M_KI = use_default_configuration_parameters ? M_KI : config.motor_ki_1;
         MY_M_KD = use_default_configuration_parameters ? M_KD : config.motor_kd_1;
@@ -122,7 +131,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         MY_H_KI = use_default_configuration_parameters ? H_KI_1 : config.heater_ki_1;
         MY_H_KD = use_default_configuration_parameters ? H_KD_1 : config.heater_kd_1;
 
-        MY_M_SP = use_default_configuration_parameters ? MOTOR_SETPOINT_1 : config.motor_setpoint_1;
+        MY_M_SP = 0;
         MY_M_KP = use_default_configuration_parameters ? M_KP : config.motor_kp_1;
         MY_M_KI = use_default_configuration_parameters ? M_KI : config.motor_ki_1;
         MY_M_KD = use_default_configuration_parameters ? M_KD : config.motor_kd_1;
@@ -163,6 +172,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     switch (current_state) {
     case VALIDATE_INIT_CONDITIONS: {
 
+      //sprintf(tmp,"FSM VALIDATE_INIT_CONDITIONS - CYCLE=%d",(uint8_t) cycle_now);
+      //send_debug_log_message(tmp);
+
       xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
       if (xReturned != pdPASS) {
         send_debug_log_message("MAIN_TASK: Unable to send start amplification zone event to logging task.\r\n");
@@ -200,7 +212,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       // Get Switch data
       xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
       if (limitSwitchFreed(switch_data)) {
-        end_cycle_1();
+        //end_cycle_1();
         updateLedState(LED_ABORT, true);
         exitInfo = CYCLE_ERROR_SENSOR_BREAK;
         runThrough = true;
@@ -209,31 +221,29 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       }
 
       next_state = CYCLE_RUNNING_A_START;
-      cycle_now = (cycle_t) 0;
+      cycle_now = (cycle_t) 0;      // start with the first cycle (whatever it is)
       cycle_last= (cycle_t) 0;
 
       break;
     }
 
     case CYCLE_RUNNING_A_START: {
-      //if(cycle_now == CYCLE_NONE) {
-      sprintf(tmp,"FSM CYCLE_RUNNING_A_START - CYCLE=%d",(uint8_t) cycle_now);
-      send_debug_log_message(tmp);
-      //}
+      //sprintf(tmp,"FSM CYCLE_RUNNING_A_START - CYCLE=%d",(uint8_t) cycle_now);
+      //send_debug_log_message(tmp);
 
       // Send start zone request
       heaterrxqueuemsg.type = HEATER_MSG_ZONE_STATE;
       heaterrxqueuemsg.cycleSelect = cycle_now;
       heaterrxqueuemsg.cycleEnabled = true;
 
-      heaterrxqueuemsg.heaterRunning = true;
+      heaterrxqueuemsg.heaterRunning = doWeRunHeaterInThisCycle();
       heaterrxqueuemsg.tempSetpoint1 = MY_H_SP;
       heaterrxqueuemsg.HEATER_KP = MY_H_KP;
       heaterrxqueuemsg.HEATER_KI = MY_H_KI;
       heaterrxqueuemsg.HEATER_KD = MY_H_KD;
       heaterrxqueuemsg.rampToTemp = false;
 
-      heaterrxqueuemsg.motorSpeed = MY_M_SP;
+      heaterrxqueuemsg.motorSpeed = doWeRunMotorInThisCycle() ? (double) MY_M_SP : 0.0;
       heaterrxqueuemsg.MOTOR_KP = MY_M_KP;
       heaterrxqueuemsg.MOTOR_KI = MY_M_KI;
       heaterrxqueuemsg.MOTOR_KD = MY_M_KD;
@@ -260,27 +270,35 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (xReturned != pdPASS) {
         send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_runConfRespQueue queue.\n");
       }
-      // Wait for run ok to start response
-      xReturned = xQueueReceive(main_runRespQueue, &start_run, portMAX_DELAY);
-      if (xReturned != pdPASS) {
-        send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
-      }
+      //send_debug_log_message("FSM CYCLE_RUNNING_A_START: rx confirm1\n");
+      
+      if((uint8_t) cycle_now == 0)  {
+        // THIS BLOCK only runs when starting the very first cycle (cycle==0)
 
-      if (!start_run) {
-        send_debug_log_message("FSM CYCLE_RUNNING_A_START: Unable to begin sample run (temperatures have not yet stabilized?)\n");
+        // Wait for run ok to start response, if CYCLE==0
+        xReturned = xQueueReceive(main_runRespQueue, &start_run, portMAX_DELAY);
+        if (xReturned != pdPASS) {
+          send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
+        }
+        //send_debug_log_message("FSM CYCLE_RUNNING_A_START: rx confirm2\n");
 
-        // Stop cycle one
-        //end_cycle_0();
-        //next_state = MAIN_STANDBY;
+        if (!start_run) {
+          send_debug_log_message("FSM CYCLE_RUNNING_A_START: Unable to begin sample run (temperatures have not yet stabilized?)\n");
 
-        // Set error during run and wait alert timeout
-        //updateLedState(LED_DECLINE, true);
-        exitInfo = CYCLE_ERROR_START_TEMP_TOO_HIGH;
-        runThrough = true;
-        next_state = CYCLE_RUNNING_D_DONE;
-        break;
+          // Stop cycle one
+          //end_cycle_0();
+          //next_state = MAIN_STANDBY;
+
+          // Set error during run and wait alert timeout
+          //updateLedState(LED_DECLINE, true);
+          exitInfo = CYCLE_ERROR_START_TEMP_TOO_HIGH;
+          runThrough = true;
+          next_state = CYCLE_RUNNING_D_DONE;
+          break;
+        }
       }
       
+      //send_debug_log_message("FSM CYCLE_RUNNING_A_START: here88\n");
       runThrough = true;
       next_state = CYCLE_RUNNING_C_TIMER;
       if(MY_RAMP_TO_TEMP) {
@@ -293,6 +311,8 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
     case CYCLE_RUNNING_B_RAMP_TO_TEMP: {
       // GHL TODO: implement
+      sprintf(tmp,"FSM CYCLE_RUNNING_B_RAMP_TO_TEMP - CYCLE=%d",(uint8_t) cycle_now);
+      send_debug_log_message(tmp);
       next_state = CYCLE_RUNNING_C_TIMER;
       break;
     }
@@ -300,8 +320,8 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     case CYCLE_RUNNING_C_TIMER: {
       if (last_state != current_state) {
         // First Time In This State
-        sprintf(tmp,"FSM CYCLE_RUNNING_C_TIMER - CYCLE=%d - first run",(uint8_t) cycle_now);
-        send_debug_log_message(tmp);
+        //sprintf(tmp,"FSM CYCLE_RUNNING_C_TIMER - CYCLE=%d - first run",(uint8_t) cycle_now);
+        //send_debug_log_message(tmp);
 
 
         // Set Timing
@@ -337,13 +357,32 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         //end_cycle_0();
         //updateLedState(LED_ABORT, true);
         //exitInfo = CYCLE_ERROR_OVER_TEMP_BATTERY; // set exit info so CYCLE_RUNNING_D_DONE knows to not continue
+        send_debug_log_message("in battery sub");
         runThrough = true;
         break;
       }
 
+      //// Handle Ramping (not setup yet)
+      //bool setReachedRx = false;
+      //xReturned = xQueueReceive(main_setPointReached, &setReachedRx, 0);
+      //if (setReachedRx) {
+      //  if(!send_event_log_message_struct(&ramp_to_temp_complete_log_msg)) {
+      //    send_debug_log_message("MAIN_TASK: Unable to send ramp_to_temp_complete_log_msg interruption event to logging task.\r\n");
+      //  }
+      //  next_state = CYCLE_2_TIMER;
+      //  break;
+      //} else if (time_left >= end_time) {
+      //  end_cycle_2();
+      //  exitInfo = CYCLE_ERROR_TIMEOUT_DURING_RAMP;
+      //  runThrough = true;
+      //  next_state = EXIT_CYCLE;
+      //  break;
+      //}
+
       // Check Normal Runtime Expirationi
       time_left = xTaskGetTickCount() - start_time;
       if (time_left >= end_time) {
+        //send_debug_log_message("in time expiry sub");
         next_state = CYCLE_RUNNING_D_DONE;  // do not set exit info, so cycle will continue to run
         //end_cycle_0();
         break;
@@ -353,6 +392,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
         //end_cycle_0();
         // handleMainErrorMessage() sets exitInfo, and returns CYCLE_RUNNING_D_DONE next_state
+        send_debug_log_message("in errorcheck sub");
         next_state = handleMainErrorMessage();    //next_state = CYCLE_RUNNING_D_DONE;
         runThrough = true;
         // set exit info
@@ -365,6 +405,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (limitSwitchFreed(switch_data)) {
         //end_cycle_0();
         //updateLedState(LED_ABORT, true);
+        send_debug_log_message("in limitswitchfreed sub");
         exitInfo = CYCLE_ERROR_SENSOR_BREAK;
         runThrough = true;
         //next_state = EXIT_CYCLE;
@@ -378,6 +419,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (buttonData.event == ON_EVENT /*|| buttonData.even == OFF_EVENT*/) {
         //end_cycle_0();
         //updateLedState(LED_ABORT, true);
+        send_debug_log_message("in buttondata sub");
         exitInfo = CYCLE_ERROR_BUTTON_EXIT;
         runThrough = true;
         //next_state = EXIT_CYCLE;
@@ -432,6 +474,8 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         sprintf(tmp,"FSM CYCLE_RUNNING_D_DONE - Exception Ocurred ExitInfo=%d",(uint8_t) exitInfo);
         send_debug_log_message(tmp);
 
+        handle_exit_notifications();
+
         updateLedState(LED_ABORT, true);
         next_state = EXIT_CYCLE;
       }
@@ -466,86 +510,15 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         if (xReturned != pdPASS) {
           send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_runConfRespQueue queue.\n");
         }
-        // Wait for run ok to start response
-        xReturned = xQueueReceive(main_runRespQueue, &stop, portMAX_DELAY);
-        if (xReturned != pdPASS) {
-          send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
-        }
+        //// Wait for run ok to start response
+        //xReturned = xQueueReceive(main_runRespQueue, &stop, portMAX_DELAY);
+        //if (xReturned != pdPASS) {
+        //  send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
+        //}
       }
       break;
     }
 
-//#ifdef SAMPLE_PREP_BOARD
-//    case CYCLE_2_MOTOR_STOP_WAIT: {
-//      if (last_state != current_state) {
-//        char w_buff[100];
-//        sprintf(w_buff, "Delaying motor turn off for %d seconds", config.motor_end_wait_time_s);
-//        send_debug_log_message(w_buff);
-//        start_time = xTaskGetTickCount();
-//        if (use_default_configuration_parameters) {
-//          end_time = ((DEFAULT_MOTOR_WAIT_TIME_S)*1000);
-//        } else {
-//          end_time = ((config.motor_end_wait_time_s) * 1000);
-//        }
-//      }
-
-//      next_state = handleBatteryMessage();
-//      if(next_state == EXIT_CYCLE){
-//        end_cycle_2();
-//        updateLedState(LED_ABORT, true);
-//        exitInfo = CYCLE_ERROR_OVER_TEMP_BATTERY;
-//        runThrough = true;
-//        break;
-//      }
-
-//      time_left = (xTaskGetTickCount() - start_time);
-
-//      if (time_left >= end_time) {
-//        // Turn off the motor
-//        MotorRxQueueMsg_t motorMsg;
-//        motorMsg.type = MOTOR_MSG_HEATER_STATE;
-//        motorMsg.motorRunning = false;
-        
-//        // stop motor PID
-//        xReturned = xQueueSend(heaterRxQueue, &stop_cycle_two_zone_motor, 0);
-//        if (xReturned != pdPASS) {
-//          send_debug_log_message("MAIN_TASK: Unable to send stop valve zone request.\r\n");
-//        }
-
-//        // Stop motor enable
-//        xReturned = xQueueSend(motorRxQueue, &motorMsg, 10);
-//        if (xReturned != pdPASS) {
-//          send_debug_log_message("HEATER_TASK: Unable to send heater state to motorRxQueue.");
-//        }
-//        next_state = CYCLE_SAMPLE_VALID_HOLD;
-//      }
-
-//      // Get Switch data
-//      xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
-//      if (limitSwitchFreed(switch_data)) {
-//        end_cycle_2();
-//        updateLedState(LED_ABORT, true);
-//        exitInfo = CYCLE_ERROR_SENSOR_BREAK;
-//        runThrough = true;
-//        next_state = EXIT_CYCLE;
-//        break;
-//      }
-      
-//      // Handle Button data in this state
-//      buttonData.event = NONE;
-//      xQueueReceive(button_mainStateQueue, &buttonData, 0);
-//      //TODO test also including off_event
-//      if (buttonData.event == ON_EVENT /*|| buttonData.even == OFF_EVENT*/) {
-//        updateLedState(LED_ABORT, true);
-//        exitInfo = CYCLE_ERROR_BUTTON_EXIT;
-//        runThrough = true;
-//        next_state = EXIT_CYCLE;
-//        break;
-//      }
-
-//      break;
-//    }
-//#endif
 
     case CYCLE_COMPLETE_DELAY: {
       if (last_state != current_state) {
@@ -634,24 +607,24 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     case EXIT_CYCLE:
       /* Confirm motor is turned off might not be if we exit early due to end cycle not calling this for cycle 2 */
       if (last_state != current_state) {
-#ifdef SAMPLE_PREP_BOARD
-        // Turn off the motor
-        MotorRxQueueMsg_t motorMsg;
-        motorMsg.type = MOTOR_MSG_HEATER_STATE;
-        motorMsg.motorRunning = false;
+//#ifdef SAMPLE_PREP_BOARD
+//        // Turn off the motor
+//        MotorRxQueueMsg_t motorMsg;
+//        motorMsg.type = MOTOR_MSG_HEATER_STATE;
+//        motorMsg.motorRunning = false;
       
-        // stop motor PID
-        xReturned = xQueueSend(heaterRxQueue, &stop_cycle_two_zone_motor, 0);
-        if (xReturned != pdPASS) {
-          send_debug_log_message("MAIN_TASK: Unable to send stop valve zone request.\r\n");
-        }
+//        // stop motor PID
+//        xReturned = xQueueSend(heaterRxQueue, &stop_cycle_two_zone_motor, 0);
+//        if (xReturned != pdPASS) {
+//          send_debug_log_message("MAIN_TASK: Unable to send stop valve zone request.\r\n");
+//        }
 
-        // Stop motor enable
-        xReturned = xQueueSend(motorRxQueue, &motorMsg, 10);
-        if (xReturned != pdPASS) {
-          send_debug_log_message("HEATER_TASK: Unable to send heater state to motorRxQueue.");
-        }
-#endif
+//        // Stop motor enable
+//        xReturned = xQueueSend(motorRxQueue, &motorMsg, 10);
+//        if (xReturned != pdPASS) {
+//          send_debug_log_message("HEATER_TASK: Unable to send heater state to motorRxQueue.");
+//        }
+//#endif
         next_state = CYCLE_SAMPLE_VALID_HOLD;
       }
 
@@ -667,6 +640,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       next_state = EXIT_CYCLE;
       break;
     }
+
   }
 
   return exitInfo;
@@ -772,180 +746,6 @@ bool limitSwitchFreed(sensor_switches_t data) {
   returnValue = !data.optical_tiggered;
 #endif
 }
-
-// GHL NOTE: copied from original begin_cycle_0
-bool begin_cycle_0(void) {
-  BaseType_t xRet;
-  bool start_run = false;
-  // Send start zone request
-  xRet = xQueueSend(heaterRxQueue, &run_cycle_zero_zone_heating, 0);
-  if (xRet != pdPASS) {
-    //send_debug_log_message("MAIN_TASK: Unable to send run amplification zone request.\n");
-    send_debug_log_message("MAIN_TASK: GHL Unable to send msg:run_cycle_zero_zone_heating to queue:heaterRxQueue .\n");
-  }
-  // Send Start Cycle One to logging task
-  xRet = xQueueSend(logger_logMessageQueue, &cycle_zero_start_log_msg, 0);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: GHL Unable to send msg:cycle_zero_start_log_msg to queue:logger_logMessageQueue .\n");
-  }
-  // Wait for run confirmation response
-  xRet = xQueueReceive(main_runConfRespQueue, &start_run, portMAX_DELAY);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
-  }
-  // Wait for run ok to start response
-  xRet = xQueueReceive(main_runRespQueue, &start_run, portMAX_DELAY);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\n");
-  }
-
-  return start_run;
-}
-
-// GHL NOTE: copied from begin_cycle_2
-void begin_cycle_1(void) {
-  BaseType_t xRet;
-  bool heat_conf = false;
-  // Send Start Cycle Two to heater queue
-  xRet = xQueueSend(heaterRxQueue, &run_cycle_one_zone_heating, 0);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send run valve zone request.\r\n");
-  }
-  // Send Start Cycle Two Event to logging task
-  xRet = xQueueSend(logger_logMessageQueue, &cycle_one_start_log_msg, 0);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send start valve zone event to logging task.\r\n");
-  }
-  // Wait for run confirmation response
-  xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
-  }
-}
-
-void begin_cycle_1b(void) {
-  BaseType_t xRet;
-  bool heat_conf = false;
-  // Send Start Cycle 1b to heater queue
-  xRet = xQueueSend(heaterRxQueue, &run_cycle_one_b_zone_heating, 0);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send run valve zone request.\r\n");
-  }
-  // Send Start Cycle Two Event to logging task
-  xRet = xQueueSend(logger_logMessageQueue, &cycle_oneB_start_log_msg, 0);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send start valve zone event to logging task.\r\n");
-  }
-  // Wait for run confirmation response
-  xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
-  }
-}
-
-void begin_cycle_2(void) {
-  BaseType_t xRet;
-  bool heat_conf = false;
-  // Send Start Cycle Two to heater queue
-  xRet = xQueueSend(heaterRxQueue, &run_cycle_two_zone_heating, 0);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send run valve zone request.\r\n");
-  }
-  // Send Start Cycle Two Event to logging task
-  xRet = xQueueSend(logger_logMessageQueue, &cycle_two_start_log_msg, 0);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send start valve zone event to logging task.\r\n");
-  }
-  // Wait for run confirmation response
-  xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
-  }
-}
-
-
-// GHL NOTE: copied from original end_cycle_1()
-void end_cycle_0(void) {
-  BaseType_t xRet;
-  bool heat_conf = false;
-  //// Send stop cycle one message to heater queue
-  //xRet = xQueueSend(heaterRxQueue, &stop_cycle_zero_zone_heating, 50);
-  //if (xRet != pdPASS) {
-  //  send_debug_log_message("MAIN_TASK: Unable to send stop amplification zone request.\r\n");
-  //}
-  // Send stop amplification Event to logging task
-  xRet = xQueueSend(logger_logMessageQueue, &cycle_zero_stop_log_msg, 50);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send stop amplification zone event to logging task.\r\n");
-  }
-  //// Wait for run confirmation response
-  //xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
-  //if (xRet != pdPASS) {
-  //  send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
-  //}
-}
-
-//GHL NOTE: copied from end_cycle_2()
-void end_cycle_1(void) {
-  BaseType_t xRet;
-  bool heat_conf = false;
-  //// Send valve zone stop request
-  //xRet = xQueueSend(heaterRxQueue, &stop_cycle_one_zone_heating, 0);
-  //if (xRet != pdPASS) {
-  //  send_debug_log_message("MAIN_TASK: Unable to send stop valve zone request.\r\n");
-  //}
-  // Send stop valve Event to logging task
-  xRet = xQueueSend(logger_logMessageQueue, &cycle_one_stop_log_msg, 0);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send stop valve zone event to logging task.\r\n");
-  }
-  //// Wait for run confirmation response
-  //xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
-  //if (xRet != pdPASS) {
-  //  send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
-  //}
-}
-
-void end_cycle_1b(void) {
-  BaseType_t xRet;
-  bool heat_conf = false;
-  //// Send valve zone stop request
-  //xRet = xQueueSend(heaterRxQueue, &stop_cycle_one_b_zone_heating, 0);
-  //if (xRet != pdPASS) {
-  //  send_debug_log_message("MAIN_TASK: Unable to send stop valve zone request.\r\n");
-  //}
-  // Send stop valve Event to logging task
-  xRet = xQueueSend(logger_logMessageQueue, &cycle_oneB_stop_log_msg, 0);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send stop valve zone event to logging task.\r\n");
-  }
-  //// Wait for run confirmation response
-  //xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
-  //if (xRet != pdPASS) {
-  //  send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
-  //}
-}
-
-void end_cycle_2(void) {
-  BaseType_t xRet;
-  bool heat_conf = false;
-  // Send valve zone stop request
-  xRet = xQueueSend(heaterRxQueue, &stop_cycle_two_zone_heating, 0);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send stop valve zone request.\r\n");
-  }
-  // Send stop valve Event to logging task
-  xRet = xQueueSend(logger_logMessageQueue, &cycle_two_stop_log_msg, 0);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to send stop valve zone event to logging task.\r\n");
-  }
-  // Wait for run confirmation response
-  xRet = xQueueReceive(main_runConfRespQueue, &heat_conf, portMAX_DELAY);
-  if (xRet != pdPASS) {
-    send_debug_log_message("MAIN_TASK: Unable to receive the start run response from main_startRunRespQueue queue.\r\n");
-  }
-}
-
 
 cycle_state_t handleMainErrorMessage() {
     xReturned = xQueueReceive(main_runErrorQueue, &main_err_msg, 0);
