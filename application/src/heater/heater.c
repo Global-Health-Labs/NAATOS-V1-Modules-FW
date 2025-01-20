@@ -57,14 +57,16 @@ void heater_task(void *pvParameters) {
       switch (heaterRxMessage.type) {
       case HEATER_MSG_SLEEP:
         // Handle sleep message
+        send_debug_log_message("HEATER_TASK: rx'ed HEATER_MSG_SLEEP");
         break;
       case HEATER_MSG_WAKE:
         // Handle wake message
+        send_debug_log_message("HEATER_TASK: rx'ed HEATER_MSG_WAKE");
         break;
       case HEATER_MSG_ZONE_STATE: {
         heaterInterface->handleHeaterZoneStateUpdate(heaterRxMessage);
         break;
-      }
+        }
       case HEATER_MSG_TEMPERATURE_DATA: {
         if (heaterRxMessage.readTempFailed) {
           MainStateErrorQueueMsg_t main_err_msg;

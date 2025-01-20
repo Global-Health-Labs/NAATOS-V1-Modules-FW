@@ -111,6 +111,13 @@ void logger_task(void *pvParameters) {
       } else if (res != FR_OK) {
         send_debug_log_message("LOG_TASK: Unable to create log file for current sample preperation.");
       }
+
+      //Zero out the last_temp_message elements so that they all start at zero for the next log file
+      last_temp_message.temperature_data.heat_zone_3_temp = 0;
+      last_temp_message.temperature_data.heat_zone_1_pwm = 0;
+      last_temp_message.temperature_data.motorSpeed = 0;
+      last_temp_message.temperature_data.heat_zone_2_pwm = 0;
+
       break;
     }
     case TEMPERATURE_DATA: {
@@ -150,18 +157,18 @@ void logger_task(void *pvParameters) {
       last_temp_message.event_data = rxLogMsg.event_data;
 
       logFileLineSize = loggerInterface->constructEventDataLogLine(logFileLine, time, last_temp_message, battery_info.batt_percent, battery_info.batt_voltage, battery_info.batt_temp);
-      if (rxLogMsg.event_data.event == SAMPLE_CYCLE_TWO_ENDED ||
-          rxLogMsg.event_data.event == SAMPLE_INTERRUPTED ||
-          rxLogMsg.event_data.event == SAMPLE_TEMPS_NOT_STABALIZED ||
-          rxLogMsg.event_data.event == SAMPLE_RECOVERY_BATT ||
-          rxLogMsg.event_data.event == SAMPLE_OVER_TEMP) {
+      //if (rxLogMsg.event_data.event == SAMPLE_CYCLE_ENDED ||
+      //    rxLogMsg.event_data.event == SAMPLE_INTERRUPTED ||
+      //    rxLogMsg.event_data.event == SAMPLE_TEMPS_NOT_STABALIZED ||
+      //    rxLogMsg.event_data.event == SAMPLE_RECOVERY_BATT ||
+      //    rxLogMsg.event_data.event == SAMPLE_OVER_TEMP) {
 
-        //Zero out the last_temp_message elements so that they all start at zero for the next log file
-        last_temp_message.temperature_data.heat_zone_3_temp = 0;
-        last_temp_message.temperature_data.heat_zone_1_pwm = 0;
-        last_temp_message.temperature_data.motorSpeed = 0;
-        last_temp_message.temperature_data.heat_zone_2_pwm = 0;
-      }
+      //  //Zero out the last_temp_message elements so that they all start at zero for the next log file
+      //  last_temp_message.temperature_data.heat_zone_3_temp = 0;
+      //  last_temp_message.temperature_data.heat_zone_1_pwm = 0;
+      //  last_temp_message.temperature_data.motorSpeed = 0;
+      //  last_temp_message.temperature_data.heat_zone_2_pwm = 0;
+      //}
 
       // Check UART Only
       if (!uart_only) {

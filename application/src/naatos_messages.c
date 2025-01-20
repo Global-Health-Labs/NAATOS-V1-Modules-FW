@@ -1,25 +1,6 @@
 #include "naatos_messages.h"
 // Zone Request Constants
-const HeaterRxQueueMsg_t run_cycle_one_zone_heating = {
-    .type = HEATER_MSG_ZONE_STATE,
-    .cycleSelect = CYCLE_ONE,
-    .cycleEnabled = true};
-const HeaterRxQueueMsg_t run_cycle_two_zone_heating = {
-    .type = HEATER_MSG_ZONE_STATE,
-    .cycleSelect = CYCLE_TWO,
-    .cycleEnabled = true};
-const HeaterRxQueueMsg_t stop_cycle_one_zone_heating = {
-    .type = HEATER_MSG_ZONE_STATE,
-    .cycleSelect = CYCLE_ONE,
-    .cycleEnabled = false};
-const HeaterRxQueueMsg_t stop_cycle_two_zone_heating = {
-    .type = HEATER_MSG_ZONE_STATE,
-    .cycleSelect = CYCLE_TWO,
-    .cycleEnabled = false};
-const HeaterRxQueueMsg_t stop_cycle_two_zone_motor = {
-    .type = HEATER_MSG_MOTOR_STATE,
-    .cycleSelect = CYCLE_TWO,
-    .cycleEnabled = false};
+// GHL: no longer used in SG mod
 
 // Log Event Constants
 const log_event_t start_event = {
@@ -73,34 +54,6 @@ const log_data_message_t interrupt_opt_log_msg = {
     .data_type = EVENT_DATA,
     .temperature_data = NULL,
     .event_data = interrupt_opt_event};
-const log_event_t cycle_two_start_event = {
-    .event = SAMPLE_CYCLE_TWO_STARTED,
-    .message = CYCLE_TWO_START_MSG};
-const log_data_message_t cycle_two_start_log_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = cycle_two_start_event};
-const log_event_t cycle_two_stop_event = {
-    .event = SAMPLE_CYCLE_TWO_ENDED,
-    .message = CYCLE_TWO_STOP_MSG};
-const log_data_message_t cycle_two_stop_log_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = cycle_two_stop_event};
-const log_event_t cycle_one_start_event = {
-    .event = SAMPLE_CYCLE_ONE_STARTED,
-    .message = CYCLE_ONE_START_MSG};
-const log_data_message_t cycle_one_start_log_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = cycle_one_start_event};
-const log_event_t cycle_one_stop_event = {
-    .event = SAMPLE_CYCLE_ONE_ENDED,
-    .message = CYCLE_ONE_END_MSG};
-const log_data_message_t cycle_one_stop_log_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = cycle_one_stop_event};
 
 const log_event_t ramp_to_temp_complete_event = {
     .event = SAMPLE_RAMP_TO_TEMP_REACHED,

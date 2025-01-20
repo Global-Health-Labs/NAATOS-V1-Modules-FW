@@ -51,13 +51,11 @@
 /* Main States */
 typedef enum {
   VALIDATE_INIT_CONDITIONS,
-  START_CYCLE_1,
-  CYCLE_1_RAMP_TO_TEMP,
-  CYCLE_1_TIMER,
-  START_CYCLE_2,
-  CYCLE_2_RAMP_TO_TEMP,
-  CYCLE_2_TIMER,
-  CYCLE_2_MOTOR_STOP_WAIT,
+
+  CYCLE_RUNNING_A_START,
+  CYCLE_RUNNING_B_INPROGRESS,
+  CYCLE_RUNNING_C_DONE_DECIDE_STOP,
+
   CYCLE_COMPLETE_DELAY,
   CYCLE_SAMPLE_VALID_HOLD,
   EXIT_CYCLE
@@ -84,13 +82,6 @@ void reset_cycle_state_machine(void);
 
 cycle_state_exit_t run_cycle_state_machine(void);
 
-bool begin_cycle_1(void);
-
-void begin_cycle_2(void);
-
-void end_cycle_1(void);
-
-void end_cycle_2(void);
 
 bool limitSwitchFreed(sensor_switches_t data);
 

@@ -59,6 +59,10 @@ void motorTask(void *pvParameters) {
     } else {
       switch (motorRxMessage.type) {
          case MOTOR_MSG_HEATER_STATE: {
+          if(motorRunning == motorRxMessage.motorRunning) {
+            //nochange;
+            break;
+          }
           motorRunning = motorRxMessage.motorRunning;
           // Switch the ccw line to switch between ccw and cw
           if (motorRunning && ((use_default_configuration_parameters && DEFAULT_MOTOR_SWTICH_CCW_CW) || (!use_default_configuration_parameters && config.switch_motor_ccw_cw))) {

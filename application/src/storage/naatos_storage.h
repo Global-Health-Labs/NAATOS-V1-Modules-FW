@@ -35,7 +35,7 @@
 #define CONFIG_DIR "config"
 
 //#define NAATOS_CONFIG_FILE "config_v2.0a.txt"
-#define NAATOS_CONFIG_FILE "config_v" VERSION ".txt"
+#define NAATOS_CONFIG_FILE "config_v" VERSION "_ghlhack.txt"
 
 #ifdef SAMPLE_PREP_BOARD
 #define CSV_HEADER "Time,HeaterTemp,HeaterPWM,MotorSpeed,MotorPWM,Battery,BatteryV,BatteryT,Event\r\n"
@@ -104,8 +104,10 @@ typedef enum {
 typedef enum {
   SAMPLE_RATE,
   LOGGING_RATE,
+  CYCLE_ZERO_RUN_TIME,
   CYCLE_ONE_RUN_TIME,
   CYCLE_TWO_RUN_TIME,
+  CYCLE_THREE_RUN_TIME,
   LOW_POWER_THRESHOLD,
   RECOVERY_POWER_THRESHOLD,
   SAMPLE_VALID_TIMEOUT,
@@ -120,6 +122,7 @@ typedef enum {
   RAMP_TO_TEMP_C1_TIMEOUT,
   RAMP_TO_TEMP_C2_TIMEOUT,
   MOTOR_END_WAIT_TIME_S,
+  HEATER_SETPOINT_0_C,
   HEATER_SETPOINT_1_C,
   HEATER_SETPOINT_2_C,
   HEATER_MAX_TEMP_C,
