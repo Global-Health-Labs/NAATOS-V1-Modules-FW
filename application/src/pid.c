@@ -20,7 +20,8 @@ void pid_controller_update(pid_controller_t *pid, float setpoint, float k_p, flo
   // Clear controller variables
   //pid->intergrator = 0.0f;
   //pid->prevMesurement = 0.0f;
-  pid->intergrator = 0.0f;
+  if(setpoint!=pid->setpoint)
+    pid->intergrator = 0.0f;
   //pid->out = 0.0f;
   // Set from parameters
   pid->setpoint = setpoint;
