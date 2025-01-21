@@ -488,7 +488,7 @@ void handleSampleMotorDataRx(int motor_speed) {
       } 
     } 
 
-    if (motorReachedSpeed && motor_pid_1.out >= config.motor_stall_pwm) {
+    if (motorReachedSpeed && motor_pid_2.out >= config.motor_stall_pwm) {
       motorStalledPWM = true;
       motorReachedSpeed = false;
     }
