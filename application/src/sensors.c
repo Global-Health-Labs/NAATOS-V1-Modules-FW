@@ -275,9 +275,16 @@ void runPowerModuleSensorCollection(void) {
   // Send temperature data to Log Data queue
   if (heaterRunning) {
     bool readTempSuccess = false;
+    bool dis = true;
     heaterMsg.readTempFailed = false;
     // I2C Read for Heater Zone 0
-    disable_valve_boost();
+    dis = disable_valve_boost();
+    while (!dis) { // Reset the Valve Boost
+      nrf_gpio_pin_clear(VALVE_PWR_EN); 
+      nrf_gpio_pin_set(VALVE_PWR_EN); 
+      valve_zone_set_6v();
+      dis = disable_valve_boost();
+    }
     readTempSuccess = readTemp(heat_zone_0, &temperatures.heat_zone_0_temp);
     enable_valve_boost();
     if (!readTempSuccess) {
@@ -288,7 +295,13 @@ void runPowerModuleSensorCollection(void) {
     temperatures.heat_zone_1_temp = 0.0;
 
     // I2C Read for Heater Zone 2
-    disable_valve_boost();
+    dis = disable_valve_boost();
+    while (!dis) {  // Reset the Valve Boost
+      nrf_gpio_pin_clear(VALVE_PWR_EN); 
+      nrf_gpio_pin_set(VALVE_PWR_EN); 
+      valve_zone_set_6v();
+      dis = disable_valve_boost();
+    }
     readTempSuccess = readTemp(heat_zone_2, &temperatures.heat_zone_2_temp);
     enable_valve_boost();
     if (!readTempSuccess) {
