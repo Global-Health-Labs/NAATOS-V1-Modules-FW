@@ -158,15 +158,12 @@ void read_sd_and_notify_tasks(void) {
 
   xReturned = get_naatos_configuration_parameters(&config);
   if (xReturned != FR_OK) {
-    send_debug_log_message("Warning: configuration file was not able to be read. Using default configuration parameters.");
-    use_default_configuration_parameters = true;
-  } else {
-    use_default_configuration_parameters = false;
-  }
+    send_debug_log_message("Error: configuration file was not able to be read.");
+  } 
 
-  xReturned = get_cycle_configurations(&cycle_configs);
+  xReturned = get_cycle_configurations_parameters(&cycle_configs);
   if (xReturned != FR_OK) {
-    send_debug_log_message("Warning: cycle configuration files were not able to be read.");
+    send_debug_log_message("Error: cycle configuration files were not able to be read.");
   }
 
   xReturned = xQueueSend(heaterRxQueue, &heaterConfigMsg, 0);
@@ -399,6 +396,7 @@ void main_task(void *pvParameters) {
     nor_flash_fatfs_mkfs();
     create_naatos_directories();
     get_naatos_configuration_parameters(&config);
+    get_cycle_configurations_parameters(&cycle_configs);
   }
 
   // Set Start up state to standby
@@ -408,12 +406,8 @@ void main_task(void *pvParameters) {
   int i = 0;
 
   // Get the alert timeout
-  if (!use_default_configuration_parameters) {
-    alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(config.alert_timeout_time_s * 1000.0));
-  } else {
-    alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(DEFAULT_ALERT_TIMEOUT_S * 1000.0));
-  }
-
+  alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(config.alert_timeout_time_s * 1000.0));
+  
   uint32_t main_wdt_start_time = 0;
   uint32_t main_wdt_end_time = pdMS_TO_TICKS(1000);
   uint32_t main_wdt_time_left = 0;
@@ -452,11 +446,8 @@ void main_task(void *pvParameters) {
 
         read_sd_and_notify_tasks();
         // Get the alert timeout
-        if (!use_default_configuration_parameters) {
-          alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(config.alert_timeout_time_s * 1000.0));
-        } else {
-          alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(DEFAULT_ALERT_TIMEOUT_S * 1000.0));
-        }
+        alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(config.alert_timeout_time_s * 1000.0));
+        
         if (config.set_date_time) {
           calendar_set_time_helper();
           reset_set_time_date();
@@ -1286,7 +1277,6 @@ int main(void) {
   res = get_naatos_configuration_parameters(&config);
   if (res != FR_OK) {
     send_debug_log_message("Warning: configuration file was not able to be read. Using default configuration parameters.");
-    use_default_configuration_parameters = true;
     // Report that the confirguation file cannot be read to a log if sd card is ok
     if (sd_card_inited) {
       log_event_t exit_event_info = {
@@ -1305,10 +1295,8 @@ int main(void) {
       if (xReturned != pdPASS) {
         send_debug_log_message("MAIN_TASK: Unable to send recovery battery percentage event to logging task.");
       }
-   }
-  } else {
-    use_default_configuration_parameters = false;
-  }
+    }
+  } 
 
   // Create Queues
   create_queues();

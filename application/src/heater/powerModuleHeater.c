@@ -86,11 +86,7 @@ void handle_cycle_two_stopstart_heater(bool amp_heating, bool valve_heating) {
   }
 
   // Set the last sample based on config
-  if (use_default_configuration_parameters) {
-    p_samp_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE);
-  } else {
-    p_samp_log_max = (config.logging_rate / config.sample_rate);
-  }
+  p_samp_log_max = (config.logging_rate / config.sample_rate);
 #endif
 }
 
@@ -149,11 +145,7 @@ void handle_cycle_one_stopstart_heater(bool amp_heating, bool valve_heating) {
   }
 
   // Set the last sample based on config
-  if (use_default_configuration_parameters) {
-    p_samp_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE);
-  } else {
-    p_samp_log_max = (config.logging_rate / config.sample_rate);
-  }
+  p_samp_log_max = (config.logging_rate / config.sample_rate);
 #endif
 }
 

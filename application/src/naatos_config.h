@@ -207,10 +207,6 @@
 #define STOP_EVENT_MSG "Sample Preperation Completed."
 #define INTERRUPT_HAL_EVENT_MSG "Sample Preperation Interrupted. Cover Removed."
 #define INTERRUPT_OPT_EVENT_MSG "Sample Preperation Interrupted. Sample Removed."
-#define CYCLE_ONE_START_MSG "Cycle 1 Started."
-#define CYCLE_ONE_END_MSG "Cycle 1 Stopped."
-#define CYCLE_TWO_START_MSG "Cycle 2 Started."
-#define CYCLE_TWO_STOP_MSG "Cycle 2 Stopped."
 #define TEMPS_NOT_STABLE "Zone Temperatures are not below the minimum run temperature. Aborting run."
 #define RECOVERY_BATT "Battery Percentage lower than the recovery threshold. Charge Battery!: "
 #define OVER_TEMP_MSG "A Zone went over its maximum temperature. Run stopped."
@@ -261,10 +257,7 @@ typedef enum {
 } charge_state_t;
 
 // Cycle Identification Enum
-typedef enum {
-  CYCLE_ONE,
-  CYCLE_TWO
-} cycle_t;
+typedef uint16_t cycle_t;
 
 // Type of update message being sent to usb queue
 typedef enum {
@@ -278,10 +271,8 @@ typedef enum {
   SAMPLE_INTERRUPTED,
   SAMPLE_BUTTON_CANCEL,
   SAMPLE_HAL_CANCEL,
-  SAMPLE_CYCLE_ONE_STARTED,
-  SAMPLE_CYCLE_ONE_ENDED,
-  SAMPLE_CYCLE_TWO_STARTED,
-  SAMPLE_CYCLE_TWO_ENDED,
+  SAMPLE_CYCLE_STARTED,
+  SAMPLE_CYCLE_ENDED,
   SAMPLE_TEMPS_NOT_STABALIZED,
   SAMPLE_RECOVERY_BATT,
   SAMPLE_OVER_TEMP,
@@ -690,4 +681,5 @@ typedef struct {
 /* Configuration Parameters Variables */
 extern naatos_config_parameters config;
 extern cycle_config_parameters *cycle_configs;
+extern int total_cycles;
 extern bool batt_recovering;

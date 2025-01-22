@@ -134,7 +134,7 @@ void create_naatos_directories(void);
 FRESULT check_for_naatos_config_file(void);
 FRESULT check_for_cycle_config_files(void);
 FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters);
-FRESULT get_cycle_configurations(cycle_config_parameters *cycle_configurations_arr);
+FRESULT get_cycle_configurations_parameters(cycle_config_parameters *cycle_configurations_arr);
 FRESULT reset_set_time_date(void);
 FRESULT create_log_file(const char *file_name);
 FRESULT write_log_line(const char *logName, const char *writeBuff, uint32_t writeBuffSize);
