@@ -118,7 +118,6 @@ naatos_config_parameters config = {
 
 cycle_config_parameters *cycle_configs; // Will be populated by the storage when the cycle configs are pulled
 
-bool use_default_configuration_parameters = false;
 bool batt_recovering = false;
 
 // Function defs
@@ -163,6 +162,11 @@ void read_sd_and_notify_tasks(void) {
     use_default_configuration_parameters = true;
   } else {
     use_default_configuration_parameters = false;
+  }
+
+  xReturned = get_cycle_configurations(&cycle_configs);
+  if (xReturned != FR_OK) {
+    send_debug_log_message("Warning: cycle configuration files were not able to be read.");
   }
 
   xReturned = xQueueSend(heaterRxQueue, &heaterConfigMsg, 0);

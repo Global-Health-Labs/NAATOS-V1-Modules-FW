@@ -198,12 +198,12 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
   // Open naatos config file
   res = f_open(&file, NAATOS_CONFIG_FILE, FA_READ);
   if (res != FR_OK) {
-    // Return that it already exists
+    // Return that it does not exists
     return res;
   }
 
   // Set the struct
-  for (int i = 0; i < NUM_PARAMETERS; i++) {
+  for (int i = 0; i < NUM_MASTER_CONFIG_PARAMETERS; i++) {
     pch = f_gets(configBuffer, 50, &file);
     pch = strtok(configBuffer, ":");
     sprintf(val, "%s", pch);
@@ -227,12 +227,6 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case LOGGING_RATE:
       parameters->logging_rate = parse_double(val, DEFAULT_LOGGING_RATE);
       break;
-    case CYCLE_ONE_RUN_TIME:
-      parameters->cycle_1_run_time_s = atoi(val);
-      break;
-    case CYCLE_TWO_RUN_TIME:
-      parameters->cycle_2_run_time_s = atoi(val);
-      break;
     case LOW_POWER_THRESHOLD:
       parameters->low_power_threshold = parse_int(val, DEFAULT_LOW_POWER_THRESHOLD);
       break;
@@ -242,18 +236,8 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case SAMPLE_VALID_TIMEOUT:
       parameters->sample_valid_timeout_s = parse_double(val, DEFAULT_VALID_TIMEOUT_S);
       break;
-    case SAMPLE_COMPLETE_DELAY:
-      parameters->sample_complete_delay_s = parse_int(val, DEFAULT_CYCLES_COMPLETE_DELAY_S);
-      break;
     case ALERT_TIMEOUT_TIME:
       parameters->alert_timeout_time_s = parse_double(val, DEFAULT_ALERT_TIMEOUT_S);
-      break;
-    case MIN_RUN_ZONE_TEMP_C:
-      parameters->min_run_zone_temp = parse_double(val, DEFAULT_MIN_RUN_ZONE_TEMP);
-      break;
-    case MIN_RUN_ZONE_TEMP_EN:
-      num = strcmp(val, "true");
-      parameters->min_run_zone_temp_en = num ? false : true;
       break;
     case DEBUG_TO_COM_EN:
       num = strcmp(val, "true");
@@ -262,9 +246,6 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
 #ifndef SAMPLE_PREP_BOARD
     case OPTICAL_DISTANCE:
       parameters->optical_distance = atoi(val);
-      break;
-    case MIN_WAIT_TIME_AFTER_CYCLE:
-      parameters->min_wait_time_after_cycle_s = atoi(val);
       break;
     case MAX_AMP_PID_PWM:
       parameters->max_amp_pid_pwm = parse_int(val, DEFAULT_MAX_AMP_PID);
@@ -278,158 +259,16 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
     case AMP_MAX_TEMP_C:
       parameters->amp_max_temp = atof(val);
       break;
-    case VALVE_SETPOINT_C_1:
-      parameters->valve_setpoint_1 = atof(val);
-      break;
-    case AMP_SETPOINT_C_1:
-      parameters->amp_setpoint_1 = atof(val);
-      break;
-    case VALVE_KP_1:
-      parameters->valve_kp_1 = atof(val);
-      break;
-    case VALVE_KI_1:
-      parameters->valve_ki_1 = atof(val);
-      break;
-    case AMP_KP_1:
-      parameters->amp_kp_1 = atof(val);
-      break;
-    case AMP_KI_1:
-      parameters->amp_ki_1 = atof(val);
-      break;
-    case VALVE_KD_1:
-      parameters->valve_kd_1 = atof(val);
-      break;
-    case VALVE_SETPOINT_C_2:
-      parameters->valve_setpoint_2 = atof(val);
-      break;
-    case AMP_SETPOINT_C_2:
-      parameters->amp_setpoint_2 = atof(val);
-      break;
-    case VALVE_KP_2:
-      parameters->valve_kp_2 = atof(val);
-      break;
-    case VALVE_KI_2:
-      parameters->valve_ki_2 = atof(val);
-      break;
-    case VALVE_KD_2:
-      parameters->valve_kd_2 = atof(val);
-      break;
-    case AMP_KP_2:
-      parameters->amp_kp_2 = atof(val);
-      break;
-    case AMP_KI_2:
-      parameters->amp_ki_2 = atof(val);
-      break;
-    case AMP_KD_2:
-      parameters->amp_kd_2 = atof(val);
-      break;
-    case RUN_AMP_CYCLE_1:
-      num = strcmp(val, "true");
-      parameters->run_amp_cycle_1 = num ? false : true;
-      break;
-    case RUN_AMP_CYCLE_2:
-      num = strcmp(val, "true");  
-      parameters->run_amp_cycle_2 = num ? false : true;
-      break;
-    case RUN_VALVE_CYCLE_1:
-      num = strcmp(val, "true");
-      parameters->run_valve_cycle_1 = num ? false : true;
-      break;
-    case RUN_VALVE_CYCLE_2:
-      num = strcmp(val, "true");
-      parameters->run_valve_cycle_2 = num ? false : true;
-      break;
 #else
-    case MAX_HEATER_PID_PWM:
-      parameters->max_heater_pid_pwm = parse_int(val, DEFAULT_MAX_HEATER_PID);
-      break;
-    case RAMP_TO_TEMP_BEFORE_CYCLE_1_START:
-      num = strcmp(val, "true");
-      parameters->ramp_to_temp_before_start_cycle_1 = num ? false : true;
-      break;
-    case RAMP_TO_TEMP_BEFORE_CYCLE_2_START:
-      num = strcmp(val, "true");
-      parameters->ramp_to_temp_before_start_cycle_2 = num ? false : true;
-      break;
-    case RAMP_TO_TEMP_C1_TIMEOUT:
-      parameters->ramp_to_temp_c1_timeout = parse_double(val, DEFAULT_RAMP_TO_TEMP_TIMEOUT);
-      break;
-    case RAMP_TO_TEMP_C2_TIMEOUT:
-      parameters->ramp_to_temp_c2_timeout = parse_double(val, DEFAULT_RAMP_TO_TEMP_TIMEOUT);
-      break;
-    case MOTOR_END_WAIT_TIME_S:
-      parameters->motor_end_wait_time_s = parse_int(val, DEFAULT_MOTOR_WAIT_TIME_S);
-      break;
-    case HEATER_SETPOINT_1_C:
-      parameters->heater_setpoint_1 = parse_double(val, DEFAULT_HEATER_SETPOINT_1);
-      break;
-    case HEATER_SETPOINT_2_C:
-      parameters->heater_setpoint_2 = parse_double(val, DEFAULT_HEATER_SETPOINT_2);
-      break;
     case HEATER_MAX_TEMP_C:
       parameters->heater_max_temp = parse_double(val, DEFAULT_MAX_TEMP);
       break;
-    case HEATER_KP_1:
-      parameters->heater_kp_1 = parse_double(val, H_KP_1);
-      break;
-    case HEATER_KI_1:
-      parameters->heater_ki_1 = parse_double(val, H_KI_1);
-      break;
-    case HEATER_KD_1:
-      parameters->heater_kd_1 = parse_double(val, H_KD_1);
-      break;
-    case HEATER_KP_2:
-      parameters->heater_kp_2 = parse_double(val, H_KP_2);
-      break;
-    case HEATER_KI_2:
-      parameters->heater_ki_2 = parse_double(val, H_KI_2);
-      break;
-    case HEATER_KD_2:
-      parameters->heater_kd_2 = parse_double(val, H_KD_2);
-      break;
-    case MOTOR_KP_1:
-      parameters->motor_kp_1 = parse_double(val, M_KP);
-      break;
-    case MOTOR_KI_1:
-      parameters->motor_ki_1 = parse_double(val, M_KI);
-      break;
-    case MOTOR_KD_1:
-      parameters->motor_kd_1 = parse_double(val, M_KD);
+    case MAX_HEATER_PID_PWM:
+      parameters->max_heater_pid_pwm = parse_int(val, DEFAULT_MAX_HEATER_PID);
       break;
     case MOTOR_SWTICH_CCW_CW:
       num = strcmp(val, "true");
       parameters->switch_motor_ccw_cw = num ? false : true;
-      break;
-    case _MOTOR_SETPOINT_1:
-      parameters->motor_setpoint_1 = parse_int(val, MOTOR_SETPOINT_1);
-      break;
-    case MOTOR_KP_2:
-      parameters->motor_kp_2 = parse_double(val, M_KP);
-      break;
-    case MOTOR_KI_2:
-      parameters->motor_ki_2 = parse_double(val, M_KI);
-      break;
-    case MOTOR_KD_2:
-      parameters->motor_kd_2 = parse_double(val, M_KD);
-      break;
-    case _MOTOR_SETPOINT_2:
-      parameters->motor_setpoint_2 = parse_int(val, MOTOR_SETPOINT_2);
-      break;
-    case RUN_MOTOR_1:
-      num = strcmp(val, "true");
-      parameters->run_motor_1 = num ? false : true;
-      break;
-    case RUN_HEATER_1:
-      num = strcmp(val, "true");
-      parameters->run_heater_1 = num ? false : true;
-      break;
-    case RUN_MOTOR_2:
-      num = strcmp(val, "true");
-      parameters->run_motor_2 = num ? false : true;
-      break;
-    case RUN_HEATER_2:
-      num = strcmp(val, "true");
-      parameters->run_heater_2 = num ? false : true;
       break;
     case HAL_SENSOR_THRESH:
       parameters->hal_sensor_thresh = parse_double(val, DEFAULT_HAL_SENSOR_THRESHOLD);
@@ -476,7 +315,188 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
   return FR_OK;
 }
 
-FRESULT check_for_config_file(void) {
+FRESULT get_cycle_configurations(cycle_config_parameters *cycle_configurations_arr) {
+  char configBuffer[50];
+  FRESULT res;
+  char *pch;
+  char val[50];
+  int num;
+  int cycle_file_cnt = 0;
+
+  // Re-Mount Storage
+  mount_storage();
+
+  // Open root directory
+  res = f_opendir(&dir, "/");
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Change directory into configs
+  res = f_chdir(CONFIG_DIR);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  for (;;) {
+    res = f_readdir(&dir, &fno);
+    // Break on error or end of dir 
+    if (res != FR_OK || fno.fname[0] == 0) break;  
+    // Check if it's a file 
+    if (!(fno.fattrib & AM_DIR)) {                 
+      if (strncmp(fno.fname, "cycle_config_", 13) == 0) {
+        // Check if the filename starts with "cycle_config_"
+        char *endptr;
+        // Attempt to convert the rest to integer
+        strtol(&fno.fname[13], &endptr, 10); 
+        // If the rest is an integer followed by a dot
+        if (*endptr == '.') { 
+          cycle_file_cnt++;
+        }
+      }
+    }
+  }
+  
+  // Ensure we have a file
+  if (cycle_file_cnt > 0) {
+    // Malloc space for the cycle configurations array
+    cycle_configurations_arr = (cycle_config_parameters *)malloc(cycle_file_cnt * sizeof(cycle_config_parameters));
+    // Loop through each file
+    for (int i = 0; i < cycle_file_cnt; i++) {
+      char buff[128];
+      sprintf(buff, "cycle_config_%d.txt", (i+1));
+      // Open current cycle config file
+      res = f_open(&file, buff, FA_READ);
+      if (res != FR_OK) {
+        // Return that it does not exists
+        return res;
+      }
+
+      // Loop throught the file and populate the cycle configuration array
+      for (int j = 0; j < NUM_CYCLE_CONFIG_PARAMS; j++) {
+        pch = f_gets(configBuffer, 50, &file);
+        pch = strtok(configBuffer, ":");
+        sprintf(val, "%s", pch);
+        pch = strtok(NULL, ":");
+        sprintf(val, "%s", pch);
+        char *newline = strchr(val, '\n');
+        if (newline) {
+          // Replace newline character with null terminator
+          *newline = '\0';
+        }
+
+        switch ((cycle_config_params_t)j) {
+        case CYCLE_RUN_TIME:
+            cycle_configurations_arr[i]->cycle_run_time_s = parse_double(val, DEFAULT_CYCLE_RUNTIME);
+            break;
+        case MIN_RUN_ZONE_TEMP_C:
+            cycle_configurations_arr[i]->min_run_zone_temp = parse_double(val, DEFAULT_MIN_RUN_ZONE_TEMP_C);
+            break;
+        case MIN_RUN_ZONE_TEMP_EN:
+            num = strcmp(val, "true");
+            cycle_configurations_arr[i]->min_run_zone_temp_en = num ? false : true;
+            break;
+        case CYCLE_DELAY_TIME:
+            cycle_configurations_arr[i]->cycle_delay_time = parse_int(val, DEFAULT_CYCLE_DELAY_TIME);
+            break;
+        case RAMP_TO_TEMP_BEFORE_CYCLE_START:
+            num = strcmp(val, "true");
+            cycle_configurations_arr[i]->ramp_to_temp_before_start_cycle = num ? false : true;
+            break;
+        case RAMP_TO_TEMP_TIMEOUT:
+            cycle_configurations_arr[i]->ramp_to_temp_timeout = parse_double(val, DEFAULT_RAMP_TO_TEMP_TIMEOUT);
+            break;
+    #ifndef SAMPLE_PREP_BOARD
+        case AMP_SETPOINT:
+            cycle_configurations_arr[i]->amp_setpoint = parse_double(val, DEFAULT_AMP_SETPOINT);
+            break;
+        case VALVE_SETPOINT:
+            cycle_configurations_arr[i]->valve_setpoint = parse_double(val, DEFAULT_VALVE_SETPOINT);
+            break;
+        case RUN_AMP:
+            num = strcmp(val, "true");
+            cycle_configurations_arr[i]->run_amp = num ? false : true;
+            break;
+        case RUN_VALVE:
+            num = strcmp(val, "true");
+            cycle_configurations_arr[i]->run_valve = num ? false : true;
+            break;
+        case AMP_KP:
+            cycle_configurations_arr[i]->amp_kp = parse_double(val, DEFAULT_AMP_KP);
+            break;
+        case AMP_KI:
+            cycle_configurations_arr[i]->amp_ki = parse_double(val, DEFAULT_AMP_KI);
+            break;
+        case AMP_KD:
+            cycle_configurations_arr[i]->amp_kd = parse_double(val, DEFAULT_AMP_KD);
+            break;
+        case VALVE_KP:
+            cycle_configurations_arr[i]->valve_kp = parse_double(val, DEFAULT_VALVE_KP);
+            break;
+        case VALVE_KI:
+            cycle_configurations_arr[i]->valve_ki = parse_double(val, DEFAULT_VALVE_KI);
+            break;
+        case VALVE_KD:
+            cycle_configurations_arr[i]->valve_ki = parse_double(val, DEFAULT_VALVE_KD);
+            break;
+    #else
+        case HEATER_SETPOINT:
+            cycle_configurations_arr[i]->heater_setpoint = parse_double(val, DEFAULT_HEATER_SETPOINT);
+            break;
+        case MOTOR_SETPOINT:
+            cycle_configurations_arr[i]->motor_setpoint = parse_double(val, DEFAULT_MOTOR_SETPOINT);
+            break;
+        case RUN_HEATER:
+            num = strcmp(val, "true");
+            cycle_configurations_arr[i]->run_heater = num ? false : true;
+            break;
+        case RUN_MOTOR:
+            num = strcmp(val, "true");
+            cycle_configurations_arr[i]->run_motor = num ? false : true;
+            break;
+        case HEATER_KP:
+            cycle_configurations_arr[i]->heater_kp = parse_double(val, DEFAULT_HEATER_KP);
+            break;
+        case HEATER_KI:
+            cycle_configurations_arr[i]->heater_ki = parse_double(val, DEFAULT_HEATER_KI);
+            break;
+        case HEATER_KD:
+            cycle_configurations_arr[i]->heater_kd = parse_double(val, DEFAULT_HEATER_KD);
+            break;
+        case MOTOR_KP:
+            cycle_configurations_arr[i]->motor_kp = parse_double(val, DEFAULT_MOTOR_KP);
+            break;
+        case MOTOR_KI:
+            cycle_configurations_arr[i]->motor_ki = parse_double(val, DEFAULT_MOTOR_KI);
+            break;
+        case MOTOR_KD:
+            cycle_configurations_arr[i]->motor_ki = parse_double(val, DEFAULT_MOTOR_KD);
+            break;
+    #endif
+        }
+      }
+
+      // Close the current cycle file
+      res = f_close(&file);
+      if (res != FR_OK) {
+        return res;
+      }
+    }
+  }
+  else {
+    return FR_NO_FILE;
+  }
+
+  // Change back directories
+  res = f_chdir("..");
+  if (res != FR_OK) {
+    return res;
+  }
+
+  return FR_OK;
+}
+
+FRESULT check_for_naatos_config_file(void) {
   FRESULT res;
   DIR dir;
   char configBuffer[50];
@@ -548,20 +568,6 @@ FRESULT check_for_config_file(void) {
     return res;
   }
 
-  // Write cycle 1 run time 
-  configBufferSize = sprintf(configBuffer, "cycle_1_run_time_s:%0.2f\n", DEFAULT_CYCLE_1_RUNTIME);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write cycle 2 run time 
-  configBufferSize = sprintf(configBuffer, "cycle_2_run_time_s:%0.2f\n", DEFAULT_CYCLE_2_RUNTIME);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
   // Write Low Power Threshold
   configBufferSize = sprintf(configBuffer, "low_power_threshold:%d\n", DEFAULT_LOW_POWER_THRESHOLD);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
@@ -583,29 +589,8 @@ FRESULT check_for_config_file(void) {
     return res;
   }
 
-  // Write Sample Complete Delay (seconds)
-  configBufferSize = sprintf(configBuffer, "sample_complete_delay_s:%0.2f\n", DEFAULT_CYCLES_COMPLETE_DELAY_S);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
   // Write Alert Timeout (seconds)
   configBufferSize = sprintf(configBuffer, "alert_timeout_time_s:%0.2f\n", DEFAULT_ALERT_TIMEOUT_S);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Minimum Run Zone Temperature and Enable
-  configBufferSize = sprintf(configBuffer, "min_run_zone_temp:%0.2f\n", DEFAULT_MIN_RUN_ZONE_TEMP);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  
-  // Write Minimum Zone Temperature Enable
-  configBufferSize = sprintf(configBuffer, "min_run_zone_temp_en:%s\n", DEFAULT_MIN_RUN_ZONE_TEMP_EN ? "true" : "false");
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -620,13 +605,6 @@ FRESULT check_for_config_file(void) {
 #ifndef SAMPLE_PREP_BOARD
   // Write Optical Switch
   configBufferSize = sprintf(configBuffer, "optical_distace:%d\n", OPTICAL_TRIG_THRES);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Minimum Wait Time After Cycle
-  configBufferSize = sprintf(configBuffer, "min_wait_time_after_cycle_s:%d\n", DEFAULT_WAIT_TIME_AFTER_CYCLE_S);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -659,196 +637,7 @@ FRESULT check_for_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
-
-  // Write Amplification Zone Setpoint 1
-  configBufferSize = sprintf(configBuffer, "amp_setpoint_1:%0.2f\n", AMP_SETPOINT_1);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Valve Zone Setpoint 1
-  configBufferSize = sprintf(configBuffer, "valve_setpoint_1:%0.2f\n", VALVE_SETPOINT_1);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Valve Kp 1
-  configBufferSize = sprintf(configBuffer, "valve_kp_1:%0.3f\n", V_KP_1);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Valve Ki 1
-  configBufferSize = sprintf(configBuffer, "valve_ki_1:%0.3f\n", V_KI_1);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Valve Kd 1
-  configBufferSize = sprintf(configBuffer, "valve_kd_1:%0.3f\n", V_KD_1);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Amplifcation Kp 1
-  configBufferSize = sprintf(configBuffer, "amp_kp_1:%0.3f\n", A_KP_1);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Amplification Ki 1
-  configBufferSize = sprintf(configBuffer, "amp_ki_1:%0.3f\n", A_KI_1);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Amplification Kd 1
-  configBufferSize = sprintf(configBuffer, "amp_kd_1:%0.3f\n", A_KD_1);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Valve Zone Setpoint 2
-  configBufferSize = sprintf(configBuffer, "valve_setpoint_2:%0.2f\n", VALVE_SETPOINT_2);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Amplification Zone Setpoint 2
-  configBufferSize = sprintf(configBuffer, "amp_setpoint_2:%0.2f\n", AMP_SETPOINT_2);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Valve Kp 2
-  configBufferSize = sprintf(configBuffer, "valve_kp_2:%0.3f\n", V_KP_2);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Valve Ki 2
-  configBufferSize = sprintf(configBuffer, "valve_ki_2:%0.3f\n", V_KI_2);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Valve Kd 2
-  configBufferSize = sprintf(configBuffer, "valve_kd_2:%0.3f\n", V_KD_2);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Amplification Kp 2
-  configBufferSize = sprintf(configBuffer, "amp_kp_2:%0.3f\n", A_KP_2);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Amplification Ki 2
-  configBufferSize = sprintf(configBuffer, "amp_ki_2:%0.3f\n", A_KI_2);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Amplification Kd 2
-  configBufferSize = sprintf(configBuffer, "amp_kd_2:%0.3f\n", A_KD_2);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Run Amplification Cycle 1
-  configBufferSize = sprintf(configBuffer, "run_amp_cycle_1:%s\n", DEFAULT_RUN_AMP_CYCLE_1 ? "true" : "false");
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Run Amplification Cycle 2
-  configBufferSize = sprintf(configBuffer, "run_amp_cycle_2:%s\n", DEFAULT_RUN_AMP_CYCLE_2 ? "true" : "false");
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Run Valve Cycle 1
-  configBufferSize = sprintf(configBuffer, "run_valve_cycle_1:%s\n", DEFAULT_RUN_VALVE_CYCLE_1 ? "true" : "false");
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Run Valve Cycle 2
-  configBufferSize = sprintf(configBuffer, "run_valve_cycle_2:%s\n", DEFAULT_RUN_VALVE_CYCLE_2 ? "true" : "false");
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
 #else
-  // Write Max Heater PID PWM
-  configBufferSize = sprintf(configBuffer, "max_heater_pid_pwm:%d\n", DEFAULT_MAX_HEATER_PID);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  configBufferSize = sprintf(configBuffer, "ramp_to_temp_before_start_cycle_1:%s\n", DEFAULT_RAMP_TO_TEMP_BEFORE_START_1 ? "true" : "false");
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  configBufferSize = sprintf(configBuffer, "ramp_to_temp_before_start_cycle_2:%s\n", DEFAULT_RAMP_TO_TEMP_BEFORE_START_2 ? "true" : "false");
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  configBufferSize = sprintf(configBuffer, "ramp_to_temp_timeout_c1:%0.2f\n", DEFAULT_RAMP_TO_TEMP_TIMEOUT);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  configBufferSize = sprintf(configBuffer, "ramp_to_temp_timeout_c2:%0.2f\n", DEFAULT_RAMP_TO_TEMP_TIMEOUT);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write Motor End Wait Time (Seconds)
-  configBufferSize = sprintf(configBuffer, "motor_end_wait_time_s:%d\n", DEFAULT_MOTOR_WAIT_TIME_S);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Write heater Zone Setpoint
-  configBufferSize = sprintf(configBuffer, "heater_setpoint_1:%0.2f\n", DEFAULT_HEATER_SETPOINT_1);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  configBufferSize = sprintf(configBuffer, "heater_setpoint_2:%0.2f\n", DEFAULT_HEATER_SETPOINT_2);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
   // Write Heater Max Temperature
   configBufferSize = sprintf(configBuffer, "heater_max_temp:%0.2f\n", DEFAULT_MAX_TEMP);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
@@ -856,138 +645,41 @@ FRESULT check_for_config_file(void) {
     return res;
   }
 
-  // Write Heater 1 Kp
-  configBufferSize = sprintf(configBuffer, "heater_kp_1:%0.3f\n", H_KP_1);
+  // Write Max Heater PID PWM
+  configBufferSize = sprintf(configBuffer, "max_heater_pid_pwm:%d\n", DEFAULT_MAX_HEATER_PID);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
-  // Write Heater 1 Ki
-  configBufferSize = sprintf(configBuffer, "heater_ki_1:%0.3f\n", H_KI_1);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Heater 1 Kd
-  configBufferSize = sprintf(configBuffer, "heater_kd_1:%0.3f\n", H_KD_1);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Heater 2 Kp
-  configBufferSize = sprintf(configBuffer, "heater_kp_2:%0.3f\n", H_KP_2);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Heater 2 Ki
-  configBufferSize = sprintf(configBuffer, "heater_ki_2:%0.3f\n", H_KI_2);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Heater 2 Kd
-  configBufferSize = sprintf(configBuffer, "heater_kd_2:%0.3f\n", H_KD_2);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Motor 1 Kp
-  configBufferSize = sprintf(configBuffer, "motor_kp_1:%0.3f\n", M_KP);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Motor 1 Ki
-  configBufferSize = sprintf(configBuffer, "motor_ki_1:%0.4f\n", M_KI);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Motor 1 Kd
-  configBufferSize = sprintf(configBuffer, "motor_kd_1:%0.3f\n", M_KD);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
+
   // Write Motor Switch CCW CW
   configBufferSize = sprintf(configBuffer, "motor_switch_ccw_cw:%s\n", DEFAULT_MOTOR_SWTICH_CCW_CW ? "true" : "false");
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
-  // Write Motor Setpoint 1
-  configBufferSize = sprintf(configBuffer, "motor_setpoint_1:%d\n", MOTOR_SETPOINT_1);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Motor 2 Kp
-  configBufferSize = sprintf(configBuffer, "motor_kp_2:%0.3f\n", M_KP);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Motor 2 Ki
-  configBufferSize = sprintf(configBuffer, "motor_ki_2:%0.4f\n", M_KI);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Motor 2 Kd
-  configBufferSize = sprintf(configBuffer, "motor_kd_2:%0.3f\n", M_KD);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Motor Setpoint 1
-  configBufferSize = sprintf(configBuffer, "motor_setpoint_2:%d\n", MOTOR_SETPOINT_2);
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Run Motor 1
-  configBufferSize = sprintf(configBuffer, "run_motor_1:%s\n", DEFAULT_RUN_MOTOR_1 ? "true" : "false");
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Run Heater 1
-  configBufferSize = sprintf(configBuffer, "run_heater_1:%s\n", DEFAULT_RUN_HEATER_1 ? "true" : "false");
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Run Motor 2
-  configBufferSize = sprintf(configBuffer, "run_motor_2:%s\n", DEFAULT_RUN_MOTOR_2 ? "true" : "false");
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
-  // Write Run Heater 2
-  configBufferSize = sprintf(configBuffer, "run_heater_2:%s\n", DEFAULT_RUN_HEATER_2 ? "true" : "false");
-  res = f_write(&file, configBuffer, configBufferSize, &b_written);
-  if (res != FR_OK) {
-    return res;
-  }
+
   // Write hal sensor voltage threshold
   configBufferSize = sprintf(configBuffer, "hal_sensor_thresh:%0.2f\n", DEFAULT_HAL_SENSOR_THRESHOLD);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
+
   // Write Motor Stall Percentage
   configBufferSize = sprintf(configBuffer, "motor_stall_percentage:%d\n", DEFAULT_MOTOR_STALL_PERCENTAGE);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
+
   // Write Motor Stall PWM
   configBufferSize = sprintf(configBuffer, "motor_stall_pwm:%0.2f\n", DEFAULT_MOTOR_STALL_PWM);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
   }
+
   // Write Motor Stall Enable
   configBufferSize = sprintf(configBuffer, "motor_stall_en:%s\n", DEFAULT_MOTOR_STALL_ENABLE ? "true" : "false");
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
@@ -1026,6 +718,29 @@ FRESULT check_for_config_file(void) {
   }
 
   return res;
+}
+
+FRESULT check_for_cycle_config_files(void) {
+  FRESULT res;
+  DIR dir;
+  char configBuffer[50];
+  uint32_t configBufferSize;
+  uint32_t b_written;
+
+  // Change directory into configs
+  res = f_chdir(CONFIG_DIR);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Try to create new cycle_config_1.txt
+  res = f_open(&file, FIRST_CYCLE_CONFIG_FILE, FA_CREATE_NEW | FA_WRITE);
+  if (res == FR_EXIST) {
+    // Return that it already exists
+    return res;
+  }
+
+  send_debug_log_message("Warning: NO CYCLE FILES FOUND, CREATING DEFAULTS NOT YET IMPLEMENTED! PUT THEM IN YOURSELF");
 }
 
 // Sets the set_time_date variable to "false"

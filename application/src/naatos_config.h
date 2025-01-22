@@ -43,7 +43,6 @@
 
 /* Battery Parameters */
 #define ENABLE_LOW_POWER_MODE 0
-#define DEFAULT_LOW_POWER_THRESHOLD 46
 
 /*------------COMMON PIN CONFIGS------------*/
 /* I2C Pins */
@@ -129,101 +128,76 @@
 
 /*--------------Board Specific Pin Configs----------------*/
 #ifdef SAMPLE_PREP_BOARD
-
 /* Heater Zones' Parameters */
 #define DEFAULT_CYCLE_ONE_ZONE_ON_TIME 120    // Seconds
 #define DEFAULT_CYCLE_TWO_ZONE_ON_TIME 120    // Seconds
-
 #else
-
 #define OPTICAL_INPUT_PIN 3
-
 /* Heater Zones' Parameters */
 #define DEFAULT_AMPLIFICATION_ZONE_ON_TIME 2400      // 40min in seconds
 #define DEFAULT_VALVE_ZONE_ON_TIME 300               // 5min in seconds
 #define BUTTON_INPUT_PIN_ALT NRF_GPIO_PIN_MAP(1, 14) // Used for recovering bad gpio pin defect
 #define BUTTON_REWORK_DETECT_INPUT NRF_GPIO_PIN_MAP(1, 12)
 #define BUTTON_REWORK_DETECT_OUTPUT NRF_GPIO_PIN_MAP(1, 13)
-
 #endif
 
-/* Default Rates
- * These rates are only used when there is no configuration file seen in the 
-   naatos_config.txt file on the sd card. When a new config files is created
-   these rates will be used in the system.
- * Rates are in seconds
-*/
-#ifdef SAMPLE_PREP_BOARD
-#define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
-#define DEFAULT_LOGGING_RATE 1.000
-#define DEFAULT_MAX_TEMP 100.0
-#define DEFAULT_MIN_RUN_ZONE_TEMP 75.0
-#define DEFAULT_MIN_RUN_ZONE_TEMP_EN false
-#define DEFAULT_ALERT_TIMEOUT_S 3.0    // Seconds
-#define DEFAULT_VALID_TIMEOUT_S 3600.0 // 1 hour
-#define DEFAULT_RECOVERY_THRES 47      // Percent
-#define OPTICAL_TRIG_THRES 800
-#define DEFAULT_HEATER_SETPOINT_1 93.5 // Sample prep only
-#define DEFAULT_HEATER_SETPOINT_2 93.5 // Sample prep only
-#define DEFAULT_RAMP_SETPOINT 95.0
-#define MOTOR_SETPOINT_1 3900
-#define MOTOR_SETPOINT_2 3900
-#define DEFAULT_RUN_MOTOR_1 false
-#define DEFAULT_RUN_HEATER_1 true
-#define DEFAULT_RUN_MOTOR_2 true
-#define DEFAULT_RUN_HEATER_2 true
-#define DEFAULT_MOTOR_SWTICH_CCW_CW  false
-#define DEFAULT_CYCLE_1_RUNTIME 240.0
-#define DEFAULT_CYCLE_2_RUNTIME 240.0
-#define DEFAULT_RAMP_TO_TEMP_BEFORE_START_1 true
-#define DEFAULT_RAMP_TO_TEMP_BEFORE_START_2 false
-#define DEFAULT_RAMP_TO_TEMP_TIMEOUT 600.0 // 10min
-#define DEFAULT_MOTOR_SPEED_PWM 71
-#define DEFAULT_MAX_HEATER_PID 100
-#define DEFAULT_HAL_SENSOR_THRESHOLD  0.30f
-#define DEFAULT_MOTOR_STALL_PERCENTAGE  20 
-#define DEFAULT_MOTOR_STALL_ENABLE  true
-#define DEFAULT_DEBUG_TO_COM_ENABLE true
-#define MAX_MOTOR_PID 100
-#define MIN_BATTERY_VOLTAGE 2.90
-#define MAX_BATTERY_VOLTAGE 4.20
-#define DEFAULT_LOW_POWER_THRESH_V 2.7
-#define DEFAULT_MOTOR_WAIT_TIME_S 0
-#define DEFAULT_MOTOR_STALL_PWM   62.0
-#else
-#define DEFAULT_SAMPLE_RATE 0.200 // 0.048 minimum
-#define DEFAULT_LOGGING_RATE 5.000
-#define DEFAULT_CYCLE_1_RUNTIME 1800.0
-#define DEFAULT_CYCLE_2_RUNTIME 180.0
-#define DEFAULT_WAIT_TIME_AFTER_CYCLE_S 900.00 // 15 min
-#define VALVE_SETPOINT_1 67.6
-#define AMP_SETPOINT_1 67.2
-#define VALVE_SETPOINT_2 93.0
-#define AMP_SETPOINT_2 67.0
-#define DEFAULT_VALVE_MAX_TEMP 105.0
-#define DEFAULT_AMP_MAX_TEMP 80.0
-#define DEFAULT_MIN_RUN_ZONE_TEMP 50.0
-#define DEFAULT_MIN_RUN_ZONE_TEMP_EN false
-#define DEFAULT_ALERT_TIMEOUT_S 3.0   // seconds
-#define DEFAULT_VALID_TIMEOUT_S 3600.0 // 1 hour
-#define DEFAULT_RECOVERY_THRES 40      // Percent
-#define OPTICAL_TRIG_THRES 800
-#define DEFAULT_MAX_AMP_PID 100
-#define DEFAULT_MAX_VALVE_PID 100
-#define DEFAULT_DEBUG_TO_COM_ENABLE true
-#define MIN_BATTERY_VOLTAGE 2.90
-#define MAX_BATTERY_VOLTAGE 4.20
-#define DEFAULT_RUN_AMP_CYCLE_1 true
-#define DEFAULT_RUN_AMP_CYCLE_2 true
-#define DEFAULT_RUN_VALVE_CYCLE_1 false
-#define DEFAULT_RUN_VALVE_CYCLE_2 true
+/* Master Configuration Default Parameters */
+#define DEFAULT_SAMPLE_RATE             0.200   // 0.048 minimum
+#define DEFAULT_LOGGING_RATE            5.000
+#define DEFAULT_LOW_POWER_THRESHOLD     46
+#define DEFAULT_RECOVERY_THRESHOLD      47      // Percent
+#define DEFAULT_VALID_TIMEOUT_S         3600.0  // 1 hour
+#define DEFAULT_ALERT_TIMEOUT_S         3.0     // seconds
+#define DEFAULT_DEBUG_TO_COM_ENABLE     true
+#ifndef SAMPLE_PREP_BOARD
+#define DEFAULT_OPTICAL_TRIG_THRESHOLD  800
+#define DEFAULT_MAX_AMP_PID             100
+#define DEFAULT_MAX_VALVE_PID           100
+#define DEFAULT_VALVE_MAX_TEMP          105.0
+#define DEFAULT_AMP_MAX_TEMP            80.0
+#else 
+#define DEFAULT_MAX_HEATER_TEMP         105
+#define DEFAULT_MAX_HEATER_PID          100
+#define DEFAULT_MOTOR_SWTICH_CCW_CW     false
+#define DEFAULT_HAL_SENSOR_THRESHOLD    0.30f
+#define DEFAULT_MOTOR_STALL_PERCENT     20 
+#define DEFAULT_MOTOR_SPEED_PWM         71
+#define DEFAULT_MOTOR_STALL_ENABLE      true
 #endif
-
 #define DEFAULT_DATE 100124                
 #define DEFAULT_TIME 120000                
 #define DEFAULT_SET_TIME false
 
-#define DEFAULT_CYCLES_COMPLETE_DELAY_S 10
+/* Cycles Configuration Default Parameters */
+#define DEFAULT_CYCLE_RUNTIME           180.0    
+#define DEFAULT_MIN_RUN_ZONE_TEMP_C     80.0
+#define DEFAULT_MIN_RUN_ZONE_TEMP_EN    false
+#define DEFAULT_CYCLE_DELAY_TIME        0
+#define DEFAULT_RAMP_TO_TEMP            false
+#define DEFAULT_RAMP_TO_TEMP_TIMEOUT    300
+#ifndef SAMPLE_PREP_BOARD
+#define DEFAULT_AMP_SETPOINT            67.2
+#define DEFAULT_VALVE_SETPOINT          93.0
+#define DEFAULT_RUN_AMP                 false
+#define DEFAULT_RUN_VALVE               false
+#define DEFAULT_AMP_KP                  2.250
+#define DEFAULT_AMP_KI                  0.025
+#define DEFAULT_AMP_KD                  2.250
+#define DEFAULT_VALVE_KP                2.250
+#define DEFAULT_VALVE_KI                0.025
+#define DEFAULT_VALVE_KD                2.250
+#else
+#define DEFAULT_HEATER_SETPOINT         93.5
+#define DEFAULT_MOTOR_SETPOINT          3900
+#define DEFAULT_RUN_HEATER              false
+#define DEFAULT_RUN_MOTOR               false
+#define DEFAULT_HEATER_KP               20.0
+#define DEFAULT_HEATER_KI               0.05
+#define DEFAULT_HEATER_KD               50.0
+#define DEFAULT_MOTOR_KP                0.005
+#define DEFAULT_MOTOR_KI                0.0005
+#define DEFAULT_MOTOR_KD                0.020
+#endif
 
 /* Device Debug Parameters */
 #define VERBOSE_PID 0
@@ -668,8 +642,8 @@ typedef struct {
   float     amp_max_temp;
   float     valve_max_temp;
 #else
-  float     max_heater_pid_pwm;
   float     heater_max_temp;
+  float     max_heater_pid_pwm;
   bool      switch_motor_ccw_cw;
   float     hal_sensor_thresh;
   int       motor_stall_percent;
@@ -686,21 +660,20 @@ typedef struct {
   float     min_run_zone_temp;
   bool      min_run_zone_temp_en;
   uint16_t  cycle_delay_time;
+  bool      ramp_to_temp_before_start_cycle;
+  float     ramp_to_temp_timeout;
 #ifndef SAMPLE_PREP_BOARD
-  float     valve_setpoint;
   float     amp_setpoint;
-  bool      run_valve;
+  float     valve_setpoint;
   bool      run_amp;
-  float     valve_kp;
-  float     valve_ki;
-  float     valve_kd;
+  bool      run_valve;
   float     amp_kp;
   float     amp_ki;
   float     amp_kd;
+  float     valve_kp;
+  float     valve_ki;
+  float     valve_kd;
 #else 
-  bool      ramp_to_temp_before_start_cycle;
-  float     ramp_to_temp_timeout;
-  uint16_t  motor_end_wait_time_s; // Might want this removed
   float     heater_setpoint;
   uint16_t  motor_setpoint;
   bool      run_heater;
@@ -715,7 +688,6 @@ typedef struct {
 } cycle_config_parameters;
 
 /* Configuration Parameters Variables */
-extern bool use_default_configuration_parameters;
 extern naatos_config_parameters config;
 extern cycle_config_parameters *cycle_configs;
 extern bool batt_recovering;

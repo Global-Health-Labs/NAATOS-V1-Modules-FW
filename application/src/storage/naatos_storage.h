@@ -36,6 +36,7 @@
 
 //#define NAATOS_CONFIG_FILE "config_v2.0a.txt"
 #define NAATOS_CONFIG_FILE "config_v" VERSION ".txt"
+#define FIRST_CYCLE_CONFIG_FILE "cycle_config_1.txt"
 
 #ifdef SAMPLE_PREP_BOARD
 #define CSV_HEADER "Time,HeaterTemp,HeaterPWM,MotorSpeed,MotorPWM,Battery,BatteryV,BatteryT,Event\r\n"
@@ -54,7 +55,6 @@
 #define BLOCKDEV_LIST() ( \
     NRF_BLOCKDEV_BASE_ADDR(m_block_dev_qspi, block_dev))
 #endif
-
 
 typedef enum {
   SAMPLE_RATE,
@@ -82,7 +82,7 @@ typedef enum {
   MMDDYY,
   HHMMSS,
   SET_DATE_TIME,
-  NUM_PARAMETERS
+  NUM_MASTER_CONFIG_PARAMETERS
 } naatos_config_params_t;
 
 typedef enum {
@@ -90,6 +90,8 @@ typedef enum {
   MIN_RUN_ZONE_TEMP_C,
   MIN_RUN_ZONE_TEMP_EN,
   CYCLE_DELAY_TIME,
+  RAMP_TO_TEMP_BEFORE_CYCLE_START,
+  RAMP_TO_TEMP_TIMEOUT,
 #ifndef SAMPLE_PREP_BOARD
   AMP_SETPOINT,
   VALVE_SETPOINT,
@@ -102,9 +104,6 @@ typedef enum {
   VALVE_KI,
   VALVE_KD,
 #else 
-  RAMP_TO_TEMP_BEFORE_CYCLE_START,
-  RAMP_TO_TEMP_TIMEOUT,
-  MOTOR_END_WAIT_TIME_S, // Might remove this
   HEATER_SETPOINT,
   MOTOR_SETPOINT,
   RUN_HEATER,
@@ -116,7 +115,7 @@ typedef enum {
   MOTOR_KI,
   MOTOR_KD,
 #endif
-  NUM_PARAMS,
+  NUM_CYCLE_CONFIG_PARAMS,
 } cycle_config_params_t;
 
 typedef struct {
@@ -132,8 +131,10 @@ void uninit_naatos_storage(void);
 void mount_storage(void);
 void unmount_storage(void);
 void create_naatos_directories(void);
-FRESULT check_for_config_file(void);
+FRESULT check_for_naatos_config_file(void);
+FRESULT check_for_cycle_config_files(void);
 FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters);
+FRESULT get_cycle_configurations(cycle_config_parameters *cycle_configurations_arr);
 FRESULT reset_set_time_date(void);
 FRESULT create_log_file(const char *file_name);
 FRESULT write_log_line(const char *logName, const char *writeBuff, uint32_t writeBuffSize);
