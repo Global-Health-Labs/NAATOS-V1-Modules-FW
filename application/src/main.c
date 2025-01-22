@@ -87,70 +87,36 @@ xQueueHandle main_wakeupTasksQueue;
 xQueueHandle main_setPointReached;
 
 // Configuration Parameters
-#ifndef SAMPLE_PREP_BOARD
+
 naatos_config_parameters config = {
-    .logging_rate = 0,
     .sample_rate = 0,
-    .cycle_1_run_time_s = 0,
-    .cycle_2_run_time_s = 0,
+    .logging_rate = 0,
     .low_power_threshold = 0,
     .recovery_power_thresh = 0,
     .sample_valid_timeout_s = 0,
-    .sample_complete_delay_s = 0,
     .alert_timeout_time_s = 0,
-    .min_run_zone_temp = 0,
-    .min_run_zone_temp_en = false,
-    .valve_setpoint_1 = 0,
-    .amp_setpoint_1 = 0,
-    .valve_kp_1 = 0,
-    .valve_ki_1 = 0,
-    .valve_kp_1 = 0,
-    .amp_kp_1 = 0,
-    .amp_ki_1 = 0,
-    .amp_kd_1 = 0,
-    .valve_setpoint_2 = 0,
-    .amp_setpoint_2 = 0,
-    .valve_kp_2 = 0,
-    .valve_ki_2 = 0,
-    .valve_kp_2 = 0,
-    .amp_kp_2 = 0,
-    .amp_ki_2 = 0,
-    .amp_kd_2 = 0,
-    .run_amp_cycle_1 = false, 
-    .run_amp_cycle_2 = false,
-    .run_valve_cycle_1 = false,
-    .run_valve_cycle_2 = false};
+    .debug_to_com_en = false,
+#ifndef SAMPLE_PREP_BOARD
+    .optical_distance = 0,
+    .max_amp_pid_pwm = 0.0,
+    .max_valve_pid_pwm = 0.0,
+    .amp_max_temp = 0.0,
+    .valve_max_temp = 0.0,
 #else
-naatos_config_parameters config = {
-    .logging_rate = 0,
-    .sample_rate = 0,
-    .cycle_1_run_time_s = 0,
-    .cycle_2_run_time_s = 0,
-    .sample_valid_timeout_s = 0,
-    .sample_complete_delay_s = 0,
-    .low_power_threshold = 0,
-    .heater_setpoint_1 = 0,
-    .heater_setpoint_2 = 0,
-    .heater_kp_1 = 0,
-    .heater_ki_1 = 0,
-    .heater_kd_1 = 0,
-    .heater_kp_2 = 0,
-    .heater_ki_2 = 0,
-    .heater_kd_2 = 0,
-    .motor_kp_1 = 0,
-    .motor_ki_1 = 0,
-    .motor_kd_1 = 0,
-    .motor_setpoint_1 = 0,
-    .motor_kp_2 = 0,
-    .motor_ki_2 = 0,
-    .motor_kd_2 = 0,
-    .motor_setpoint_2 = 0,
-    .motor_stall_percent = 0,
-    .run_motor_1 = false,
-    .run_heater_1 = false,
-    .run_motor_2 = false,
-    .run_heater_2 = false };
+    .max_heater_pid_pwm = 0,
+    .heater_max_temp = 0.0,
+    .switch_motor_ccw_cw = 0.0,
+    .hal_sensor_thresh = 0.0, 
+    .motor_stall_percent = 0.0,
+    .motor_stall_pwm = 0.0,
+    .motor_stall_en = 0.0,
 #endif
+    .mmddyy = 0,
+    .hhmmss = 0,
+    .set_date_time = false
+};
+
+cycle_config_parameters *cycle_configs; // Will be populated by the storage when the cycle configs are pulled
 
 bool use_default_configuration_parameters = false;
 bool batt_recovering = false;

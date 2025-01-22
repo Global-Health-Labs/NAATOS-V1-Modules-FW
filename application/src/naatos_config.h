@@ -654,88 +654,68 @@ extern xTaskHandle buttonTaskHandle;
 // Config parameters
 
 typedef struct {
-  float sample_rate;
-  float logging_rate;
-  float cycle_1_run_time_s;
-  float cycle_2_run_time_s;
-  uint16_t low_power_threshold;
-  uint16_t recovery_power_thresh;
-  float sample_valid_timeout_s;
-  int sample_complete_delay_s;
-  float alert_timeout_time_s;
-  float min_run_zone_temp;
-  bool min_run_zone_temp_en;
-  bool debug_to_com_en;
+  float     sample_rate;
+  float     logging_rate;
+  uint16_t  low_power_threshold;
+  uint16_t  recovery_power_thresh;
+  float     sample_valid_timeout_s;
+  float     alert_timeout_time_s;
+  bool      debug_to_com_en;
 #ifndef SAMPLE_PREP_BOARD  
-  uint16_t optical_distance;
-  uint16_t min_wait_time_after_cycle_s;
-  float max_amp_pid_pwm;
-  float max_valve_pid_pwm;
-  float amp_max_temp;
-  float valve_max_temp;
-  float valve_setpoint_1;
-  float amp_setpoint_1;
-  float valve_kp_1;
-  float valve_ki_1;
-  float valve_kd_1;
-  float amp_kp_1;
-  float amp_ki_1;
-  float amp_kd_1;
-  float valve_setpoint_2;
-  float amp_setpoint_2;
-  float valve_kp_2;
-  float valve_ki_2;
-  float valve_kd_2;
-  float amp_kp_2;
-  float amp_ki_2;
-  float amp_kd_2;
-  bool run_amp_cycle_1;
-  bool run_amp_cycle_2;
-  bool run_valve_cycle_1;
-  bool run_valve_cycle_2;
-  int mmddyy;
-  int hhmmss;
-  bool set_date_time;
+  uint16_t  optical_distance;
+  float     max_amp_pid_pwm;
+  float     max_valve_pid_pwm;
+  float     amp_max_temp;
+  float     valve_max_temp;
 #else
-  float max_heater_pid_pwm;
-  bool ramp_to_temp_before_start_cycle_1;
-  bool ramp_to_temp_before_start_cycle_2;
-  float ramp_to_temp_c1_timeout;
-  float ramp_to_temp_c2_timeout;
-  uint16_t motor_end_wait_time_s;
-  float heater_setpoint_1;
-  float heater_setpoint_2;
-  float heater_max_temp;
-  float heater_kp_1;
-  float heater_ki_1;
-  float heater_kd_1;
-  float heater_kp_2;
-  float heater_ki_2;
-  float heater_kd_2;
-  float motor_kp_1;
-  float motor_ki_1;
-  float motor_kd_1;
-  bool switch_motor_ccw_cw;
-  uint16_t motor_setpoint_1;
-  float motor_kp_2;
-  float motor_ki_2;
-  float motor_kd_2;
-  uint16_t motor_setpoint_2;
-  bool run_motor_1;
-  bool run_heater_1;
-  bool run_motor_2;
-  bool run_heater_2;
-  float hal_sensor_thresh;
-  int motor_stall_percent;
-  float motor_stall_pwm;
-  bool motor_stall_en;
+  float     max_heater_pid_pwm;
+  float     heater_max_temp;
+  bool      switch_motor_ccw_cw;
+  float     hal_sensor_thresh;
+  int       motor_stall_percent;
+  float     motor_stall_pwm;
+  bool      motor_stall_en;
+#endif
   int mmddyy;
   int hhmmss;
   bool set_date_time;
-#endif
 } naatos_config_parameters;
+
+typedef struct {
+  float     cycle_run_time_s;
+  float     min_run_zone_temp;
+  bool      min_run_zone_temp_en;
+  uint16_t  cycle_delay_time;
+#ifndef SAMPLE_PREP_BOARD
+  float     valve_setpoint;
+  float     amp_setpoint;
+  bool      run_valve;
+  bool      run_amp;
+  float     valve_kp;
+  float     valve_ki;
+  float     valve_kd;
+  float     amp_kp;
+  float     amp_ki;
+  float     amp_kd;
+#else 
+  bool      ramp_to_temp_before_start_cycle;
+  float     ramp_to_temp_timeout;
+  uint16_t  motor_end_wait_time_s; // Might want this removed
+  float     heater_setpoint;
+  uint16_t  motor_setpoint;
+  bool      run_heater;
+  bool      run_motor;
+  float     heater_kp;
+  float     heater_ki;
+  float     heater_kd;
+  float     motor_kp;
+  float     motor_ki;
+  float     motor_kd;
+#endif
+} cycle_config_parameters;
 
 /* Configuration Parameters Variables */
 extern bool use_default_configuration_parameters;
 extern naatos_config_parameters config;
+extern cycle_config_parameters *cycle_configs;
 extern bool batt_recovering;
