@@ -35,7 +35,7 @@
 #define CONFIG_DIR "config"
 
 //#define NAATOS_CONFIG_FILE "config_v2.0a.txt"
-#define NAATOS_CONFIG_FILE "config_v" VERSION "_ghlhack.txt"
+#define NAATOS_CONFIG_FILE "config_v" VERSION "_ghlhack1b.txt"
 
 #ifdef SAMPLE_PREP_BOARD
 #define CSV_HEADER "Time,HeaterTemp,HeaterPWM,MotorSpeed,MotorPWM,Battery,BatteryV,BatteryT,Event\r\n"

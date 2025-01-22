@@ -65,7 +65,7 @@ void motorTask(void *pvParameters) {
           }
           motorRunning = motorRxMessage.motorRunning;
           // Switch the ccw line to switch between ccw and cw
-          if (motorRunning && ((use_default_configuration_parameters && DEFAULT_MOTOR_SWTICH_CCW_CW) || (!use_default_configuration_parameters && config.switch_motor_ccw_cw))) {
+          if (!motorRunning && ((use_default_configuration_parameters && DEFAULT_MOTOR_SWTICH_CCW_CW) || (!use_default_configuration_parameters && config.switch_motor_ccw_cw))) {
             if (motor_ccw) {
               send_debug_log_message("Motor switched to CW");
               nrf_gpio_pin_clear(MOTOR_CWCCW);
@@ -77,7 +77,7 @@ void motorTask(void *pvParameters) {
               motor_ccw = true;
             }
           }
-          send_debug_log_message("start/stop motor");
+          send_debug_log_message("start/stop motor change");
           break;
          }
          case MOTOR_MSG_TIMER_MOTOR_EVENT: {
