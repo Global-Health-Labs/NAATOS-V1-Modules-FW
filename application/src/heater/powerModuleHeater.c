@@ -1,11 +1,8 @@
 #include "powerModuleHeater.h"
 #include "timers.h"
 
-pid_controller_t valve_pid_1;
-pid_controller_t amp_pid_1;
-
-pid_controller_t valve_pid_2;
-pid_controller_t amp_pid_2;
+pid_controller_t valve_pid;
+pid_controller_t amp_pid;
 
 temperature_pwm_data_t pm_h_pwm_data = {
     .heat_zone_0_pwm = 0,
@@ -19,8 +16,6 @@ bool pm_amp_heater_running = false;
 bool pm_valve_greater_than_max = false;
 bool pm_valve_heater_running = false;
 
-bool cycle_one_running = false;
-bool cycle_two_running = false;
 bool starting_run = true;
 
 temperature_data_t pm_local_temp_data;
@@ -32,11 +27,11 @@ static log_data_message_t logMsg = {
     .event_data = NULL,
     .temperature_data = NULL};
 
-void handle_cycle_two_stopstart_heater(bool amp_heating, bool valve_heating) {
+void handle_cycle_stopstart_heater(bool amp_heating, bool valve_heating) {
 #ifndef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
 
-  if (cycle_one_running && !amp_heating && !valve_heating)
+  if (!amp_heating && !valve_heating)
     return;
 
   if (amp_heating) {
@@ -50,65 +45,6 @@ void handle_cycle_two_stopstart_heater(bool amp_heating, bool valve_heating) {
   } else {
     disable_valve_boost();
   }
-  
-  // Send the heater status
-  SensorRxQueueMsg_t msg;
-  msg.type = SENSOR_MSG_HEATER_STATE;
-  msg.heaterRunning = false;
-  if (amp_heating || valve_heating) {
-    msg.heaterRunning = true;
-  }
-  xReturned = xQueueSend(sensorRxQueue, &msg, 0);
-  if (xReturned != pdPASS) {
-    send_debug_log_message("HEATER_TASK: Unable to send heater state to sensorRxQueue.");
-  }
-  
-  // Update the watchdog status
-  watchdog_time_update_t wdtUpdate = {
-      .taskName = HEATER,
-      .valid = false};
-  if (amp_heating || valve_heating) {
-    wdtUpdate.valid = true;
-  }
-  xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
-  if (xReturned != pdPASS) {
-    send_debug_log_message("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task");
-  }
-  
-  // Respond to heater change
-  PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_DISABLE};
-  if (amp_heating || valve_heating) {
-    pwmMsg.type = PWM_MSG_ENABLE;
-  }
-  xReturned = xQueueSend(pwmRxQueue, &pwmMsg, 0);
-  if (xReturned != pdPASS) {
-    send_debug_log_message("heater: Unable to send stop to pwmRxQueue.");
-  }
-
-  // Set the last sample based on config
-  p_samp_log_max = (config.logging_rate / config.sample_rate);
-#endif
-}
-
-void handle_cycle_one_stopstart_heater(bool amp_heating, bool valve_heating) {
-#ifndef SAMPLE_PREP_BOARD
-  BaseType_t xReturned;
-
-  if (cycle_one_running && !amp_heating && !valve_heating)
-    return;
-
-  if (amp_heating) {
-    nrf_gpio_pin_set(AMP_PWR_EN);
-  } else {
-    nrf_gpio_pin_clear(AMP_PWR_EN);
-  }
-
-  if (valve_heating) {
-    enable_valve_boost();
-  } else {
-    disable_valve_boost();
-  }
-
   
   // Send the heater status
   SensorRxQueueMsg_t msg;
@@ -316,65 +252,36 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
 void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
 #ifndef SAMPLE_PREP_BOARD
-  // Set zones enabled
-  if (heaterRxMessage.cycleSelect == CYCLE_ONE) {
-    cycle_one_running = heaterRxMessage.cycleEnabled;
-    if (!cycle_one_running) {
-      amp_pid_1.out = 0;
-      valve_pid_1.out = 0;
+   /* Disable Heater */
+   if (!heaterRxMessage.cycleEnabled) {
+    // Set PWMs to Zero
+    amp_pid.out = 0;
+    valve_pid.out = 0;
+    temperature_pwm_data_t pwmData = {
+        .heat_zone_0_pwm = valve_pid.out,
+        .heat_zone_1_pwm = 0,
+        .heat_zone_2_pwm = amp_pid.out,
+        .heat_zone_3_pwm = 0};
+    updateDutyCycles(pwmData);
 
-      temperature_pwm_data_t pwmData = {
-          .heat_zone_0_pwm = valve_pid_1.out,
-          .heat_zone_1_pwm = 0,
-          .heat_zone_2_pwm = amp_pid_1.out,
-          .heat_zone_3_pwm = 0};
-      updateDutyCycles(pwmData);
+    // Send stop heater to sensors task
+    pm_amp_heater_running = false;
+    pm_valve_heater_running = false;
+    starting_run = false;
+    handle_cycle_stopstart_heater(pm_amp_heater_running, pm_valve_heater_running);
+  } 
 
-      // TODO: Implement defaults
-      // Reinitalize PID Values
-      pid_controller_init(&valve_pid_1, config.valve_setpoint_1, config.valve_kp_1, config.valve_ki_1, config.valve_kd_1, config.max_valve_pid_pwm);
-      pid_controller_init(&amp_pid_1, config.amp_setpoint_1, config.amp_kp_1, config.amp_ki_1, config.amp_kd_1, config.max_amp_pid_pwm);
-
-      // Send stop heater to sensors task
-      pm_amp_heater_running = false;
-      pm_valve_heater_running = false;
-      starting_run = false;
-      handle_cycle_one_stopstart_heater(pm_amp_heater_running, pm_valve_heater_running);
-    } else {
-      starting_run = true;
-      pm_amp_heater_running = config.run_amp_cycle_1;
-      pm_valve_heater_running = config.run_valve_cycle_1;
-      powerModuleResetHeaterPIDs();
-      // Send starting heater to sensors task
-      handle_cycle_one_stopstart_heater(pm_amp_heater_running, pm_valve_heater_running);
-    }
-  } else if (heaterRxMessage.cycleSelect = CYCLE_TWO) {
-    cycle_two_running = heaterRxMessage.cycleEnabled;
-    if (!cycle_two_running) {
-      valve_pid_2.out = 0;
-      amp_pid_2.out = 0;
-
-      temperature_pwm_data_t pwmData = {
-          .heat_zone_0_pwm = valve_pid_2.out,
-          .heat_zone_1_pwm = 0,
-          .heat_zone_2_pwm = amp_pid_2.out,
-          .heat_zone_3_pwm = 0};
-      updateDutyCycles(pwmData);
-
-      // Reinitalize PID Values
-      pid_controller_init(&valve_pid_2, config.valve_setpoint_2, config.valve_kp_2, config.valve_ki_2, config.valve_kd_2, config.max_valve_pid_pwm);
-      pid_controller_init(&amp_pid_2, config.amp_setpoint_2, config.amp_kp_2, config.amp_ki_2, config.amp_kd_2, config.max_amp_pid_pwm);
-
-      // Send stop heater to sensors task
-      pm_amp_heater_running = false;
-      pm_valve_heater_running = false;
-      handle_cycle_two_stopstart_heater(pm_amp_heater_running, pm_valve_heater_running);
-    } else {
-      pm_amp_heater_running = config.run_amp_cycle_2;
-      pm_valve_heater_running = config.run_valve_cycle_2;
-      powerModuleResetHeaterPIDs();
-      handle_cycle_two_stopstart_heater(pm_amp_heater_running, pm_valve_heater_running);
-    }
+  /* Enable Heater */
+  else {
+    // Update the cycle config to the current cycle
+    cycle_config = &cycle_configs[(uint16_t)(heaterRxMessage.cycleSelect - 1)]; // Index = cycle - 1
+    // Set Parameters
+    starting_run = true;
+    pm_amp_heater_running = cycle_config->run_amp;
+    pm_valve_heater_running = cycle_config->run_valve;
+    powerModuleResetHeaterPIDs();
+    // Send starting heater to sensors task
+    handle_cycle_stopstart_heater(pm_amp_heater_running, pm_valve_heater_running);
   }
 #endif
 }
@@ -382,21 +289,8 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
 void powerModuleResetHeaterPIDs(void) {
 #ifndef SAMPLE_PREP_BOARD
   // Create PID Controllers
-  if (use_default_configuration_parameters) {
-    pid_controller_init(&valve_pid_1, VALVE_SETPOINT_1, V_KP_1, V_KI_1, V_KD_1, DEFAULT_MAX_VALVE_PID);
-    pid_controller_init(&amp_pid_1, AMP_SETPOINT_1, A_KP_1, A_KI_1, A_KD_1, DEFAULT_MAX_AMP_PID);
-  } else {
-    pid_controller_init(&valve_pid_1, config.valve_setpoint_1, config.valve_kp_1, config.valve_ki_1, config.valve_kd_1, config.max_valve_pid_pwm);
-    pid_controller_init(&amp_pid_1, config.amp_setpoint_1, config.amp_kp_1, config.amp_ki_1, config.amp_kd_1, config.max_amp_pid_pwm);
-  }
-  // Create PID Controllers
-  if (use_default_configuration_parameters) {
-    pid_controller_init(&valve_pid_2, VALVE_SETPOINT_2, V_KP_2, V_KI_2, V_KD_2, DEFAULT_MAX_VALVE_PID);
-    pid_controller_init(&amp_pid_2, AMP_SETPOINT_2, A_KP_2, A_KI_2, A_KD_2, DEFAULT_MAX_AMP_PID);
-  } else {
-    pid_controller_init(&valve_pid_2, config.valve_setpoint_2, config.valve_kp_2, config.valve_ki_2, config.valve_kd_2, config.max_valve_pid_pwm);
-    pid_controller_init(&amp_pid_2, config.amp_setpoint_2, config.amp_kp_2, config.amp_ki_2, config.amp_kd_2, config.max_amp_pid_pwm);
-  }
+  pid_controller_init(&valve_pid, cycle_config->valve_setpoint, cycle_config->valve_kp, cycle_config->valve_ki, cycle_config->valve_kd, config.max_valve_pid_pwm);
+  pid_controller_init(&amp_pid, cycle_config->amp_setpoint, cycle_config->amp_kp, cycle_config->amp_ki, cycle_config->amp_kd, config.max_amp_pid_pwm);
 #endif
 }
 

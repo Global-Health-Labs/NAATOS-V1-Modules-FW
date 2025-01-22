@@ -1,14 +1,4 @@
 #include "naatos_messages.h"
-// Zone Request Constants
-const HeaterRxQueueMsg_t stop_cycle_zone_heating = {
-    .type = HEATER_MSG_ZONE_STATE,
-    .cycleSelect = 1,
-    .cycleEnabled = false};
-const HeaterRxQueueMsg_t stop_cycle_two_zone_motor = {
-    .type = HEATER_MSG_MOTOR_STATE,
-    .cycleSelect = CYCLE_TWO,
-    .cycleEnabled = false};
-
 // Log Event Constants
 const log_event_t start_event = {
     .event = SAMPLE_START,
@@ -61,22 +51,6 @@ const log_data_message_t interrupt_opt_log_msg = {
     .data_type = EVENT_DATA,
     .temperature_data = NULL,
     .event_data = interrupt_opt_event};
-const log_event_t cycle_two_start_event = {
-    .event = SAMPLE_CYCLE_TWO_STARTED,
-    .message = CYCLE_TWO_START_MSG};
-const log_data_message_t cycle_two_start_log_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = cycle_two_start_event};
-const log_event_t cycle_two_stop_event = {
-    .event = SAMPLE_CYCLE_TWO_ENDED,
-    .message = CYCLE_TWO_STOP_MSG};
-const log_data_message_t cycle_two_stop_log_msg = {
-    .data_type = EVENT_DATA,
-    .temperature_data = NULL,
-    .event_data = cycle_two_stop_event};
-
-
 const log_event_t ramp_to_temp_complete_event = {
     .event = SAMPLE_RAMP_TO_TEMP_REACHED,
     .message = SAMPLE_RAMP_TO_TEMP_REACHED_MSG};
