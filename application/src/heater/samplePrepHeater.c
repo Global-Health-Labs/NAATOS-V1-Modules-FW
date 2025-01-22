@@ -17,7 +17,7 @@ bool heater_running_now = false;
 bool heater_running_last = false;
 bool motor_running_now = false;
 bool motor_running_last = false;
-
+static char tmp[100];
 bool rx_runmotor = false;
 bool rx_runheater = false;
 
@@ -190,6 +190,8 @@ void samplePrepUpdateHeaterPIDs(void) {
 }
 
 void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
+  static uint32_t counter = 0;
+  counter++;
 #ifdef SAMPLE_PREP_BOARD
   //send_debug_log_message("HEATER_TASK: samplePrepHandleHeaterSensorDataRx()");
   BaseType_t xReturned;
@@ -266,6 +268,14 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     send_debug_log_message(tmp);
 #endif
 
+
+    #if 1
+      if(counter%10==0) {
+        sprintf(tmp, "PID_Detail MotorPID_I_Term=%f HeaterPID_I_Term=%f", motor_pid.intergrator,heater_pid.intergrator);
+        send_debug_log_message(tmp);
+      }
+    #endif
+
     if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0) {
       greater_than_max = true;
     }
@@ -320,8 +330,10 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   }
   #endif
 }
-static char tmp[100];
+
 void handleSampleMotorDataRx(int motor_speed) {
+  uint32_t counter = 0;
+  counter++;
 #ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
 
@@ -384,7 +396,7 @@ void samplePrepHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
   
   bool heater_run = false;
   bool motor_run = false;
-  char tmp[100];
+  //char tmp[100];
 
 
   if (heaterRxMessage.type == HEATER_MSG_ZONE_STATE) {
