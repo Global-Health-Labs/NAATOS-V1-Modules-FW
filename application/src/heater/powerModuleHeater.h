@@ -25,8 +25,6 @@
 
 extern HeaterInterface powerModuleHeater_I;
 
-cycle_config_parameters *cycle_config;
-
 void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data);
 
 void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage);

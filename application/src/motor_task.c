@@ -61,7 +61,7 @@ void motorTask(void *pvParameters) {
          case MOTOR_MSG_MOTOR_STATE: {
           motorRunning = motorRxMessage.motorRunning;
           // Switch the ccw line to switch between ccw and cw
-          if (motorRunning && (config.switch_motor_ccw_cw))) {
+          if (motorRunning && (config.switch_motor_ccw_cw)) {
             if (motor_ccw) {
               send_debug_log_message("Motor switched to CW");
               nrf_gpio_pin_clear(MOTOR_CWCCW);

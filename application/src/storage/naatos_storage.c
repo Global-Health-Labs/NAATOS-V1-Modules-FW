@@ -73,9 +73,15 @@ void create_naatos_directories() {
   if (res == FR_OK) {
     send_debug_log_message("Config directory created");
   }
-  res = check_for_config_file();
+  res = check_for_naatos_config_file();
   if (res == FR_OK) {
     send_debug_log_message("New config.txt config file in config subdirectory created with default parameters.");
+  } else if (res != FR_EXIST) {
+    send_debug_log_message("Unable to retreive config.txt");
+  }
+  res = check_for_cycle_config_files();
+  if (res == FR_OK) {
+    send_debug_log_message("New cycle configuration files in subdirectory created with default parameters");
   } else if (res != FR_EXIST) {
     send_debug_log_message("Unable to retreive config.txt");
   }
@@ -262,7 +268,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       break;
 #else
     case HEATER_MAX_TEMP_C:
-      parameters->heater_max_temp = parse_double(val, DEFAULT_MAX_TEMP);
+      parameters->heater_max_temp = parse_double(val, DEFAULT_MAX_HEATER_TEMP);
       break;
     case MAX_HEATER_PID_PWM:
       parameters->max_heater_pid_pwm = parse_int(val, DEFAULT_MAX_HEATER_PID);
@@ -275,7 +281,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       parameters->hal_sensor_thresh = parse_double(val, DEFAULT_HAL_SENSOR_THRESHOLD);
       break;
     case MOTOR_STALL_PERCENT:
-      parameters->motor_stall_percent = parse_int(val, DEFAULT_MOTOR_STALL_PERCENTAGE);
+      parameters->motor_stall_percent = parse_int(val, DEFAULT_MOTOR_STALL_PERCENT);
       break;
     case MOTOR_STALL_PWM:
       parameters->motor_stall_pwm = parse_double(val, DEFAULT_MOTOR_STALL_PWM);
@@ -639,7 +645,7 @@ FRESULT check_for_naatos_config_file(void) {
   }
 #else
   // Write Heater Max Temperature
-  configBufferSize = sprintf(configBuffer, "heater_max_temp:%0.2f\n", DEFAULT_MAX_TEMP);
+  configBufferSize = sprintf(configBuffer, "heater_max_temp:%0.2f\n", DEFAULT_MAX_HEATER_TEMP);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;
@@ -667,7 +673,7 @@ FRESULT check_for_naatos_config_file(void) {
   }
 
   // Write Motor Stall Percentage
-  configBufferSize = sprintf(configBuffer, "motor_stall_percentage:%d\n", DEFAULT_MOTOR_STALL_PERCENTAGE);
+  configBufferSize = sprintf(configBuffer, "motor_stall_percentage:%d\n", DEFAULT_MOTOR_STALL_PERCENT);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;

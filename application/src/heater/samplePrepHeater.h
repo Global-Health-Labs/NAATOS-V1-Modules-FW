@@ -23,8 +23,6 @@
 
 extern HeaterInterface samplePrepHeater_I;
 
-cycle_config_parameters *cycle_config;
-
 void handleSampleMotorDataRx(int motor_speed);
 void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data);
 void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage);

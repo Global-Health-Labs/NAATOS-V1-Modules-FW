@@ -141,6 +141,10 @@
 #define BUTTON_REWORK_DETECT_OUTPUT NRF_GPIO_PIN_MAP(1, 13)
 #endif
 
+/* Non-Device Specific Defines */
+#define MIN_BATTERY_VOLTAGE 2.90
+#define MAX_BATTERY_VOLTAGE 4.20
+
 /* Master Configuration Default Parameters */
 #define DEFAULT_SAMPLE_RATE             0.200   // 0.048 minimum
 #define DEFAULT_LOGGING_RATE            5.000
@@ -161,7 +165,7 @@
 #define DEFAULT_MOTOR_SWTICH_CCW_CW     false
 #define DEFAULT_HAL_SENSOR_THRESHOLD    0.30f
 #define DEFAULT_MOTOR_STALL_PERCENT     20 
-#define DEFAULT_MOTOR_SPEED_PWM         71
+#define DEFAULT_MOTOR_STALL_PWM         71
 #define DEFAULT_MOTOR_STALL_ENABLE      true
 #endif
 #define DEFAULT_DATE 100124                

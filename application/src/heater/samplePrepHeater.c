@@ -13,6 +13,8 @@ const MainStateErrorQueueMsg_t motor_stall_pwm_err_msg = {
   .overTempData = NULL
 };
 
+cycle_config_parameters *s_cycle_config;
+
 pid_controller_t heater_pid;
 pid_controller_t motor_pid;
 
@@ -21,7 +23,7 @@ bool heater_running = false;
 bool starting_sample_prep_run = true;
 bool h_pwm_req = false;
 bool greater_than_max = false;
-bool rampToTemp = false;
+bool s_rampToTemp = false;
 bool motorStalledPercent = false;
 bool motorStalledPWM = false;
 bool motorReachedSpeed = false;
@@ -43,9 +45,9 @@ static log_data_message_t logMsg = {
     .data_type = TEMPERATURE_DATA,
     .event_data = NULL,
     .temperature_data = NULL};
-
-void handle_cycle_stopstart_heater(bool heating) {
 #ifdef SAMPLE_PREP_BOARD
+void handle_sample_cycle_stopstart_heater(bool heating) {
+
   BaseType_t xReturned;
   
   // Update the Heating Enable
@@ -56,8 +58,8 @@ void handle_cycle_stopstart_heater(bool heating) {
   }
 
   // Check if we want to Ramp To Temperature
-  if (cycle_config->ramp_to_temp_before_start_cycle) {
-    rampToTemp = true;
+  if (s_cycle_config->ramp_to_temp_before_start_cycle) {
+    s_rampToTemp = true;
   }
   
   // Send the heater status
@@ -91,10 +93,11 @@ void handle_cycle_stopstart_heater(bool heating) {
 
   // Set the last sample based on config
   samp_log_max = (config.logging_rate / config.sample_rate);
-#endif
 }
+#endif
 
 void handle_cycle_stopstart_motor(bool motor_running) {
+#ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
 
   // update the motor enable
@@ -128,13 +131,14 @@ void handle_cycle_stopstart_motor(bool motor_running) {
 
   // Set the last sample based on config
   samp_log_max = (config.logging_rate / config.sample_rate);
+#endif
 }
 
 void samplePrepResetHeaterPIDs(void) {
 #ifdef SAMPLE_PREP_BOARD
   // Create PID Controllers
-  pid_controller_init(&heater_pid, cycle_config->heater_setpoint, cycle_config->heater_kp, cycle_config->heater_ki, cycle_config->heater_kd, config.max_heater_pid_pwm);
-  pid_controller_init(&motor_pid, cycle_config->motor_setpoint, cycle_config->motor_kp, cycle_config->motor_ki, cycle_config->motor_kd, 100); // Default 100% max PWM
+  pid_controller_init(&heater_pid, s_cycle_config->heater_setpoint, s_cycle_config->heater_kp, s_cycle_config->heater_ki, s_cycle_config->heater_kd, config.max_heater_pid_pwm);
+  pid_controller_init(&motor_pid, s_cycle_config->motor_setpoint, s_cycle_config->motor_kp, s_cycle_config->motor_ki, s_cycle_config->motor_kd, 100); // Default 100% max PWM
   #endif
 }
 
@@ -143,12 +147,12 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   BaseType_t xReturned;
   local_temp_data = temperature_data;
   // Ensure temperatures are below the minimum run zone temperature
-  if (cycle_config->min_run_zone_temp_en) {
+  if (s_cycle_config->min_run_zone_temp_en) {
     if (starting_sample_prep_run &&
-        (temperature_data.heat_zone_0_temp > cycle_config->min_run_zone_temp || 
-            temperature_data.heat_zone_1_temp > cycle_config->min_run_zone_temp ||
-            temperature_data.heat_zone_2_temp > cycle_config->min_run_zone_temp ||
-            temperature_data.heat_zone_3_temp > cycle_config->min_run_zone_temp)) {
+        (temperature_data.heat_zone_0_temp > s_cycle_config->min_run_zone_temp || 
+            temperature_data.heat_zone_1_temp > s_cycle_config->min_run_zone_temp ||
+            temperature_data.heat_zone_2_temp > s_cycle_config->min_run_zone_temp ||
+            temperature_data.heat_zone_3_temp > s_cycle_config->min_run_zone_temp)) {
       starting_sample_prep_run = false;
       // Send cannot start
       xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
@@ -157,10 +161,10 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
       }
       return;
     } else if (starting_sample_prep_run &&
-               (temperature_data.heat_zone_0_temp <= cycle_config->min_run_zone_temp && 
-                   temperature_data.heat_zone_1_temp <= cycle_config->min_run_zone_temp &&
-                   temperature_data.heat_zone_2_temp <= cycle_config->min_run_zone_temp &&
-                   temperature_data.heat_zone_3_temp <= cycle_config->min_run_zone_temp)) {
+               (temperature_data.heat_zone_0_temp <= s_cycle_config->min_run_zone_temp && 
+                   temperature_data.heat_zone_1_temp <= s_cycle_config->min_run_zone_temp &&
+                   temperature_data.heat_zone_2_temp <= s_cycle_config->min_run_zone_temp &&
+                   temperature_data.heat_zone_3_temp <= s_cycle_config->min_run_zone_temp)) {
       // Send can start
       xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
       if (xReturned != pdPASS) {
@@ -168,7 +172,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
       }
       starting_sample_prep_run = false;
     }
-  } else if (!cycle_config->min_run_zone_temp_en && starting_sample_prep_run) {
+  } else if (!s_cycle_config->min_run_zone_temp_en && starting_sample_prep_run) {
     // Send can start
     xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
     if (xReturned != pdPASS) {
@@ -183,13 +187,13 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     pid_controller_compute(&heater_pid, temperature_data.heat_zone_3_temp);
     
     // Check TO See if we have Ramped to Temperature if Enabled
-    if (rampToTemp) {
-      if ((temperature_data.heat_zone_3_temp >= cycle_config->heater_setpoint)) {
-        xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
+    if (s_rampToTemp) {
+      if ((temperature_data.heat_zone_3_temp >= s_cycle_config->heater_setpoint)) {
+        xReturned = xQueueSend(main_setPointReached, &s_rampToTemp, 0);
         if (xReturned != pdPASS) {
           send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
         }
-        rampToTemp = false;
+        s_rampToTemp = false;
       }
     }
 
@@ -274,7 +278,7 @@ void handleSampleMotorDataRx(int motor_speed) {
         .heat_zone_2_pwm = 0,
         .heat_zone_3_pwm = 0};
 
-    if (cycle_config->run_motor) {
+    if (s_cycle_config->run_motor) {
       pid_controller_compute(&motor_pid, motor_speed);
       pwmData.heat_zone_2_pwm = motor_pid.out;
     }
@@ -290,12 +294,12 @@ void handleSampleMotorDataRx(int motor_speed) {
   #endif
   
     // Check if Motor has come up to speed yet
-    if (motor_speed >= cycle_config->motor_setpoint && config.motor_stall_en) {
+    if (motor_speed >= s_cycle_config->motor_setpoint && config.motor_stall_en) {
       motorReachedSpeed = true;
     }
 
     // Motor Stall Percentage Check
-    if (motorReachedSpeed && motor_speed < (cycle_config->motor_setpoint - ((float)cycle_config->motor_setpoint * ((float)config.motor_stall_percent / 100.0 )))) {
+    if (motorReachedSpeed && motor_speed < (s_cycle_config->motor_setpoint - ((float)s_cycle_config->motor_setpoint * ((float)config.motor_stall_percent / 100.0 )))) {
       motorStalledPercent = true;
       motorReachedSpeed = false;
     }
@@ -347,7 +351,7 @@ void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
       heater_running = false;
       starting_sample_prep_run = false;
       motorReachedSpeed = false; // clear motor speed reached
-      handle_cycle_stopstart_heater(heater_running);
+      handle_sample_cycle_stopstart_heater(heater_running);
 
     /* Enable Heater */
     } else {
@@ -356,7 +360,7 @@ void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
       motorReachedSpeed = false;
       samplePrepResetHeaterPIDs();
       // Send starting heater to sensors task
-      handle_cycle_stopstart_heater(heater_running);
+      handle_sample_cycle_stopstart_heater(heater_running);
     }
   }
   else if (heaterRxMessage.type == HEATER_MSG_MOTOR_STATE){
@@ -378,7 +382,7 @@ void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
     /* Enable Motor */
     else {
       // Set Motor Enabled if the cycle has it enabled
-      if (cycle_config->run_motor) {
+      if (s_cycle_config->run_motor) {
         motor_running = true;
         motorReachedSpeed = false;
         // Send Start Motor

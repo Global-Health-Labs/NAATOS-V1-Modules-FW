@@ -11,14 +11,14 @@ temperature_pwm_data_t pm_h_pwm_data = {
     .heat_zone_3_pwm = 0,
     .sample_prep_heater_pwm = 0};
 
+cycle_config_parameters *p_cycle_config;
+
 bool pm_amp_greater_than_max = false;
 bool pm_amp_heater_running = false;
 bool pm_valve_greater_than_max = false;
 bool pm_valve_heater_running = false;
-
 bool starting_run = true;
-
-bool rampToTemp = false;
+bool p_rampToTemp = false;
 
 temperature_data_t pm_local_temp_data;
 uint32_t p_samp_log_index = 0;
@@ -29,7 +29,7 @@ static log_data_message_t logMsg = {
     .event_data = NULL,
     .temperature_data = NULL};
 
-void handle_cycle_stopstart_heater(bool amp_heating, bool valve_heating) {
+void handle_power_cycle_stopstart_heater(bool amp_heating, bool valve_heating) {
 #ifndef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
   
@@ -48,8 +48,8 @@ void handle_cycle_stopstart_heater(bool amp_heating, bool valve_heating) {
   }
 
   // Check if we want to Ramp To Temperature
-  if (cycle_config->ramp_to_temp_before_start_cycle) {
-    rampToTemp = true;
+  if (p_cycle_config->ramp_to_temp_before_start_cycle) {
+    p_rampToTemp = true;
   }
   
   // Send the heater status
@@ -97,12 +97,12 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   pm_local_temp_data = temperature_data;
 
   // Ensure temperatures are below the minimum run zone temperature
-  if (cycle_config->min_run_zone_temp_en) {
+  if (p_cycle_config->min_run_zone_temp_en) {
     if (starting_run &&
-        (temperature_data.heat_zone_0_temp > cycle_config->min_run_zone_temp || 
-            temperature_data.heat_zone_1_temp > cycle_config->min_run_zone_temp ||
-            temperature_data.heat_zone_2_temp > cycle_config->min_run_zone_temp ||
-            temperature_data.heat_zone_3_temp > cycle_config->min_run_zone_temp)) {
+        (temperature_data.heat_zone_0_temp > p_cycle_config->min_run_zone_temp || 
+            temperature_data.heat_zone_1_temp > p_cycle_config->min_run_zone_temp ||
+            temperature_data.heat_zone_2_temp > p_cycle_config->min_run_zone_temp ||
+            temperature_data.heat_zone_3_temp > p_cycle_config->min_run_zone_temp)) {
       starting_run = false;
       // Send cannot start
       xReturned = xQueueSend(main_runRespQueue, &starting_run, 0);
@@ -111,10 +111,10 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
       }
       return;
     } else if (starting_run &&
-               (temperature_data.heat_zone_0_temp <= cycle_config->min_run_zone_temp && 
-                   temperature_data.heat_zone_1_temp <= cycle_config->min_run_zone_temp &&
-                   temperature_data.heat_zone_2_temp <= cycle_config->min_run_zone_temp &&
-                   temperature_data.heat_zone_3_temp <= cycle_config->min_run_zone_temp)) {
+               (temperature_data.heat_zone_0_temp <= p_cycle_config->min_run_zone_temp && 
+                   temperature_data.heat_zone_1_temp <= p_cycle_config->min_run_zone_temp &&
+                   temperature_data.heat_zone_2_temp <= p_cycle_config->min_run_zone_temp &&
+                   temperature_data.heat_zone_3_temp <= p_cycle_config->min_run_zone_temp)) {
       // Send can start
       xReturned = xQueueSend(main_runRespQueue, &starting_run, 0);
       if (xReturned != pdPASS) {
@@ -122,7 +122,7 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
       }
       starting_run = false;
     }
-  } else if (!cycle_config->min_run_zone_temp_en && starting_run) {
+  } else if (!p_cycle_config->min_run_zone_temp_en && starting_run) {
     // Send can start
     xReturned = xQueueSend(main_runRespQueue, &starting_run, 0);
     if (xReturned != pdPASS) {
@@ -132,27 +132,27 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   }
 
   // Check to see if we have Ramped to Temperature if Enabled (All Active zones have hit there setpoint)
-  if (rampToTemp) {
-    bool rampComplete = ((temperature_data.heat_zone_2_temp >= cycle_config->amp_setpoint) && (temperature_data.heat_zone_0_temp >= cycle_config->valve_setpoint) && cycle_config->run_amp && cycle_config->run_valve) || // Both On
-                        ((temperature_data.heat_zone_2_temp >= cycle_config->amp_setpoint) && cycle_config->run_amp && !cycle_config->run_valve) || // Amplification Only On
-                        ((temperature_data.heat_zone_0_temp >= cycle_config->valve_setpoint) && !cycle_config->run_amp && cycle_config->run_valve); // Valve Only On
+  if (p_rampToTemp) {
+    bool rampComplete = ((temperature_data.heat_zone_2_temp >= p_cycle_config->amp_setpoint) && (temperature_data.heat_zone_0_temp >= p_cycle_config->valve_setpoint) && p_cycle_config->run_amp && p_cycle_config->run_valve) || // Both On
+                        ((temperature_data.heat_zone_2_temp >= p_cycle_config->amp_setpoint) && p_cycle_config->run_amp && !p_cycle_config->run_valve) || // Amplification Only On
+                        ((temperature_data.heat_zone_0_temp >= p_cycle_config->valve_setpoint) && !p_cycle_config->run_amp && p_cycle_config->run_valve); // Valve Only On
     if (rampComplete) {
-      xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
+      xReturned = xQueueSend(main_setPointReached, &p_rampToTemp, 0);
       if (xReturned != pdPASS) {
         send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
       }
-      rampToTemp = false;
+      p_rampToTemp = false;
     }
   }
 
   // Update Amplification PID loop with new temperatures
-  if (cycle_config->run_amp) { 
+  if (p_cycle_config->run_amp) { 
     pid_controller_compute(&amp_pid, temperature_data.heat_zone_2_temp);
   } else {
     amp_pid.out = 0.0;
   }
   // Update Valve PID loop with new temperatures
-  if (cycle_config->run_valve) {
+  if (p_cycle_config->run_valve) {
     pid_controller_compute(&valve_pid, temperature_data.heat_zone_0_temp);
   } else {
     valve_pid.out = 0.0;
@@ -243,20 +243,20 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
     pm_amp_heater_running = false;
     pm_valve_heater_running = false;
     starting_run = false;
-    handle_cycle_stopstart_heater(pm_amp_heater_running, pm_valve_heater_running);
+    handle_power_cycle_stopstart_heater(pm_amp_heater_running, pm_valve_heater_running);
   } 
 
   /* Enable Heater */
   else {
     // Update the cycle config to the current cycle
-    cycle_config = &cycle_configs[(uint16_t)(heaterRxMessage.cycleSelect - 1)]; // Index = cycle - 1
+    p_cycle_config = &cycle_configs[(uint16_t)(heaterRxMessage.cycleSelect - 1)]; // Index = cycle - 1
     // Set Parameters
     starting_run = true;
-    pm_amp_heater_running = cycle_config->run_amp;
-    pm_valve_heater_running = cycle_config->run_valve;
+    pm_amp_heater_running = p_cycle_config->run_amp;
+    pm_valve_heater_running = p_cycle_config->run_valve;
     powerModuleResetHeaterPIDs();
     // Send starting heater to sensors task
-    handle_cycle_stopstart_heater(pm_amp_heater_running, pm_valve_heater_running);
+    handle_power_cycle_stopstart_heater(pm_amp_heater_running, pm_valve_heater_running);
   }
 #endif
 }
@@ -264,8 +264,8 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
 void powerModuleResetHeaterPIDs(void) {
 #ifndef SAMPLE_PREP_BOARD
   // Create PID Controllers
-  pid_controller_init(&valve_pid, cycle_config->valve_setpoint, cycle_config->valve_kp, cycle_config->valve_ki, cycle_config->valve_kd, config.max_valve_pid_pwm);
-  pid_controller_init(&amp_pid, cycle_config->amp_setpoint, cycle_config->amp_kp, cycle_config->amp_ki, cycle_config->amp_kd, config.max_amp_pid_pwm);
+  pid_controller_init(&valve_pid, p_cycle_config->valve_setpoint, p_cycle_config->valve_kp, p_cycle_config->valve_ki, p_cycle_config->valve_kd, config.max_valve_pid_pwm);
+  pid_controller_init(&amp_pid, p_cycle_config->amp_setpoint, p_cycle_config->amp_kp, p_cycle_config->amp_ki, p_cycle_config->amp_kd, config.max_amp_pid_pwm);
 #endif
 }
 
