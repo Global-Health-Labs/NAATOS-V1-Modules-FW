@@ -54,6 +54,11 @@ void handle_cycle_stopstart_heater(bool heating) {
   } else {
     nrf_gpio_pin_set(MOTOR_PWR_EN);
   }
+
+  // Check if we want to Ramp To Temperature
+  if (cycle_config->ramp_to_temp_before_start_cycle) {
+    rampToTemp = true;
+  }
   
   // Send the heater status
   SensorRxQueueMsg_t msg;
@@ -175,16 +180,16 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   // Update PID and PWM
   if (heater_running) {
     // Update Heater Zone 3 PID loop with new temperatures
-    if (cycle_config->run_heater) {
-      pid_controller_compute(&heater_pid, temperature_data.heat_zone_3_temp);
-      if (rampToTemp) {
-        if ((temperature_data.heat_zone_3_temp >= cycle_config->heater_setpoint)) {
-          xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
-          if (xReturned != pdPASS) {
-            send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
-          }
-          rampToTemp = false;
+    pid_controller_compute(&heater_pid, temperature_data.heat_zone_3_temp);
+    
+    // Check TO See if we have Ramped to Temperature if Enabled
+    if (rampToTemp) {
+      if ((temperature_data.heat_zone_3_temp >= cycle_config->heater_setpoint)) {
+        xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
+        if (xReturned != pdPASS) {
+          send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
         }
+        rampToTemp = false;
       }
     }
 

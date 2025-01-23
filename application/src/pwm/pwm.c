@@ -199,6 +199,7 @@ void pwm_task(void *pvParameters) {
       }
 
       case PWM_MSG_HEATER_DISABLE: {
+ #ifdef SAMPLE_PREP_BOARD
         app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_2_CHANNEL, 0);
         app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_3_CHANNEL, 0);
         vTaskDelay(pdMS_TO_TICKS(100));
@@ -207,10 +208,30 @@ void pwm_task(void *pvParameters) {
           heaterPWMEnabled = false;
         }
         break;
+#endif  
+        app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, 0);
+        app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, 0);
+        app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_2_CHANNEL, 0);
+        app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_3_CHANNEL, 0);
+        vTaskDelay(pdMS_TO_TICKS(100));
+        if (heaterPWMEnabled) {
+          app_pwm_disable(&PWM0);
+          app_pwm_disable(&PWM2);
+          heaterPWMEnabled = false;
+        }
+        break;
       }
 
       case PWM_MSG_HEATER_ENABLE: {
+#ifdef SAMPLE_PREP_BOARD
         if (!heaterPWMEnabled) {
+          app_pwm_enable(&PWM2);
+          heaterPWMEnabled = true;
+        }
+        break;
+#endif
+        if (!heaterPWMEnabled) {
+          app_pwm_enable(&PWM0);
           app_pwm_enable(&PWM2);
           heaterPWMEnabled = true;
         }

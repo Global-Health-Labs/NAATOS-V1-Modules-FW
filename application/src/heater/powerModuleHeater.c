@@ -18,6 +18,8 @@ bool pm_valve_heater_running = false;
 
 bool starting_run = true;
 
+bool rampToTemp = false;
+
 temperature_data_t pm_local_temp_data;
 uint32_t p_samp_log_index = 0;
 uint32_t p_samp_log_max = 0;
@@ -30,20 +32,24 @@ static log_data_message_t logMsg = {
 void handle_cycle_stopstart_heater(bool amp_heating, bool valve_heating) {
 #ifndef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
-
-  if (!amp_heating && !valve_heating)
-    return;
-
+  
+  // Set the Amplification Zone Boost Enable
   if (amp_heating) {
     nrf_gpio_pin_set(AMP_PWR_EN);
   } else {
     nrf_gpio_pin_clear(AMP_PWR_EN);
   }
 
+  // Set the Valve Zone Boost Enable
   if (valve_heating) {
     enable_valve_boost();
   } else {
     disable_valve_boost();
+  }
+
+  // Check if we want to Ramp To Temperature
+  if (cycle_config->ramp_to_temp_before_start_cycle) {
+    rampToTemp = true;
   }
   
   // Send the heater status
@@ -71,9 +77,9 @@ void handle_cycle_stopstart_heater(bool amp_heating, bool valve_heating) {
   }
   
   // Respond to heater change
-  PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_DISABLE};
+  PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_HEATER_DISABLE};
   if (amp_heating || valve_heating) {
-    pwmMsg.type = PWM_MSG_ENABLE;
+    pwmMsg.type = PWM_MSG_HEATER_ENABLE;
   }
   xReturned = xQueueSend(pwmRxQueue, &pwmMsg, 0);
   if (xReturned != pdPASS) {
@@ -123,6 +129,20 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
       send_debug_log_message("HEATER_TASK: Unable to send cannot start run response.");
     }
     starting_run = false;
+  }
+
+  // Check to see if we have Ramped to Temperature if Enabled (All Active zones have hit there setpoint)
+  if (rampToTemp) {
+    bool rampComplete = ((temperature_data.heat_zone_2_temp >= cycle_config->amp_setpoint) && (temperature_data.heat_zone_0_temp >= cycle_config->valve_setpoint) && cycle_config->run_amp && cycle_config->run_valve) || // Both On
+                        ((temperature_data.heat_zone_2_temp >= cycle_config->amp_setpoint) && cycle_config->run_amp && !cycle_config->run_valve) || // Amplification Only On
+                        ((temperature_data.heat_zone_0_temp >= cycle_config->valve_setpoint) && !cycle_config->run_amp && cycle_config->run_valve); // Valve Only On
+    if (rampComplete) {
+      xReturned = xQueueSend(main_setPointReached, &rampToTemp, 0);
+      if (xReturned != pdPASS) {
+        send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
+      }
+      rampToTemp = false;
+    }
   }
 
   // Update Amplification PID loop with new temperatures
