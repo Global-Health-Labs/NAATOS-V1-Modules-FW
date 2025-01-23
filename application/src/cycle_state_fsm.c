@@ -320,9 +320,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     case EXIT_CYCLE: {
       /* Confirm motor is turned off might not be if we exit early due to end cycle not calling this for cycle 2 */
       if (last_state != current_state) {
-#ifdef SAMPLE_PREP_BOARD
-        
-#endif  
+        // End the current Cycle
+        end_cycle((cycle_t)(current_cycle_index + 1));
+        // Check to see if there are more cycles to be completed 
         if ((current_cycle_index + 1) == total_cycles){
           next_state = CYCLE_SAMPLE_VALID_HOLD;
         } else {
@@ -460,7 +460,7 @@ bool begin_cycle(cycle_t cycle) {
   BaseType_t xRet;
   bool start_run = false;
 
-  // Create Cycle Zones Request
+  // Create Cycle Zones Request For New Cycle
   HeaterRxQueueMsg_t run_cycle_zones = {
     .type = HEATER_MSG_ZONE_STATE,
     .cycleSelect = cycle,
@@ -526,6 +526,7 @@ void end_cycle(cycle_t cycle) {
     .data_type = EVENT_DATA,
     .temperature_data = NULL,
     .event_data = cycle_stop_event};
+
   // Send Stop Cycle to logging task
   xRet = xQueueSend(logger_logMessageQueue, &cycle_stop_log_msg, 50);
   if (xRet != pdPASS) {
