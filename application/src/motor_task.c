@@ -37,12 +37,10 @@ void vSensorMotorTimerCallback(TimerHandle_t xTimer) {
   MotorRxQueueMsg_t msg;
 
   msg.type = MOTOR_MSG_TIMER_MOTOR_EVENT;
- // if (!usb_suspend) {
-    xReturned = xQueueSend(motorRxQueue, &msg, 0);
-    if (xReturned != pdPASS) {
-      send_debug_log_message("Sensor: Unable to send timer update to sensorRxQueue queue. from motor timer callback\n");
-    }
- // }
+  xReturned = xQueueSend(motorRxQueue, &msg, 0);
+  if (xReturned != pdPASS) {
+    send_debug_log_message("Sensor: Unable to send timer update to sensorRxQueue queue. from motor timer callback\n");
+  }
 }
 
 void motorTask(void *pvParameters) {

@@ -115,9 +115,6 @@ void heater_task(void *pvParameters) {
       case HEATER_MSG_WDT_UPDATE:
         // Handle watchdog timer update message
         break;
-      case HEATER_MSG_MOTOR_STATE:
-        heaterInterface->handleHeaterZoneStateUpdate(heaterRxMessage);
-        break;
       default:
         // Handle unknown message
         break;

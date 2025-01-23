@@ -460,13 +460,13 @@ bool begin_cycle(cycle_t cycle) {
   BaseType_t xRet;
   bool start_run = false;
 
-  // Create Cycle Heating Request
-  HeaterRxQueueMsg_t run_cycle_zone_heating = {
+  // Create Cycle Zones Request
+  HeaterRxQueueMsg_t run_cycle_zones = {
     .type = HEATER_MSG_ZONE_STATE,
     .cycleSelect = cycle,
     .cycleEnabled = true};
   // Send start zone request
-  xRet = xQueueSend(heaterRxQueue, &run_cycle_zone_heating, 0);
+  xRet = xQueueSend(heaterRxQueue, &run_cycle_zones, 0);
   if (xRet != pdPASS) {
     send_debug_log_message("MAIN_TASK: Unable to send start heater zone request.\n");
   }

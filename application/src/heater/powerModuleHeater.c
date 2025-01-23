@@ -227,7 +227,7 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
 void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
 #ifndef SAMPLE_PREP_BOARD
-   /* Disable Heater */
+   /* Disable Heaters */
    if (!heaterRxMessage.cycleEnabled) {
     // Set PWMs to Zero
     amp_pid.out = 0;
@@ -246,7 +246,7 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
     handle_power_cycle_stopstart_heater(pm_amp_heater_running, pm_valve_heater_running);
   } 
 
-  /* Enable Heater */
+  /* Enable Heater(s) */
   else {
     // Update the cycle config to the current cycle
     p_cycle_config = &cycle_configs[(uint16_t)(heaterRxMessage.cycleSelect - 1)]; // Index = cycle - 1

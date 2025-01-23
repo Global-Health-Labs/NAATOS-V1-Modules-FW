@@ -8,8 +8,8 @@
 #define VERSION "3.0"
 
 /*Define this when building sample prep only otherwise comment out*/
-//#define SAMPLE_PREP_BOARD
-#define POWER_MODULE_BOARD
+#define SAMPLE_PREP_BOARD
+//#define POWER_MODULE_BOARD
 
 #ifdef SAMPLE_PREP_BOARD
 #define SAMPLE_PREP_REV_A 0
@@ -499,7 +499,6 @@ typedef enum {
   HEATER_MSG_CONFIG_UPDATED,
   HEATER_MSG_WDT_UPDATE,
   HEATER_MSG_TEMPERATURE_DATA_ERROR,
-  HEATER_MSG_MOTOR_STATE
 } HeaterRxQueueType_t;
 
 typedef struct {

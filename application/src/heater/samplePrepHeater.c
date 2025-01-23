@@ -331,64 +331,44 @@ void handleSampleMotorDataRx(int motor_speed) {
 void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
 #ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
-  
-  /* Heater Zone Update*/
-  if (heaterRxMessage.type == HEATER_MSG_ZONE_STATE) {
-    /* Disable Heater */
-    if (!heaterRxMessage.cycleEnabled) { //AMP2 will be used in sample prep for heating
-      heater_pid.out = 0;
-      temperature_pwm_data_t pwmData = {
-          .heat_zone_0_pwm = 0,
-          .heat_zone_1_pwm = heater_pid.out,
-          .sample_prep_heater_pwm = heater_pid.out,
-          .heat_zone_2_pwm = 0,
-          .heat_zone_3_pwm = 0};
-      updateDutyCycles(pwmData);
-     
-      vTaskDelay(pdMS_TO_TICKS(200));
-      updateDutyCycles(pwmData);
-      // Send stop heater to sensors task
-      heater_running = false;
-      starting_sample_prep_run = false;
-      motorReachedSpeed = false; // clear motor speed reached
-      handle_sample_cycle_stopstart_heater(heater_running);
 
-    /* Enable Heater */
-    } else {
-      starting_sample_prep_run = true;
-      heater_running = true;
-      motorReachedSpeed = false;
-      samplePrepResetHeaterPIDs();
-      // Send starting heater to sensors task
-      handle_sample_cycle_stopstart_heater(heater_running);
-    }
-  }
-  else if (heaterRxMessage.type == HEATER_MSG_MOTOR_STATE){
-    /* Disable Motor */
-    if (!heaterRxMessage.motorRunning){
-        temperature_pwm_data_t pwmData = {
-            .heat_zone_0_pwm = 0,
-            .heat_zone_1_pwm = 0,
-            .sample_prep_heater_pwm = 0,
-            .heat_zone_2_pwm = 0,
-            .heat_zone_3_pwm = 0};
-        updateDutyCycles(pwmData);
-        
-        motor_running = false;
-        // Send Stop Motor
-        handle_cycle_stopstart_motor(motor_running);
-    }
-    
-    /* Enable Motor */
-    else {
-      // Set Motor Enabled if the cycle has it enabled
-      if (s_cycle_config->run_motor) {
-        motor_running = true;
-        motorReachedSpeed = false;
-        // Send Start Motor
-        handle_cycle_stopstart_motor(motor_running);
-      }
-    }
+  /* Cycle Ending */
+  if (!heaterRxMessage.cycleEnabled) { //AMP2 will be used in sample prep for heating
+    // Set IUD outputs to 0
+    heater_pid.out = 0;
+    motor_pid.out = 0;
+    // Update PWM Duty Cycles
+    temperature_pwm_data_t pwmData = {
+        .heat_zone_0_pwm = 0,
+        .heat_zone_1_pwm = heater_pid.out,
+        .sample_prep_heater_pwm = heater_pid.out,
+        .heat_zone_2_pwm = motor_pid.out,
+        .heat_zone_3_pwm = 0};
+    updateDutyCycles(pwmData);
+    // Reset Control Vars
+    motorReachedSpeed = false;
+    starting_sample_prep_run = false;
+    // Send stop heater and motor
+    heater_running = false;
+    motor_running = false;
+    handle_sample_cycle_stopstart_heater(heater_running);
+    handle_cycle_stopstart_motor(motor_running);
+
+  /* Cycle Starting */
+  } else {
+    // Update the cycle config to the current cycle
+    s_cycle_config = &cycle_configs[(uint16_t)(heaterRxMessage.cycleSelect - 1)]; // Index = cycle - 1
+    // Reset PIDs
+    samplePrepResetHeaterPIDs();
+    // Reset Control Vars
+    motorReachedSpeed = false;
+    starting_sample_prep_run = true;
+    // Set running based on new config
+    heater_running = s_cycle_config->run_heater;
+    motor_running = s_cycle_config->run_motor;
+    // Send start heater and motor
+    handle_sample_cycle_stopstart_heater(heater_running);
+    handle_cycle_stopstart_motor(motor_running);
   }
   #endif
 }
