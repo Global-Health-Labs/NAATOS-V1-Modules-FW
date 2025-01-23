@@ -415,7 +415,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (buttonData.event == ON_EVENT /*|| buttonData.even == OFF_EVENT*/) {
         //end_cycle_0();
         //updateLedState(LED_ABORT, true);
+        #if 0
         send_debug_log_message("in buttondata sub");
+        #endif
         exitInfo = CYCLE_ERROR_BUTTON_EXIT;
         runThrough = true;
         //next_state = EXIT_CYCLE;

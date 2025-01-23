@@ -19,6 +19,7 @@ static bool heat_zone_1_active = false;
 static bool heat_zone_2_active = false;
 static bool heat_zone_3_active = false;
 static bool motor_active = false;
+static char tmp[150];
 
 static usb_suspend_acpt_t sus_acpt = {
       .task = PWM,
@@ -132,7 +133,7 @@ void updateDutyCycles(temperature_pwm_data_t pwmData) {
 
   xReturned = xQueueSend(pwmRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
-    send_debug_log_message("USB: Unable to send main state response to main_mainStateRespQueue queue.");
+    send_debug_log_message("PWM: Unable to send PWM_MSG_CALLBACK_EVENT to pwmRxQueue queue.");
   }
 }
 
@@ -140,24 +141,57 @@ void pwm_task(void *pvParameters) {
   BaseType_t xReturned;
   PwmRxQueueMsg_t pwmMsg;
   usb_suspend_req_t sus_req;
+  volatile app_pwm_duty_t pwm1_pre = 0;
+  volatile app_pwm_duty_t pwm1_post = 0;
+  
+  volatile bool pwm0_ready_old = pwm0_ready_flag;
+  volatile bool pwm0_ready_new = pwm0_ready_flag;
 
   app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, heat_zone_0_duty);
   app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, heat_zone_1_duty);
   app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_2_CHANNEL, heat_zone_2_duty);
   app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_3_CHANNEL, heat_zone_3_duty);
+  uint16_t counter = 0;
+  uint16_t nbusychecks = 0;
 
   // Main Task Loop
   for (;;) {
+    counter++;
+
     xReturned = xQueueReceive(pwmRxQueue, &pwmMsg, portMAX_DELAY);
     if (xReturned != pdPASS) {
       send_debug_log_message("Unable to Rx data to sensor queue");
     } else {
+
+      if(pwm0_ready_old != pwm0_ready_flag) {
+    #if 0
+        // pwm0_ready_flag CHANGED
+        sprintf(tmp, "GHL6 PWM pwm0_ready_flag was=%d now=%d",
+          pwm0_ready_old,pwm0_ready_flag
+        );
+        send_debug_log_message(tmp);
+    #endif
+        pwm0_ready_old = pwm0_ready_flag;
+      }
+      //pwm0_ready_new = pwm0_ready_flag;
+
       switch (pwmMsg.type) {
       case PWM_MSG_UPDATE_DUTY: {
 
         break;
       }
       case PWM_MSG_CALLBACK_EVENT: {
+        #if 0
+        if(counter%10==0) {
+          sprintf(tmp, "GHL1 PWM PR0=%d PR2=%d HZs=%d,%d,%d,%d PWMs=%d,%d,%d,%d P0BUSY=%d",
+            pwm0_ready_flag,pwm2_ready_flag,
+            heat_zone_0_active,heat_zone_1_active,heat_zone_2_active,heat_zone_3_active,
+            heat_zone_0_duty,heat_zone_1_duty,heat_zone_2_duty,heat_zone_3_duty,
+            app_pwm_busy_check(&PWM0)
+          );
+          send_debug_log_message(tmp);
+        }
+        #endif
         if (pwm0_ready_flag) {
           if (heat_zone_0_active || heat_zone_1_active) {
             pwm0_ready_flag = false;
@@ -170,12 +204,36 @@ void pwm_task(void *pvParameters) {
             app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, 0);
           }
 
+          pwm1_pre = app_pwm_channel_duty_get(&PWM0, HEAT_ZONE_1_CHANNEL);
           if (heat_zone_1_duty > 0) {
             app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, heat_zone_1_duty);
           } else if (heat_zone_1_active) {
             heat_zone_1_active = false;
-            app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, 0);
+            
+            //app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, 0);
+
+            if((heat_zone_1_duty<=0) && (pwm1_pre != heat_zone_1_duty)){
+              // SG / GHL : I don't know why, but SOMETIMES when setting PWM to 0 it does not take! There's a little trick here which seems to work
+
+            #if 0
+              // we are about to alter the PWM state of this channel, and we are supposed to set it to ZERO
+              sprintf(tmp, "GHL3 PWM 1PRE=%d 1WANT=%d Want  0%, Do Special GHL Handling",
+                pwm1_pre,heat_zone_1_duty
+              );
+              send_debug_log_message(tmp);
+            #endif
+
+              app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, 1);
+              //nbusychecks = 0;
+              //while(!app_pwm_busy_check(&PWM0)){
+              //  vTaskDelay(50); // 50 ticks
+              //  nbusychecks++;
+              //}
+              vTaskDelay(pdMS_TO_TICKS(50)); // 1ms
+              app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, 0);
+            }
           }
+          pwm1_post = app_pwm_channel_duty_get(&PWM0, HEAT_ZONE_1_CHANNEL);
         }
 
         if (pwm2_ready_flag) {
@@ -190,6 +248,19 @@ void pwm_task(void *pvParameters) {
             heat_zone_2_active = false;
           }
         }
+
+        #if 0
+        if(counter%10==0) {
+          sprintf(tmp, "GHL2 PWM PR0=%d PR2=%d HZs=%d,%d,%d,%d PWMs=%d,%d,%d,%d 1PRE=%d 1POST=%d P0BUSY=%d NBUSY=%d",
+            pwm0_ready_flag,pwm2_ready_flag,
+            heat_zone_0_active,heat_zone_1_active,heat_zone_2_active,heat_zone_3_active,
+            heat_zone_0_duty,heat_zone_1_duty,heat_zone_2_duty,heat_zone_3_duty,
+            pwm1_pre, pwm1_post, app_pwm_busy_check(&PWM0), nbusychecks
+          );
+          send_debug_log_message(tmp);
+        }
+        #endif
+
         break;
       }
 
@@ -204,6 +275,8 @@ void pwm_task(void *pvParameters) {
           app_pwm_disable(&PWM2);
           pwmEnabled = false;
           send_debug_log_message("PWM_MSG_DISABLE: and disabling");
+        } else{
+          send_debug_log_message("PWM_MSG_DISABLE: was already disabled");
         }
         break;
       }
@@ -214,6 +287,8 @@ void pwm_task(void *pvParameters) {
           app_pwm_enable(&PWM2);
           pwmEnabled = true;
           send_debug_log_message("PWM_MSG_ENABLE: and enabling");
+        } else{
+          send_debug_log_message("PWM_MSG_ENABLE: was already enabled");
         }
         break;
       }

@@ -252,14 +252,14 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     send_debug_log_message(tmp);
 #endif
 
-    #if 1
+#if 0
     if(counter%10==0) {
       sprintf(tmp, "GHL PID H[ SP=%.01f I=%.01f O=%.01f PWM1=%.01f PWM3=%.01f ]",
         heater_pid.setpoint,heater_pid.intergrator,heater_pid.out,h_pwm_data.heat_zone_1_pwm,h_pwm_data.heat_zone_3_pwm
       );
       send_debug_log_message(tmp);
     }
-    #endif
+#endif
 
     if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0) {
       greater_than_max = true;
