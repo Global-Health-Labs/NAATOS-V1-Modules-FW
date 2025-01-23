@@ -36,6 +36,7 @@
 
 //#define NAATOS_CONFIG_FILE "config_v2.0a.txt"
 #define NAATOS_CONFIG_FILE "config_v" VERSION ".txt"
+
 #define FIRST_CYCLE_CONFIG_FILE "cycle_config_1.txt"
 
 #ifdef SAMPLE_PREP_BOARD

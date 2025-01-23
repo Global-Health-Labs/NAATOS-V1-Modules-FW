@@ -83,7 +83,7 @@ void create_naatos_directories() {
   if (res == FR_OK) {
     send_debug_log_message("New cycle configuration files in subdirectory created with default parameters");
   } else if (res != FR_EXIST) {
-    send_debug_log_message("Unable to retreive config.txt");
+    send_debug_log_message("Unable to retreive cycle configuration files");
   }
 }
 
@@ -332,14 +332,8 @@ FRESULT get_cycle_configurations_parameters(cycle_config_parameters *cycle_confi
   // Re-Mount Storage
   mount_storage();
 
-  // Open root directory
-  res = f_opendir(&dir, "/");
-  if (res != FR_OK) {
-    return res;
-  }
-
-  // Change directory into configs
-  res = f_chdir(CONFIG_DIR);
+  // Open config directory
+  res = f_opendir(&dir, "/config");
   if (res != FR_OK) {
     return res;
   }
@@ -362,7 +356,7 @@ FRESULT get_cycle_configurations_parameters(cycle_config_parameters *cycle_confi
       }
     }
   }
-  
+
   // Ensure we have a file
   if (total_cycles > 0) {
     // Malloc space for the cycle configurations array
@@ -370,7 +364,7 @@ FRESULT get_cycle_configurations_parameters(cycle_config_parameters *cycle_confi
     // Loop through each file
     for (int i = 0; i < total_cycles; i++) {
       char buff[128];
-      sprintf(buff, "cycle_config_%d.txt", (i+1));
+      sprintf(buff, "/config/cycle_config_%d.txt", (i+1));
       // Open current cycle config file
       res = f_open(&file, buff, FA_READ);
       if (res != FR_OK) {
@@ -732,6 +726,15 @@ FRESULT check_for_cycle_config_files(void) {
   char configBuffer[50];
   uint32_t configBufferSize;
   uint32_t b_written;
+
+  // Re-Mount Storage
+  mount_storage();
+
+  // Open root directory
+  res = f_opendir(&dir, "/");
+  if (res != FR_OK) {
+    return res;
+  }
 
   // Change directory into configs
   res = f_chdir(CONFIG_DIR);
