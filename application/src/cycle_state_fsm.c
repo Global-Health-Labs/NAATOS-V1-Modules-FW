@@ -37,8 +37,8 @@ static bool doWeRunHeaterInThisCycle() {
   switch(cycle_now) {
     case CYCLE_ZERO:    return use_default_configuration_parameters ? DEFAULT_RUN_HEATER_1 : config.run_heater_1;
     case CYCLE_ONE:     return use_default_configuration_parameters ? DEFAULT_RUN_HEATER_1 : config.run_heater_1;
-    case CYCLE_TWO:   return use_default_configuration_parameters ? DEFAULT_RUN_HEATER_2 : config.run_heater_2;
-    case CYCLE_THREE:     return false;
+    case CYCLE_TWO:     return use_default_configuration_parameters ? DEFAULT_RUN_HEATER_2 : config.run_heater_2;
+    case CYCLE_THREE:   return false;
     default:            return false;
   }
 }
@@ -47,8 +47,8 @@ static bool doWeRunMotorInThisCycle() {
   switch(cycle_now) {
     case CYCLE_ZERO:    false;
     case CYCLE_ONE:     return use_default_configuration_parameters ? DEFAULT_RUN_MOTOR_1 : config.run_motor_1;
-    case CYCLE_TWO:   return use_default_configuration_parameters ? DEFAULT_RUN_MOTOR_2 : config.run_motor_2;
-    case CYCLE_THREE:     return use_default_configuration_parameters ? DEFAULT_RUN_MOTOR_2 : config.run_motor_2;
+    case CYCLE_TWO:     return use_default_configuration_parameters ? DEFAULT_RUN_MOTOR_2 : config.run_motor_2;
+    case CYCLE_THREE:   return use_default_configuration_parameters ? DEFAULT_RUN_MOTOR_2 : config.run_motor_2;
     default:            return false;
   }
 }
@@ -58,8 +58,8 @@ float getCycleRuntime() {
   switch(cycle_now) {
     case CYCLE_ZERO:    runtime = use_default_configuration_parameters ? DEFAULT_CYCLE_0_RUNTIME : config.cycle_0_run_time_s; break;
     case CYCLE_ONE:     runtime = use_default_configuration_parameters ? DEFAULT_CYCLE_1_RUNTIME : config.cycle_1_run_time_s; break;
-    case CYCLE_TWO:   runtime = use_default_configuration_parameters ? DEFAULT_CYCLE_2_RUNTIME : config.cycle_2_run_time_s; break;
-    case CYCLE_THREE:     runtime = use_default_configuration_parameters ? DEFAULT_CYCLE_3_RUNTIME : config.cycle_3_run_time_s; break;
+    case CYCLE_TWO:     runtime = use_default_configuration_parameters ? DEFAULT_CYCLE_2_RUNTIME : config.cycle_2_run_time_s; break;
+    case CYCLE_THREE:   runtime = use_default_configuration_parameters ? DEFAULT_CYCLE_3_RUNTIME : config.cycle_3_run_time_s; break;
     default:            runtime = 6.0;  break;
   }
   return runtime;
@@ -103,10 +103,12 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     last_state = current_state;
     current_state = next_state;
     
+    #if 0
     if(last_state != current_state) {
       sprintf(tmp,"FSM STATE %d -> %d",(uint8_t) last_state, (uint8_t) current_state);
       send_debug_log_message(tmp);
     }
+    #endif
 
 
     bool start_run;
