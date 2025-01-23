@@ -49,7 +49,6 @@ cycle_state_t handleBatteryMessage() {
 }
 
 cycle_state_exit_t run_cycle_state_machine(void) {
-  cycle_config_parameters *current_cycle_config;
   int current_cycle_index = 0;
   runThrough = true;
 
@@ -111,8 +110,6 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     }
 
     case START_CYCLE: {
-      // Get the current cycle configuration
-      current_cycle_config = &cycle_configs[current_cycle_index];
       // Send start cycle 1 message to heater queue
       if (!begin_cycle((cycle_t)(current_cycle_index + 1))) {
         send_debug_log_message("MAIN_TASK: Unable to begin sample run, temperatures have not yet stabalized.\r\n");
@@ -130,18 +127,18 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
 #ifdef SAMPLE_PREP_BOARD
       // Set LEDs
-      if (current_cycle_config->run_heater) {
+      if (cycle_configs[current_cycle_index].run_heater) {
         updateLedState(LED_RUN_HEATER, true);
         updateLedState(LED_RUN_MOTOR, false);
       }
-      if (current_cycle_config->run_motor) {
+      if (cycle_configs[current_cycle_index].run_motor) {
         updateLedState(LED_RUN_MOTOR, true);
         updateLedState(LED_RUN_HEATER, false);
       }
 
-      if (current_cycle_config->ramp_to_temp_before_start_cycle && current_cycle_config->run_heater) {
+      if (cycle_configs[current_cycle_index].ramp_to_temp_before_start_cycle && cycle_configs[current_cycle_index].run_heater) {
         start_time = xTaskGetTickCount();
-        end_time = (current_cycle_config->ramp_to_temp_timeout) * configTICK_RATE_HZ;
+        end_time = (cycle_configs[current_cycle_index].ramp_to_temp_timeout) * configTICK_RATE_HZ;
         next_state = CYCLE_RAMP_TO_TEMP;
       } else {
         next_state = CYCLE_TIMER;
@@ -149,9 +146,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 #else
       updateLedState(LED_RUN_HEATER, true);
 
-      if (current_cycle_config->ramp_to_temp_before_start_cycle && (current_cycle_config->run_amp || current_cycle_config->run_valve)) {
+      if (cycle_configs[current_cycle_index].ramp_to_temp_before_start_cycle && (cycle_configs[current_cycle_index].run_amp || cycle_configs[current_cycle_index].run_valve)) {
         start_time = xTaskGetTickCount();
-        end_time = (current_cycle_config->ramp_to_temp_timeout) * configTICK_RATE_HZ;
+        end_time = (cycle_configs[current_cycle_index].ramp_to_temp_timeout) * configTICK_RATE_HZ;
         next_state = CYCLE_RAMP_TO_TEMP;
       } else {
         next_state = CYCLE_TIMER;
@@ -223,7 +220,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     case CYCLE_TIMER: {
       if (last_state != current_state) {
         start_time = xTaskGetTickCount();
-        end_time = (current_cycle_config->cycle_run_time_s) * configTICK_RATE_HZ;
+        end_time = (cycle_configs[current_cycle_index].cycle_run_time_s) * configTICK_RATE_HZ;
       }
 
       next_state = handleBatteryMessage();
@@ -277,7 +274,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     case CYCLE_COMPLETE_DELAY: {
       if (last_state != current_state) {
         start_time = xTaskGetTickCount();
-        end_time = ((current_cycle_config->cycle_delay_time) * 1000);
+        end_time = ((cycle_configs[current_cycle_index].cycle_delay_time) * 1000);
       }
 
       next_state = handleBatteryMessage();
@@ -320,8 +317,6 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     case EXIT_CYCLE: {
       /* Confirm motor is turned off might not be if we exit early due to end cycle not calling this for cycle 2 */
       if (last_state != current_state) {
-        // End the current Cycle
-        end_cycle((cycle_t)(current_cycle_index + 1));
         // Check to see if there are more cycles to be completed 
         if ((current_cycle_index + 1) == total_cycles){
           next_state = CYCLE_SAMPLE_VALID_HOLD;
@@ -407,11 +402,11 @@ void handle_exit_notifications(void) {
     sprintf(exitString, "%s%f", SAMPLE_BATTERY_OVER_TEMP, batt_info_recv.batt_temp);
     break;
   case CYCLE_ERROR_OVER_TEMP:
-    sprintf(exitString, "%s: %d", SAMPLE_OVER_TEMPERATURE, over_temp_data.heat_zone_1_temp);
+    sprintf(exitString, "%s", SAMPLE_OVER_TEMPERATURE);
     eventType = SAMPLE_OVER_TEMP;
     break;
   case CYCLE_ERROR_START_TEMP_TOO_HIGH:
-    sprintf(exitString, "%s: %d", TEMPS_NOT_STABLE, over_temp_data.heat_zone_1_temp);
+    sprintf(exitString, "%s", TEMPS_NOT_STABLE);
     eventType = SAMPLE_TEMPS_NOT_STABALIZED;
     break;
   case CYCLE_ERROR_TIMEOUT_DURING_RAMP:

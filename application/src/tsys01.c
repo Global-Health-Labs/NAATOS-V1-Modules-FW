@@ -46,60 +46,19 @@ static tsys01_errors_t tsys01_writeRegister(sensor_selection_t sensor, uint8_t r
   current_op_type = ts_operation;
 
 #ifdef SAMPLE_PREP_BOARD
-#if SAMPLE_PREP_REV_B
   switch (sensor) {
-  case heat_zone_0:
-    interface = i2c_interface_system;
-    slave_addr = TSYS01_ADDR_ALT;
-    break;
-  case heat_zone_1:
-    interface = i2c_interface_system;
-    slave_addr = TSYS01_ADDR;
-    break;
-  case heat_zone_2:
-    interface = i2c_interface_sensors;
-    slave_addr = TSYS01_ADDR_ALT;
-    break;
-  case heat_zone_3:
+  case heater_zone:
     interface = i2c_interface_sensors;
     slave_addr = TSYS01_ADDR;
     break;
   }
-#elif SAMPLE_PREP_REV_A
-  switch (sensor) {
-  case heat_zone_0:
-    interface = i2c_interface_system;
-    slave_addr = TSYS01_ADDR_ALT;
-    break;
-  case heat_zone_1:
-    interface = i2c_interface_system;
-    slave_addr = TSYS01_ADDR;
-    break;
-  case heat_zone_2:
-    interface = i2c_interface_sensors;
-    slave_addr = TSYS01_ADDR_ALT;
-    break;
-  case heat_zone_3:
-    interface = i2c_interface_sensors;
-    slave_addr = TSYS01_ADDR;
-    break;
-  }
-#endif
 #else 
   switch (sensor) {
-  case heat_zone_0:
+  case valve_zone:
     interface = i2c_interface_sensors;
     slave_addr = TSYS01_ADDR_ALT;
     break;
-  case heat_zone_1:
-    interface = i2c_interface_system;
-    slave_addr = TSYS01_ADDR;
-    break;
-  case heat_zone_2:
-    interface = i2c_interface_sensors;
-    slave_addr = TSYS01_ADDR;
-    break;
-  case heat_zone_3:
+  case amp_zone:
     interface = i2c_interface_sensors;
     slave_addr = TSYS01_ADDR;
     break;
@@ -133,66 +92,24 @@ static tsys01_errors_t tsys01_readRegister(sensor_selection_t sensor, uint8_t re
   current_op_type = ts_operation;
 
 #ifdef SAMPLE_PREP_BOARD
-#if SAMPLE_PREP_REV_B
   switch (sensor) {
-  case heat_zone_0:
-    interface = i2c_interface_system;
-    slave_addr = TSYS01_ADDR_ALT;
-    break;
-  case heat_zone_1:
-    interface = i2c_interface_system;
-    slave_addr = TSYS01_ADDR;
-    break;
-  case heat_zone_2:
-    interface = i2c_interface_sensors;
-    slave_addr = TSYS01_ADDR_ALT;
-    break;
-  case heat_zone_3:
+  case heater_zone:
     interface = i2c_interface_sensors;
     slave_addr = TSYS01_ADDR;
     break;
   }
-#elif SAMPLE_PREP_REV_A
-  switch (sensor) {
-  case heat_zone_0:
-    interface = i2c_interface_system;
-    slave_addr = TSYS01_ADDR_ALT;
-    break;
-  case heat_zone_1:
-    interface = i2c_interface_system;
-    slave_addr = TSYS01_ADDR;
-    break;
-  case heat_zone_2:
-    interface = i2c_interface_sensors;
-    slave_addr = TSYS01_ADDR_ALT;
-    break;
-  case heat_zone_3:
-    interface = i2c_interface_sensors;
-    slave_addr = TSYS01_ADDR;
-    break;
-  }
-#endif
 #else 
   switch (sensor) {
-  case heat_zone_0:
+  case valve_zone:
     interface = i2c_interface_sensors;
     slave_addr = TSYS01_ADDR_ALT;
     break;
-  case heat_zone_1:
-    interface = i2c_interface_system;
-    slave_addr = TSYS01_ADDR;
-    break;
-  case heat_zone_2:
-    interface = i2c_interface_sensors;
-    slave_addr = TSYS01_ADDR;
-    break;
-  case heat_zone_3:
+  case amp_zone:
     interface = i2c_interface_sensors;
     slave_addr = TSYS01_ADDR;
     break;
   }
 #endif
-  
 
   err_code = xUtil_TWI_Read(interface, slave_addr, reg, read_buf, read_len);
 

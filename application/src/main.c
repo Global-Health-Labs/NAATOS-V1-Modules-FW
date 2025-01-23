@@ -161,8 +161,8 @@ void read_sd_and_notify_tasks(void) {
     send_debug_log_message("Error: configuration file was not able to be read.");
   } 
 
-  xReturned = get_cycle_configurations_parameters(&cycle_configs);
-  if (xReturned != FR_OK) {
+  xReturned = get_cycle_configurations_parameters();
+  if (cycle_configs == NULL || xReturned != FR_OK) {
     send_debug_log_message("Error: cycle configuration files were not able to be read.");
   }
 
@@ -396,7 +396,7 @@ void main_task(void *pvParameters) {
     nor_flash_fatfs_mkfs();
     create_naatos_directories();
     get_naatos_configuration_parameters(&config);
-    get_cycle_configurations_parameters(&cycle_configs);
+    get_cycle_configurations_parameters();
   }
 
   // Set Start up state to standby

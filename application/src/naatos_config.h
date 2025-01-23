@@ -118,9 +118,9 @@
 #define HEATER_ZONE_3_PIN 33                     // P0.20
 #else
 #define BUTTON_INPUT_PIN  38
-#define HEATER_ZONE_0_PIN 27                     // P1.01 -> Valve Zone
+#define VALVE_ZONE_PIN 27                     // P1.01 -> Valve Zone
 #define HEATER_ZONE_1_PIN 9                      // P1.02
-#define HEATER_ZONE_2_PIN 33                     // P0.19 -> Amplification Zone
+#define AMP_ZONE_PIN 33                     // P0.19 -> Amplification Zone
 #define HEATER_ZONE_3_PIN 10                     // P0.20
 #endif
 #endif
@@ -160,7 +160,7 @@
 #define DEFAULT_VALVE_MAX_TEMP          105.0
 #define DEFAULT_AMP_MAX_TEMP            80.0
 #else 
-#define DEFAULT_MAX_HEATER_TEMP         105
+#define DEFAULT_MAX_HEATER_TEMP         105.0
 #define DEFAULT_MAX_HEATER_PID          100
 #define DEFAULT_MOTOR_SWTICH_CCW_CW     false
 #define DEFAULT_HAL_SENSOR_THRESHOLD    0.30f
@@ -313,24 +313,28 @@ typedef struct {
 
 // Temperature Data Struct
 typedef struct {
-  float heat_zone_0_temp;
-  float heat_zone_0_pwm;
-  float heat_zone_1_temp;
-  float heat_zone_1_pwm;
-  float heat_zone_2_temp;
-  float heat_zone_2_pwm;
-  float heat_zone_3_temp;
-  float heat_zone_3_pwm;
-  double motorSpeed;
+#ifdef SAMPLE_PREP_BOARD
+  float heater_temp;
+  float heater_pwm;
+  float motor_speed;
+  float motor_pwm;
+#else 
+  float amp_temp;
+  float amp_pwm;
+  float valve_temp;
+  float valve_pwm;
+#endif
 } temperature_data_t;
 
 // Temperature PWM Data Struct
 typedef struct {
-  float heat_zone_0_pwm;
-  float heat_zone_1_pwm;
-  float heat_zone_2_pwm;
-  float heat_zone_3_pwm;
-  float sample_prep_heater_pwm;
+#ifdef SAMPLE_PREP_BOARD
+  float heater_pwm;
+  float motor_pwm;
+#else
+  float amp_pwm;
+  float valve_pwm;
+#endif
 } temperature_pwm_data_t;
 
 typedef enum {

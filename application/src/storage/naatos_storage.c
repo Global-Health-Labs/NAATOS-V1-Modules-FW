@@ -322,12 +322,15 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
   return FR_OK;
 }
 
-FRESULT get_cycle_configurations_parameters(cycle_config_parameters *cycle_configurations_arr) {
+FRESULT get_cycle_configurations_parameters() {
   char configBuffer[50];
   FRESULT res;
   char *pch;
   char val[50];
   int num;
+
+  // Re-Mount Storage
+  mount_storage();
 
   // Re-Mount Storage
   mount_storage();
@@ -360,7 +363,7 @@ FRESULT get_cycle_configurations_parameters(cycle_config_parameters *cycle_confi
   // Ensure we have a file
   if (total_cycles > 0) {
     // Malloc space for the cycle configurations array
-    cycle_configurations_arr = (cycle_config_parameters *)malloc(total_cycles * sizeof(cycle_config_parameters));
+    cycle_configs = (cycle_config_parameters *)malloc(total_cycles * sizeof(cycle_config_parameters));
     // Loop through each file
     for (int i = 0; i < total_cycles; i++) {
       char buff[128];
@@ -375,11 +378,11 @@ FRESULT get_cycle_configurations_parameters(cycle_config_parameters *cycle_confi
       // Loop throught the file and populate the cycle configuration array
       for (int j = 0; j < NUM_CYCLE_CONFIG_PARAMS; j++) {
         pch = f_gets(configBuffer, 50, &file);
-        pch = strtok(configBuffer, ":");
+        pch = strtok(configBuffer, ":\n\r");
         sprintf(val, "%s", pch);
         pch = strtok(NULL, ":");
         sprintf(val, "%s", pch);
-        char *newline = strchr(val, '\n');
+        char *newline = strchr(val, '\r'); // Was previosuly \n
         if (newline) {
           // Replace newline character with null terminator
           *newline = '\0';
@@ -387,90 +390,90 @@ FRESULT get_cycle_configurations_parameters(cycle_config_parameters *cycle_confi
 
         switch ((cycle_config_params_t)j) {
         case CYCLE_RUN_TIME:
-            cycle_configurations_arr[i].cycle_run_time_s = parse_double(val, DEFAULT_CYCLE_RUNTIME);
+            cycle_configs[i].cycle_run_time_s = parse_double(val, DEFAULT_CYCLE_RUNTIME);
             break;
         case MIN_RUN_ZONE_TEMP_C:
-            cycle_configurations_arr[i].min_run_zone_temp = parse_double(val, DEFAULT_MIN_RUN_ZONE_TEMP_C);
+            cycle_configs[i].min_run_zone_temp = parse_double(val, DEFAULT_MIN_RUN_ZONE_TEMP_C);
             break;
         case MIN_RUN_ZONE_TEMP_EN:
             num = strcmp(val, "true");
-            cycle_configurations_arr[i].min_run_zone_temp_en = num ? false : true;
+            cycle_configs[i].min_run_zone_temp_en = num ? false : true;
             break;
         case CYCLE_DELAY_TIME:
-            cycle_configurations_arr[i].cycle_delay_time = parse_int(val, DEFAULT_CYCLE_DELAY_TIME);
+            cycle_configs[i].cycle_delay_time = parse_int(val, DEFAULT_CYCLE_DELAY_TIME);
             break;
         case RAMP_TO_TEMP_BEFORE_CYCLE_START:
             num = strcmp(val, "true");
-            cycle_configurations_arr[i].ramp_to_temp_before_start_cycle = num ? false : true;
+            cycle_configs[i].ramp_to_temp_before_start_cycle = num ? false : true;
             break;
         case RAMP_TO_TEMP_TIMEOUT:
-            cycle_configurations_arr[i].ramp_to_temp_timeout = parse_double(val, DEFAULT_RAMP_TO_TEMP_TIMEOUT);
+            cycle_configs[i].ramp_to_temp_timeout = parse_double(val, DEFAULT_RAMP_TO_TEMP_TIMEOUT);
             break;
     #ifndef SAMPLE_PREP_BOARD
         case AMP_SETPOINT:
-            cycle_configurations_arr[i].amp_setpoint = parse_double(val, DEFAULT_AMP_SETPOINT);
+            cycle_configs[i].amp_setpoint = parse_double(val, DEFAULT_AMP_SETPOINT);
             break;
         case VALVE_SETPOINT:
-            cycle_configurations_arr[i].valve_setpoint = parse_double(val, DEFAULT_VALVE_SETPOINT);
+            cycle_configs[i].valve_setpoint = parse_double(val, DEFAULT_VALVE_SETPOINT);
             break;
         case RUN_AMP:
             num = strcmp(val, "true");
-            cycle_configurations_arr[i].run_amp = num ? false : true;
+            cycle_configs[i].run_amp = num ? false : true;
             break;
         case RUN_VALVE:
             num = strcmp(val, "true");
-            cycle_configurations_arr[i].run_valve = num ? false : true;
+            cycle_configs[i].run_valve = num ? false : true;
             break;
         case AMP_KP:
-            cycle_configurations_arr[i].amp_kp = parse_double(val, DEFAULT_AMP_KP);
+            cycle_configs[i].amp_kp = parse_double(val, DEFAULT_AMP_KP);
             break;
         case AMP_KI:
-            cycle_configurations_arr[i].amp_ki = parse_double(val, DEFAULT_AMP_KI);
+            cycle_configs[i].amp_ki = parse_double(val, DEFAULT_AMP_KI);
             break;
         case AMP_KD:
-            cycle_configurations_arr[i].amp_kd = parse_double(val, DEFAULT_AMP_KD);
+            cycle_configs[i].amp_kd = parse_double(val, DEFAULT_AMP_KD);
             break;
         case VALVE_KP:
-            cycle_configurations_arr[i].valve_kp = parse_double(val, DEFAULT_VALVE_KP);
+            cycle_configs[i].valve_kp = parse_double(val, DEFAULT_VALVE_KP);
             break;
         case VALVE_KI:
-            cycle_configurations_arr[i].valve_ki = parse_double(val, DEFAULT_VALVE_KI);
+            cycle_configs[i].valve_ki = parse_double(val, DEFAULT_VALVE_KI);
             break;
         case VALVE_KD:
-            cycle_configurations_arr[i].valve_ki = parse_double(val, DEFAULT_VALVE_KD);
+            cycle_configs[i].valve_ki = parse_double(val, DEFAULT_VALVE_KD);
             break;
     #else
         case HEATER_SETPOINT:
-            cycle_configurations_arr[i].heater_setpoint = parse_double(val, DEFAULT_HEATER_SETPOINT);
+            cycle_configs[i].heater_setpoint = parse_double(val, DEFAULT_HEATER_SETPOINT);
             break;
         case MOTOR_SETPOINT:
-            cycle_configurations_arr[i].motor_setpoint = parse_double(val, DEFAULT_MOTOR_SETPOINT);
+            cycle_configs[i].motor_setpoint = parse_double(val, DEFAULT_MOTOR_SETPOINT);
             break;
         case RUN_HEATER:
             num = strcmp(val, "true");
-            cycle_configurations_arr[i].run_heater = num ? false : true;
+            cycle_configs[i].run_heater = num ? false : true;
             break;
         case RUN_MOTOR:
             num = strcmp(val, "true");
-            cycle_configurations_arr[i].run_motor = num ? false : true;
+            cycle_configs[i].run_motor = num ? false : true;
             break;
         case HEATER_KP:
-            cycle_configurations_arr[i].heater_kp = parse_double(val, DEFAULT_HEATER_KP);
+            cycle_configs[i].heater_kp = parse_double(val, DEFAULT_HEATER_KP);
             break;
         case HEATER_KI:
-            cycle_configurations_arr[i].heater_ki = parse_double(val, DEFAULT_HEATER_KI);
+            cycle_configs[i].heater_ki = parse_double(val, DEFAULT_HEATER_KI);
             break;
         case HEATER_KD:
-            cycle_configurations_arr[i].heater_kd = parse_double(val, DEFAULT_HEATER_KD);
+            cycle_configs[i].heater_kd = parse_double(val, DEFAULT_HEATER_KD);
             break;
         case MOTOR_KP:
-            cycle_configurations_arr[i].motor_kp = parse_double(val, DEFAULT_MOTOR_KP);
+            cycle_configs[i].motor_kp = parse_double(val, DEFAULT_MOTOR_KP);
             break;
         case MOTOR_KI:
-            cycle_configurations_arr[i].motor_ki = parse_double(val, DEFAULT_MOTOR_KI);
+            cycle_configs[i].motor_ki = parse_double(val, DEFAULT_MOTOR_KI);
             break;
         case MOTOR_KD:
-            cycle_configurations_arr[i].motor_ki = parse_double(val, DEFAULT_MOTOR_KD);
+            cycle_configs[i].motor_kd = parse_double(val, DEFAULT_MOTOR_KD);
             break;
     #endif
         }
@@ -674,7 +677,7 @@ FRESULT check_for_naatos_config_file(void) {
   }
 
   // Write Motor Stall PWM
-  configBufferSize = sprintf(configBuffer, "motor_stall_pwm:%0.2f\n", DEFAULT_MOTOR_STALL_PWM);
+  configBufferSize = sprintf(configBuffer, "motor_stall_pwm:%d\n", DEFAULT_MOTOR_STALL_PWM);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;

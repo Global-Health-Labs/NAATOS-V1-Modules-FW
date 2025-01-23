@@ -6,6 +6,7 @@ extern "C" {
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "naatos_config.h"
 
 #define TSYS01_ADDR (0x77U)
 #define TSYS01_ADDR_ALT (0x76U)
@@ -32,10 +33,12 @@ typedef enum {
 } tsys01_errors_t;
 
 typedef enum {
-  heat_zone_0,
-  heat_zone_1,
-  heat_zone_2,
-  heat_zone_3,
+#ifdef SAMPLE_PREP_BOARD
+  heater_zone,
+#else
+  amp_zone,
+  valve_zone,
+#endif
   num_sensors
 } sensor_selection_t;
 

@@ -13,11 +13,14 @@
 
 #define SAMPLE_HEATER_CHANNEL 0
 
-#define HEAT_ZONE_0_CHANNEL 0
-#define HEAT_ZONE_1_CHANNEL 1
-#define HEAT_ZONE_2_CHANNEL 0
-#define HEAT_ZONE_3_CHANNEL 1
+#ifdef SAMPLE_PREP_BOARD
+#define HEATER_CHANNEL  0
+#define MOTOR_CHANNEL   0
+#else
+#define AMP_CHANNEL 0
+#define VALVE_CHANNEL 0
 #define MOTOR_CHANNEL 0
+#endif
 
 void init_pwms(void);
 void uninit_pwms(void);

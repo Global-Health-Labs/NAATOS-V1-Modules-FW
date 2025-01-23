@@ -6,7 +6,7 @@ typedef struct {
   void (*handleMotorDataRx)(int motor_speed);
   void (*handleHeaterZoneStateUpdate)(HeaterRxQueueMsg_t heaterRxMessage);
   void (*resetHeaterPIDs)(void);
-  temperature_pwm_data_t (*getPwmData)(void);
+  //temperature_pwm_data_t (*getPwmData)(void);
   bool (*getOverTempStatus)(void);
   temperature_data_t (*getOverTempData)(void);
   bool (*getHeaterRunningStatus)(void);

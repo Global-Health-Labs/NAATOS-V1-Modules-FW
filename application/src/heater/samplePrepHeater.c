@@ -34,27 +34,21 @@ temperature_data_t local_temp_data;
 uint32_t samp_log_index = 0;
 uint32_t samp_log_max = 0;
 
-temperature_pwm_data_t h_pwm_data = {
-    .heat_zone_0_pwm = 0,
-    .heat_zone_1_pwm = 0,
-    .heat_zone_2_pwm = 0,
-    .heat_zone_3_pwm = 0,
-    .sample_prep_heater_pwm = 0};
-
 static log_data_message_t logMsg = {
     .data_type = TEMPERATURE_DATA,
     .event_data = NULL,
     .temperature_data = NULL};
+
+
 #ifdef SAMPLE_PREP_BOARD
 void handle_sample_cycle_stopstart_heater(bool heating) {
-
   BaseType_t xReturned;
   
   // Update the Heating Enable
   if (!heating) { //need to stop supply before stopping pwm
     nrf_gpio_pin_clear(HEATER_PWR_EN);
   } else {
-    nrf_gpio_pin_set(MOTOR_PWR_EN);
+    nrf_gpio_pin_set(HEATER_PWR_EN);
   }
 
   // Check if we want to Ramp To Temperature
@@ -145,14 +139,12 @@ void samplePrepResetHeaterPIDs(void) {
 void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 #ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
+  temperature_pwm_data_t pwmData;
+
   local_temp_data = temperature_data;
   // Ensure temperatures are below the minimum run zone temperature
   if (s_cycle_config->min_run_zone_temp_en) {
-    if (starting_sample_prep_run &&
-        (temperature_data.heat_zone_0_temp > s_cycle_config->min_run_zone_temp || 
-            temperature_data.heat_zone_1_temp > s_cycle_config->min_run_zone_temp ||
-            temperature_data.heat_zone_2_temp > s_cycle_config->min_run_zone_temp ||
-            temperature_data.heat_zone_3_temp > s_cycle_config->min_run_zone_temp)) {
+    if (starting_sample_prep_run && (temperature_data.heater_temp > s_cycle_config->min_run_zone_temp)) {
       starting_sample_prep_run = false;
       // Send cannot start
       xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
@@ -160,11 +152,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
         send_debug_log_message("HEATER_TASK: Unable to send cannot start run response.");
       }
       return;
-    } else if (starting_sample_prep_run &&
-               (temperature_data.heat_zone_0_temp <= s_cycle_config->min_run_zone_temp && 
-                   temperature_data.heat_zone_1_temp <= s_cycle_config->min_run_zone_temp &&
-                   temperature_data.heat_zone_2_temp <= s_cycle_config->min_run_zone_temp &&
-                   temperature_data.heat_zone_3_temp <= s_cycle_config->min_run_zone_temp)) {
+    } else if (starting_sample_prep_run && (temperature_data.heater_temp <= s_cycle_config->min_run_zone_temp)) {
       // Send can start
       xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
       if (xReturned != pdPASS) {
@@ -184,11 +172,11 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   // Update PID and PWM
   if (heater_running) {
     // Update Heater Zone 3 PID loop with new temperatures
-    pid_controller_compute(&heater_pid, temperature_data.heat_zone_3_temp);
+    pid_controller_compute(&heater_pid, temperature_data.heater_temp);
     
     // Check TO See if we have Ramped to Temperature if Enabled
     if (s_rampToTemp) {
-      if ((temperature_data.heat_zone_3_temp >= s_cycle_config->heater_setpoint)) {
+      if ((temperature_data.heater_temp >= s_cycle_config->heater_setpoint)) {
         xReturned = xQueueSend(main_setPointReached, &s_rampToTemp, 0);
         if (xReturned != pdPASS) {
           send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
@@ -196,21 +184,11 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
         s_rampToTemp = false;
       }
     }
-
-    temperature_pwm_data_t pwmData = {
-          .heat_zone_0_pwm = 0,
-          .heat_zone_1_pwm = 0,
-          .sample_prep_heater_pwm = heater_pid.out,
-          .heat_zone_2_pwm = 0,
-          .heat_zone_3_pwm = heater_pid.out};
-
-    // Update Heater Zone 3 PWM with PID output
-    h_pwm_data.heat_zone_0_pwm = pwmData.heat_zone_0_pwm;
-    h_pwm_data.heat_zone_1_pwm = pwmData.heat_zone_1_pwm;
-    // Dont Heater Zone 2, its from the motor task
-    h_pwm_data.heat_zone_3_pwm = pwmData.heat_zone_3_pwm;
-
-    updateDutyCycles(h_pwm_data);
+    
+    // Maintain Current Motor PID PWM
+    pwmData.heater_pwm = heater_pid.out;
+    pwmData.motor_pwm = motor_pid.out;
+    updateDutyCycles(pwmData);
 
 #if VERBOSE_HEATING
     char tmp[150];
@@ -220,7 +198,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     send_debug_log_message(tmp);
 #endif
 
-    if ((config.heater_max_temp < temperature_data.heat_zone_3_temp) || temperature_data.heat_zone_3_temp < 0) {
+    if ((config.heater_max_temp < temperature_data.heater_temp) || temperature_data.heater_temp < 0) {
       greater_than_max = true;
     }
 
@@ -235,15 +213,10 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     }
   }
 
-  logMsg.temperature_data.heat_zone_1_temp = temperature_data.heat_zone_1_temp;
-  logMsg.temperature_data.heat_zone_2_temp = temperature_data.heat_zone_2_temp;
-  logMsg.temperature_data.heat_zone_3_temp = temperature_data.heat_zone_3_temp;
-  logMsg.temperature_data.heat_zone_0_temp = temperature_data.heat_zone_0_temp;
-  logMsg.temperature_data.heat_zone_1_pwm = h_pwm_data.heat_zone_1_pwm;
-  logMsg.temperature_data.heat_zone_2_pwm = h_pwm_data.heat_zone_2_pwm;
-  logMsg.temperature_data.heat_zone_3_pwm = h_pwm_data.heat_zone_3_pwm;
-  logMsg.temperature_data.heat_zone_0_pwm = h_pwm_data.heat_zone_0_pwm;
-  logMsg.temperature_data.motorSpeed = last_motor_speed;
+  logMsg.temperature_data.heater_temp = temperature_data.heater_temp;
+  logMsg.temperature_data.heater_pwm = pwmData.heater_pwm;
+  logMsg.temperature_data.motor_speed = last_motor_speed;
+  logMsg.temperature_data.motor_pwm = pwmData.motor_pwm;
   
   logMsg.data_type = UART_DATA;
   // Send the Log message
@@ -268,25 +241,20 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 void handleSampleMotorDataRx(int motor_speed) {
 #ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
+  temperature_pwm_data_t pwmData;
   char tmp[100];
   
   if (motor_running) {
-    // Maintain Current Heater PID PWM
-    temperature_pwm_data_t pwmData = {
-        .heat_zone_0_pwm = 0,
-        .heat_zone_1_pwm = heater_pid.out,
-        .heat_zone_2_pwm = 0,
-        .heat_zone_3_pwm = 0};
-
     if (s_cycle_config->run_motor) {
       pid_controller_compute(&motor_pid, motor_speed);
-      pwmData.heat_zone_2_pwm = motor_pid.out;
     }
 
-    h_pwm_data.heat_zone_2_pwm = pwmData.heat_zone_2_pwm;
-    last_motor_speed = motor_speed;
-
+    // Maintain Current Heater PID PWM
+    pwmData.motor_pwm = motor_pid.out;
+    pwmData.heater_pwm = heater_pid.out;
     updateDutyCycles(pwmData);
+    // Update last motor speed
+    last_motor_speed = motor_speed;
 
   #if VERBOSE_MOTOR
     sprintf(tmp, "Motor Speed: %d rpm; Motor PWM: %0.2f", motor_speed, pwmData.heat_zone_2_pwm);
@@ -339,11 +307,8 @@ void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
     motor_pid.out = 0;
     // Update PWM Duty Cycles
     temperature_pwm_data_t pwmData = {
-        .heat_zone_0_pwm = 0,
-        .heat_zone_1_pwm = heater_pid.out,
-        .sample_prep_heater_pwm = heater_pid.out,
-        .heat_zone_2_pwm = motor_pid.out,
-        .heat_zone_3_pwm = 0};
+        .heater_pwm = heater_pid.out,
+        .motor_pwm = motor_pid.out};
     updateDutyCycles(pwmData);
     // Reset Control Vars
     motorReachedSpeed = false;
@@ -371,10 +336,6 @@ void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
     handle_cycle_stopstart_motor(motor_running);
   }
   #endif
-}
-
-temperature_pwm_data_t getSamplePrepPwmData(void) {
-  return h_pwm_data;
 }
 
 bool getSamplePrepOverTempStatus(void) {

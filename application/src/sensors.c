@@ -8,20 +8,28 @@ void sensorCollection(void);
 
 sensor_switches_t switches;
 temperature_data_t temperatures = {
-    .heat_zone_0_pwm = 0,
-    .heat_zone_0_temp = 0,
-    .heat_zone_1_pwm = 0,
-    .heat_zone_1_temp = 0,
-    .heat_zone_2_pwm = 0,
-    .heat_zone_2_temp = 0,
-    .heat_zone_3_pwm = 0,
-    .heat_zone_3_temp = 0};
+#ifdef SAMPLE_PREP_BOARD
+    .heater_pwm = 0.0,
+    .heater_temp = 0.0,
+    .motor_speed = 0.0,
+    .motor_pwm = 0.0
+#else 
+    .amp_pwm = 0.0,
+    .amp_temp = 0.0,
+    .valve_pwm = 0.0,
+    .valve_temp = 0.0
+#endif
+    };
 
 temperature_pwm_data_t pwm_data = {
-    .heat_zone_0_pwm = 0,
-    .heat_zone_1_pwm = 0,
-    .heat_zone_2_pwm = 0,
-    .heat_zone_3_pwm = 0};
+#ifdef SAMPLE_PREP_BOARD
+    .heater_pwm = 0.0,
+    .motor_pwm = 0.0
+#else
+    .amp_pwm = 0.0,
+    .valve_pwm = 0.0
+#endif
+    };
 
 
 static tsys01_errors_t tsys01_err;
@@ -82,19 +90,23 @@ void stopSensorTempTimer(void) {
 }
 
 void samplePrepSensorTaskSetup(void) {
+#ifdef SAMPLE_PREP_BOARD
   /* Get TSYS01 Calibration Values */
-  tsys01_err = tsys01_getCalibrationValues(heat_zone_3);
+  tsys01_err = tsys01_getCalibrationValues(heater_zone);
   if (tsys01_err == tsys01_i2c_error) {
     NVIC_SystemReset();
     asm volatile("nop");
   }
   sensorTempTimer = xTimerCreate("SensorTempTimer", sampleRateTicks, pdTRUE, (void *)0, vSensorTempTimerCallback);
+#endif
 }
 
 void powerModuleSensorTaskSetup(void) {
-  tsys01_err = tsys01_getCalibrationValues(heat_zone_0);
-  tsys01_err = tsys01_getCalibrationValues(heat_zone_2);
+#ifndef SAMPLE_PREP_BOARD
+  tsys01_err = tsys01_getCalibrationValues(valve_zone);
+  tsys01_err = tsys01_getCalibrationValues(amp_zone);
   sensorTempTimer = xTimerCreate("SensorTempTimer", sampleRateTicks, pdTRUE, (void *)0, vSensorTempTimerCallback);
+#endif
 }
 
 void sensors_task(void *pvParameters) {
@@ -269,14 +281,11 @@ void runPowerModuleSensorCollection(void) {
       valve_zone_set_6v();
       dis = disable_valve_boost();
     }
-    readTempSuccess = readTemp(heat_zone_0, &temperatures.heat_zone_0_temp);
+    readTempSuccess = readTemp(valve_zone, &temperatures.valve_temp);
     enable_valve_boost();
     if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }
-
-    // I2C Read for Heater Zone 1, Not Connected
-    temperatures.heat_zone_1_temp = 0.0;
 
     // I2C Read for Heater Zone 2
     dis = disable_valve_boost();
@@ -286,18 +295,15 @@ void runPowerModuleSensorCollection(void) {
       valve_zone_set_6v();
       dis = disable_valve_boost();
     }
-    readTempSuccess = readTemp(heat_zone_2, &temperatures.heat_zone_2_temp);
+    readTempSuccess = readTemp(amp_zone, &temperatures.amp_temp);
     enable_valve_boost();
     if (!readTempSuccess) {
       heaterMsg.readTempFailed = true;
     }
 
-    // I2C Read for Heater Zone 3, Not Connected
-    temperatures.heat_zone_3_temp = 0.0;
-
+    // Send Temperatures to heater
     heaterMsg.type = HEATER_MSG_TEMPERATURE_DATA;
     heaterMsg.tempData = temperatures;
-
     xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
     if (xReturned != pdPASS) {
       char errorString[100];
@@ -309,6 +315,7 @@ void runPowerModuleSensorCollection(void) {
 }
 
 void runSamplePrepSensorCollection(void) {
+#ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
   HeaterRxQueueMsg_t heaterMsg;
   bool readTempSuccess = false;
@@ -341,7 +348,7 @@ void runSamplePrepSensorCollection(void) {
 
   // Collect 10 temperature samples
   for (int i = 0; i < 6; i++) {
-      bool readTempSuccess = readTemp(heat_zone_3, &temp);
+      bool readTempSuccess = readTemp(heater_zone, &temp);
       if (readTempSuccess) {
           temp_samples[i] = temp;
           consecutive_failures = 0; // Reset the failure counter on success
@@ -372,7 +379,7 @@ void runSamplePrepSensorCollection(void) {
   float avg_temp = (temp_samples[2] + temp_samples[3]) / 2.0;
 
   // Update the temperature reading with the averaged value
-  temperatures.heat_zone_3_temp = avg_temp;
+  temperatures.heater_temp = avg_temp;
 
   // Put Switch Data into queue
   xReturned = xQueueSend(main_switchQueue, (void *)&switches, 10);
@@ -392,6 +399,7 @@ void runSamplePrepSensorCollection(void) {
       send_debug_log_message(errorString);
     }
   }
+#endif
 }
 
 bool readTemp(sensor_selection_t sensor, float *temperature) {
