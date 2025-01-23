@@ -91,12 +91,12 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   pm_local_temp_data = temperature_data;
 
   // Ensure temperatures are below the minimum run zone temperature
-  if (config.min_run_zone_temp_en) {
+  if (cycle_config->min_run_zone_temp_en) {
     if (starting_run &&
-        (temperature_data.heat_zone_0_temp > config.min_run_zone_temp || 
-            temperature_data.heat_zone_1_temp > config.min_run_zone_temp ||
-            temperature_data.heat_zone_2_temp > config.min_run_zone_temp ||
-            temperature_data.heat_zone_3_temp > config.min_run_zone_temp)) {
+        (temperature_data.heat_zone_0_temp > cycle_config->min_run_zone_temp || 
+            temperature_data.heat_zone_1_temp > cycle_config->min_run_zone_temp ||
+            temperature_data.heat_zone_2_temp > cycle_config->min_run_zone_temp ||
+            temperature_data.heat_zone_3_temp > cycle_config->min_run_zone_temp)) {
       starting_run = false;
       // Send cannot start
       xReturned = xQueueSend(main_runRespQueue, &starting_run, 0);
@@ -105,10 +105,10 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
       }
       return;
     } else if (starting_run &&
-               (temperature_data.heat_zone_0_temp <= config.min_run_zone_temp && 
-                   temperature_data.heat_zone_1_temp <= config.min_run_zone_temp &&
-                   temperature_data.heat_zone_2_temp <= config.min_run_zone_temp &&
-                   temperature_data.heat_zone_3_temp <= config.min_run_zone_temp)) {
+               (temperature_data.heat_zone_0_temp <= cycle_config->min_run_zone_temp && 
+                   temperature_data.heat_zone_1_temp <= cycle_config->min_run_zone_temp &&
+                   temperature_data.heat_zone_2_temp <= cycle_config->min_run_zone_temp &&
+                   temperature_data.heat_zone_3_temp <= cycle_config->min_run_zone_temp)) {
       // Send can start
       xReturned = xQueueSend(main_runRespQueue, &starting_run, 0);
       if (xReturned != pdPASS) {
@@ -116,7 +116,7 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
       }
       starting_run = false;
     }
-  } else if (!config.min_run_zone_temp_en && starting_run) {
+  } else if (!cycle_config->min_run_zone_temp_en && starting_run) {
     // Send can start
     xReturned = xQueueSend(main_runRespQueue, &starting_run, 0);
     if (xReturned != pdPASS) {
@@ -125,74 +125,37 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     starting_run = false;
   }
 
-  // Update PID and PWM
-  if (cycle_one_running) {
-    // Update Amplification PID loop with new temperatures
-    if (config.run_amp_cycle_1) { 
-      pid_controller_compute(&amp_pid_1, temperature_data.heat_zone_2_temp);
-    } else {
-      amp_pid_1.out = 0.0;
-    }
-    // Update Valve PID loop with new temperatures
-    if (config.run_valve_cycle_1) {
-      pid_controller_compute(&valve_pid_1, temperature_data.heat_zone_0_temp);
-    } else {
-      valve_pid_1.out = 0.0;
-    }
-
-    temperature_pwm_data_t pwmData = {
-        .heat_zone_0_pwm = valve_pid_1.out, // Heat Zone 0 controls Valve
-        .heat_zone_1_pwm = 0,
-        .heat_zone_2_pwm = amp_pid_1.out,   // Heat Zone 2 controls Amplification
-        .heat_zone_3_pwm = 0};
-    updateDutyCycles(pwmData);
-    
-    // Set the PWMs for the logger
-    pm_h_pwm_data.heat_zone_0_pwm = pwmData.heat_zone_0_pwm;
-    pm_h_pwm_data.heat_zone_1_pwm = pwmData.heat_zone_1_pwm;
-    pm_h_pwm_data.heat_zone_2_pwm = pwmData.heat_zone_2_pwm;
-    pm_h_pwm_data.heat_zone_3_pwm = pwmData.heat_zone_3_pwm;
-    // Ensure that the temperatures are not greater than the max temperatures allowed
-    if (config.amp_max_temp < temperature_data.heat_zone_2_temp || temperature_data.heat_zone_2_temp < 0) {
-      pm_amp_greater_than_max = true;
-    }
-    if (config.valve_max_temp < temperature_data.heat_zone_0_temp || temperature_data.heat_zone_0_temp < 0) {
-      pm_valve_greater_than_max = true;
-    }
+  // Update Amplification PID loop with new temperatures
+  if (cycle_config->run_amp) { 
+    pid_controller_compute(&amp_pid, temperature_data.heat_zone_2_temp);
+  } else {
+    amp_pid.out = 0.0;
   }
-  if (cycle_two_running) {
-    // Update Amplification PID loop with new temperatures
-    if (config.run_amp_cycle_2) {
-      pid_controller_compute(&amp_pid_2, temperature_data.heat_zone_2_temp);
-    } else {
-      amp_pid_2.out = 0.0;
-    }
-    // Update Valve PID loop with new temperatures
-    if (config.run_valve_cycle_2) {
-      pid_controller_compute(&valve_pid_2, temperature_data.heat_zone_0_temp);
-    } else {
-      valve_pid_2.out = 0.0;
-    }
+  // Update Valve PID loop with new temperatures
+  if (cycle_config->run_valve) {
+    pid_controller_compute(&valve_pid, temperature_data.heat_zone_0_temp);
+  } else {
+    valve_pid.out = 0.0;
+  }
 
-    temperature_pwm_data_t pwmData = {
-        .heat_zone_0_pwm = valve_pid_2.out,
-        .heat_zone_1_pwm = 0,
-        .heat_zone_2_pwm = amp_pid_2.out,
-        .heat_zone_3_pwm = 0};
-    updateDutyCycles(pwmData);
-
-    // Set the PWMs for the logger
-    pm_h_pwm_data.heat_zone_0_pwm = pwmData.heat_zone_0_pwm;
-    pm_h_pwm_data.heat_zone_1_pwm = pwmData.heat_zone_1_pwm;
-    pm_h_pwm_data.heat_zone_2_pwm = pwmData.heat_zone_2_pwm;
-    pm_h_pwm_data.heat_zone_3_pwm = pwmData.heat_zone_3_pwm;
-    // Ensure that the temperatures are not greater than the max temperatures allowed
-    if (config.amp_max_temp < temperature_data.heat_zone_2_temp || temperature_data.heat_zone_2_temp < 0) {
-      pm_amp_greater_than_max = true;
-    }
-    if (config.valve_max_temp < temperature_data.heat_zone_0_temp || temperature_data.heat_zone_0_temp < 0) {
-      pm_valve_greater_than_max = true;
-    }
+  temperature_pwm_data_t pwmData = {
+      .heat_zone_0_pwm = valve_pid.out, // Heat Zone 0 controls Valve
+      .heat_zone_1_pwm = 0,
+      .heat_zone_2_pwm = amp_pid.out,   // Heat Zone 2 controls Amplification
+      .heat_zone_3_pwm = 0};
+  updateDutyCycles(pwmData);
+  
+  // Set the PWMs for the logger
+  pm_h_pwm_data.heat_zone_0_pwm = pwmData.heat_zone_0_pwm;
+  pm_h_pwm_data.heat_zone_1_pwm = pwmData.heat_zone_1_pwm;
+  pm_h_pwm_data.heat_zone_2_pwm = pwmData.heat_zone_2_pwm;
+  pm_h_pwm_data.heat_zone_3_pwm = pwmData.heat_zone_3_pwm;
+  // Ensure that the temperatures are not greater than the max temperatures allowed
+  if (config.amp_max_temp < temperature_data.heat_zone_2_temp || temperature_data.heat_zone_2_temp < 0) {
+    pm_amp_greater_than_max = true;
+  }
+  if (config.valve_max_temp < temperature_data.heat_zone_0_temp || temperature_data.heat_zone_0_temp < 0) {
+    pm_valve_greater_than_max = true;
   }
 
   // Handle being greater than the maximum temperature
@@ -207,18 +170,10 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
 #if VERBOSE_PID
   char w_buff[100];
-  if (cycle_one_running) {
-    sprintf(w_buff, "V Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_0_temp, valve_pid_1.out);
-    send_debug_log_message(w_buff);
-    sprintf(w_buff, "A Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_2_temp, amp_pid_1.out);
-    send_debug_log_message(w_buff);
-  }
-  if (cycle_two_running) {
-    sprintf(w_buff, "V Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_0_temp, valve_pid_2.out);
-    send_debug_log_message(w_buff);
-    sprintf(w_buff, "A Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_2_temp, amp_pid_2.out);
-    send_debug_log_message(w_buff);
-  }
+  sprintf(w_buff, "V Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_0_temp, valve_pid.out);
+  send_debug_log_message(w_buff);
+  sprintf(w_buff, "A Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_2_temp, amp_pid.out);
+  send_debug_log_message(w_buff);
 #endif
 
   logMsg.temperature_data.heat_zone_1_temp = temperature_data.heat_zone_1_temp;

@@ -58,10 +58,10 @@ void motorTask(void *pvParameters) {
       send_debug_log_message("Unable to Rx data to motor queue\n");
     } else {
       switch (motorRxMessage.type) {
-         case MOTOR_MSG_HEATER_STATE: {
+         case MOTOR_MSG_MOTOR_STATE: {
           motorRunning = motorRxMessage.motorRunning;
           // Switch the ccw line to switch between ccw and cw
-          if (motorRunning && ((use_default_configuration_parameters && DEFAULT_MOTOR_SWTICH_CCW_CW) || (!use_default_configuration_parameters && config.switch_motor_ccw_cw))) {
+          if (motorRunning && (config.switch_motor_ccw_cw))) {
             if (motor_ccw) {
               send_debug_log_message("Motor switched to CW");
               nrf_gpio_pin_clear(MOTOR_CWCCW);

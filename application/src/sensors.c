@@ -64,11 +64,7 @@ void vSensorTempTimerCallback(TimerHandle_t xTimer) {
 void startSensorTempTimer(void) {
   TickType_t sampleRateTicks;
 
-  if (use_default_configuration_parameters) {
-    sampleRateTicks = pdMS_TO_TICKS((DEFAULT_SAMPLE_RATE * 1000.0));
-  } else {
-    sampleRateTicks = pdMS_TO_TICKS((config.sample_rate * 1000.0));
-  }
+  sampleRateTicks = pdMS_TO_TICKS((config.sample_rate * 1000.0));
 
   if (xTimerChangePeriod(sensorTempTimer, sampleRateTicks, 100) != pdPASS) {
     send_debug_log_message("Cannot change period of sensor timer. \n");
@@ -115,19 +111,11 @@ void sensors_task(void *pvParameters) {
       .over = true};
 
   // Set the last sample based on config
-  if (use_default_configuration_parameters) {
-    sample_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE);
-  } else {
-    sample_log_max = (config.logging_rate / config.sample_rate);
-  }
+  sample_log_max = (config.logging_rate / config.sample_rate);
 
   SensorRxQueueMsg_t sensorRxMessage;
 
-  if (use_default_configuration_parameters) {
-    sampleRateTicks = pdMS_TO_TICKS((DEFAULT_SAMPLE_RATE * 1000.0) - 12.0);
-  } else {
-    sampleRateTicks = pdMS_TO_TICKS((config.sample_rate * 1000.0) - 12.0);
-  }
+  sampleRateTicks = pdMS_TO_TICKS((config.sample_rate * 1000.0) - 12.0);
 
 #ifdef SAMPLE_PREP_BOARD
   samplePrepSensorTaskSetup();
@@ -241,15 +229,11 @@ void handleConfigUpdated(void) {
 }
 
 void updateSampleLogMax(void) {
-  // Set the last sample based on config
-  if (use_default_configuration_parameters) {
-    sample_log_max = (DEFAULT_LOGGING_RATE / DEFAULT_SAMPLE_RATE);
-  } else {
-    sample_log_max = (config.logging_rate / config.sample_rate);
-  }
+  sample_log_max = (config.logging_rate / config.sample_rate);
 }
 
 void runPowerModuleSensorCollection(void) {
+#ifndef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
   HeaterRxQueueMsg_t heaterMsg;
 
@@ -321,6 +305,7 @@ void runPowerModuleSensorCollection(void) {
       send_debug_log_message(errorString);
     }
   }
+#endif
 }
 
 void runSamplePrepSensorCollection(void) {

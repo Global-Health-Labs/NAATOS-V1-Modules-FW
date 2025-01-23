@@ -38,7 +38,8 @@ void pwm2_ready_callback(uint32_t pwm_id) {
   pwm2_ready_flag = true;
 }
 
-bool pwmEnabled = false;
+bool motorPWMEnabled = false;
+bool heaterPWMEnabled = false;
 
 void init_pwms(void) {
   ret_code_t err;
@@ -74,7 +75,8 @@ void init_pwms(void) {
   /* Enable PWMs */
   app_pwm_enable(&PWM0);
   app_pwm_enable(&PWM2);
-  pwmEnabled = true;
+  heaterPWMEnabled = true;
+  motorPWMEnabled = true;
 
   // Set Original Duty Cycles to 0
   app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, 0);
@@ -105,6 +107,9 @@ void uninit_pwms(void) {
   nrf_gpio_cfg_input(HEATER_ZONE_2_PIN, NRF_GPIO_PIN_INPUT_DISCONNECT);
   nrf_gpio_cfg_input(HEATER_ZONE_3_PIN, NRF_GPIO_PIN_INPUT_DISCONNECT);
 #endif
+
+  heaterPWMEnabled = false;
+  motorPWMEnabled = false;
 }
 
 void updateDutyCycles(temperature_pwm_data_t pwmData) {
@@ -193,25 +198,40 @@ void pwm_task(void *pvParameters) {
         break;
       }
 
-      case PWM_MSG_DISABLE: {
-        app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, 0);
-        app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, 0);
+      case PWM_MSG_HEATER_DISABLE: {
         app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_2_CHANNEL, 0);
         app_pwm_channel_duty_set(&PWM2, HEAT_ZONE_3_CHANNEL, 0);
         vTaskDelay(pdMS_TO_TICKS(100));
-        if (pwmEnabled) {
-          app_pwm_disable(&PWM0);
+        if (heaterPWMEnabled) {
           app_pwm_disable(&PWM2);
-          pwmEnabled = false;
+          heaterPWMEnabled = false;
         }
         break;
       }
 
-      case PWM_MSG_ENABLE: {
-        if (!pwmEnabled) {
-          app_pwm_enable(&PWM0);
+      case PWM_MSG_HEATER_ENABLE: {
+        if (!heaterPWMEnabled) {
           app_pwm_enable(&PWM2);
-          pwmEnabled = true;
+          heaterPWMEnabled = true;
+        }
+        break;
+      }
+
+      case PWM_MSG_MOTOR_DISABLE: {
+        app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_0_CHANNEL, 0);
+        app_pwm_channel_duty_set(&PWM0, HEAT_ZONE_1_CHANNEL, 0);
+        vTaskDelay(pdMS_TO_TICKS(100));
+        if (motorPWMEnabled) {
+          app_pwm_disable(&PWM0);
+          motorPWMEnabled = false;
+        }
+        break;
+      }
+
+      case PWM_MSG_MOTOR_ENABLE: {
+        if (!motorPWMEnabled) {
+          app_pwm_enable(&PWM0);
+          motorPWMEnabled = true;
         }
         break;
       }

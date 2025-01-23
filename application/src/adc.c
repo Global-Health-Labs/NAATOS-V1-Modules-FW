@@ -32,14 +32,8 @@ bool get_hal_triggered(void) {
   // Check thresholds
   // Voltage idles at 1V and changes +/- 45 mV/mT depending on polarity of magnetic feild
   //    0V-2V
-  if (use_default_configuration_parameters) {
-    if (NOMINAL_HAL + DEFAULT_HAL_SENSOR_THRESHOLD <= hal_v || NOMINAL_HAL - DEFAULT_HAL_SENSOR_THRESHOLD >= hal_v) {
-      return true;
-    }
-  } else {
-    if (NOMINAL_HAL + config.hal_sensor_thresh <= hal_v || NOMINAL_HAL - config.hal_sensor_thresh >= hal_v) {
-      return true;
-    }
+  if (NOMINAL_HAL + config.hal_sensor_thresh <= hal_v || NOMINAL_HAL - config.hal_sensor_thresh >= hal_v) {
+    return true;
   }
   return false;
 #else 

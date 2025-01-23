@@ -604,7 +604,7 @@ FRESULT check_for_naatos_config_file(void) {
   }
 #ifndef SAMPLE_PREP_BOARD
   // Write Optical Switch
-  configBufferSize = sprintf(configBuffer, "optical_distace:%d\n", OPTICAL_TRIG_THRESHOLD);
+  configBufferSize = sprintf(configBuffer, "optical_distace:%d\n", DEFAULT_OPTICAL_TRIG_THRESHOLD);
   res = f_write(&file, configBuffer, configBufferSize, &b_written);
   if (res != FR_OK) {
     return res;

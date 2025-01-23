@@ -8,8 +8,8 @@
 #define VERSION "3.0"
 
 /*Define this when building sample prep only otherwise comment out*/
-//#define SAMPLE_PREP_BOARD
-#define POWER_MODULE_BOARD
+#define SAMPLE_PREP_BOARD
+//#define POWER_MODULE_BOARD
 
 #ifdef SAMPLE_PREP_BOARD
 #define SAMPLE_PREP_REV_A 0
@@ -198,9 +198,6 @@
 #define DEFAULT_MOTOR_KI                0.0005
 #define DEFAULT_MOTOR_KD                0.020
 #endif
-
-/* Device Debug Parameters */
-#define VERBOSE_PID 0
 
 /* Log Event Messages */
 #define START_EVENT_MSG "Sample Preperation Started."
@@ -443,7 +440,7 @@ typedef enum {
   MOTOR_MSG_SLEEP,
   MOTOR_MSG_WAKEUP,
   MOTOR_CONFIG_UPDATED,
-  MOTOR_MSG_HEATER_STATE
+  MOTOR_MSG_MOTOR_STATE
 } MotorRxQueueType_t;
 
 typedef struct {
@@ -510,6 +507,7 @@ typedef struct {
   bool heaterRunning;
   double motorSpeed;
   bool readTempFailed;
+  bool motorRunning;
 } HeaterRxQueueMsg_t;
 
 typedef struct {
@@ -535,13 +533,14 @@ typedef struct {
 typedef enum {
   PWM_MSG_UPDATE_DUTY,
   PWM_MSG_CALLBACK_EVENT,
-  PWM_MSG_DISABLE,
-  PWM_MSG_ENABLE
+  PWM_MSG_HEATER_DISABLE,
+  PWM_MSG_HEATER_ENABLE,
+  PWM_MSG_MOTOR_DISABLE,
+  PWM_MSG_MOTOR_ENABLE
 } PWMRxQueueType_t;
 
 typedef struct {
   PWMRxQueueType_t type;
-
 } PwmRxQueueMsg_t;
 
 // LED Handeling
