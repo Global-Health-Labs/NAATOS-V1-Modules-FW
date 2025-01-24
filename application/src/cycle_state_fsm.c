@@ -361,6 +361,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       runThrough = false;
       // Perform exit operations
       // Cleanup or final actions
+      current_cycle_index = 0;
       handle_exit_notifications();
       next_state = VALIDATE_INIT_CONDITIONS;
       break;
