@@ -327,7 +327,7 @@ void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
     heater_running = false;
     motor_running = false;
     handle_sample_cycle_stopstart_heater(heater_running);
-    if (curr_cycle_config_index+1 == total_cycles || !(&cycle_configs[curr_cycle_config_index+1].run_motor) || heaterRxMessage.fromError)
+    if (curr_cycle_config_index+1 == total_cycles || !(((&cycle_configs[curr_cycle_config_index+1])->run_motor)) || heaterRxMessage.fromError)
       handle_cycle_stopstart_motor(motor_running);
 
   /* Cycle Starting */
@@ -350,7 +350,8 @@ void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
     motor_running = s_cycle_config->run_motor;
     // Send start heater and motor
     handle_sample_cycle_stopstart_heater(heater_running);
-    if (curr_cycle_config_index == 0 || !(&cycle_configs[curr_cycle_config_index-1].run_motor))
+    bool prev_cycle_running_motor = (&cycle_configs[curr_cycle_config_index-1])->run_motor;
+    if (curr_cycle_config_index == 0 || !prev_cycle_running_motor)
       handle_cycle_stopstart_motor(motor_running);
   }
   #endif
