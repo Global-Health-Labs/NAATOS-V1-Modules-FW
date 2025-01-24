@@ -152,8 +152,8 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
   local_temp_data = temperature_data;
   // Ensure temperatures are below the minimum run zone temperature
-  if (s_cycle_config->min_run_zone_temp_en) {
-    if (starting_sample_prep_run && (temperature_data.heater_temp > s_cycle_config->min_run_zone_temp)) {
+  if (config.min_run_zone_temp_en) {
+    if (starting_sample_prep_run && (temperature_data.heater_temp > config.min_run_zone_temp)) {
       starting_sample_prep_run = false;
       // Send cannot start
       xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
@@ -161,7 +161,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
         send_debug_log_message("HEATER_TASK: Unable to send cannot start run response.");
       }
       return;
-    } else if (starting_sample_prep_run && (temperature_data.heater_temp <= s_cycle_config->min_run_zone_temp)) {
+    } else if (starting_sample_prep_run && (temperature_data.heater_temp <= config.min_run_zone_temp)) {
       // Send can start
       xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
       if (xReturned != pdPASS) {
@@ -169,7 +169,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
       }
       starting_sample_prep_run = false;
     }
-  } else if (!s_cycle_config->min_run_zone_temp_en && starting_sample_prep_run) {
+  } else if (!config.min_run_zone_temp_en && starting_sample_prep_run) {
     // Send can start
     xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
     if (xReturned != pdPASS) {
@@ -331,8 +331,14 @@ void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
   } else {
     // Update the cycle config to the current cycle
     s_cycle_config = &cycle_configs[(uint16_t)(heaterRxMessage.cycleSelect - 1)]; // Index = cycle - 1
-    // Reset PIDs
-    samplePrepResetHeaterPIDs();
+    // Reset PIDs if this is the start of the cycle
+    if (heaterRxMessage.cycleSelect == 1) {
+      samplePrepResetHeaterPIDs();
+    } else {
+      // Update the setpoints of the next cycle if it is being run in the cycle
+      if (s_cycle_config->run_heater) { pid_controller_update_setpoint(&heater_pid, s_cycle_config->heater_setpoint); }
+      if (s_cycle_config->run_motor ) { pid_controller_update_setpoint(&motor_pid , s_cycle_config->motor_setpoint ); }
+    }
     // Reset Control Vars
     motorReachedSpeed = false;
     starting_sample_prep_run = true;

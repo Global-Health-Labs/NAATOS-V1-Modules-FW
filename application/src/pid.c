@@ -42,3 +42,7 @@ void pid_controller_compute(pid_controller_t *pid, float measurement) {
   // Keep Track of for Next Execution
   pid->prevMesurement = measurement;
 }
+
+void pid_controller_update_setpoint(pid_controller_t *pid, float setpoint) {
+  pid->setpoint = setpoint;
+}

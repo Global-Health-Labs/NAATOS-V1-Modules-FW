@@ -38,6 +38,9 @@
 #define NAATOS_CONFIG_FILE "config_v" VERSION ".txt"
 
 #define FIRST_CYCLE_CONFIG_FILE "cycle_config_1.txt"
+#define SECOND_CYCLE_CONFIG_FILE "cycle_config_2.txt"
+#define THIRD_CYCLE_CONFIG_FILE "cycle_config_3.txt"
+#define FOURTH_CYCLE_CONFIG_FILE "cycle_config_4.txt"
 
 #ifdef SAMPLE_PREP_BOARD
 #define CSV_HEADER "Time,HeaterTemp,HeaterPWM,MotorSpeed,MotorPWM,Battery,BatteryV,BatteryT,Event\r\n"
@@ -65,6 +68,8 @@ typedef enum {
   SAMPLE_VALID_TIMEOUT,
   ALERT_TIMEOUT_TIME,
   DEBUG_TO_COM_EN,
+  MIN_RUN_ZONE_TEMP_EN,
+  MIN_RUN_ZONE_TEMP_C,
 #ifndef SAMPLE_PREP_BOARD
   OPTICAL_DISTANCE,
   MAX_AMP_PID_PWM,
@@ -88,8 +93,6 @@ typedef enum {
 
 typedef enum {
   CYCLE_RUN_TIME,
-  MIN_RUN_ZONE_TEMP_C,
-  MIN_RUN_ZONE_TEMP_EN,
   CYCLE_DELAY_TIME,
   RAMP_TO_TEMP_BEFORE_CYCLE_START,
   RAMP_TO_TEMP_TIMEOUT,

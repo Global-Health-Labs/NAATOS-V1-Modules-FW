@@ -1,4 +1,5 @@
 #include "naatos_storage.h"
+#include "sample_prep_default_cycles.h"
 
 /* Storage Variables */
 static FIL file;
@@ -250,6 +251,13 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       num = strcmp(val, "true");
       parameters->debug_to_com_en = num ? false : true;
       break;
+    case MIN_RUN_ZONE_TEMP_EN:
+      num = strcmp(val, "true");
+      parameters->min_run_zone_temp_en = num ? false : true;
+      break;
+    case MIN_RUN_ZONE_TEMP_C:
+      parameters->min_run_zone_temp = parse_double(val, DEFAULT_MIN_RUN_ZONE_TEMP_C);
+      break;
 #ifndef SAMPLE_PREP_BOARD
     case OPTICAL_DISTANCE:
       parameters->optical_distance = atoi(val);
@@ -382,7 +390,7 @@ FRESULT get_cycle_configurations_parameters() {
         sprintf(val, "%s", pch);
         pch = strtok(NULL, ":");
         sprintf(val, "%s", pch);
-        char *newline = strchr(val, '\r'); // Was previosuly \n
+        char *newline = strchr(val, '\n'); 
         if (newline) {
           // Replace newline character with null terminator
           *newline = '\0';
@@ -391,13 +399,6 @@ FRESULT get_cycle_configurations_parameters() {
         switch ((cycle_config_params_t)j) {
         case CYCLE_RUN_TIME:
             cycle_configs[i].cycle_run_time_s = parse_double(val, DEFAULT_CYCLE_RUNTIME);
-            break;
-        case MIN_RUN_ZONE_TEMP_C:
-            cycle_configs[i].min_run_zone_temp = parse_double(val, DEFAULT_MIN_RUN_ZONE_TEMP_C);
-            break;
-        case MIN_RUN_ZONE_TEMP_EN:
-            num = strcmp(val, "true");
-            cycle_configs[i].min_run_zone_temp_en = num ? false : true;
             break;
         case CYCLE_DELAY_TIME:
             cycle_configs[i].cycle_delay_time = parse_int(val, DEFAULT_CYCLE_DELAY_TIME);
@@ -605,6 +606,22 @@ FRESULT check_for_naatos_config_file(void) {
   if (res != FR_OK) {
     return res;
   }
+  
+  // Write Minimum Run Zone Temperature Enable
+  configBufferSize = sprintf(configBuffer, "min_run_zone_temp_en:%s\n", DEFAULT_MIN_RUN_ZONE_TEMP_EN ? "true" : "false");
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Write Minimum Run Zone
+  configBufferSize = sprintf(configBuffer, "min_run_zone_temp:%0.2f\n", DEFAULT_MIN_RUN_ZONE_TEMP_C);
+  res = f_write(&file, configBuffer, configBufferSize, &b_written);
+  if (res != FR_OK) {
+    return res;
+  } 
+
+
 #ifndef SAMPLE_PREP_BOARD
   // Write Optical Switch
   configBufferSize = sprintf(configBuffer, "optical_distace:%d\n", DEFAULT_OPTICAL_TRIG_THRESHOLD);
@@ -751,8 +768,28 @@ FRESULT check_for_cycle_config_files(void) {
     // Return that it already exists
     return res;
   }
+  
+  // TODO: Remove any possible leftover cycle configuration files
+  
+  // Let user know
+  send_debug_log_message("Creating new default cycle configuration files.");
 
-  send_debug_log_message("Warning: NO CYCLE FILES FOUND, CREATING DEFAULTS NOT YET IMPLEMENTED! PUT THEM IN YOURSELF");
+  // Create Sample Prep Default files
+  res = f_write(&file, sp_default_cycle_config_1, sp_default_cycle_config_1_size, &b_written);
+  res = f_close(&file);
+
+  res = f_open(&file, SECOND_CYCLE_CONFIG_FILE, FA_CREATE_NEW | FA_WRITE);
+  res = f_write(&file, sp_default_cycle_config_2, sp_default_cycle_config_2_size, &b_written);
+  res = f_close(&file);
+
+  res = f_open(&file, THIRD_CYCLE_CONFIG_FILE, FA_CREATE_NEW | FA_WRITE);
+  res = f_write(&file, sp_default_cycle_config_3, sp_default_cycle_config_3_size, &b_written);
+  res = f_close(&file);
+
+  res = f_open(&file, FOURTH_CYCLE_CONFIG_FILE, FA_CREATE_NEW | FA_WRITE);
+  res = f_write(&file, sp_default_cycle_config_4, sp_default_cycle_config_4_size, &b_written);
+  res = f_close(&file);
+  
 }
 
 // Sets the set_time_date variable to "false"

@@ -160,7 +160,7 @@
 #define DEFAULT_VALVE_MAX_TEMP          105.0
 #define DEFAULT_AMP_MAX_TEMP            80.0
 #else 
-#define DEFAULT_MAX_HEATER_TEMP         105.0
+#define DEFAULT_MAX_HEATER_TEMP         115.0
 #define DEFAULT_MAX_HEATER_PID          100
 #define DEFAULT_MOTOR_SWTICH_CCW_CW     false
 #define DEFAULT_HAL_SENSOR_THRESHOLD    0.30f
@@ -638,6 +638,8 @@ typedef struct {
   float     sample_valid_timeout_s;
   float     alert_timeout_time_s;
   bool      debug_to_com_en;
+  float     min_run_zone_temp;
+  bool      min_run_zone_temp_en;
 #ifndef SAMPLE_PREP_BOARD  
   uint16_t  optical_distance;
   float     max_amp_pid_pwm;
@@ -660,8 +662,6 @@ typedef struct {
 
 typedef struct {
   float     cycle_run_time_s;
-  float     min_run_zone_temp;
-  bool      min_run_zone_temp_en;
   uint16_t  cycle_delay_time;
   bool      ramp_to_temp_before_start_cycle;
   float     ramp_to_temp_timeout;
