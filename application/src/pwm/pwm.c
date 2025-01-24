@@ -121,6 +121,9 @@ void updateDutyCycles(temperature_pwm_data_t pwmData) {
   heater_duty = pwmData.heater_pwm;
   motor_duty = pwmData.motor_pwm;
 
+  app_pwm_channel_duty_set(&PWM0, HEATER_CHANNEL, heater_duty);
+  app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL, motor_duty);
+
   if (heater_duty > 0) {
     heater_active = true;
   }
@@ -153,8 +156,8 @@ void pwm_task(void *pvParameters) {
   usb_suspend_req_t sus_req;
 
 #ifdef SAMPLE_PREP_BOARD
-  app_pwm_channel_duty_set(&PWM0, HEATER_CHANNEL, heater_duty);
-  app_pwm_channel_duty_set(&PWM0, MOTOR_CHANNEL, motor_duty);
+  app_pwm_channel_duty_set(&PWM0, HEATER_CHANNEL, 1);
+  app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL, 1);
 #else
   app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty);
   app_pwm_channel_duty_set(&PWM2, AMP_CHANNEL, amp_duty);
@@ -179,10 +182,10 @@ void pwm_task(void *pvParameters) {
           }
 
           if (heater_duty > 0) {
-           app_pwm_channel_duty_set(&PWM0, HEATER_CHANNEL, heater_duty);
+           //app_pwm_channel_duty_set(&PWM0, HEATER_CHANNEL, heater_duty);
           } else if (heater_active) {
             heater_active = false;
-            app_pwm_channel_duty_set(&PWM0, HEATER_CHANNEL, 0);
+            //app_pwm_channel_duty_set(&PWM0, HEATER_CHANNEL, 0);
           }
         }
 
@@ -192,10 +195,10 @@ void pwm_task(void *pvParameters) {
           }
 
           if (motor_duty > 0) {
-           app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL, motor_duty);
+           //app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL, motor_duty);
           } else if (motor_active) {
             motor_active = false;
-            app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL, 0);
+            //app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL, 0);
           }
         }
 #else
@@ -230,7 +233,7 @@ void pwm_task(void *pvParameters) {
 
       case PWM_MSG_HEATER_DISABLE: {
  #ifdef SAMPLE_PREP_BOARD
-        app_pwm_channel_duty_set(&PWM0, HEATER_CHANNEL, 0);
+        //app_pwm_channel_duty_set(&PWM0, HEATER_CHANNEL, 0);
         vTaskDelay(pdMS_TO_TICKS(100));
         if (heaterPWMEnabled) {
           app_pwm_disable(&PWM0);
@@ -268,7 +271,7 @@ void pwm_task(void *pvParameters) {
       }
 
       case PWM_MSG_MOTOR_DISABLE: {
-        app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL, 0);
+        //app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL, 0);
         vTaskDelay(pdMS_TO_TICKS(100));
         if (motorPWMEnabled) {
           app_pwm_disable(&PWM2);
