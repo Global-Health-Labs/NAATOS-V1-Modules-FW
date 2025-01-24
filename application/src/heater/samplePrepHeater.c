@@ -268,37 +268,38 @@ void handleSampleMotorDataRx(int motor_speed) {
   sprintf(tmp, "Motor Speed: %d rpm; Motor PWM: %0.2f", motor_speed, pwmData.heat_zone_2_pwm);
   send_debug_log_message(tmp);
 #endif
-
-  // Check if Motor has come up to speed yet
-  if (motor_speed >= s_cycle_config->motor_setpoint && config.motor_stall_en) {
-    motorReachedSpeed = true;
-  }
-
-  // Motor Stall Percentage Check
-  if (motorReachedSpeed && motor_speed < (s_cycle_config->motor_setpoint - ((float)s_cycle_config->motor_setpoint * ((float)config.motor_stall_percent / 100.0 )))) {
-    motorStalledPercent = true;
-    motorReachedSpeed = false;
-  }
-  // Motor Stall PWM Check
-  if (motorReachedSpeed && motor_pid.out >= config.motor_stall_pwm) {
-    motorStalledPWM = true;
-    motorReachedSpeed = false;
-  }
-  // Handle motor Stall Detection
-  if (motorStalledPercent || motorStalledPWM) {
-    // Set LEDs
-    updateLedState(LED_ABORT, true);
-    // Send alert message to main task
-    if (motorStalledPercent) {
-      xReturned = xQueueSend(main_runErrorQueue, &motor_stall_percent_err_msg, 0);
-    } else {
-      xReturned = xQueueSend(main_runErrorQueue, &motor_stall_pwm_err_msg, 0);
+  if (motor_running) {
+    // Check if Motor has come up to speed yet
+    if (motor_speed >= s_cycle_config->motor_setpoint && config.motor_stall_en) {
+      motorReachedSpeed = true;
     }
-    if (xReturned != pdPASS) {
-      send_debug_log_message("HEATER_TASK: Unable to send run error for motor stalled to main_runErrorQueue.");
+
+    // Motor Stall Percentage Check
+    if (motorReachedSpeed && motor_speed < (s_cycle_config->motor_setpoint - ((float)s_cycle_config->motor_setpoint * ((float)config.motor_stall_percent / 100.0 )))) {
+      motorStalledPercent = true;
+      motorReachedSpeed = false;
     }
-    motorStalledPWM = false;
-    motorStalledPercent = false;
+    // Motor Stall PWM Check
+    if (motorReachedSpeed && motor_pid.out >= config.motor_stall_pwm) {
+      motorStalledPWM = true;
+      motorReachedSpeed = false;
+    }
+    // Handle motor Stall Detection
+    if (motorStalledPercent || motorStalledPWM) {
+      // Set LEDs
+      updateLedState(LED_ABORT, true);
+      // Send alert message to main task
+      if (motorStalledPercent) {
+        xReturned = xQueueSend(main_runErrorQueue, &motor_stall_percent_err_msg, 0);
+      } else {
+        xReturned = xQueueSend(main_runErrorQueue, &motor_stall_pwm_err_msg, 0);
+      }
+      if (xReturned != pdPASS) {
+        send_debug_log_message("HEATER_TASK: Unable to send run error for motor stalled to main_runErrorQueue.");
+      }
+      motorStalledPWM = false;
+      motorStalledPercent = false;
+    }
   }
   #endif
 }
@@ -312,9 +313,11 @@ void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
 
   /* Cycle Ending */
   if (!heaterRxMessage.cycleEnabled) { //AMP2 will be used in sample prep for heating
+    bool next_cycle_running_motor = (&cycle_configs[curr_cycle_config_index+1])->run_motor;
+
     // Set IUD outputs to 0
     heater_pid.out = 0;
-    motor_pid.out = 0;
+    if (!next_cycle_running_motor)  { motor_pid.out = 0; }
     // Update PWM Duty Cycles
     temperature_pwm_data_t pwmData = {
         .heater_pwm = heater_pid.out,
@@ -327,7 +330,7 @@ void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
     heater_running = false;
     motor_running = false;
     handle_sample_cycle_stopstart_heater(heater_running);
-    if (curr_cycle_config_index+1 == total_cycles || !(((&cycle_configs[curr_cycle_config_index+1])->run_motor)) || heaterRxMessage.fromError)
+    if (curr_cycle_config_index+1 == total_cycles || !next_cycle_running_motor || heaterRxMessage.fromError)
       handle_cycle_stopstart_motor(motor_running);
 
   /* Cycle Starting */
