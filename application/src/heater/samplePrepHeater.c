@@ -14,6 +14,7 @@ const MainStateErrorQueueMsg_t motor_stall_pwm_err_msg = {
 };
 
 cycle_config_parameters *s_cycle_config;
+int curr_cycle_config_index;
 
 pid_controller_t heater_pid;
 pid_controller_t motor_pid;
@@ -307,6 +308,9 @@ void handleSampleMotorDataRx(int motor_speed) {
 void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
 #ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
+  
+  // Get current cycle config index; Index = cycle - 1
+  curr_cycle_config_index = (uint16_t)(heaterRxMessage.cycleSelect - 1);
 
   /* Cycle Ending */
   if (!heaterRxMessage.cycleEnabled) { //AMP2 will be used in sample prep for heating
@@ -330,7 +334,7 @@ void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
   /* Cycle Starting */
   } else {
     // Update the cycle config to the current cycle
-    s_cycle_config = &cycle_configs[(uint16_t)(heaterRxMessage.cycleSelect - 1)]; // Index = cycle - 1
+    s_cycle_config = &cycle_configs[curr_cycle_config_index]; 
     // Reset PIDs if this is the start of the cycle
     if (heaterRxMessage.cycleSelect == 1) {
       samplePrepResetHeaterPIDs();
