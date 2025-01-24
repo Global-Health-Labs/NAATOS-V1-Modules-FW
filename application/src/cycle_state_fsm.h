@@ -80,7 +80,7 @@ typedef enum {
 void reset_cycle_state_machine(void);
 cycle_state_exit_t run_cycle_state_machine(void);
 bool begin_cycle(cycle_t cycle);
-void end_cycle(cycle_t cycle);
+void end_cycle(cycle_t cycle, bool end_from_error);
 bool limitSwitchFreed(sensor_switches_t data);
 void handle_exit_notifications(void);
 cycle_state_t handleMainErrorMessage();

@@ -521,6 +521,7 @@ typedef struct {
   double motorSpeed;
   bool readTempFailed;
   bool motorRunning;
+  bool fromError;
 } HeaterRxQueueMsg_t;
 
 typedef struct {
