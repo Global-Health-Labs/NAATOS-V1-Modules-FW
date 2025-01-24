@@ -468,11 +468,10 @@ bool begin_cycle(cycle_t cycle) {
   }
 
   // Create New Cycle Started Logging Task
-  char w_buff[64];
-  sprintf(w_buff, "Cycle %d Started.", (uint16_t)cycle);
   log_event_t cycle_start_event = {
     .event = SAMPLE_CYCLE_STARTED,
-    .message = *w_buff};
+    .message = NULL};
+  sprintf(cycle_start_event.message, "Cycle %d Started.", (uint16_t)cycle);
   log_data_message_t cycle_start_log_msg = {
     .data_type = EVENT_DATA,
     .temperature_data = NULL,
@@ -513,11 +512,10 @@ void end_cycle(cycle_t cycle) {
   }
   
   // Create Cycle Stopped Logging Task
-  char w_buff[64];
-  sprintf(w_buff, "Cycle %d Stopped.", (uint16_t)cycle);
   log_event_t cycle_stop_event = {
     .event = SAMPLE_CYCLE_ENDED,
-    .message = *w_buff};
+    .message = NULL};
+  sprintf(cycle_stop_event.message, "Cycle %d Stopped.", (uint16_t)cycle);
   log_data_message_t cycle_stop_log_msg = {
     .data_type = EVENT_DATA,
     .temperature_data = NULL,

@@ -154,10 +154,6 @@ void sensors_task(void *pvParameters) {
       switch (sensorRxMessage.type) {
       case SENSOR_MSG_HEATER_STATE: {
         heaterRunning = sensorRxMessage.heaterRunning;
-        
-        char buff[100];
-        sprintf(buff, "heaterRunning: %s, s_motorRunning: %s", (heaterRunning ? "true" : "false"), (s_motorRunning ? "true" : "false"));
-        send_debug_log_message(buff);
 
         HeaterRxQueueMsg_t heaterMsg = {
             .type = HEATER_MSG_SENSOR_CONFIRM,
@@ -175,23 +171,6 @@ void sensors_task(void *pvParameters) {
 #ifdef SAMPLE_PREP_BOARD
       case SENSOR_MSG_MOTOR_STATE: {
         s_motorRunning = sensorRxMessage.motorRunning;
-        
-        char buff[100];
-        sprintf(buff, "heaterRunning: %s, s_motorRunning: %s", (heaterRunning ? "true" : "false"), (s_motorRunning ? "true" : "false"));
-        send_debug_log_message(buff);
-        
-        /*
-        HeaterRxQueueMsg_t heaterMsg = {
-            .type = HEATER_MSG_SENSOR_CONFIRM,
-            .heaterRunning = heaterRunning
-            };
-
-        // Respond to heater change
-        xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
-        if (xReturned != pdPASS) {
-          send_debug_log_message("USB: Unable to send main state response to main_mainStateRespQueue queue.\r\n");
-        }
-        */
         break;
       }
 #endif
