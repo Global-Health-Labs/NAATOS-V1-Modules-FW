@@ -22,6 +22,7 @@ fuel_batt_info_t batt_info_recv =  {
 
 MainStateErrorQueueMsg_t main_err_msg;
 volatile bool runThrough = true;
+int current_cycle_index = 0;
 float extraLogData = 0.0;
 
 temperature_data_t over_temp_data;
@@ -49,7 +50,6 @@ cycle_state_t handleBatteryMessage() {
 }
 
 cycle_state_exit_t run_cycle_state_machine(void) {
-  int current_cycle_index = 0;
   runThrough = true;
 
   while (runThrough) {
@@ -325,6 +325,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
           next_state = START_CYCLE;
         } 
       }
+      break;
     }
 
     case CYCLE_SAMPLE_VALID_HOLD: {

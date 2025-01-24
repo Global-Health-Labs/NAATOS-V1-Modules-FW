@@ -45,6 +45,7 @@ TimerHandle_t sensorTempTimer;
 TickType_t sampleRateTicks;
 
 bool heaterRunning = false;
+bool s_motorRunning = false;
 bool usb_suspend = false;
 uint32_t sample_log_index = 0;
 uint32_t sample_log_max = 0;
@@ -153,10 +154,15 @@ void sensors_task(void *pvParameters) {
       switch (sensorRxMessage.type) {
       case SENSOR_MSG_HEATER_STATE: {
         heaterRunning = sensorRxMessage.heaterRunning;
+        
+        char buff[100];
+        sprintf(buff, "heaterRunning: %s, s_motorRunning: %s", (heaterRunning ? "true" : "false"), (s_motorRunning ? "true" : "false"));
+        send_debug_log_message(buff);
 
         HeaterRxQueueMsg_t heaterMsg = {
             .type = HEATER_MSG_SENSOR_CONFIRM,
-            .heaterRunning = heaterRunning};
+            .heaterRunning = heaterRunning
+            };
 
         // Respond to heater change
         xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
@@ -165,6 +171,30 @@ void sensors_task(void *pvParameters) {
         }
         break;
       }
+
+#ifdef SAMPLE_PREP_BOARD
+      case SENSOR_MSG_MOTOR_STATE: {
+        s_motorRunning = sensorRxMessage.motorRunning;
+        
+        char buff[100];
+        sprintf(buff, "heaterRunning: %s, s_motorRunning: %s", (heaterRunning ? "true" : "false"), (s_motorRunning ? "true" : "false"));
+        send_debug_log_message(buff);
+        
+        /*
+        HeaterRxQueueMsg_t heaterMsg = {
+            .type = HEATER_MSG_SENSOR_CONFIRM,
+            .heaterRunning = heaterRunning
+            };
+
+        // Respond to heater change
+        xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
+        if (xReturned != pdPASS) {
+          send_debug_log_message("USB: Unable to send main state response to main_mainStateRespQueue queue.\r\n");
+        }
+        */
+        break;
+      }
+#endif
 
       case SENSOR_MSG_USB_SUSPEND: {
         // Send Suspend Accepted
@@ -387,11 +417,14 @@ void runSamplePrepSensorCollection(void) {
     send_debug_log_message("SENSORS_TASK: Unable to send switch data in main_switchQueue.\r\n");
   }
 
+#ifndef SAMPLE_PREP_BOARD
   if (heaterRunning) {
-
+#else 
+  
+#endif
+  if (heaterRunning || s_motorRunning) {
     heaterMsg.type = HEATER_MSG_TEMPERATURE_DATA;
     heaterMsg.tempData = temperatures;
-
     xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
     if (xReturned != pdPASS) {
       char errorString[100];

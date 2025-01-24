@@ -426,6 +426,9 @@ typedef struct {
 
 typedef enum {
   SENSOR_MSG_HEATER_STATE,
+#ifdef SAMPLE_PREP_BOARD
+  SENSOR_MSG_MOTOR_STATE,
+#endif
   SENSOR_MSG_USB_SUSPEND,
   SENSOR_MSG_TIMER_TEMP_EVENT,
   SENSOR_MSG_TIMER_MOTOR_EVENT,
@@ -437,6 +440,9 @@ typedef enum {
 typedef struct {
   SensorRxQueueType_t type;
   bool heaterRunning;
+#ifdef SAMPLE_PREP_BOARD
+  bool motorRunning;
+#endif
   bool usbSuspend;
   temperature_pwm_data_t pwmData;
 } SensorRxQueueMsg_t;

@@ -195,7 +195,7 @@ void pwm_task(void *pvParameters) {
            app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL, motor_duty);
           } else if (motor_active) {
             motor_active = false;
-            app_pwm_channel_duty_set(&PWM2, MOTOR, 0);
+            app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL, 0);
           }
         }
 #else

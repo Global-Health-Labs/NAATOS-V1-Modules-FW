@@ -29,7 +29,7 @@ bool motorStalledPWM = false;
 bool motorReachedSpeed = false;
 int last_motor_speed = 0;
 
-temperature_data_t local_temp_data;
+temperature_data_t local_temp_data = {};
 
 uint32_t samp_log_index = 0;
 uint32_t samp_log_max = 0;
@@ -113,6 +113,15 @@ void handle_cycle_stopstart_motor(bool motor_running) {
     send_debug_log_message("HEATER_TASK: Unable to send heater state to motorRxQueue.");
   }
 
+   // Send the heater status (Want to let the sensors know that motor is running so that temperature data can still be sent and logged)
+  SensorRxQueueMsg_t msg;
+  msg.type = SENSOR_MSG_MOTOR_STATE;
+  msg.motorRunning = motor_running;
+  xReturned = xQueueSend(sensorRxQueue, &msg, 0);
+  if (xReturned != pdPASS) {
+    send_debug_log_message("HEATER_TASK: Unable to send heater state to sensorRxQueue.");
+  }
+
   // Update the PWM status for the motor
   PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_MOTOR_DISABLE};
   if (motor_running) {
@@ -184,7 +193,6 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
         s_rampToTemp = false;
       }
     }
-    
     // Maintain Current Motor PID PWM
     pwmData.heater_pwm = heater_pid.out;
     pwmData.motor_pwm = motor_pid.out;
