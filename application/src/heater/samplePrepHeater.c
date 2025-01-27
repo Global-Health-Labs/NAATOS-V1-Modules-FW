@@ -225,7 +225,7 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   logMsg.temperature_data.heater_temp = temperature_data.heater_temp;
   logMsg.temperature_data.heater_pwm = pwmData.heater_pwm;
   logMsg.temperature_data.motor_speed = last_motor_speed;
-  logMsg.temperature_data.motor_pwm = pwmData.motor_pwm;
+  logMsg.temperature_data.motor_pwm = motor_pid.out;
   
   logMsg.data_type = UART_DATA;
   // Send the Log message
