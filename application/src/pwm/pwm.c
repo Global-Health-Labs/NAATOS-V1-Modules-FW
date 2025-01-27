@@ -233,7 +233,7 @@ void pwm_task(void *pvParameters) {
 
       case PWM_MSG_HEATER_DISABLE: {
  #ifdef SAMPLE_PREP_BOARD
-        //app_pwm_channel_duty_set(&PWM0, HEATER_CHANNEL, 0);
+        app_pwm_channel_duty_set(&PWM0, HEATER_CHANNEL, 0);
         vTaskDelay(pdMS_TO_TICKS(100));
         if (heaterPWMEnabled) {
           app_pwm_disable(&PWM0);
@@ -271,7 +271,7 @@ void pwm_task(void *pvParameters) {
       }
 
       case PWM_MSG_MOTOR_DISABLE: {
-        //app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL, 0);
+        app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL, 0);
         vTaskDelay(pdMS_TO_TICKS(100));
         if (motorPWMEnabled) {
           app_pwm_disable(&PWM2);

@@ -91,8 +91,8 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   pm_local_temp_data = temperature_data;
 
   // Ensure temperatures are below the minimum run zone temperature
-  if (p_cycle_config->min_run_zone_temp_en) {
-    if (starting_run &&  (temperature_data.amp_temp > p_cycle_config->min_run_zone_temp || temperature_data.valve_temp > p_cycle_config->min_run_zone_temp)) {
+  if (config.min_run_zone_temp_en) {
+    if (starting_run &&  (temperature_data.amp_temp > config.min_run_zone_temp || temperature_data.valve_temp > config.min_run_zone_temp)) {
       starting_run = false;
       // Send cannot start
       xReturned = xQueueSend(main_runRespQueue, &starting_run, 0);
@@ -100,7 +100,7 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
         send_debug_log_message("HEATER_TASK: Unable to send cannot start run response.");
       }
       return;
-    } else if (starting_run && (temperature_data.amp_temp <= p_cycle_config->min_run_zone_temp && temperature_data.valve_temp <= p_cycle_config->min_run_zone_temp )) {
+    } else if (starting_run && (temperature_data.amp_temp <= config.min_run_zone_temp && temperature_data.valve_temp <= config.min_run_zone_temp )) {
       // Send can start
       xReturned = xQueueSend(main_runRespQueue, &starting_run, 0);
       if (xReturned != pdPASS) {
@@ -108,7 +108,7 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
       }
       starting_run = false;
     }
-  } else if (!p_cycle_config->min_run_zone_temp_en && starting_run) {
+  } else if (!config.min_run_zone_temp_en && starting_run) {
     // Send can start
     xReturned = xQueueSend(main_runRespQueue, &starting_run, 0);
     if (xReturned != pdPASS) {
