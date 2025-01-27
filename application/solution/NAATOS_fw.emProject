@@ -204,6 +204,7 @@
         <file file_name="../src/storage/naatos_storage.c" />
         <file file_name="../src/storage/naatos_storage.h" />
         <file file_name="../src/storage/sample_prep_default_cycles.h" />
+        <file file_name="../src/storage/power_module_default_cycles.h" />
       </folder>
       <file file_name="../src/motor_task.c" />
       <file file_name="../src/motor_task.h" />

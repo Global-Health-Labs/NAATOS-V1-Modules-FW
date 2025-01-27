@@ -1,5 +1,6 @@
 #include "naatos_storage.h"
 #include "sample_prep_default_cycles.h"
+#include "power_module_default_cycles.h"
 
 /* Storage Variables */
 static FIL file;
@@ -441,7 +442,7 @@ FRESULT get_cycle_configurations_parameters() {
             cycle_configs[i].valve_ki = parse_double(val, DEFAULT_VALVE_KI);
             break;
         case VALVE_KD:
-            cycle_configs[i].valve_ki = parse_double(val, DEFAULT_VALVE_KD);
+            cycle_configs[i].valve_kd = parse_double(val, DEFAULT_VALVE_KD);
             break;
     #else
         case HEATER_SETPOINT:
@@ -775,6 +776,7 @@ FRESULT check_for_cycle_config_files(void) {
   send_debug_log_message("Creating new default cycle configuration files.");
 
   // Create Sample Prep Default files
+#ifdef SAMPLE_PREP_BOARD
   res = f_write(&file, sp_default_cycle_config_1, sp_default_cycle_config_1_size, &b_written);
   res = f_close(&file);
 
@@ -789,6 +791,10 @@ FRESULT check_for_cycle_config_files(void) {
   res = f_open(&file, FOURTH_CYCLE_CONFIG_FILE, FA_CREATE_NEW | FA_WRITE);
   res = f_write(&file, sp_default_cycle_config_4, sp_default_cycle_config_4_size, &b_written);
   res = f_close(&file);
+#else
+  res = f_write(&file, pm_default_cycle_config_1, pm_default_cycle_config_1_size, &b_written);
+  res = f_close(&file);
+#endif
   
 }
 

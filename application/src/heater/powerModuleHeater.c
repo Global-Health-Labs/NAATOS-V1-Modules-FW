@@ -168,9 +168,9 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
 
 #if VERBOSE_PID
   char w_buff[100];
-  sprintf(w_buff, "V Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_0_temp, valve_pid.out);
+  sprintf(w_buff, "V Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.valve_temp, valve_pid.out);
   send_debug_log_message(w_buff);
-  sprintf(w_buff, "A Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.heat_zone_2_temp, amp_pid.out);
+  sprintf(w_buff, "A Zone: Temp: %0.2f\tDuty: %0.2f", temperature_data.amp_temp, amp_pid.out);
   send_debug_log_message(w_buff);
 #endif
 
@@ -203,8 +203,8 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
 #ifndef SAMPLE_PREP_BOARD
   temperature_pwm_data_t pwmData;
 
-   /* Disable Heaters */
-   if (!heaterRxMessage.cycleEnabled) {
+  /* Disable Heaters */
+  if (!heaterRxMessage.cycleEnabled) {
     // Set PWMs to Zero
     amp_pid.out = 0;
     valve_pid.out = 0;
@@ -227,7 +227,14 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
     starting_run = true;
     pm_amp_heater_running = p_cycle_config->run_amp;
     pm_valve_heater_running = p_cycle_config->run_valve;
-    powerModuleResetHeaterPIDs();
+    // Reset PIDs if this is the start of the cycle
+    if (heaterRxMessage.cycleSelect == 1) {
+      powerModuleResetHeaterPIDs();
+    } else {
+      // Update the setpoints of the next cycle if it is being run in the cycle
+      if (p_cycle_config->run_amp) { pid_controller_update_setpoint(&amp_pid, p_cycle_config->amp_setpoint); }
+      if (p_cycle_config->run_valve ) { pid_controller_update_setpoint(&valve_pid, p_cycle_config->valve_setpoint ); }
+    }
     // Send starting heater to sensors task
     handle_power_cycle_stopstart_heater(pm_amp_heater_running, pm_valve_heater_running);
   }

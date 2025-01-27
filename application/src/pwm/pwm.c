@@ -134,6 +134,9 @@ void updateDutyCycles(temperature_pwm_data_t pwmData) {
   amp_duty = pwmData.amp_pwm;
   valve_duty = pwmData.valve_pwm;
 
+  app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty);
+  app_pwm_channel_duty_set(&PWM2, AMP_CHANNEL, amp_duty);
+
   if (amp_duty > 0) {
     amp_active = true;
   }
@@ -141,8 +144,6 @@ void updateDutyCycles(temperature_pwm_data_t pwmData) {
     valve_active = true;
   }
 #endif
-
-  
 
   xReturned = xQueueSend(pwmRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
@@ -159,8 +160,8 @@ void pwm_task(void *pvParameters) {
   app_pwm_channel_duty_set(&PWM0, HEATER_CHANNEL, 1);
   app_pwm_channel_duty_set(&PWM2, MOTOR_CHANNEL, 1);
 #else
-  app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty);
-  app_pwm_channel_duty_set(&PWM2, AMP_CHANNEL, amp_duty);
+  app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 1);
+  app_pwm_channel_duty_set(&PWM2, AMP_CHANNEL, 1);
 #endif
 
   // Main Task Loop
@@ -208,7 +209,7 @@ void pwm_task(void *pvParameters) {
           }
 
           if (valve_duty > 0) {
-            app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty);
+            //app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, valve_duty);
           } else if (valve_active) {
             valve_active = false;
             app_pwm_channel_duty_set(&PWM0, VALVE_CHANNEL, 0);
@@ -221,7 +222,7 @@ void pwm_task(void *pvParameters) {
           }
 
           if (amp_duty > 0) {
-            app_pwm_channel_duty_set(&PWM2, AMP_CHANNEL, amp_duty);
+            //app_pwm_channel_duty_set(&PWM2, AMP_CHANNEL, amp_duty);
           } else if (amp_active) {
             app_pwm_channel_duty_set(&PWM2, AMP_CHANNEL, 0);
             amp_active = false;
