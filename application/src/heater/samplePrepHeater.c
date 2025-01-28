@@ -113,6 +113,10 @@ void handle_cycle_stopstart_motor(bool motor_running) {
   if (xReturned != pdPASS) {
     send_debug_log_message("HEATER_TASK: Unable to send heater state to motorRxQueue.");
   }
+  if(!motor_running)  {
+    // force last RPM to 0
+    last_motor_speed = 0;
+  }
 
    // Send the heater status (Want to let the sensors know that motor is running so that temperature data can still be sent and logged)
   SensorRxQueueMsg_t msg;
