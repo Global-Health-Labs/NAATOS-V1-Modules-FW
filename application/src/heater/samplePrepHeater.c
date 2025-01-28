@@ -346,8 +346,12 @@ void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
       samplePrepResetHeaterPIDs();
     } else {
       // Update the setpoints of the next cycle if it is being run in the cycle
-      if (s_cycle_config->run_heater) { pid_controller_update_setpoint(&heater_pid, s_cycle_config->heater_setpoint); }
-      if (s_cycle_config->run_motor ) { pid_controller_update_setpoint(&motor_pid , s_cycle_config->motor_setpoint ); }
+      if (s_cycle_config->run_heater) {
+        pid_controller_update(&heater_pid, s_cycle_config->heater_setpoint, s_cycle_config->heater_kp, s_cycle_config->heater_ki, s_cycle_config->heater_kd);
+      }
+      if (s_cycle_config->run_motor ) {
+        pid_controller_update(&motor_pid , s_cycle_config->motor_setpoint, s_cycle_config->motor_kp, s_cycle_config->motor_ki, s_cycle_config->motor_kd);
+      }
     }
     // Reset Control Vars
     motorReachedSpeed = false;

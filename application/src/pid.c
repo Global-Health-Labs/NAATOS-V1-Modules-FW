@@ -16,6 +16,24 @@ void pid_controller_init(pid_controller_t *pid, float setpoint, float k_p, float
   pid->lim_min = PID_LIM_MIN;
 }
 
+void pid_controller_update(pid_controller_t *pid, float setpoint, float k_p, float k_i, float k_d) {
+  // Clear controller variables
+  //pid->intergrator = 0.0f;
+  //pid->prevMesurement = 0.0f;
+  if(setpoint!=pid->setpoint)
+    // RESET THE INTEGRATOR ONLY IF THE SETPOINT HAS CHANGED
+    pid->intergrator = 0.0f;
+  //pid->out = 0.0f;
+  // Set from parameters
+  pid->setpoint = setpoint;
+  pid->k_p = k_p;
+  pid->k_i = k_i;
+  pid->k_d = k_d;
+  //// Set from defines
+  //pid->lim_max = pid_max;
+  //pid->lim_min = PID_LIM_MIN;
+}
+
 void pid_controller_compute(pid_controller_t *pid, float measurement) {
   // Error Signal
   float error = pid->setpoint - measurement;
