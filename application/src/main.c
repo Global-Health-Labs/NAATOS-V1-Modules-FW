@@ -443,8 +443,6 @@ void main_task(void *pvParameters) {
           send_debug_log_message("MAIN: Unable to send sensor wakeup to motorRxQueue.");
         }
 #endif
-
-        read_sd_and_notify_tasks();
         // Get the alert timeout
         alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(config.alert_timeout_time_s * 1000.0));
         
@@ -1296,7 +1294,12 @@ int main(void) {
         send_debug_log_message("MAIN_TASK: Unable to send recovery battery percentage event to logging task.");
       }
     }
-  } 
+  }
+  // Get Cycle Configuration Parameters
+  res = get_cycle_configurations_parameters();
+  if (res != FR_OK) {
+    send_debug_log_message("Error: cycle configuration file was not able to be read.");
+  }
 
   // Create Queues
   create_queues();
