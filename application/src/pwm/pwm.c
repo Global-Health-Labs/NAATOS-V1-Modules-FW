@@ -73,10 +73,10 @@ void init_pwms(void) {
   err = app_pwm_init(&PWM2, &pwm2_cfg, pwm2_ready_callback);
   APP_ERROR_CHECK(err);
   /* Enable PWMs */
-  app_pwm_enable(&PWM0);
-  app_pwm_enable(&PWM2);
-  heaterPWMEnabled = true;
-  motorPWMEnabled = true;
+  //app_pwm_enable(&PWM0);
+  //app_pwm_enable(&PWM2);
+  //heaterPWMEnabled = true;
+  //motorPWMEnabled = true;
 
   // Set Original Duty Cycles to 0
 #ifdef SAMPLE_PREP_BOARD
