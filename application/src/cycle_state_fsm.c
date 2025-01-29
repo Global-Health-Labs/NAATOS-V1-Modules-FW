@@ -163,6 +163,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       bool setReachedRx = false;
       xReturned = xQueueReceive(main_setPointReached, &setReachedRx, 0);
+      if (xReturned != pdPASS) {
+        setReachedRx = false;
+      }
 
       next_state = handleBatteryMessage();
       if(next_state == RUN_ERROR_OR_FINISHED){
