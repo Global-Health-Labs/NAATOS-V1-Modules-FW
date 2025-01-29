@@ -111,6 +111,20 @@ void logger_task(void *pvParameters) {
       } else if (res != FR_OK) {
         send_debug_log_message("LOG_TASK: Unable to create log file for current sample preperation.");
       }
+
+      //Zero out the last_temp_message elements so that they all start at zero for the next log file
+      #ifdef SAMPLE_PREP_BOARD
+        last_temp_message.temperature_data.heater_temp = 0;
+        last_temp_message.temperature_data.heater_pwm = 0;
+        last_temp_message.temperature_data.motor_speed = 0;
+        last_temp_message.temperature_data.motor_pwm = 0;
+      #else 
+        last_temp_message.temperature_data.amp_temp = 0;
+        last_temp_message.temperature_data.amp_pwm = 0;
+        last_temp_message.temperature_data.valve_temp = 0;
+        last_temp_message.temperature_data.valve_pwm = 0;
+      #endif
+
       break;
     }
     case TEMPERATURE_DATA: {
@@ -150,8 +164,7 @@ void logger_task(void *pvParameters) {
       last_temp_message.event_data = rxLogMsg.event_data;
 
       logFileLineSize = loggerInterface->constructEventDataLogLine(logFileLine, time, last_temp_message, battery_info.batt_percent, battery_info.batt_voltage, battery_info.batt_temp);
-      if (rxLogMsg.event_data.event == SAMPLE_CYCLE_ENDED ||
-          rxLogMsg.event_data.event == SAMPLE_INTERRUPTED ||
+      if (rxLogMsg.event_data.event == SAMPLE_INTERRUPTED ||
           rxLogMsg.event_data.event == SAMPLE_TEMPS_NOT_STABALIZED ||
           rxLogMsg.event_data.event == SAMPLE_RECOVERY_BATT ||
           rxLogMsg.event_data.event == SAMPLE_OVER_TEMP) {
