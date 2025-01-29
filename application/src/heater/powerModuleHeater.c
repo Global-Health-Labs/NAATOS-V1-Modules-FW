@@ -232,8 +232,12 @@ void powerModuleHandleHeaterZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) 
       powerModuleResetHeaterPIDs();
     } else {
       // Update the setpoints of the next cycle if it is being run in the cycle
-      if (p_cycle_config->run_amp) { pid_controller_update_setpoint(&amp_pid, p_cycle_config->amp_setpoint); }
-      if (p_cycle_config->run_valve ) { pid_controller_update_setpoint(&valve_pid, p_cycle_config->valve_setpoint ); }
+      if (p_cycle_config->run_amp) { 
+        pid_controller_update(&amp_pid, p_cycle_config->amp_setpoint, p_cycle_config->amp_kp, p_cycle_config->amp_ki, p_cycle_config->amp_kd); 
+      }
+      if (p_cycle_config->run_valve ) { 
+        pid_controller_update(&valve_pid, p_cycle_config->valve_setpoint, p_cycle_config->valve_kp, p_cycle_config->valve_ki, p_cycle_config->valve_kd); 
+      }
     }
     // Send starting heater to sensors task
     handle_power_cycle_stopstart_heater(pm_amp_heater_running, pm_valve_heater_running);
