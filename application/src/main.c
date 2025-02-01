@@ -367,6 +367,7 @@ void main_task(void *pvParameters) {
   button_update_t buttonData = {.event = NONE};
   bool hal_triggered = false, optical_triggered = false;
   bool error_during_run = false;
+  cycle_state_exit_t cycle_exit_info = CYCLE_ERROR_UNKNOWN;
   bool over_temp = false;
   bool loggedLowPowerOnce = false;
   bool loggedBatteyrOverTempOnce = false;
@@ -411,6 +412,20 @@ void main_task(void *pvParameters) {
   uint32_t main_wdt_start_time = 0;
   uint32_t main_wdt_end_time = pdMS_TO_TICKS(1000);
   uint32_t main_wdt_time_left = 0;
+
+  // GHL TEST STUB
+#if 0
+  nrf_gpio_cfg_output( NRF_GPIO_PIN_MAP(1, 5) );
+  nrf_gpio_pin_set( NRF_GPIO_PIN_MAP(1, 5) );   // force BRAKE_N high
+  //nrf_gpio_cfg_output( NRF_GPIO_PIN_MAP(1, 5) ); // force MOTOR_FG high
+  //nrf_gpio_pin_set( MOTOR_INPUT_PIN );   // force MOTOR_FG high
+  // Turn on 24V motor enable line for short time, then turn off
+  nrf_gpio_pin_clear(MOTOR_PWR_EN); 
+  vTaskDelay(pdMS_TO_TICKS(2000));  // wait 2s
+  nrf_gpio_pin_set(MOTOR_PWR_EN); // turn ON
+  vTaskDelay(pdMS_TO_TICKS(2000));  // wait 2s
+  nrf_gpio_pin_clear(MOTOR_PWR_EN);  //turn back off
+#endif
 
   create_tasks();
 
@@ -636,6 +651,16 @@ void main_task(void *pvParameters) {
         // Delay
         vTaskDelay(100);
       }
+    #if 1
+      // automatically change to running-mode after a fixed time elapses (twice the sample_valid_timeout_s)
+      // this is for running back to back tests, should be same as pushing the button
+      if ( (pdTICKS_TO_MS(xTaskGetTickCount() - end_time)>((uint32_t) (config.sample_valid_timeout_s*1.0*1000.0))) && (cycle_exit_info == CYCLE_SAMPLE_INVALIDATED) ) {
+      //if (  (pdTICKS_TO_MS(xTaskGetTickCount() - end_time)>((uint32_t) (config.sample_valid_timeout_s*2.0*1000.0)))    ) {
+        next_state = MAIN_RUNNING;
+        // Delay
+        vTaskDelay(100);
+      }
+    #endif
 #else
       // Check if we can go to RUN state
       if (optical_triggered && !error_during_run) {
@@ -671,7 +696,8 @@ void main_task(void *pvParameters) {
         main_wdt_time_left = 0;
       }
 
-      cycle_state_exit_t cycle_exit_info = run_cycle_state_machine();
+      cycle_exit_info = run_cycle_state_machine();
+      end_time = xTaskGetTickCount();
 
       // Check if USB State needs to be updated
       if (xQueueReceive(main_usbConnRecvQueue, &usb_conn_status, 0) == pdPASS) {
