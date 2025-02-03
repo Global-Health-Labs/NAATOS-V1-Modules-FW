@@ -6,7 +6,8 @@
 #define TPS25750_I2C_ADDRESS 0x23
 #define BOOT_STATUS_REGISTER 0x2D
 #define BQ25792_ADDR 0x6B
-#define APP_MODE 0x04415050 // ASCII for 'APP '
+//#define APP_MODE 0x04415050 // ASCII for 'APP '
+#define APP_MODE 0x41505020 // ASCII for 'APP '
 #define MODE_REGISTER 0x03
 
 #define CMD1_REGISTER 0x08        // Command register

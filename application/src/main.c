@@ -388,6 +388,7 @@ void main_task(void *pvParameters) {
   // issues with charging when the kill switch is off
   vTaskDelay(pdMS_TO_TICKS(1000));
   while(!pd_eeprom_init_complete());
+  test_read_reg();
   setup_charger();
 
   // See if we are resetting the file system
