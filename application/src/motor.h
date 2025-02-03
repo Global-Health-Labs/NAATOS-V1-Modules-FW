@@ -1,10 +1,15 @@
 #pragma once
 #include "nrf_drv_ppi.h"
 #include "nrf_drv_timer.h"
-
 #include "nrf_drv_gpiote.h"
+#include "naatos_config.h"
 
-#define MOTOR_INPUT_PIN NRF_GPIO_PIN_MAP(1, 12) //4    //TP1= P1.12
+#if MOTOR_FG_REWORK
+#define MOTOR_INPUT_PIN NRF_GPIO_PIN_MAP(1, 12)    //TP1= P1.12
+#else
+#define MOTOR_INPUT_PIN 4
+#endif
+
 #define MOTOR_OUTPUT_PIN 26  //47 //TP4 = P1.15
 #define MOTOR_OUTPUT_PIN2 45 //TP2 = P1.13 Only here because PWM.c asks for two pins to cfg a PWM module
 #define MOTOR_CWCCW 25

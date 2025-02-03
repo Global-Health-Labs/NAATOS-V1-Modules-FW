@@ -186,7 +186,7 @@ void set_startup_enables(void) {
   nrf_gpio_pin_clear(HEATER_PWR_EN); 
   // Turn off the motor enable
   nrf_gpio_cfg_output(MOTOR_PWR_EN);
-  nrf_gpio_pin_clear(MOTOR_PWR_EN); 
+  nrf_gpio_pin_set(MOTOR_PWR_EN); 
   // Turn on the motor brake
   nrf_gpio_cfg_output(MOTOR_BRAKE_N_PIN);
   NRF_GPIO->PIN_CNF[MOTOR_BRAKE_N_PIN] &= ~GPIO_PIN_CNF_DRIVE_Msk; // Clear the DRIVE bits

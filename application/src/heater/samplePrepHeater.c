@@ -98,12 +98,12 @@ void handle_cycle_stopstart_motor(bool motor_running) {
   // update the motor enable and brake
   if (motor_running) {
     nrf_gpio_pin_set(MOTOR_BRAKE_N_PIN);
-    vTaskDelay(pdMS_TO_TICKS(10));
-    nrf_gpio_pin_set(MOTOR_PWR_EN);
+    //vTaskDelay(pdMS_TO_TICKS(10));
+    //nrf_gpio_pin_set(MOTOR_PWR_EN);
   } else {
     nrf_gpio_pin_clear(MOTOR_BRAKE_N_PIN);
-    vTaskDelay(pdMS_TO_TICKS(10));
-    nrf_gpio_pin_clear(MOTOR_PWR_EN);
+    //vTaskDelay(pdMS_TO_TICKS(10));
+    //nrf_gpio_pin_clear(MOTOR_PWR_EN);
   }
 
   // Send the motor status
