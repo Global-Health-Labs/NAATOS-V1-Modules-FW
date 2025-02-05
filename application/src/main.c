@@ -412,6 +412,22 @@ void main_task(void *pvParameters) {
   uint32_t main_wdt_end_time = pdMS_TO_TICKS(1000);
   uint32_t main_wdt_time_left = 0;
 
+  // GHL TEST STUB
+#if 1
+  //nrf_gpio_cfg_output( NRF_GPIO_PIN_MAP(1, 5) );
+  //nrf_gpio_pin_set( NRF_GPIO_PIN_MAP(1, 5) );   // force BRAKE_N high
+
+  //nrf_gpio_cfg_output( NRF_GPIO_PIN_MAP(1, 5) ); // force MOTOR_FG high
+  //nrf_gpio_pin_set( MOTOR_INPUT_PIN );   // force MOTOR_FG high
+
+  // Turn on 24V motor enable line for short time, then turn off
+  nrf_gpio_pin_clear(MOTOR_PWR_EN); 
+  vTaskDelay(pdMS_TO_TICKS(2000));  // wait 2s
+  nrf_gpio_pin_set(MOTOR_PWR_EN); // turn ON
+  vTaskDelay(pdMS_TO_TICKS(2000));  // wait 2s
+  nrf_gpio_pin_clear(MOTOR_PWR_EN);  //turn back off
+#endif
+
   create_tasks();
 
   // Main State Loop
