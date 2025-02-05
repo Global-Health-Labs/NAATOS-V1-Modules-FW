@@ -38,6 +38,7 @@
 #define USE_CALENDAR_CHIP 1
 #define VERBOSE_PID 0
 #define USE_MOTOR 1
+#define MOTOR_FG_REWORK 0
 
 #define pdTICKS_TO_MS(xTimeInTicks) ((TickType_t)(((uint64_t)(xTimeInTicks) * (uint64_t)1000U) / (uint64_t)configTICK_RATE_HZ))
 
@@ -109,6 +110,7 @@
 #define SAMPLE_HEATER_PIN NRF_GPIO_PIN_MAP(1, 1) // P1.01
 #define HAL_INPUT_PIN NRF_GPIO_PIN_MAP(0, 2)
 #define BUTTON_INPUT_PIN  38
+#define MOTOR_BRAKE_N_PIN NRF_GPIO_PIN_MAP(1, 5)
 #else 
 #if POWER_MODULE_REV_A
 #define BUTTON_INPUT_PIN  44                     // USES TP1 on REVA
