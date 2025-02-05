@@ -418,7 +418,7 @@ void main_task(void *pvParameters) {
   uint32_t main_wdt_time_left = 0;
 
   // GHL TEST STUB
-#if 1
+#if 0
   //nrf_gpio_cfg_output( NRF_GPIO_PIN_MAP(1, 5) );
   //nrf_gpio_pin_set( NRF_GPIO_PIN_MAP(1, 5) );   // force BRAKE_N high
 
