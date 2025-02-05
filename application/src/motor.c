@@ -34,7 +34,8 @@ static void gpiote_init(void) {
   }
 
   nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(false);
-  in_config.pull = NRF_GPIO_PIN_NOPULL;
+  //in_config.pull = NRF_GPIO_PIN_NOPULL;
+  in_config.pull = NRF_GPIO_PIN_PULLUP;
 
   err_code = nrf_drv_gpiote_in_init(MOTOR_INPUT_PIN, &in_config, empty_gpiote_event_handler);
   APP_ERROR_CHECK(err_code);
