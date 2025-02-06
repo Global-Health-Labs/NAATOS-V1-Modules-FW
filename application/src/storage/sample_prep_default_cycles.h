@@ -26,7 +26,7 @@ const char *sp_default_cycle_config_2 =
   "motor_setpoint:0\n"
   "run_heater_enable:true\n"
   "run_motor_enable:false\n"
-  "heater_kp:20.000\n"
+  "heater_kp:60.000\n"
   "heater_ki:0.050\n"
   "heater_kd:50.000\n"
   "motor_kp:0.005\n"
