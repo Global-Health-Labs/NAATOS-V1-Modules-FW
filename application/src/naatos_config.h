@@ -5,7 +5,7 @@
 #include "task.h"
 #include <stdint.h>
 
-#define VERSION "3.1_ghlRC1"
+#define VERSION "3.1_ghlRC2"
 
 /*Define this when building sample prep only otherwise comment out*/
 #define SAMPLE_PREP_BOARD
@@ -149,7 +149,7 @@
 
 /* Master Configuration Default Parameters */
 #define DEFAULT_SAMPLE_RATE             0.200   // 0.048 minimum
-#define DEFAULT_LOGGING_RATE            5.000
+#define DEFAULT_LOGGING_RATE            1.000
 #define DEFAULT_LOW_POWER_THRESHOLD     46
 #define DEFAULT_RECOVERY_THRESHOLD      47      // Percent
 #define DEFAULT_VALID_TIMEOUT_S         3600.0  // 1 hour
@@ -162,12 +162,12 @@
 #define DEFAULT_VALVE_MAX_TEMP          105.0
 #define DEFAULT_AMP_MAX_TEMP            80.0
 #else 
-#define DEFAULT_MAX_HEATER_TEMP         115.0
+#define DEFAULT_MAX_HEATER_TEMP         120.0
 #define DEFAULT_MAX_HEATER_PID          100
-#define DEFAULT_MOTOR_SWTICH_CCW_CW     false
+#define DEFAULT_MOTOR_SWTICH_CCW_CW     true
 #define DEFAULT_HAL_SENSOR_THRESHOLD    0.30f
-#define DEFAULT_MOTOR_STALL_PERCENT     20 
-#define DEFAULT_MOTOR_STALL_PWM         71
+#define DEFAULT_MOTOR_STALL_PERCENT     20
+#define DEFAULT_MOTOR_STALL_PWM         61
 #define DEFAULT_MOTOR_STALL_ENABLE      true
 #endif
 #define DEFAULT_DATE 100124                
