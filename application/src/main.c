@@ -372,6 +372,7 @@ void main_task(void *pvParameters) {
   button_update_t buttonData = {.event = NONE};
   bool hal_triggered = false, optical_triggered = false;
   bool error_during_run = false;
+  cycle_state_exit_t cycle_exit_info = CYCLE_ERROR_UNKNOWN;
   bool over_temp = false;
   bool loggedLowPowerOnce = false;
   bool loggedBatteyrOverTempOnce = false;
@@ -641,6 +642,16 @@ void main_task(void *pvParameters) {
         // Delay
         vTaskDelay(100);
       }
+    #if DO_AUTOMATIC_RUNS
+      // automatically change to running-mode after a fixed time elapses (twice the sample_valid_timeout_s)
+      // this is for running back to back tests, should be same as pushing the button
+      // will run forever if cycle exited normally (cycle_exit_info == CYCLE_SAMPLE_INVALIDATED)
+      if ( (pdTICKS_TO_MS(xTaskGetTickCount() - end_time)>((uint32_t) (config.sample_valid_timeout_s*1.0*1000.0))) && (cycle_exit_info == CYCLE_SAMPLE_INVALIDATED) ) {
+        next_state = MAIN_RUNNING;
+        // Delay
+        vTaskDelay(100);
+      }
+    #endif
 #else
       // Check if we can go to RUN state
       if (optical_triggered && !error_during_run) {
@@ -676,7 +687,9 @@ void main_task(void *pvParameters) {
         main_wdt_time_left = 0;
       }
 
-      cycle_state_exit_t cycle_exit_info = run_cycle_state_machine();
+	  // keep track of time that the state machine exited
+      cycle_exit_info = run_cycle_state_machine();
+      end_time = xTaskGetTickCount();
 
       // Check if USB State needs to be updated
       if (xQueueReceive(main_usbConnRecvQueue, &usb_conn_status, 0) == pdPASS) {
