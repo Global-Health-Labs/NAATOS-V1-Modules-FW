@@ -3,6 +3,10 @@
 #include "../usb.h"
 #include "timers.h"
 
+static char tmp[150];
+static const uint8_t tmpbufsize = sizeof(tmp)/sizeof(tmp[0]) ;
+static uint32_t counter = 0;
+
 const MainStateErrorQueueMsg_t motor_stall_percent_err_msg = {
   .errType = ERR_MOTOR_STALLED_PERCENT,
   .overTempData = NULL
@@ -94,6 +98,13 @@ void handle_sample_cycle_stopstart_heater(bool heating) {
 void handle_cycle_stopstart_motor(bool motor_running) {
 #ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
+#if 0
+  if(motor_running) {
+    send_debug_log_message("handle_cycle_stopstart_motor() called with motor_running=TRUE");
+  } else{
+    send_debug_log_message("handle_cycle_stopstart_motor() called with motor_running=FALSE");
+  }
+#endif
 
   // update the motor enable and brake
   if (motor_running) {
@@ -110,9 +121,6 @@ void handle_cycle_stopstart_motor(bool motor_running) {
   MotorRxQueueMsg_t motorMsg;
   motorMsg.type = MOTOR_MSG_MOTOR_STATE;
   motorMsg.motorRunning = motor_running;
-  if (motorMsg.motorRunning) {
-    motor_running = true;
-  }
   xReturned = xQueueSend(motorRxQueue, &motorMsg, 10);
   if (xReturned != pdPASS) {
     send_debug_log_message("HEATER_TASK: Unable to send heater state to motorRxQueue.");
@@ -131,6 +139,13 @@ void handle_cycle_stopstart_motor(bool motor_running) {
     send_debug_log_message("HEATER_TASK: Unable to send heater state to sensorRxQueue.");
   }
 
+#if 0
+  snprintf(tmp,tmpbufsize,"handle_cycle_stopstart_motor()1 motor_running=%d pid.out=%.02f last_speed=%d)",
+    motor_running,motor_pid.out,last_motor_speed
+  );
+  send_debug_log_message(tmp);
+#endif
+
   // Update the PWM status for the motor
   PwmRxQueueMsg_t pwmMsg = {.type = PWM_MSG_MOTOR_DISABLE};
   if (motor_running) {
@@ -143,6 +158,14 @@ void handle_cycle_stopstart_motor(bool motor_running) {
 
   // Set the last sample based on config
   samp_log_max = (config.logging_rate / config.sample_rate);
+
+#if 1
+  snprintf(tmp,tmpbufsize,"handle_cycle_stopstart_motor()2 motor_running=%d pid.out=%.02f last_speed=%d)",
+    motor_running,motor_pid.out,last_motor_speed
+  );
+  send_debug_log_message(tmp);
+#endif
+
 #endif
 }
 
@@ -151,7 +174,9 @@ void samplePrepResetHeaterPIDs(void) {
   // Create PID Controllers
   pid_controller_init(&heater_pid, s_cycle_config->heater_setpoint, s_cycle_config->heater_kp, s_cycle_config->heater_ki, s_cycle_config->heater_kd, config.max_heater_pid_pwm);
   pid_controller_init(&motor_pid, s_cycle_config->motor_setpoint, s_cycle_config->motor_kp, s_cycle_config->motor_ki, s_cycle_config->motor_kd, 100); // Default 100% max PWM
-  #endif
+  //send_debug_log_message("samplePrepResetHeaterPIDs()");
+  counter = 0;
+#endif
 }
 
 void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
@@ -208,7 +233,6 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     updateDutyCycles(pwmData);
 
 #if VERBOSE_HEATING
-    char tmp[150];
     sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f", 
                   temperature_data.heat_zone_0_temp, temperature_data.heat_zone_1_temp, temperature_data.heat_zone_2_temp, temperature_data.heat_zone_3_temp, 
                   h_pwm_data.heat_zone_0_pwm, h_pwm_data.heat_zone_1_pwm, h_pwm_data.heat_zone_2_pwm, h_pwm_data.heat_zone_3_pwm);
@@ -259,13 +283,21 @@ void handleSampleMotorDataRx(int motor_speed) {
 #ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
   temperature_pwm_data_t pwmData;
-  char tmp[100];
+  counter++;
   
   if (s_cycle_config->run_motor) {
     pid_controller_compute(&motor_pid, motor_speed);
   }
 
   // Maintain Current Heater PID PWM
+#if 1
+  if(counter<35)  {
+    snprintf(tmp,tmpbufsize,"handleSampleMotorDataRx() rpm=%d lastrpm=%d pid.out=%.02f",
+      motor_speed,last_motor_speed,motor_pid.out
+    );
+    send_debug_log_message(tmp);
+  }
+#endif
   pwmData.motor_pwm = motor_pid.out;
   pwmData.heater_pwm = heater_pid.out;
   updateDutyCycles(pwmData);
@@ -315,13 +347,39 @@ void handleSampleMotorDataRx(int motor_speed) {
 void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
 #ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
+  bool next_cycle_running_motor;
+  bool prev_cycle_running_motor;
   
   // Get current cycle config index; Index = cycle - 1
   curr_cycle_config_index = (uint16_t)(heaterRxMessage.cycleSelect - 1);
 
+  // Determine Previous and Next Motor States
+  if(heaterRxMessage.cycleSelect < total_cycles) {
+    next_cycle_running_motor = cycle_configs[curr_cycle_config_index+1].run_motor;
+  } else{
+    // this was last cycle, no next cycle
+    next_cycle_running_motor = false;
+  }
+  if(heaterRxMessage.cycleSelect == 1) {
+    // this was first cycle, no previous cycle
+    prev_cycle_running_motor = false;
+  } else{
+    prev_cycle_running_motor = cycle_configs[curr_cycle_config_index-1].run_motor;
+  }
+
+  // Debug messages
+#if 0
+  snprintf(tmp,tmpbufsize,"ZoneStateUpdate() cycleEn=%d cycleSelect=%d/%d motor(prev=%d now=%d next=%d pid.out=%.02f last_speed=%d)",
+    heaterRxMessage.cycleEnabled,heaterRxMessage.cycleSelect,total_cycles,
+    prev_cycle_running_motor,cycle_configs[curr_cycle_config_index].run_motor,next_cycle_running_motor,
+    motor_pid.out,last_motor_speed
+  );
+  send_debug_log_message(tmp);
+#endif
+
   /* Cycle Ending */
   if (!heaterRxMessage.cycleEnabled) { //AMP2 will be used in sample prep for heating
-    bool next_cycle_running_motor = (&cycle_configs[curr_cycle_config_index+1])->run_motor;
+    //bool next_cycle_running_motor = (&cycle_configs[curr_cycle_config_index+1])->run_motor;
 
     // Set IUD outputs to 0
     heater_pid.out = 0;
@@ -365,7 +423,7 @@ void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
     motor_running = s_cycle_config->run_motor;
     // Send start heater and motor
     handle_sample_cycle_stopstart_heater(heater_running);
-    bool prev_cycle_running_motor = (&cycle_configs[curr_cycle_config_index-1])->run_motor;
+    //bool prev_cycle_running_motor = (&cycle_configs[curr_cycle_config_index-1])->run_motor;
     if (curr_cycle_config_index == 0 || !prev_cycle_running_motor)
       handle_cycle_stopstart_motor(motor_running);
   }

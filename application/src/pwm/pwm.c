@@ -147,7 +147,7 @@ void updateDutyCycles(temperature_pwm_data_t pwmData) {
 
   xReturned = xQueueSend(pwmRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
-    send_debug_log_message("USB: Unable to send main state response to main_mainStateRespQueue queue.");
+    send_debug_log_message("PWM: Unable to send PWM_MSG_CALLBACK_EVENT to pwmRxQueue.");
   }
 }
 
