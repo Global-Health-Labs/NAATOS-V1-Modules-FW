@@ -3,6 +3,10 @@
 #include "../usb.h"
 #include "timers.h"
 
+static char tmp[150];
+static const uint8_t tmpbufsize = sizeof(tmp)/sizeof(tmp[0]) ;
+static uint32_t counter = 0;
+
 const MainStateErrorQueueMsg_t motor_stall_percent_err_msg = {
   .errType = ERR_MOTOR_STALLED_PERCENT,
   .overTempData = NULL
@@ -208,7 +212,6 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
     updateDutyCycles(pwmData);
 
 #if VERBOSE_HEATING
-    char tmp[150];
     sprintf(tmp, "Heat Zones: %0.2f,%0.2f,%0.2f,%0.2f; PWM: %0.2f,%0.2f,%0.2f,%0.2f", 
                   temperature_data.heat_zone_0_temp, temperature_data.heat_zone_1_temp, temperature_data.heat_zone_2_temp, temperature_data.heat_zone_3_temp, 
                   h_pwm_data.heat_zone_0_pwm, h_pwm_data.heat_zone_1_pwm, h_pwm_data.heat_zone_2_pwm, h_pwm_data.heat_zone_3_pwm);
@@ -259,13 +262,21 @@ void handleSampleMotorDataRx(int motor_speed) {
 #ifdef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
   temperature_pwm_data_t pwmData;
-  char tmp[100];
   
   if (s_cycle_config->run_motor) {
     pid_controller_compute(&motor_pid, motor_speed);
   }
 
   // Maintain Current Heater PID PWM
+#if 1
+  counter++;
+  if(counter<35)  {
+    snprintf(tmp,tmpbufsize,"handleSampleMotorDataRx() rpm=%d lastrpm=%d pid.out=%.02f",
+      motor_speed,last_motor_speed,motor_pid.out
+    );
+    send_debug_log_message(tmp);
+  }
+#endif
   pwmData.motor_pwm = motor_pid.out;
   pwmData.heater_pwm = heater_pid.out;
   updateDutyCycles(pwmData);
@@ -360,6 +371,7 @@ void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
     // Reset Control Vars
     motorReachedSpeed = false;
     starting_sample_prep_run = true;
+    counter = 0;  // for debug message output only
     // Set running based on new config
     heater_running = s_cycle_config->run_heater;
     motor_running = s_cycle_config->run_motor;
