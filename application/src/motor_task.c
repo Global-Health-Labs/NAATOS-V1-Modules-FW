@@ -57,6 +57,14 @@ void motorTask(void *pvParameters) {
     } else {
       switch (motorRxMessage.type) {
          case MOTOR_MSG_MOTOR_STATE: {
+          if(!motorRunning && motorRxMessage.motorRunning)  {
+            // motor was not running, but it is now supposed to be running
+            // in other words, it's starting up.
+            //send_debug_log_message("motor_task() reset avg speeds");
+            avg_speed[0]=0;
+            avg_speed[1]=0;
+            avg_speed[2]=0;
+          }
           motorRunning = motorRxMessage.motorRunning;
           // Switch the ccw line to switch between ccw and cw
           if (motorRunning && (config.switch_motor_ccw_cw)) {
