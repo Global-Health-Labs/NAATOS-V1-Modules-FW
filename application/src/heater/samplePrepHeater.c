@@ -5,7 +5,7 @@
 
 static char tmp[150];
 static const uint8_t tmpbufsize = sizeof(tmp)/sizeof(tmp[0]) ;
-static uint32_t counter = 0;
+static uint32_t counter = 0;  // for debug message output only
 
 const MainStateErrorQueueMsg_t motor_stall_percent_err_msg = {
   .errType = ERR_MOTOR_STALLED_PERCENT,
@@ -268,7 +268,8 @@ void handleSampleMotorDataRx(int motor_speed) {
   }
 
   // Maintain Current Heater PID PWM
-#if 1
+#if 0
+  // output very verbose motor speed data for the first 35 calls of this function when a cycle starts
   counter++;
   if(counter<35)  {
     snprintf(tmp,tmpbufsize,"handleSampleMotorDataRx() rpm=%d lastrpm=%d pid.out=%.02f",
