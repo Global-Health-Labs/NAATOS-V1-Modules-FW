@@ -5,7 +5,7 @@
 #include "task.h"
 #include <stdint.h>
 
-#define VERSION "3.1_ghlRC3"
+#define VERSION "3.1_ghlRC4"
 
 /*Define this when building sample prep only otherwise comment out*/
 //#define SAMPLE_PREP_BOARD
