@@ -160,8 +160,8 @@
 #define DEFAULT_OPTICAL_TRIG_THRESHOLD  800
 #define DEFAULT_MAX_AMP_PID             100
 #define DEFAULT_MAX_VALVE_PID           100
-#define DEFAULT_VALVE_MAX_TEMP          105.0
-#define DEFAULT_AMP_MAX_TEMP            80.0
+#define DEFAULT_VALVE_MAX_TEMP          120.0
+#define DEFAULT_AMP_MAX_TEMP            120.0
 #else 
 #define DEFAULT_MAX_HEATER_TEMP         120.0
 #define DEFAULT_MAX_HEATER_PID          100
@@ -183,8 +183,8 @@
 #define DEFAULT_RAMP_TO_TEMP            false
 #define DEFAULT_RAMP_TO_TEMP_TIMEOUT    300
 #ifndef SAMPLE_PREP_BOARD
-#define DEFAULT_AMP_SETPOINT            67.2
-#define DEFAULT_VALVE_SETPOINT          93.0
+#define DEFAULT_AMP_SETPOINT            72
+#define DEFAULT_VALVE_SETPOINT          110
 #define DEFAULT_RUN_AMP                 false
 #define DEFAULT_RUN_VALVE               false
 #define DEFAULT_AMP_KP                  2.250
