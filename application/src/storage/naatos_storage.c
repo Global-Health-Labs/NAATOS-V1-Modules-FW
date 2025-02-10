@@ -349,7 +349,13 @@ FRESULT get_cycle_configurations_parameters() {
   if (res != FR_OK) {
     return res;
   }
+  
+  // ensure we start at 0
+  //...this became important in context of the hold-down reformat procedure
+  // (with 4 cycle default, it was actually assuming 8 cycles on the first run after reset
+  total_cycles = 0;
 
+  // Count the number of cycle files
   for (;;) {
     res = f_readdir(&dir, &fno);
     // Break on error or end of dir 
