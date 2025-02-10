@@ -47,7 +47,7 @@
 #define CSV_HEADER_SIZE 79
 #else
 #define CSV_HEADER "Time,ValveTemp,ValvePWM,AmpTemp,AmpPWM,Batt,BatteryV,BatteryT,Event\r\n"
-#define CSV_HEADER_SIZE 70
+#define CSV_HEADER_SIZE 69
 #endif
 
 #if USE_SD_CARD
