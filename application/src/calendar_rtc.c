@@ -263,3 +263,25 @@ bool calendar_set_time_helper(void) {
 
   return true;
 }
+
+bool calendar_check_state(void) {
+  #ifdef I2C_CONNECTED & USE_CALENDAR_CHIP & (SAMPLE_PREP_REV_B|POWER_MODULE_REV_B)
+
+  uint8_t rxbuf[7];
+  char tmp[100];
+  ret_code_t ret;
+
+
+  
+  ret = xUtil_TWI_Read(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, rxbuf, 1);
+  if(ret==0) {
+    sprintf(tmp,"CAL CTRL1=0x%02x",rxbuf[0]);
+    send_debug_log_message(tmp);
+  } else{
+    send_debug_log_message("CAL CTRL1 read error");
+  }
+
+
+
+  #endif
+}
