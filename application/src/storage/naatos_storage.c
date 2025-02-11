@@ -349,7 +349,13 @@ FRESULT get_cycle_configurations_parameters() {
   if (res != FR_OK) {
     return res;
   }
+  
+  // ensure we start at 0
+  //...this became important in context of the hold-down reformat procedure
+  // (with 4 cycle default, it was actually assuming 8 cycles on the first run after reset
+  total_cycles = 0;
 
+  // Count the number of cycle files
   for (;;) {
     res = f_readdir(&dir, &fno);
     // Break on error or end of dir 
@@ -517,8 +523,16 @@ FRESULT check_for_naatos_config_file(void) {
   // Try to create new naatos_config.txt
   res = f_open(&file, NAATOS_CONFIG_FILE, FA_CREATE_NEW | FA_WRITE);
   if (res == FR_EXIST) {
-    // Return that it already exists
-    return res;
+    // Verify that it has non-zero size
+    res = f_stat(NAATOS_CONFIG_FILE,&fno);
+    if(fno.fsize>0) {
+      // Return that it already exists
+      return FR_EXIST;
+    } else{
+      send_debug_log_message("Found config file existed but it was zero size. Proceed as if it wasn't there.");
+    }
+
+
   }
 
   // Open the directory for reading

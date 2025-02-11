@@ -5,7 +5,7 @@
 #include "task.h"
 #include <stdint.h>
 
-#define VERSION "3.1"
+#define VERSION "3.1_ghlRC3"
 
 /*Define this when building sample prep only otherwise comment out*/
 #define SAMPLE_PREP_BOARD
@@ -38,6 +38,8 @@
 #define USE_CALENDAR_CHIP 1
 #define VERBOSE_PID 0
 #define USE_MOTOR 1
+#define MOTOR_FG_REWORK 0
+#define DO_AUTOMATIC_RUNS 0
 
 #define pdTICKS_TO_MS(xTimeInTicks) ((TickType_t)(((uint64_t)(xTimeInTicks) * (uint64_t)1000U) / (uint64_t)configTICK_RATE_HZ))
 
@@ -109,6 +111,7 @@
 #define SAMPLE_HEATER_PIN NRF_GPIO_PIN_MAP(1, 1) // P1.01
 #define HAL_INPUT_PIN NRF_GPIO_PIN_MAP(0, 2)
 #define BUTTON_INPUT_PIN  38
+#define MOTOR_BRAKE_N_PIN NRF_GPIO_PIN_MAP(1, 5)
 #else 
 #if POWER_MODULE_REV_A
 #define BUTTON_INPUT_PIN  44                     // USES TP1 on REVA
@@ -147,7 +150,7 @@
 
 /* Master Configuration Default Parameters */
 #define DEFAULT_SAMPLE_RATE             0.200   // 0.048 minimum
-#define DEFAULT_LOGGING_RATE            5.000
+#define DEFAULT_LOGGING_RATE            1.000
 #define DEFAULT_LOW_POWER_THRESHOLD     46
 #define DEFAULT_RECOVERY_THRESHOLD      47      // Percent
 #define DEFAULT_VALID_TIMEOUT_S         3600.0  // 1 hour
@@ -160,12 +163,12 @@
 #define DEFAULT_VALVE_MAX_TEMP          105.0
 #define DEFAULT_AMP_MAX_TEMP            80.0
 #else 
-#define DEFAULT_MAX_HEATER_TEMP         115.0
+#define DEFAULT_MAX_HEATER_TEMP         120.0
 #define DEFAULT_MAX_HEATER_PID          100
-#define DEFAULT_MOTOR_SWTICH_CCW_CW     false
+#define DEFAULT_MOTOR_SWTICH_CCW_CW     true
 #define DEFAULT_HAL_SENSOR_THRESHOLD    0.30f
-#define DEFAULT_MOTOR_STALL_PERCENT     20 
-#define DEFAULT_MOTOR_STALL_PWM         71
+#define DEFAULT_MOTOR_STALL_PERCENT     20
+#define DEFAULT_MOTOR_STALL_PWM         61
 #define DEFAULT_MOTOR_STALL_ENABLE      true
 #endif
 #define DEFAULT_DATE 100124                
