@@ -23,5 +23,6 @@ bool calendar_set_time_helper(void);
 bool calendar_stop(void);
 bool calendar_start(void);
 bool calendar_set_32k(void);
+bool calendar_check_state(void);
 
 #endif
