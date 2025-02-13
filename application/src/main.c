@@ -1215,7 +1215,7 @@ void create_queues() {
   if (logger_recvBattPercentQueue == NULL)
     send_debug_log_message("Unable to create logger_recvBattPercentQueue queue");
 
-  logger_logMessageQueue = xQueueCreate(10, sizeof(log_data_message_t));
+  logger_logMessageQueue = xQueueCreate(20, sizeof(log_data_message_t));
   if (logger_logMessageQueue == NULL)
     send_debug_log_message("Unable to create logger_logMessageQueue queue");
 
