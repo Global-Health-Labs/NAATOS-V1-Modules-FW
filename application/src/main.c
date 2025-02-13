@@ -499,6 +499,11 @@ void main_task(void *pvParameters) {
         float white_starting_voltage = MIN_BATTERY_VOLTAGE + ((MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE) * ((float)LED_POWER_LEVEL_HIGH_THRESH / 100.0));
         float recovery_starting_voltage = MIN_BATTERY_VOLTAGE + ((MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE) * ((float)config.recovery_power_thresh / 100.0));
 
+        if(batt_info_recv.batt_voltage<1.0) {
+          sprintf(exitBatteryOvrTempString, "main_task: battery voltage less than 1.0V (was %fV)", batt_info_recv.batt_voltage);
+          send_debug_log_message(exitBatteryOvrTempString);
+        }
+
         if (l_powerLevel != led_pl_high && 
            ((batt_info_recv.batt_voltage >= white_starting_voltage && l_powerLevel != led_pl_medium) ||
             (batt_info_recv.batt_voltage >= white_starting_voltage + (0.01f) && l_powerLevel == led_pl_medium))) {
@@ -512,6 +517,18 @@ void main_task(void *pvParameters) {
           batt_recovering = false;
           if (!usb_started)
             updateLedStatePowerLevel(LED_STANDBY, true, led_pl_medium);
+
+          if(loggedLowPowerOnce) {
+            loggedLowPowerOnce = false;
+            xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
+            if (xReturned != pdPASS) {
+              send_debug_log_message("MAIN_TASK: Unable to send log start\r\n");
+            }
+            sprintf(exitBatteryOvrTempString, "Battery is now okay (again) to start cycle: %f recovery_starting_voltage=%f", batt_info_recv.batt_voltage , recovery_starting_voltage);
+            send_debug_log_message(exitBatteryOvrTempString);
+            send_event_log_message(SAMPLE_BATTERY_LOW, exitBatteryOvrTempString);
+          }
+
         }
         else if ((batt_info_recv.batt_voltage < min_starting_voltage) && l_powerLevel != led_pl_low) {
           batt_recovering = true;
@@ -521,8 +538,9 @@ void main_task(void *pvParameters) {
             if (xReturned != pdPASS) {
               send_debug_log_message("MAIN_TASK: Unable to send log start\r\n");
             }
-             sprintf(exitBatteryOvrTempString, "%s%f", SAMPLE_LOW_BATTERY_STRING, batt_info_recv.batt_percent);
-             send_event_log_message(SAMPLE_BATTERY_LOW, exitBatteryOvrTempString);
+            sprintf(exitBatteryOvrTempString, "%s%f min_starting_voltage=%f", SAMPLE_LOW_BATTERY_STRING, batt_info_recv.batt_voltage , min_starting_voltage);
+            send_debug_log_message(exitBatteryOvrTempString);
+            send_event_log_message(SAMPLE_BATTERY_LOW, exitBatteryOvrTempString);
           }
 
           if (!usb_started)
