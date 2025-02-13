@@ -480,7 +480,7 @@ void main_task(void *pvParameters) {
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &batt_info_recv, pdMS_TO_TICKS(100)) == pdPASS) {
         // Create the Power on log if we have not yet
-        if (!power_on_log_created && !usb_started) {
+        if (!power_on_log_created) {
           power_on_log_created = true;
           xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
           if (xReturned != pdPASS) {
@@ -488,9 +488,6 @@ void main_task(void *pvParameters) {
           }
           sprintf(exitBatteryOvrTempString, "%s%0.02f", POWER_ON_STRING, batt_info_recv.batt_voltage);
           send_event_log_message(SAMPLE_BATTERY_OVERTEMP, exitBatteryOvrTempString);
-        }
-        else if (!power_on_log_created && usb_started) {
-          power_on_log_created = true;
         }
 
         // Set the variable LED from the battery percentage
