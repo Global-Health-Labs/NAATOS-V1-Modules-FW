@@ -324,6 +324,17 @@ void logger_task(void *pvParameters) {
               send_debug_log_message(logFileLine);
             }
           }
+        // ---
+        // Get FW Versions (argument: none)
+        // ---
+        // GETVER,
+        } else if(strncmp(rxLogMsg.event_data.message,"GETVER",6) == 0) {
+          send_debug_log_message("LOG_TASK: LOGGER_USB_CDC_UART_RECEIVE --> GETVER command handler");
+
+          sprintf(logFileLine,"V=\"%s\" FGREWORK=%d AUTO=%d",
+            VERSION, MOTOR_FG_REWORK,DO_AUTOMATIC_RUNS
+          );
+          send_debug_log_message(logFileLine);
         } else{
           send_debug_log_message("LOG_TASK: LOGGER_USB_CDC_UART_RECEIVE --> command unhandled");
         }
