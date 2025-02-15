@@ -335,6 +335,22 @@ void logger_task(void *pvParameters) {
             VERSION, MOTOR_FG_REWORK,DO_AUTOMATIC_RUNS
           );
           send_debug_log_message(logFileLine);
+        // ---
+        // Initiate DFU (argument: none)
+        // ---
+        // GODFU,
+        } else if(strncmp(rxLogMsg.event_data.message,"TODFU",5) == 0) {
+          send_debug_log_message("LOG_TASK: LOGGER_USB_CDC_UART_RECEIVE --> TODFU command handler");
+
+          send_debug_log_message("not implemented");
+        // ---
+        // Initiate USB-MSC (argument: none)
+        // ---
+        // GOMSC,
+        } else if(strncmp(rxLogMsg.event_data.message,"TOMSC",5) == 0) {
+          send_debug_log_message("LOG_TASK: LOGGER_USB_CDC_UART_RECEIVE --> TOMSC command handler");
+
+          send_debug_log_message("not implemented");
         } else{
           send_debug_log_message("LOG_TASK: LOGGER_USB_CDC_UART_RECEIVE --> command unhandled");
         }
