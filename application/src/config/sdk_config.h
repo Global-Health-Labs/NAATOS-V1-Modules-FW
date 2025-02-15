@@ -6528,4 +6528,16 @@
 //==========================================================
 
 // <<< end of configuration section >>>
+
+
+
+
+#ifndef APP_USBD_DUMMY_ENABLED
+#define APP_USBD_DUMMY_ENABLED 1
+#endif
+
+
+
+
+
 #endif //SDK_CONFIG_H

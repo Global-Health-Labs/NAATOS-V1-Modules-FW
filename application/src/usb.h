@@ -17,6 +17,7 @@
 #include "app_usbd_msc.h"
 #include "app_usbd_serial_num.h"
 #include "app_usbd_string_desc.h"
+#include "app_usbd_dummy.h"
 
 #include "nrf_cli.h"
 #include "nrf_cli_uart.h"
@@ -38,12 +39,14 @@
 #define USB__TASK_DELAY pdMS_TO_TICKS(100)
 
 // CDC ACM Defines
-#define CDC_ACM_COMM_INTERFACE 1
+#define CDC_ACM_COMM_INTERFACE 0
 #define CDC_ACM_COMM_EPIN NRF_DRV_USBD_EPIN2
 
-#define CDC_ACM_DATA_INTERFACE 2
+#define CDC_ACM_DATA_INTERFACE 1
 #define CDC_ACM_DATA_EPIN NRF_DRV_USBD_EPIN1
 #define CDC_ACM_DATA_EPOUT NRF_DRV_USBD_EPOUT1
+
+#define MSC_DATA_INTERFACE 2
 
 #define READ_SIZE 1
 
@@ -53,7 +56,7 @@
 #if USE_SD_CARD
 #define ENDPOINT_LIST() APP_USBD_MSC_ENDPOINT_LIST(3, 3)
 #elif USE_NOR_FLASH
-#define ENDPOINT_LIST() APP_USBD_MSC_ENDPOINT_LIST(1, 1)
+#define ENDPOINT_LIST() APP_USBD_MSC_ENDPOINT_LIST(3, 2)
 #endif
 
 // Mass storage class work buffer size
@@ -86,5 +89,5 @@ void usb_task(void *pvParameters);
 void composite_usb_task(void *pvParameters);
 void write_to_com(const char * msg, int len);
 void start_usb(bool cdc_acm, bool msc);
-void restart_usb_only_cdc_acm(void);
+//void restart_usb_only_cdc_acm(void);
 void usb_suspend_conflicting_tasks(void);

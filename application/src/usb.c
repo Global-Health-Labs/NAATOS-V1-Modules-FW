@@ -57,11 +57,12 @@ TimerHandle_t compositeUsbTimer;
 
 // Mass storage class instance
 APP_USBD_MSC_GLOBAL_DEF(m_app_msc,
-    0,
+    MSC_DATA_INTERFACE,
     msc_user_ev_handler,
     ENDPOINT_LIST(),
     BLOCKDEV_LIST(),
     MSC_WORKBUFFER_SIZE);
+
 // CDC_ACM class instance
 APP_USBD_CDC_ACM_GLOBAL_DEF(m_app_cdc_acm,
     cdc_acm_user_ev_handler,
@@ -71,6 +72,11 @@ APP_USBD_CDC_ACM_GLOBAL_DEF(m_app_cdc_acm,
     CDC_ACM_DATA_EPIN,
     CDC_ACM_DATA_EPOUT,
     APP_USBD_CDC_COMM_PROTOCOL_AT_V250);
+
+// Mass storage class DUMMY (when it is not activated)
+APP_USBD_DUMMY_GLOBAL_DEF(m_app_msc_dummy, MSC_DATA_INTERFACE);
+// Simon Note: https://github.com/vincent290587/stravaV10/blob/develop/source/usb/usb_cdc.c#L502
+// Simon Note: https://devzone.nordicsemi.com/f/nordic-q-a/43042/2-usb-devices-eg-2-usb-cdc-acm-or-1-usb-adc-acm-and-1-usb-audio-simultaneously
 
 void vUSBTimerCallback(TimerHandle_t xTimer) {
   BaseType_t xReturned;
@@ -361,8 +367,33 @@ void start_usb(bool cdc_acm, bool msc) {
   ret = app_usbd_init(&usbd_config);
   APP_ERROR_CHECK(ret);
 
+  ret = app_usbd_class_remove_all();
+  APP_ERROR_CHECK(ret);
+
   usb_initalized = true;
 
+  if(msc) {
+    msc_active = true;
+    app_usbd_class_inst_t const *class_inst_msc = app_usbd_msc_class_inst_get(&m_app_msc);
+    ret = app_usbd_class_append(class_inst_msc);
+    APP_ERROR_CHECK(ret);
+  } else{
+    msc_active = false;
+    app_usbd_class_inst_t const *class_inst_msc_dummy = app_usbd_msc_class_inst_get(&m_app_msc_dummy);
+    ret = app_usbd_class_append(class_inst_msc_dummy);
+    APP_ERROR_CHECK(ret);
+  }
+
+  if (cdc_acm) {
+    cdc_acm_active = true;
+    app_usbd_class_inst_t const *class_cdc_acm = app_usbd_cdc_acm_class_inst_get(&m_app_cdc_acm);
+    ret = app_usbd_class_append(class_cdc_acm);
+    APP_ERROR_CHECK(ret);
+  } else {
+    cdc_acm_active = false;
+  }
+  
+  /*
   if (cdc_acm) {
     cdc_acm_active = true;
     app_usbd_class_inst_t const *class_cdc_acm = app_usbd_cdc_acm_class_inst_get(&m_app_cdc_acm);
@@ -380,6 +411,7 @@ void start_usb(bool cdc_acm, bool msc) {
   } else {
     msc_active = false;
   }
+  */
 
   if (USBD_POWER_DETECTION) {
     ret = app_usbd_power_events_enable();
@@ -597,7 +629,7 @@ void usb_task(void *pvParameters) {
         app_usbd_uninit();
  
         // Restart the USB
-        start_usb(false, true);
+        start_usb(true, true);
         usbd_user_ev_handler(APP_USBD_EVT_POWER_DETECTED);
         break;
       }
