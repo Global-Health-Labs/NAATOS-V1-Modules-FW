@@ -18,6 +18,7 @@ extern xQueueHandle main_usbConnRecvQueue;
 extern xQueueHandle main_usbChangedConfQueue;
 extern xQueueHandle main_wakeupTasksQueue;
 extern xQueueHandle main_setPointReached;
+extern xQueueHandle main_SerialRXQueue; // GHL-add
 
 // Sensor Task Queue
 extern xQueueHandle sensorRxQueue;

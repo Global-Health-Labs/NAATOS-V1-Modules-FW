@@ -353,6 +353,11 @@ typedef struct {
   charge_state_t charge_state;
 } usb_message_t;
 
+// SerialRX message queue type
+typedef struct {
+  char message[64];
+} SerialRXQueue_msg_t;
+
 // Battery Request with task to send to
 typedef struct {
   tasks_t task_req;

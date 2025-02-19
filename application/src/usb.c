@@ -220,21 +220,17 @@ void cdc_acm_user_ev_handler(app_usbd_class_inst_t const *p_inst,
     //sprintf(tmp, "End ACM_USER_EVT_RX_DONE: final rxbuf=%s", COM_PORT_RXBUF);
     //send_debug_log_message(tmp);
 
-    // GHL: Send to Logger task where the message line will be parsed and acted-upon there
+    // GHL: Send to a task where the message line will be parsed and acted-upon there
 
-    // prepare logMessageQueue item
-    log_event_t logEventData;
-    strncpy(logEventData.message, COM_PORT_RXBUF, 50);    // copy our temporary com_port_buffer string to logger event data message
-    log_data_message_t logMsg = {
-        .data_type = LOGGER_USB_CDC_UART_RECEIVE,
-        .event_data = logEventData,
-    };
+    // prepare queue item
+    SerialRXQueue_msg_t dataMsg;
+    strncpy(dataMsg.message, COM_PORT_RXBUF, COM_PORT_RXBUF_SIZE);    // copy our temporary com_port_buffer string to message to submit to queue
     
     // submit into queue
     BaseType_t xReturned;
-    xReturned = xQueueSend(logger_logMessageQueue, &logMsg, 0);
+    xReturned = xQueueSend(main_SerialRXQueue, &dataMsg, 0);
     if (xReturned != pdPASS) {
-      send_debug_log_message("USB_CDC: Unable to send USB COM PORT line data to LOGGER queue.");
+      send_debug_log_message("USB_CDC: Unable to send USB COM PORT line data to main_SerialRXQueue.");
     }
 
     // reset our pointer back to beginning

@@ -85,6 +85,7 @@ xQueueHandle main_usbConnRecvQueue;
 xQueueHandle main_usbChangedConfQueue;
 xQueueHandle main_wakeupTasksQueue;
 xQueueHandle main_setPointReached;
+xQueueHandle main_SerialRXQueue;
 
 // Configuration Parameters
 
@@ -128,6 +129,7 @@ void send_usb_change(usb_command_t cmd);
 void reset_and_enter_dfu(void);
 
 char exitBatteryOvrTempString[256];
+char tmp[128];
 
 xTaskHandle get_usb_task_handle(void) {
   return usbTaskHandle;
@@ -360,6 +362,175 @@ void uninit_peripherals(void) {
 
 /*********************************************************************
 *
+*       parseIncomingSerialMessageAndAct(char* strmsg)
+*
+*   Parse incoming serial message and act upon-it ( called from main_task() )
+*/
+void parseIncomingSerialMessageAndAct(char* strmsg)  {
+  char * sPtrTmp;
+  bool success = true;
+
+  sprintf(tmp,"MAIN_TASK: UART RX'ed->""%s""",strmsg);
+  send_debug_log_message(tmp);
+
+  // add termination nulls in the string to the first \n or \r characters
+  sPtrTmp = strchr(strmsg,'\r');
+  if(sPtrTmp != NULL) {
+    *sPtrTmp = '\0';
+  }
+  sPtrTmp = strchr(strmsg,'\n');
+  if(sPtrTmp != NULL) {
+    *sPtrTmp = '\0';
+  }
+
+  // search for COMMA, which separates LEFTSIDE command, and RIGHTSIDE arguments
+  sPtrTmp = strchr(strmsg,',');
+  if(sPtrTmp != NULL) {
+    // found comma separator
+  
+    // move pointer just to the right of the COMMA if not end of string
+    if(*(sPtrTmp+1)!='\0')
+      sPtrTmp++;
+
+    // check for commands we will recognize and handle
+
+
+    // ---
+    // SET RTC CLOCK (argument: give ISO8601-like string 20YY-mm-dd HH:MM:SS)
+    // ---
+    // SETCLK,2024-11-14 14:27:34
+    // or
+    // SETCLK,2024-11-14T14:27:34
+    // convenient to use with YAT (yet another terminal) timestamp insertion: SETCLK,\!(TimeStamp())
+    if(strncmp(strmsg,"SETCLK",6) == 0) {
+      send_debug_log_message("MAIN_TASK: UART RX --> SETCLK command handler");
+
+      //check it's the right length
+      // expect ISO8601 string strickly like: "2024-11-14T14:27:00" or "2024-11-14 14:27:34"
+      // T can be interchanged with a space
+      if(strlen(sPtrTmp)==19) {
+        // proper length! Go through and parse the date
+        send_debug_log_message("MAIN_TASK: UART RX --> SETCLK command: OK length");
+
+        // SHOW THE OLD TIME
+        calendar_time_t time;
+        calendar_get_time(&time);
+        sprintf(tmp,"Old read time  M: %d D: %d Y:%d h: %d m: %d s: %d",
+            time.month,
+            time.day,
+            time.year,
+            time.hour,
+            time.minute,
+            time.second
+        );
+        send_debug_log_message(tmp);
+
+        // SET DATETIME STRUCTURE
+        time.year   = ((sPtrTmp[2]-'0')*10)+(sPtrTmp[3]-'0');
+        time.month  = ((sPtrTmp[5]-'0')*10)+(sPtrTmp[6]-'0');
+        time.day    = ((sPtrTmp[8]-'0')*10)+(sPtrTmp[9]-'0');
+        time.hour   = ((sPtrTmp[11]-'0')*10)+(sPtrTmp[12]-'0');
+        time.minute = ((sPtrTmp[14]-'0')*10)+(sPtrTmp[15]-'0');
+        time.second = ((sPtrTmp[17]-'0')*10)+(sPtrTmp[18]-'0');
+
+        // sanity check
+        if(time.year>=30)  {
+          success=false;
+          send_debug_log_message("MAIN_TASK: UART RX --> SETCLK command: FAIL year");
+        }
+        if((time.month>13) || (time.month==0))  {
+          success=false;
+          send_debug_log_message("MAIN_TASK: UART RX --> SETCLK command: FAIL month");
+        }
+        if((time.day>31) || (time.day==0))  {
+          success=false;
+          send_debug_log_message("MAIN_TASK: UART RX --> SETCLK command: FAIL day");
+        }
+        if(time.hour>=24)  {
+          success=false;
+          send_debug_log_message("MAIN_TASK: UART RX --> SETCLK command: FAIL hour");
+        }
+        if(time.minute>=60)  {
+          success=false;
+          send_debug_log_message("MAIN_TASK: UART RX --> SETCLK command: FAIL minute");
+        }
+        if(time.second>=60)  {
+          success=false;
+          send_debug_log_message("MAIN_TASK: UART RX --> SETCLK command: FAIL second");
+        }
+
+        if(success) {
+          // Set the time
+          calendar_set_time(&time);
+          sprintf(tmp,"Requested time  M: %d D: %d Y:%d h: %d m: %d s: %d",
+              time.month,
+              time.day,
+              time.year,
+              time.hour,
+              time.minute,
+              time.second
+          );
+          send_debug_log_message(tmp);
+
+          // Readback the time
+          calendar_get_time(&time);
+          sprintf(tmp,"Readback time  M: %d D: %d Y:%d h: %d m: %d s: %d",
+              time.month,
+              time.day,
+              time.year,
+              time.hour,
+              time.minute,
+              time.second
+          );
+          send_debug_log_message(tmp);
+        }
+      }
+    
+    // ---
+    // Get FW Versions (argument: none)
+    // ---
+    // GETVER,
+    } else if(strncmp(strmsg,"GETVER",6) == 0) {
+      send_debug_log_message("MAIN_TASK: UART RX --> GETVER command handler");
+
+      sprintf(tmp,"V=\"%s\" FGREWORK=%d AUTO=%d",
+        VERSION, MOTOR_FG_REWORK,DO_AUTOMATIC_RUNS
+      );
+      send_debug_log_message(tmp);
+
+    // ---
+    // Initiate DFU (argument: none)
+    // ---
+    // GODFU,
+    } else if(strncmp(strmsg,"TODFU",5) == 0) {
+      send_debug_log_message("MAIN_TASK: UART RX --> TODFU command handler");
+
+      send_debug_log_message("not implemented");
+
+    // ---
+    // Initiate USB-MSC (argument: none)
+    // ---
+    // GOMSC,
+    } else if(strncmp(strmsg,"TOMSC",5) == 0) {
+      send_debug_log_message("MAIN_TASK: UART RX --> TOMSC command handler");
+
+      send_debug_log_message("not implemented");
+    
+    // ---
+    // unrecognized command
+    // ---
+    // message had comma, but we did not understand it
+    } else{
+      send_debug_log_message("MAIN_TASK: UART RX --> command unhandled");
+    }
+  } else  {
+    send_debug_log_message("MAIN_TASK: UART RX --> couldn't parse input (no comma)");
+  }
+}
+
+
+/*********************************************************************
+*
 *       main_task()
 *
 *   Main Task of NAATOS Application
@@ -369,6 +540,7 @@ void main_task(void *pvParameters) {
   uint8_t queue_size;
   sensor_switches_t switch_data = {.optical_tiggered = false};
   fuel_batt_info_t batt_info_recv;
+  SerialRXQueue_msg_t serial_rx_msg;
   button_update_t buttonData = {.event = NONE};
   bool hal_triggered = false, optical_triggered = false;
   bool error_during_run = false;
@@ -565,6 +737,14 @@ void main_task(void *pvParameters) {
 #endif
       }
 
+      /* **** HANDLE USB CDC SERIAL COM PORT RX **** */
+      // Get switch status if it has changed
+      if(xQueueReceive(main_SerialRXQueue, &serial_rx_msg, 0) == pdPASS)  {
+        // we got a new item from the serial port (see usb.c)
+        parseIncomingSerialMessageAndAct(serial_rx_msg.message);
+      }
+
+
       /* **** HANDLE USB AND SWITCH **** */
       // Get switch status if it has changed
       if (xQueueReceive(button_mainStateQueue, &buttonData, 0) == pdPASS) {
@@ -736,7 +916,6 @@ void main_task(void *pvParameters) {
 
     case MAIN_ALERT: {
       if (last_state != main_state) {
-        char tmp[50];
         updateLedState(LED_WAKEUP, true);
         updateLedState(LED_RUN_MOTOR, false);
         updateLedState(LED_RUN_HEATER, false);
@@ -1189,6 +1368,12 @@ void create_queues() {
   if (main_wakeupTasksQueue == NULL) {
     send_debug_log_message("Unable to create main_wakeupTasksQueue queue");
   }
+
+  main_SerialRXQueue = xQueueCreate(QUEUE_SIZE, sizeof(SerialRXQueue_msg_t));
+  if (main_SerialRXQueue == NULL) {
+    send_debug_log_message("Unable to create main_SerialRXQueue queue");
+  }
+
   // Heater Task Queues
   heaterRxQueue = xQueueCreate(10, sizeof(HeaterRxQueueMsg_t));
   if (heaterRxQueue == NULL) {
@@ -1373,5 +1558,7 @@ void sendWdtMain(bool valid) {
     send_debug_log_message("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task");
   }
 }
+
+
 
 /*************************** End of file ****************************/
