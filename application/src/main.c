@@ -129,7 +129,8 @@ void send_usb_change(usb_command_t cmd);
 void reset_and_enter_dfu(void);
 
 char exitBatteryOvrTempString[256];
-char tmp[128];
+const uint8_t tmpsz = 128;
+static char tmp[128];
 
 xTaskHandle get_usb_task_handle(void) {
   return usbTaskHandle;
@@ -369,6 +370,7 @@ void uninit_peripherals(void) {
 void parseIncomingSerialMessageAndAct(char* strmsg)  {
   char * sPtrTmp;
   bool success = true;
+  calendar_time_t time;
 
   sprintf(tmp,"MAIN_TASK: UART RX'ed->""%s""",strmsg);
   send_debug_log_message(tmp);
@@ -413,7 +415,6 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
         send_debug_log_message("MAIN_TASK: UART RX --> SETCLK command: OK length");
 
         // SHOW THE OLD TIME
-        calendar_time_t time;
         calendar_get_time(&time);
         sprintf(tmp,"Old read time  M: %d D: %d Y:%d h: %d m: %d s: %d",
             time.month,
@@ -493,10 +494,81 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
     } else if(strncmp(strmsg,"GETVER",6) == 0) {
       send_debug_log_message("MAIN_TASK: UART RX --> GETVER command handler");
 
-      sprintf(tmp,"V=\"%s\" FGREWORK=%d AUTO=%d",
+      sprintf(tmp,"V=\"%s\" FGREWORK=%d AUTORUN=%d",
         VERSION, MOTOR_FG_REWORK,DO_AUTOMATIC_RUNS
       );
       send_debug_log_message(tmp);
+
+    // ---
+    // Get Status (argument: none)
+    // ---
+    // STATUS,
+    } else if(strncmp(strmsg,"STATUS",6) == 0) {
+      send_debug_log_message("MAIN_TASK: UART RX --> STATUS command handler");
+
+      calendar_get_time(&time);
+      snprintf(tmp,tmpsz,"V=\"%s\" FGREWORK=%d AUTORUN=%d TS=\"20%02d-%02d-%02d %02d:%02d:%02d\"",
+        VERSION, MOTOR_FG_REWORK,DO_AUTOMATIC_RUNS,
+        time.year,
+        time.month,
+        time.day,
+        time.hour,
+        time.minute,
+        time.second
+      );
+      send_debug_log_message(tmp);
+
+    // ---
+    // CFGGET (argument: none)
+    // ---
+    // CFGGET,
+    } else if(strncmp(strmsg,"CFGGET",6) == 0) {
+      send_debug_log_message("MAIN_TASK: UART RX --> CFGGET command handler");
+
+      // main global config
+      send_debug_log_message("---Config Dump: Global---");
+      snprintf(tmp,tmpsz,"sample_valid_timeout_s:%f heater_max_temp:%f",
+        config.sample_valid_timeout_s,config.heater_max_temp
+      );
+      send_debug_log_message(tmp);
+      snprintf(tmp,tmpsz,"motor cwccw:%d stall maxpwm:%f spdpct:%d,%d",
+        config.switch_motor_ccw_cw,
+        config.motor_stall_pwm,
+        config.motor_stall_en,config.motor_stall_percent
+      );
+      send_debug_log_message(tmp);
+
+      // cycle config
+      for(uint8_t i=0; i<total_cycles; i++) {
+        snprintf(tmp,tmpsz,"---Config Dump: Cycle %d/%d---",
+          i+1,total_cycles
+        );
+        send_debug_log_message(tmp);
+        snprintf(tmp,tmpsz,"time_s:%f temp_ramp:%d,%f",
+          cycle_configs[i].cycle_run_time_s,cycle_configs[i].ramp_to_temp_before_start_cycle,cycle_configs[i].ramp_to_temp_timeout
+        );
+        send_debug_log_message(tmp);
+        if(cycle_configs[i].run_heater) {
+          snprintf(tmp,tmpsz,"heater sp:%f kp:%f ki:%f kd:%f",
+            cycle_configs[i].heater_setpoint,
+            cycle_configs[i].heater_kp,
+            cycle_configs[i].heater_ki,
+            cycle_configs[i].heater_kd
+          );
+          send_debug_log_message(tmp);
+        }
+        if(cycle_configs[i].run_motor) {
+          snprintf(tmp,tmpsz,"motor  sp:%d kp:%f ki:%f kd:%f",
+            cycle_configs[i].motor_setpoint,
+            cycle_configs[i].motor_kp,
+            cycle_configs[i].motor_ki,
+            cycle_configs[i].motor_kd
+          );
+          send_debug_log_message(tmp);
+        }
+
+      }
+
 
     // ---
     // Initiate DFU (argument: none)
