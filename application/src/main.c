@@ -732,6 +732,23 @@ void main_task(void *pvParameters) {
           }
           sprintf(exitBatteryOvrTempString, "%s%0.02f", POWER_ON_STRING, batt_info_recv.batt_voltage);
           send_event_log_message(SAMPLE_BATTERY_OVERTEMP, exitBatteryOvrTempString);
+
+          // reset reason
+          uint32_t rstreason = nrf_power_resetreas_get();
+          sprintf(exitBatteryOvrTempString, "Reset Reasons Register:%x RESETPIN=%d DOG=%d SREQ=%d LOCKUP=%d OFF=%d LPCOMP=%d DIF=%d NFC=%d VBUS=%d",
+            rstreason,
+            (rstreason&POWER_RESETREAS_RESETPIN_Msk)!=0,
+            (rstreason&POWER_RESETREAS_DOG_Msk)!=0,
+            (rstreason&POWER_RESETREAS_SREQ_Msk)!=0,
+            (rstreason&POWER_RESETREAS_LOCKUP_Msk)!=0,
+            (rstreason&POWER_RESETREAS_OFF_Msk)!=0,
+            (rstreason&POWER_RESETREAS_LPCOMP_Msk)!=0,
+            (rstreason&POWER_RESETREAS_DIF_Msk)!=0,
+            (rstreason&POWER_RESETREAS_NFC_Msk)!=0,
+            (rstreason&POWER_RESETREAS_VBUS_Msk)!=0
+          );
+          send_event_log_message(SAMPLE_BATTERY_OVERTEMP, exitBatteryOvrTempString);
+          nrf_power_resetreas_clear((uint32_t) POWER_RESETREAS_RESETPIN_Msk|POWER_RESETREAS_DOG_Msk|POWER_RESETREAS_SREQ_Msk|POWER_RESETREAS_LOCKUP_Msk|POWER_RESETREAS_OFF_Msk|POWER_RESETREAS_LPCOMP_Msk|POWER_RESETREAS_DIF_Msk|POWER_RESETREAS_NFC_Msk|POWER_RESETREAS_VBUS_Msk);
         }
 
         // Set the variable LED from the battery percentage
