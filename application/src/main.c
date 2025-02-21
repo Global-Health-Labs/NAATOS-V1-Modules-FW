@@ -156,6 +156,21 @@ void reset_and_enter_dfu(void) {
   asm volatile("nop");
 }
 
+void reset(void)  {
+  // Device will enter bootloader on next reset,
+  // use this line of code to perform the reset:
+  NVIC_SystemReset();
+  asm volatile("nop");
+}
+
+void reformat_filesystem_and_reread(void) {
+  unmount_storage();
+  nor_flash_fatfs_mkfs();
+  create_naatos_directories();
+  get_naatos_configuration_parameters(&config);
+  get_cycle_configurations_parameters();
+}
+
 void read_sd_and_notify_tasks(void) {
   BaseType_t xReturned;
   HeaterRxQueueMsg_t heaterConfigMsg = {
@@ -380,7 +395,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
   calendar_time_t time;
   button_update_t button_update_msg;  //<-- for sending button events to rest of tasks
 
-  sprintf(tmp,"MAIN_TASK: UART RX'ed->""%s""",strmsg);
+  sprintf(tmp,"COMRXTASK: PARSE RX'ed->""%s""",strmsg);
   send_debug_log_message(tmp);
 
   // add termination nulls in the string to the first \n or \r characters
@@ -413,14 +428,14 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
     // SETCLK,2024-11-14T14:27:34
     // convenient to use with YAT (yet another terminal) timestamp insertion: SETCLK,\!(TimeStamp())
     if(strncmp(strmsg,"SETCLK",6) == 0) {
-      send_debug_log_message("MAIN_TASK: UART RX --> SETCLK command handler");
+      send_debug_log_message("COMRXTASK: PARSE --> SETCLK command handler");
 
       //check it's the right length
       // expect ISO8601 string strickly like: "2024-11-14T14:27:00" or "2024-11-14 14:27:34"
       // T can be interchanged with a space
       if(strlen(sPtrTmp)==19) {
         // proper length! Go through and parse the date
-        send_debug_log_message("MAIN_TASK: UART RX --> SETCLK command: OK length");
+        send_debug_log_message("COMRXTASK: PARSE --> SETCLK command: OK length");
 
         // SHOW THE OLD TIME
         calendar_get_time(&time);
@@ -445,27 +460,27 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
         // sanity check
         if(time.year>=30)  {
           success=false;
-          send_debug_log_message("MAIN_TASK: UART RX --> SETCLK command: FAIL year");
+          send_debug_log_message("COMRXTASK: PARSE --> SETCLK command: FAIL year");
         }
         if((time.month>13) || (time.month==0))  {
           success=false;
-          send_debug_log_message("MAIN_TASK: UART RX --> SETCLK command: FAIL month");
+          send_debug_log_message("COMRXTASK: PARSE --> SETCLK command: FAIL month");
         }
         if((time.day>31) || (time.day==0))  {
           success=false;
-          send_debug_log_message("MAIN_TASK: UART RX --> SETCLK command: FAIL day");
+          send_debug_log_message("COMRXTASK: PARSE --> SETCLK command: FAIL day");
         }
         if(time.hour>=24)  {
           success=false;
-          send_debug_log_message("MAIN_TASK: UART RX --> SETCLK command: FAIL hour");
+          send_debug_log_message("COMRXTASK: PARSE --> SETCLK command: FAIL hour");
         }
         if(time.minute>=60)  {
           success=false;
-          send_debug_log_message("MAIN_TASK: UART RX --> SETCLK command: FAIL minute");
+          send_debug_log_message("COMRXTASK: PARSE --> SETCLK command: FAIL minute");
         }
         if(time.second>=60)  {
           success=false;
-          send_debug_log_message("MAIN_TASK: UART RX --> SETCLK command: FAIL second");
+          send_debug_log_message("COMRXTASK: PARSE --> SETCLK command: FAIL second");
         }
 
         if(success) {
@@ -501,7 +516,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
     // ---
     // GETVER,
     } else if(strncmp(strmsg,"GETVER",6) == 0) {
-      send_debug_log_message("MAIN_TASK: UART RX --> GETVER command handler");
+      send_debug_log_message("COMRXTASK: PARSE --> GETVER command handler");
 
       sprintf(tmp,"V=\"%s\" FGREWORK=%d AUTORUN=%d",
         VERSION, MOTOR_FG_REWORK,DO_AUTOMATIC_RUNS
@@ -514,7 +529,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
     // ---
     // STATUS,
     } else if(strncmp(strmsg,"STATUS",6) == 0) {
-      send_debug_log_message("MAIN_TASK: UART RX --> STATUS command handler");
+      send_debug_log_message("COMRXTASK: PARSE --> STATUS command handler");
       
       if(main_state==MAIN_STANDBY)  {
         sprintf(strmsg,"MAIN_STANDBY");
@@ -525,6 +540,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
       }
 
       calendar_get_time(&time);
+      #ifdef SAMPLE_PREP_BOARD
       snprintf(tmp,tmpsz,"V=\"%s\" FGREWORK=%d AUTORUN=%d TS=\"20%02d-%02d-%02d %02d:%02d:%02d\" MAIN_STATE=\"%s\"",
         VERSION, MOTOR_FG_REWORK,DO_AUTOMATIC_RUNS,
         time.year,
@@ -536,13 +552,26 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
         strmsg
       );
       send_debug_log_message(tmp);
+      #else
+      snprintf(tmp,tmpsz,"V=\"%s\" AUTORUN=%d TS=\"20%02d-%02d-%02d %02d:%02d:%02d\" MAIN_STATE=\"%s\"",
+        VERSION, DO_AUTOMATIC_RUNS,
+        time.year,
+        time.month,
+        time.day,
+        time.hour,
+        time.minute,
+        time.second,
+        strmsg
+      );
+      send_debug_log_message(tmp);
+      #endif
 
     // ---
     // CFGGET (argument: none)
     // ---
     // CFGGET,
     } else if(strncmp(strmsg,"CFGGET",6) == 0) {
-      send_debug_log_message("MAIN_TASK: UART RX --> CFGGET command handler");
+      send_debug_log_message("COMRXTASK: PARSE --> CFGGET command handler");
       // main global config
       send_debug_log_message("---Config Dump: Global---");
   #ifdef SAMPLE_PREP_BOARD
@@ -597,7 +626,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
     // ---
     // TODFU,
     } else if(strncmp(strmsg,"TODFU",5) == 0) {
-      send_debug_log_message("MAIN_TASK: UART RX --> TODFU command handler");
+      send_debug_log_message("COMRXTASK: PARSE --> TODFU command handler");
 
       if(main_state==MAIN_STANDBY)  {
         send_debug_log_message("simulate DFU entry by sending bootloader button event (3 presses)");
@@ -605,7 +634,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
         button_update_msg.event = BOOTLOADER_EVENT;  //<-- when triple-pressed
         BaseType_t xReturned = xQueueSend(button_mainStateQueue, &button_update_msg, 0);
         if (xReturned != pdPASS) {
-          send_debug_log_message("SWITCH_TASK: Unable to send to button_mainStateQueue.");
+          send_debug_log_message("COMRXTASK: Unable to send to button_mainStateQueue.");
         }
 
       } else{
@@ -617,7 +646,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
     // ---
     // TOMSC,
     } else if(strncmp(strmsg,"TOMSC",5) == 0) {
-      send_debug_log_message("MAIN_TASK: UART RX --> TOMSC command handler");
+      send_debug_log_message("COMRXTASK: PARSE --> TOMSC command handler");
 
       //send_debug_log_message("not implemented");
       if(main_state==MAIN_STANDBY)  {
@@ -626,7 +655,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
         button_update_msg.event = OFF_EVENT;  //<-- when long-pressed
         BaseType_t xReturned = xQueueSend(button_mainStateQueue, &button_update_msg, 0);
         if (xReturned != pdPASS) {
-          send_debug_log_message("SWITCH_TASK: Unable to send to button_mainStateQueue.");
+          send_debug_log_message("COMRXTASK: Unable to send to button_mainStateQueue.");
         }
 
         // move the main state machine to main_bootloader
@@ -640,7 +669,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
     // ---
     // EXITMSC,
     } else if(strncmp(strmsg,"EXITMSC",7) == 0) {
-      send_debug_log_message("MAIN_TASK: UART RX --> EXITMSC command handler");
+      send_debug_log_message("COMRXTASK: PARSE --> EXITMSC command handler");
 
       if(main_state==MAIN_FILE)  {
         send_debug_log_message("simulate USB-MSC exit by sending a buttonpress");
@@ -648,11 +677,38 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
         button_update_msg.event = ON_EVENT;  //<-- when pushed once
         BaseType_t xReturned = xQueueSend(button_mainStateQueue, &button_update_msg, 0);
         if (xReturned != pdPASS) {
-          send_debug_log_message("SWITCH_TASK: Unable to send to button_mainStateQueue.");
+          send_debug_log_message("COMRXTASK: Unable to send to button_mainStateQueue.");
         }
 
         // move the main state machine to main_bootloader
         //next_state = MAIN_BOOTLOADER;
+      } else{
+        send_debug_log_message("error, main_state!=MAIN_FILE, canoot exit USB-MSC now");
+      }
+
+    // ---
+    // REFORMAT (argument: none)
+    // ---
+    // REFORMAT,
+    //
+    // This will set a value in GPREG2 and initiate a software reset; upon bootup at main_task() initialization reset process will occur
+    // This should act just like the hold-button-while-power-on-reset
+    } else if(strncmp(strmsg,"REFORMAT",8) == 0) {
+      send_debug_log_message("COMRXTASK: PARSE --> REFORMAT command handler");
+
+      if(main_state==MAIN_STANDBY)  {
+        send_debug_log_message("set a retained bitfield and reset, to reformat the filesystem, soon");
+        vTaskDelay(pdMS_TO_TICKS(100));
+        gpregret2.bit.reformat = true;
+        NRF_POWER->GPREGRET2 = gpregret2.reg;
+        
+        //TODO: ideally i'd like to rectreate the button-holding action, but the GPREGRET2 seems to not persist after the NVIC_SystemReset():
+        //TODO: so as a work-around we'll just do the reformat here, then reset
+        reformat_filesystem_and_reread();
+
+        reset();
+        // should never continue beyond
+
       } else{
         send_debug_log_message("error, main_state!=MAIN_FILE, canoot exit USB-MSC now");
       }
@@ -662,10 +718,10 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
     // ---
     // message had comma, but we did not understand it
     } else{
-      send_debug_log_message("MAIN_TASK: UART RX --> command unhandled");
+      send_debug_log_message("COMRXTASK: PARSE --> command unhandled");
     }
   } else  {
-    send_debug_log_message("MAIN_TASK: UART RX --> couldn't parse input (no comma)");
+    send_debug_log_message("COMRXTASK: PARSE --> couldn't parse input (no comma)");
   }
 }
 
@@ -710,9 +766,7 @@ void main_task(void *pvParameters) {
   send_debug_log_message(exitBatteryOvrTempString);
   gpregret2.reg = (NRF_POWER->GPREGRET2); // for nordic only 8 bits lsb are retained
   gpregret2.bit.app_set_this_on = true; // our app will just always set this bit to 1 at startup
-  NRF_POWER->GPREGRET2 = gpregret2.reg;
-  sprintf(exitBatteryOvrTempString, "STARTUP2 GPREGRET1=0x%08x GPEGRET2=0x%08x", NRF_POWER->GPREGRET, NRF_POWER->GPREGRET2);
-  send_debug_log_message(exitBatteryOvrTempString);
+
 
   // Initalize the charger in here after 1 second to avoid 
   // issues with charging when the kill switch is off
@@ -722,13 +776,17 @@ void main_task(void *pvParameters) {
 
   // See if we are resetting the file system
   bool button_pressed  = !(nrf_gpio_pin_read(BUTTON_INPUT_PIN));
-  if (button_pressed && !usb_started) {
-    unmount_storage();
-    nor_flash_fatfs_mkfs();
-    create_naatos_directories();
-    get_naatos_configuration_parameters(&config);
-    get_cycle_configurations_parameters();
+  // either holding down button with no USB, or gpregret2 bitfield set (through uart)
+  if ( (button_pressed && !usb_started) || (gpregret2.bit.reformat) ) {
+    gpregret2.bit.reformat = false;
+
+    reformat_filesystem_and_reread();
   }
+
+  // Set GPREGRET2 register
+  NRF_POWER->GPREGRET2 = gpregret2.reg;
+  sprintf(exitBatteryOvrTempString, "STARTUP2 GPREGRET1=0x%08x GPEGRET2=0x%08x", NRF_POWER->GPREGRET, NRF_POWER->GPREGRET2);
+  send_debug_log_message(exitBatteryOvrTempString);
 
   // Set Start up state to standby
   main_state = MAIN_SLEEP;

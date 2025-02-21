@@ -706,11 +706,11 @@ typedef struct {
 typedef union {
   struct {
     bool app_set_this_on : 1;
-    bool _unused1    : 1;
+    bool _unused1    : 1; // bit 0
     bool _unused2    : 1;
     bool _unused3    : 1;
     bool _unused4    : 1;
-    bool _unused5    : 1;
+    bool reformat    : 1; // bit 5
     bool _unused6    : 1;
     bool _unused7    : 1;
   } bit;
