@@ -524,9 +524,9 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
     // CFGGET,
     } else if(strncmp(strmsg,"CFGGET",6) == 0) {
       send_debug_log_message("MAIN_TASK: UART RX --> CFGGET command handler");
-
       // main global config
       send_debug_log_message("---Config Dump: Global---");
+  #ifdef SAMPLE_PREP_BOARD
       snprintf(tmp,tmpsz,"sample_valid_timeout_s:%f heater_max_temp:%f",
         config.sample_valid_timeout_s,config.heater_max_temp
       );
@@ -537,6 +537,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
         config.motor_stall_en,config.motor_stall_percent
       );
       send_debug_log_message(tmp);
+   #endif
 
       // cycle config
       for(uint8_t i=0; i<total_cycles; i++) {
@@ -544,6 +545,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
           i+1,total_cycles
         );
         send_debug_log_message(tmp);
+  #ifdef SAMPLE_PREP_BOARD
         snprintf(tmp,tmpsz,"time_s:%f temp_ramp:%d,%f",
           cycle_configs[i].cycle_run_time_s,cycle_configs[i].ramp_to_temp_before_start_cycle,cycle_configs[i].ramp_to_temp_timeout
         );
@@ -566,6 +568,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
           );
           send_debug_log_message(tmp);
         }
+  #endif
 
       }
 
