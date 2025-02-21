@@ -73,6 +73,7 @@ xTaskHandle compositeTaskHandle;
 xTaskHandle buttonTaskHandle;
 xTaskHandle ledTaskHandle;
 xTaskHandle motorTaskHandle;
+xTaskHandle comrxTaskHandle;
 
 xQueueHandle main_batteryDataQueue;
 xQueueHandle main_switchQueue;
@@ -120,6 +121,12 @@ naatos_config_parameters config = {
 cycle_config_parameters *cycle_configs; // Will be populated by the storage when the cycle configs are pulled
 
 bool batt_recovering = false;
+
+// File-Global Variables
+static main_state_t main_state = MAIN_SLEEP;
+static main_state_t next_state = MAIN_STANDBY;
+static main_state_t last_state = MAIN_SLEEP;
+
 
 // Function defs
 void sendWdtHeaterInvalid();
@@ -371,6 +378,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
   char * sPtrTmp;
   bool success = true;
   calendar_time_t time;
+  button_update_t button_update_msg;  //<-- for sending button events to rest of tasks
 
   sprintf(tmp,"MAIN_TASK: UART RX'ed->""%s""",strmsg);
   send_debug_log_message(tmp);
@@ -487,6 +495,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
         }
       }
     
+    /*
     // ---
     // Get FW Versions (argument: none)
     // ---
@@ -498,6 +507,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
         VERSION, MOTOR_FG_REWORK,DO_AUTOMATIC_RUNS
       );
       send_debug_log_message(tmp);
+    */
 
     // ---
     // Get Status (argument: none)
@@ -505,16 +515,25 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
     // STATUS,
     } else if(strncmp(strmsg,"STATUS",6) == 0) {
       send_debug_log_message("MAIN_TASK: UART RX --> STATUS command handler");
+      
+      if(main_state==MAIN_STANDBY)  {
+        sprintf(strmsg,"MAIN_STANDBY");
+      } else if(main_state==MAIN_FILE)  {
+        sprintf(strmsg,"MAIN_FILE");
+      } else{
+        sprintf(strmsg,"other");
+      }
 
       calendar_get_time(&time);
-      snprintf(tmp,tmpsz,"V=\"%s\" FGREWORK=%d AUTORUN=%d TS=\"20%02d-%02d-%02d %02d:%02d:%02d\"",
+      snprintf(tmp,tmpsz,"V=\"%s\" FGREWORK=%d AUTORUN=%d TS=\"20%02d-%02d-%02d %02d:%02d:%02d\" MAIN_STATE=\"%s\"",
         VERSION, MOTOR_FG_REWORK,DO_AUTOMATIC_RUNS,
         time.year,
         time.month,
         time.day,
         time.hour,
         time.minute,
-        time.second
+        time.second,
+        strmsg
       );
       send_debug_log_message(tmp);
 
@@ -576,20 +595,67 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
     // ---
     // Initiate DFU (argument: none)
     // ---
-    // GODFU,
+    // TODFU,
     } else if(strncmp(strmsg,"TODFU",5) == 0) {
       send_debug_log_message("MAIN_TASK: UART RX --> TODFU command handler");
 
-      send_debug_log_message("not implemented");
+      if(main_state==MAIN_STANDBY)  {
+        send_debug_log_message("simulate DFU entry by sending bootloader button event (3 presses)");
+
+        button_update_msg.event = BOOTLOADER_EVENT;  //<-- when triple-pressed
+        BaseType_t xReturned = xQueueSend(button_mainStateQueue, &button_update_msg, 0);
+        if (xReturned != pdPASS) {
+          send_debug_log_message("SWITCH_TASK: Unable to send to button_mainStateQueue.");
+        }
+
+      } else{
+        send_debug_log_message("error, main_state!=MAIN_STANDBY, cannot enter DFU");
+      }
 
     // ---
     // Initiate USB-MSC (argument: none)
     // ---
-    // GOMSC,
+    // TOMSC,
     } else if(strncmp(strmsg,"TOMSC",5) == 0) {
       send_debug_log_message("MAIN_TASK: UART RX --> TOMSC command handler");
 
-      send_debug_log_message("not implemented");
+      //send_debug_log_message("not implemented");
+      if(main_state==MAIN_STANDBY)  {
+        send_debug_log_message("simulate USB-MSC entry by sending a long-press of button");
+
+        button_update_msg.event = OFF_EVENT;  //<-- when long-pressed
+        BaseType_t xReturned = xQueueSend(button_mainStateQueue, &button_update_msg, 0);
+        if (xReturned != pdPASS) {
+          send_debug_log_message("SWITCH_TASK: Unable to send to button_mainStateQueue.");
+        }
+
+        // move the main state machine to main_bootloader
+        //next_state = MAIN_BOOTLOADER;
+      } else{
+        send_debug_log_message("error, main_state!=MAIN_STANDBY, canoot start USB-MSC now");
+      }
+
+    // ---
+    // Exit USB-MSC (argument: none)
+    // ---
+    // EXITMSC,
+    } else if(strncmp(strmsg,"EXITMSC",7) == 0) {
+      send_debug_log_message("MAIN_TASK: UART RX --> EXITMSC command handler");
+
+      if(main_state==MAIN_FILE)  {
+        send_debug_log_message("simulate USB-MSC exit by sending a buttonpress");
+
+        button_update_msg.event = ON_EVENT;  //<-- when pushed once
+        BaseType_t xReturned = xQueueSend(button_mainStateQueue, &button_update_msg, 0);
+        if (xReturned != pdPASS) {
+          send_debug_log_message("SWITCH_TASK: Unable to send to button_mainStateQueue.");
+        }
+
+        // move the main state machine to main_bootloader
+        //next_state = MAIN_BOOTLOADER;
+      } else{
+        send_debug_log_message("error, main_state!=MAIN_FILE, canoot exit USB-MSC now");
+      }
     
     // ---
     // unrecognized command
@@ -653,9 +719,9 @@ void main_task(void *pvParameters) {
   }
 
   // Set Start up state to standby
-  main_state_t main_state = MAIN_SLEEP;
-  main_state_t next_state = MAIN_STANDBY;
-  main_state_t last_state = MAIN_SLEEP;
+  main_state = MAIN_SLEEP;
+  next_state = MAIN_STANDBY;
+  last_state = MAIN_SLEEP;
   int i = 0;
 
   // Get the alert timeout
@@ -738,7 +804,7 @@ void main_task(void *pvParameters) {
 
           // reset reason
           uint32_t rstreason = nrf_power_resetreas_get();
-          sprintf(exitBatteryOvrTempString, "Reset Reasons Register:%x RESETPIN=%d DOG=%d SREQ=%d LOCKUP=%d OFF=%d LPCOMP=%d DIF=%d NFC=%d VBUS=%d",
+          sprintf(exitBatteryOvrTempString, "POWER.RESETREAS=0x%02x RESETPIN=%d DOG=%d SREQ=%d LOCKUP=%d OFF=%d LPCOMP=%d DIF=%d NFC=%d VBUS=%d",
             rstreason,
             (rstreason&POWER_RESETREAS_RESETPIN_Msk)!=0,
             (rstreason&POWER_RESETREAS_DOG_Msk)!=0,
@@ -828,14 +894,6 @@ void main_task(void *pvParameters) {
         }
 #endif
       }
-
-      /* **** HANDLE USB CDC SERIAL COM PORT RX **** */
-      // Get switch status if it has changed
-      if(xQueueReceive(main_SerialRXQueue, &serial_rx_msg, 0) == pdPASS)  {
-        // we got a new item from the serial port (see usb.c)
-        parseIncomingSerialMessageAndAct(serial_rx_msg.message);
-      }
-
 
       /* **** HANDLE USB AND SWITCH **** */
       // Get switch status if it has changed
@@ -1278,6 +1336,35 @@ void main_task(void *pvParameters) {
   }
 }
 
+void comrx_task(void *pvParameters) {
+  /* **** HANDLE USB CDC SERIAL COM PORT RX **** */
+  /*
+  *
+  *
+  * Parse and act-upon any serial message
+  *
+  *
+  **/
+  (void)pvParameters;
+  BaseType_t xReturned;
+  SerialRXQueue_msg_t serial_rx_msg;
+
+  for (;;) {
+    if (xQueueReceive(main_SerialRXQueue, &serial_rx_msg, portMAX_DELAY) != pdPASS) {
+      send_debug_log_message("Unable to Rx data from main_SerialRXQueue");
+    
+    } else {
+      // message received
+
+      // we got a new item from the serial port (see usb.c)
+      parseIncomingSerialMessageAndAct(serial_rx_msg.message);
+
+    }
+  } // task end for(;;)
+
+}
+
+
 void send_usb_change(usb_command_t cmd) {
   BaseType_t xReturned;
   bool confirmed = false;
@@ -1413,6 +1500,14 @@ void create_tasks() {
     vTaskDelete(ledTaskHandle);
   }
   #endif
+  //comrx Task
+  xReturned = xTaskCreate(comrx_task, "COMRXTsk", 1024, NULL, 0, &comrxTaskHandle);
+  if (xReturned != pdPASS) {
+    // The task was created.  Use the task's handle to delete the task.
+    sprintf(buff, "Error creating Composite COMRXTsk task. Error: %d", xReturned);
+    send_debug_log_message(buff);
+    vTaskDelete(comrxTaskHandle);
+  }
 }
 
 /*********************************************************************
