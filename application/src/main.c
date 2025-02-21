@@ -681,9 +681,11 @@ void main_task(void *pvParameters) {
   uint8_t queue_size;
   sensor_switches_t switch_data = {.optical_tiggered = false};
   fuel_batt_info_t batt_info_recv;
-  SerialRXQueue_msg_t serial_rx_msg;
   button_update_t buttonData = {.event = NONE};
   bool hal_triggered = false, optical_triggered = false;
+#ifdef POWER_MODULE_BOARD
+  bool optical_triggered_last = true;   // use catch condition where the unit is powered on, with cartridge inserted; don't want to start right away
+#endif
   bool error_during_run = false;
   cycle_state_exit_t cycle_exit_info = CYCLE_ERROR_UNKNOWN;
   bool over_temp = false;
@@ -999,13 +1001,15 @@ void main_task(void *pvParameters) {
     #endif
 #else
       // Check if we can go to RUN state
-      if (optical_triggered && !error_during_run) {
+      // - should only occur from low to high transition on optical sensor so it doesn't start right away when powering on
+      if (optical_triggered && !error_during_run && !optical_triggered_last) {
         next_state = MAIN_RUNNING;
         // Delay
         vTaskDelay(100);
       }
 #endif
       buttonData.event = NONE;
+      optical_triggered_last = optical_triggered;
 
       main_wdt_time_left = pdTICKS_TO_MS(xTaskGetTickCount() - main_wdt_start_time);
 
@@ -1032,7 +1036,7 @@ void main_task(void *pvParameters) {
         main_wdt_time_left = 0;
       }
 
-	  // keep track of time that the state machine exited
+      // keep track of time that the state machine exited
       cycle_exit_info = run_cycle_state_machine();
       end_time = xTaskGetTickCount();
 
