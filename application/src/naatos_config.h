@@ -700,6 +700,23 @@ typedef struct {
 #endif
 } cycle_config_parameters;
 
+/* General Purpose Retained Registers 2 */
+// we will use this in NAATOS application to track a few things
+// one note: it does not get retained across watchdog resets (WDOG)
+typedef union {
+  struct {
+    bool app_set_this_on : 1;
+    bool _unused1    : 1;
+    bool _unused2    : 1;
+    bool _unused3    : 1;
+    bool _unused4    : 1;
+    bool _unused5    : 1;
+    bool _unused6    : 1;
+    bool _unused7    : 1;
+  } bit;
+  uint8_t reg;
+} naatos_gpregret2_t;
+
 /* Configuration Parameters Variables */
 extern naatos_config_parameters config;
 extern cycle_config_parameters *cycle_configs;

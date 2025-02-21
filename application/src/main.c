@@ -126,7 +126,7 @@ bool batt_recovering = false;
 static main_state_t main_state = MAIN_SLEEP;
 static main_state_t next_state = MAIN_STANDBY;
 static main_state_t last_state = MAIN_SLEEP;
-
+static naatos_gpregret2_t gpregret2;  // track the general purpose retained register 2 (1 is used for DFU entry)
 
 // Function defs
 void sendWdtHeaterInvalid();
@@ -704,6 +704,16 @@ void main_task(void *pvParameters) {
       .sendTo = BATTERY_MSG_SOC_MAIN};
   BaseType_t xHigherPriorityTaskWoken = pdTRUE;
 
+  // Read current GPREGRET2 values
+  // We use this to pass some information from the previous startup if applicable
+  sprintf(exitBatteryOvrTempString, "STARTUP1 GPREGRET1=0x%08x GPEGRET2=0x%08x", NRF_POWER->GPREGRET, NRF_POWER->GPREGRET2);
+  send_debug_log_message(exitBatteryOvrTempString);
+  gpregret2.reg = (NRF_POWER->GPREGRET2); // for nordic only 8 bits lsb are retained
+  gpregret2.bit.app_set_this_on = true; // our app will just always set this bit to 1 at startup
+  NRF_POWER->GPREGRET2 = gpregret2.reg;
+  sprintf(exitBatteryOvrTempString, "STARTUP2 GPREGRET1=0x%08x GPEGRET2=0x%08x", NRF_POWER->GPREGRET, NRF_POWER->GPREGRET2);
+  send_debug_log_message(exitBatteryOvrTempString);
+
   // Initalize the charger in here after 1 second to avoid 
   // issues with charging when the kill switch is off
   vTaskDelay(pdMS_TO_TICKS(1000));
@@ -806,7 +816,7 @@ void main_task(void *pvParameters) {
 
           // reset reason
           uint32_t rstreason = nrf_power_resetreas_get();
-          sprintf(exitBatteryOvrTempString, "POWER.RESETREAS=0x%02x RESETPIN=%d DOG=%d SREQ=%d LOCKUP=%d OFF=%d LPCOMP=%d DIF=%d NFC=%d VBUS=%d",
+          sprintf(exitBatteryOvrTempString, "POWER.RESETREAS=0x%08x RESETPIN=%d DOG=%d SREQ=%d LOCKUP=%d OFF=%d LPCOMP=%d DIF=%d NFC=%d VBUS=%d",
             rstreason,
             (rstreason&POWER_RESETREAS_RESETPIN_Msk)!=0,
             (rstreason&POWER_RESETREAS_DOG_Msk)!=0,
@@ -819,7 +829,15 @@ void main_task(void *pvParameters) {
             (rstreason&POWER_RESETREAS_VBUS_Msk)!=0
           );
           send_event_log_message(SAMPLE_BATTERY_OVERTEMP, exitBatteryOvrTempString);
+          // must be cleared or it becomes "cumulative" weirdly, not truly reflecting this last bootup
           nrf_power_resetreas_clear((uint32_t) POWER_RESETREAS_RESETPIN_Msk|POWER_RESETREAS_DOG_Msk|POWER_RESETREAS_SREQ_Msk|POWER_RESETREAS_LOCKUP_Msk|POWER_RESETREAS_OFF_Msk|POWER_RESETREAS_LPCOMP_Msk|POWER_RESETREAS_DIF_Msk|POWER_RESETREAS_NFC_Msk|POWER_RESETREAS_VBUS_Msk);
+
+          // gpgret2 values
+          sprintf(exitBatteryOvrTempString, "GPREGRET2: 0x%x",
+            gpregret2.reg
+          );
+          send_event_log_message(SAMPLE_BATTERY_OVERTEMP, exitBatteryOvrTempString);
+
         }
 
         // Set the variable LED from the battery percentage
