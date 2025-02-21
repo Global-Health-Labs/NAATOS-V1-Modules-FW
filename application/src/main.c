@@ -591,7 +591,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
       send_debug_log_message("COMRXTASK: PARSE --> CFGGET command handler");
       // main global config
       send_debug_log_message("---Config Dump: Global---");
-  #ifdef SAMPLE_PREP_BOARD
+   #ifdef SAMPLE_PREP_BOARD
       snprintf(tmp,tmpsz,"sample_valid_timeout_s:%f heater_max_temp:%f",
         config.sample_valid_timeout_s,config.heater_max_temp
       );
@@ -603,6 +603,17 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
       );
       send_debug_log_message(tmp);
    #endif
+   #ifdef POWER_MODULE_BOARD
+      snprintf(tmp,tmpsz,"sample_valid_timeout_s:%f valve_max_temp:%f amp_max_temp:%f",
+        config.sample_valid_timeout_s,config.valve_max_temp,config.amp_max_temp
+      );
+      send_debug_log_message(tmp);
+      snprintf(tmp,tmpsz,"optical_distance:%f",
+        config.optical_distance
+      );
+      send_debug_log_message(tmp);
+   #endif
+
 
       // cycle config
       for(uint8_t i=0; i<total_cycles; i++) {
@@ -891,7 +902,7 @@ void main_task(void *pvParameters) {
 
           // reset reason
           uint32_t rstreason = nrf_power_resetreas_get();
-          sprintf(exitBatteryOvrTempString, "Boot. POWER.RESETREAS=0x%08x RESETPIN=%d DOG=%d SREQ=%d LOCKUP=%d OFF=%d LPCOMP=%d DIF=%d NFC=%d VBUS=%d",
+          sprintf(exitBatteryOvrTempString, "Boot POWER.RESETREAS=0x%08x RESETPIN=%d DOG=%d SREQ=%d LOCKUP=%d OFF=%d LPCOMP=%d DIF=%d NFC=%d VBUS=%d",
             rstreason,
             (rstreason&POWER_RESETREAS_RESETPIN_Msk)!=0,
             (rstreason&POWER_RESETREAS_DOG_Msk)!=0,
@@ -907,10 +918,11 @@ void main_task(void *pvParameters) {
           // must be cleared or it becomes "cumulative" weirdly, not truly reflecting this last bootup
           nrf_power_resetreas_clear((uint32_t) POWER_RESETREAS_RESETPIN_Msk|POWER_RESETREAS_DOG_Msk|POWER_RESETREAS_SREQ_Msk|POWER_RESETREAS_LOCKUP_Msk|POWER_RESETREAS_OFF_Msk|POWER_RESETREAS_LPCOMP_Msk|POWER_RESETREAS_DIF_Msk|POWER_RESETREAS_NFC_Msk|POWER_RESETREAS_VBUS_Msk);
 
-          // gpgret2 values
-          sprintf(exitBatteryOvrTempString, "Boot. GPREGRET2: 0x%x",
+          // gpgret2 and SN: values
+          sprintf(exitBatteryOvrTempString, "Boot GPREGRET2: 0x%x SN: ",
             gpregret2.reg
           );
+          get_nordic_uniqueid_concat_to_a_string(exitBatteryOvrTempString);
           send_event_log_message(SAMPLE_BATTERY_OVERTEMP, exitBatteryOvrTempString);
 
         }

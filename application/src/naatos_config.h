@@ -5,7 +5,7 @@
 #include "task.h"
 #include <stdint.h>
 
-#define VERSION "3.1"
+#define VERSION "3.2rc1"
 
 /*Define this when building sample prep only otherwise comment out*/
 //#define SAMPLE_PREP_BOARD
@@ -160,7 +160,7 @@
 #define DEFAULT_OPTICAL_TRIG_THRESHOLD  800
 #define DEFAULT_MAX_AMP_PID             100
 #define DEFAULT_MAX_VALVE_PID           100
-#define DEFAULT_VALVE_MAX_TEMP          120.0
+#define DEFAULT_VALVE_MAX_TEMP          130.0
 #define DEFAULT_AMP_MAX_TEMP            120.0
 #else 
 #define DEFAULT_MAX_HEATER_TEMP         120.0
@@ -227,7 +227,7 @@
 #define SAMPLE_OVER_TEMPERATURE "Sample over temperature error"
 #define SAMPLE_BATTERY_OVER_TEMP "Battery over temperature error:"
 #define SAMPLE_LOW_BATTERY_STRING "Battery is too low to start cycle: "
-#define POWER_ON_STRING "Boot. Starting battery voltage: "
+#define POWER_ON_STRING "Boot Starting battery voltage: "
 #define USB_SUSPEND_TASKS_TIME 15000
 
 /* Main States */
