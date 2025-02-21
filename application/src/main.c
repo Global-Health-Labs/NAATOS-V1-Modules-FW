@@ -171,6 +171,22 @@ void reformat_filesystem_and_reread(void) {
   get_cycle_configurations_parameters();
 }
 
+void get_nordic_uniqueid_concat_to_a_string(char* string)  {
+  // inspired by function in app_usbd_serial_num.c in NORDIC SDK
+
+  char serial_number_string[16];
+  const uint16_t serial_num_high_bytes = (uint16_t)NRF_FICR->DEVICEADDR[1] | 0xC000; // The masking makes the address match the Random Static BLE address.
+  const uint32_t serial_num_low_bytes  = NRF_FICR->DEVICEADDR[0];
+
+  (void)snprintf(serial_number_string,15,
+                 "%04"PRIX16"%08"PRIX32,
+                 serial_num_high_bytes,
+                 serial_num_low_bytes);
+
+  //string_create(serial_number_string);
+  strcat(string,serial_number_string);
+}
+
 void read_sd_and_notify_tasks(void) {
   BaseType_t xReturned;
   HeaterRxQueueMsg_t heaterConfigMsg = {
@@ -541,7 +557,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
 
       calendar_get_time(&time);
       #ifdef SAMPLE_PREP_BOARD
-      snprintf(tmp,tmpsz,"V=\"%s\" FGREWORK=%d AUTORUN=%d TS=\"20%02d-%02d-%02d %02d:%02d:%02d\" MAIN_STATE=\"%s\"",
+      snprintf(tmp,tmpsz,"V=\"%s\" FGREWORK=%d AUTORUN=%d TS=\"20%02d-%02d-%02d %02d:%02d:%02d\" MAIN_STATE=\"%s\" SN=\"",
         VERSION, MOTOR_FG_REWORK,DO_AUTOMATIC_RUNS,
         time.year,
         time.month,
@@ -551,9 +567,8 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
         time.second,
         strmsg
       );
-      send_debug_log_message(tmp);
       #else
-      snprintf(tmp,tmpsz,"V=\"%s\" AUTORUN=%d TS=\"20%02d-%02d-%02d %02d:%02d:%02d\" MAIN_STATE=\"%s\"",
+      snprintf(tmp,tmpsz,"V=\"%s\" AUTORUN=%d TS=\"20%02d-%02d-%02d %02d:%02d:%02d\" MAIN_STATE=\"%s\" SN=\"",
         VERSION, DO_AUTOMATIC_RUNS,
         time.year,
         time.month,
@@ -563,8 +578,10 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
         time.second,
         strmsg
       );
-      send_debug_log_message(tmp);
       #endif
+      get_nordic_uniqueid_concat_to_a_string(tmp);
+      strcat(tmp,"\"");
+      send_debug_log_message(tmp);
 
     // ---
     // CFGGET (argument: none)
@@ -874,7 +891,7 @@ void main_task(void *pvParameters) {
 
           // reset reason
           uint32_t rstreason = nrf_power_resetreas_get();
-          sprintf(exitBatteryOvrTempString, "POWER.RESETREAS=0x%08x RESETPIN=%d DOG=%d SREQ=%d LOCKUP=%d OFF=%d LPCOMP=%d DIF=%d NFC=%d VBUS=%d",
+          sprintf(exitBatteryOvrTempString, "Boot. POWER.RESETREAS=0x%08x RESETPIN=%d DOG=%d SREQ=%d LOCKUP=%d OFF=%d LPCOMP=%d DIF=%d NFC=%d VBUS=%d",
             rstreason,
             (rstreason&POWER_RESETREAS_RESETPIN_Msk)!=0,
             (rstreason&POWER_RESETREAS_DOG_Msk)!=0,
@@ -891,7 +908,7 @@ void main_task(void *pvParameters) {
           nrf_power_resetreas_clear((uint32_t) POWER_RESETREAS_RESETPIN_Msk|POWER_RESETREAS_DOG_Msk|POWER_RESETREAS_SREQ_Msk|POWER_RESETREAS_LOCKUP_Msk|POWER_RESETREAS_OFF_Msk|POWER_RESETREAS_LPCOMP_Msk|POWER_RESETREAS_DIF_Msk|POWER_RESETREAS_NFC_Msk|POWER_RESETREAS_VBUS_Msk);
 
           // gpgret2 values
-          sprintf(exitBatteryOvrTempString, "GPREGRET2: 0x%x",
+          sprintf(exitBatteryOvrTempString, "Boot. GPREGRET2: 0x%x",
             gpregret2.reg
           );
           send_event_log_message(SAMPLE_BATTERY_OVERTEMP, exitBatteryOvrTempString);
