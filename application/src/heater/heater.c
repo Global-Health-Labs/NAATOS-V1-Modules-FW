@@ -29,7 +29,13 @@ void sendWdtHeaterValid() {
   watchdog_time_update_t wdtUpdate = {};
   wdtUpdate.taskName = HEATER;
   wdtUpdate.valid = true;
-
+#if 0
+  // some debug messages
+  if(wdtUpdate.valid)
+    send_debug_log_message("heater: sending wdtUpdate.valid=TRUE");
+  else
+    send_debug_log_message("heater: sending wdtUpdate.valid=FALSE");
+#endif
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
   if (xReturned != pdPASS) {
     send_debug_log_message("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task");
@@ -82,7 +88,9 @@ void heater_task(void *pvParameters) {
         } else {
           if (wdtTimeout++ > (1 / config.sample_rate)) { // send out once a second
             wdtTimeout = 0;
-            sendWdtHeaterValid(); // update watchdog
+            if(heaterInterface->getHeaterRunningStatus()) {
+              sendWdtHeaterValid(); // update watchdog
+            }
           }
           heaterInterface->handleHeaterSensorDataRx(heaterRxMessage.tempData);
         }
