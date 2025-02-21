@@ -8,8 +8,8 @@
 #define VERSION "3.1"
 
 /*Define this when building sample prep only otherwise comment out*/
-#define SAMPLE_PREP_BOARD
-//#define POWER_MODULE_BOARD
+//#define SAMPLE_PREP_BOARD
+#define POWER_MODULE_BOARD
 
 #ifdef SAMPLE_PREP_BOARD
 #define SAMPLE_PREP_REV_A 0
@@ -38,7 +38,7 @@
 #define USE_CALENDAR_CHIP 1
 #define VERBOSE_PID 0
 #define USE_MOTOR 1
-#define MOTOR_FG_REWORK 1
+#define MOTOR_FG_REWORK 0
 #define DO_AUTOMATIC_RUNS 0
 
 #define pdTICKS_TO_MS(xTimeInTicks) ((TickType_t)(((uint64_t)(xTimeInTicks) * (uint64_t)1000U) / (uint64_t)configTICK_RATE_HZ))
