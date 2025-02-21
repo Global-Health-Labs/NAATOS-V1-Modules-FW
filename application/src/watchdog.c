@@ -1,6 +1,7 @@
 #include "watchdog.h"
 #include "boards.h"
 #include "naatos_queues.h"
+#include "logger/logger.h"
 static nrfx_wdt_channel_id m_channel_id;
 
 xQueueHandle watchdog_rxTimesQueue;
@@ -48,6 +49,9 @@ void wdtFeedTask(void *pvParameters) {
   bool mainValid = false;
   int mainTicks = 0;
 
+  bool heaterDbgShowOnce = false;
+  bool batteryDbgShowOnce = false;
+  bool mainDbgShowOnce = false;
 
 #if NAATOS_ENABLE_WATCHDOG
   watchdog_init();
@@ -85,7 +89,6 @@ void wdtFeedTask(void *pvParameters) {
         break;
       }
     }
-#if NAATOS_ENABLE_WATCHDOG
     if (heaterValid) {
       heaterTicks++;
     }
@@ -98,6 +101,22 @@ void wdtFeedTask(void *pvParameters) {
       mainTicks++;
     }
 
+    if(heaterTicks >= MAX_WDT_TASK_TIMEOUT && !heaterDbgShowOnce) {
+      heaterDbgShowOnce = true;
+      send_debug_log_message("GHL DBG - SWWatchdog Expired --> HEATER");
+    }
+
+    if(batteryTicks >= MAX_WDT_TASK_TIMEOUT && !batteryDbgShowOnce) {
+      batteryDbgShowOnce = true;
+      send_debug_log_message("GHL DBG - SWWatchdog Expired --> BATTERY");
+    }
+
+    if(mainTicks >= MAX_WDT_TASK_TIMEOUT && !mainDbgShowOnce) {
+      mainDbgShowOnce = true;
+      send_debug_log_message("GHL DBG - SWWatchdog Expired --> MAIN");
+    }
+
+#if NAATOS_ENABLE_WATCHDOG
     if (heaterTicks < MAX_WDT_TASK_TIMEOUT && batteryTicks < MAX_WDT_TASK_TIMEOUT && mainTicks < MAX_WDT_TASK_TIMEOUT) {
       nrf_drv_wdt_channel_feed(m_channel_id);
     }
