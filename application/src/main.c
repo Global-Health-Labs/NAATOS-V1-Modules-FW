@@ -500,6 +500,10 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
         }
 
         if(success) {
+          // Reset
+          calendar_reset(); //<-- needed for us because sometimes VDD does not start at zero due to battery jiggling when unit is first assembled
+          vTaskDelay(pdMS_TO_TICKS(5));
+
           // Set the time
           calendar_set_time(&time);
           sprintf(tmp,"Requested time  M: %d D: %d Y:%d h: %d m: %d s: %d",
@@ -525,7 +529,28 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
           send_debug_log_message(tmp);
         }
       }
-    
+
+    // ---
+    // TEST RTC CLOCK (argument: none)
+    // ---
+    // TSTCLK,
+    // queries a few PCF85063A registers for debug purposes and displays
+    } else if(strncmp(strmsg,"TSTCLK",6) == 0) {
+      send_debug_log_message("COMRXTASK: PARSE --> TSTCLK command handler");
+
+      calendar_check_state();
+
+    // ---
+    // RESET RTC CLOCK (argument: none)
+    // ---
+    // RSTCLK,
+    // issues softare reset on PCF85063A
+    } else if(strncmp(strmsg,"RSTCLK",6) == 0) {
+      send_debug_log_message("COMRXTASK: PARSE --> RSTCLK command handler");
+
+      calendar_reset();
+
+
     /*
     // ---
     // Get FW Versions (argument: none)

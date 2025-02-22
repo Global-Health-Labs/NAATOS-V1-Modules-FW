@@ -134,7 +134,11 @@ bool calendar_set_time(calendar_time_t *now) {
 
 // Resets the calendar chip *** Will get rid of current date set
 bool calendar_reset(void) {
-  uint8_t buff = 0x58;
+  //uint8_t buff = 0x58;
+  //uint8_t buff = 0b00100000;
+  uint8_t buff[2];
+  buff[0] = PCF85_REG_CTRL1_ADDR;
+  buff[1] = 0x58;
   ret_code_t ret;
 #if I2C_CONNECTED
 
@@ -142,6 +146,9 @@ bool calendar_reset(void) {
   ret = xUtil_TWI_Write(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
 #elif SAMPLE_PREP_REV_B
   ret = xUtil_TWI_Write(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
+#endif
+#if SAMPLE_PREP_REV_B || POWER_MODULE_REV_B
+  ret = xUtil_TWI_Write(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 2);
 #endif
   if (ret)
     return false;
@@ -154,13 +161,19 @@ bool calendar_reset(void) {
 
 // Stops the RTC from counting
 bool calendar_stop(void) {
-  uint8_t buff = 0x1 << 5;
+  //uint8_t buff = 0x1 << 5;
+  uint8_t buff[2];
+  buff[0] = PCF85_REG_CTRL1_ADDR;
+  buff[1] = 0x1 << 5;
   ret_code_t ret;
 #if I2C_CONNECTED
 #if SAMPLE_PREP_REV_A
   ret = xUtil_TWI_Write(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
 #elif SAMPLE_PREP_REV_B
   ret = xUtil_TWI_Write(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
+#endif
+#if SAMPLE_PREP_REV_B || POWER_MODULE_REV_B
+  ret = xUtil_TWI_Write(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 2);
 #endif
   if (ret)
     return false;
@@ -173,13 +186,18 @@ bool calendar_stop(void) {
 
 // Start the RTC counting
 bool calendar_start(void) {
-  uint8_t buff = 0x00;
+  uint8_t buff[2];
+  buff[0] = PCF85_REG_CTRL1_ADDR;
+  buff[1] = 0x00;
   ret_code_t ret;
 #if I2C_CONNECTED
 #if SAMPLE_PREP_REV_A
   ret = xUtil_TWI_Write(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
 #elif SAMPLE_PREP_REV_B
   ret = xUtil_TWI_Write(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 1);
+#endif
+#if SAMPLE_PREP_REV_B || POWER_MODULE_REV_B
+  ret = xUtil_TWI_Write(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, buff, 2);
 #endif
   if (ret)
     return false;
@@ -217,7 +235,7 @@ bool calendar_set_time_helper(void) {
   calendar_time_t now;
 
   //Check if the time should be set
-  calendar_get_time(&now);
+  //calendar_get_time(&now);
 
   //Debug to hardcode the time
   //now.second = 1;
@@ -240,6 +258,9 @@ bool calendar_set_time_helper(void) {
   now.week_day = 1; //Leaving the weekday/day of the week value hardcoded. This isn't reported in the log file.
 
   //calendar_stop();
+  calendar_reset(); //<-- needed because sometimes VDD does not start at zero due to battery jiggling when unit is first assembled
+  vTaskDelay(pdMS_TO_TICKS(5));
+  //calendar_check_state();
   calendar_set_time(&now);
 
   //send_debug_log_message("Requested time  M: %d D: %d Y:%d h: %d m: %d s: %d",
@@ -266,13 +287,13 @@ bool calendar_set_time_helper(void) {
 
 bool calendar_check_state(void) {
   #ifdef I2C_CONNECTED & USE_CALENDAR_CHIP & (SAMPLE_PREP_REV_B|POWER_MODULE_REV_B)
-
+  // PCF85063
   uint8_t rxbuf[7];
   char tmp[100];
   ret_code_t ret;
 
 
-  
+  // READ CTRL1
   ret = xUtil_TWI_Read(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, rxbuf, 1);
   if(ret==0) {
     sprintf(tmp,"CAL CTRL1=0x%02x",rxbuf[0]);
@@ -281,6 +302,36 @@ bool calendar_check_state(void) {
     send_debug_log_message("CAL CTRL1 read error");
   }
 
+  // READ REG
+  ret = xUtil_TWI_Read(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, rxbuf, 1);
+  if(ret==0) {
+    sprintf(tmp,"CAL 04h_SECONDS=0x%02x",rxbuf[0]);
+    send_debug_log_message(tmp);
+  } else{
+    send_debug_log_message("CAL 04h_SECONDS read error");
+  }
+
+  //// SEND SW RESET
+  //send_debug_log_message("CAL send reset");
+  //calendar_reset();
+
+  //// READ CTRL1
+  //ret = xUtil_TWI_Read(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_CTRL1_ADDR, rxbuf, 1);
+  //if(ret==0) {
+  //  sprintf(tmp,"CAL CTRL1=0x%02x",rxbuf[0]);
+  //  send_debug_log_message(tmp);
+  //} else{
+  //  send_debug_log_message("CAL CTRL1 read error");
+  //}
+
+  //// READ REG
+  //ret = xUtil_TWI_Read(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, rxbuf, 1);
+  //if(ret==0) {
+  //  sprintf(tmp,"CAL 04h_SECONDS=0x%02x",rxbuf[0]);
+  //  send_debug_log_message(tmp);
+  //} else{
+  //  send_debug_log_message("CAL 04h_SECONDS read error");
+  //}
 
 
   #endif
