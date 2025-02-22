@@ -622,12 +622,12 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
         );
         send_debug_log_message(tmp);
   #ifdef SAMPLE_PREP_BOARD
-        snprintf(tmp,tmpsz,"time_s:%f temp_ramp:%d,%f",
+        snprintf(tmp,tmpsz,"time_s:%.1f temp_ramp:%d,%.1f",
           cycle_configs[i].cycle_run_time_s,cycle_configs[i].ramp_to_temp_before_start_cycle,cycle_configs[i].ramp_to_temp_timeout
         );
         send_debug_log_message(tmp);
         if(cycle_configs[i].run_heater) {
-          snprintf(tmp,tmpsz,"heater sp:%f kp:%f ki:%f kd:%f",
+          snprintf(tmp,tmpsz,"heater sp:%.1f kp:%.4f ki:%.4f kd:%.4f",
             cycle_configs[i].heater_setpoint,
             cycle_configs[i].heater_kp,
             cycle_configs[i].heater_ki,
@@ -636,11 +636,35 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
           send_debug_log_message(tmp);
         }
         if(cycle_configs[i].run_motor) {
-          snprintf(tmp,tmpsz,"motor  sp:%d kp:%f ki:%f kd:%f",
+          snprintf(tmp,tmpsz,"motor  sp:%d kp:%.4f ki:%.4f kd:%.4f",
             cycle_configs[i].motor_setpoint,
             cycle_configs[i].motor_kp,
             cycle_configs[i].motor_ki,
             cycle_configs[i].motor_kd
+          );
+          send_debug_log_message(tmp);
+        }
+  #endif
+  #ifdef POWER_MODULE_BOARD
+        snprintf(tmp,tmpsz,"time_s:%.1f temp_ramp:%d,%.1f",
+          cycle_configs[i].cycle_run_time_s,cycle_configs[i].ramp_to_temp_before_start_cycle,cycle_configs[i].ramp_to_temp_timeout
+        );
+        send_debug_log_message(tmp);
+        if(cycle_configs[i].run_amp) {
+          snprintf(tmp,tmpsz,"ampl. sp:%.1f kp:%.4f ki:%.4f kd:%.4f",
+            cycle_configs[i].amp_setpoint,
+            cycle_configs[i].amp_kp,
+            cycle_configs[i].amp_ki,
+            cycle_configs[i].amp_kd
+          );
+          send_debug_log_message(tmp);
+        }
+        if(cycle_configs[i].run_valve) {
+          snprintf(tmp,tmpsz,"valve sp:%.1f kp:%.4f ki:%.4f kd:%.4f",
+            cycle_configs[i].valve_setpoint,
+            cycle_configs[i].valve_kp,
+            cycle_configs[i].valve_ki,
+            cycle_configs[i].valve_kd
           );
           send_debug_log_message(tmp);
         }
