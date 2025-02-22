@@ -4,6 +4,7 @@
 #include "stdbool.h"
 #include "task.h"
 #include <stdint.h>
+#include "naatos_config_file.h"
 
 #define VERSION "3.1"
 
@@ -39,7 +40,7 @@
 #define VERBOSE_PID 0
 #define USE_MOTOR 1
 #define MOTOR_FG_REWORK 1
-#define DO_AUTOMATIC_RUNS 0
+#define DO_AUTOMATIC_RUNS 1
 
 #define pdTICKS_TO_MS(xTimeInTicks) ((TickType_t)(((uint64_t)(xTimeInTicks) * (uint64_t)1000U) / (uint64_t)configTICK_RATE_HZ))
 

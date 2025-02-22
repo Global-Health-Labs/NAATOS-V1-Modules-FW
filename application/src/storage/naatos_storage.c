@@ -1,6 +1,7 @@
 #include "naatos_storage.h"
 #include "sample_prep_default_cycles.h"
 #include "power_module_default_cycles.h"
+//#include "naatos_config_file.h"
 
 /* Storage Variables */
 static FIL file;
@@ -187,6 +188,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
   char configBuffer[50];
   FRESULT res;
   char *pch;
+  char key[50];
   char val[50];
   int num;
 
@@ -214,8 +216,11 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
   // Set the struct
   for (int i = 0; i < NUM_MASTER_CONFIG_PARAMETERS; i++) {
     pch = f_gets(configBuffer, 50, &file);
+    // key
     pch = strtok(configBuffer, ":");
-    sprintf(val, "%s", pch);
+    sprintf(key, "%s", pch);
+    
+    // val
     pch = strtok(NULL, ":");
     sprintf(val, "%s", pch);
     char *newline = strchr(val, '\n');
@@ -224,6 +229,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       *newline = '\0';
     }
 
+/*
     switch ((naatos_config_params_t)i) {
     case SAMPLE_RATE:
       parameters->sample_rate = atof(val);
@@ -315,6 +321,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       break;
     }
   }
+  */
 
   // Close the file
   res = f_close(&file);
