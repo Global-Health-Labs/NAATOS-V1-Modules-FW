@@ -974,6 +974,17 @@ void main_task(void *pvParameters) {
           get_nordic_uniqueid_concat_to_a_string(exitBatteryOvrTempString);
           send_event_log_message(SAMPLE_BATTERY_OVERTEMP, exitBatteryOvrTempString);
 
+        #ifdef POWER_MODULE_BOARD
+          // PLAY STARTUP SOUND
+          PwmRxQueueMsg_t pwmmsg = {
+              .type = PWM_MSG_BUZZER_TONE_200ms_1
+          };
+          BaseType_t xReturned;
+          xReturned = xQueueSend(pwmRxQueue, &pwmmsg, 0);
+          if (xReturned != pdPASS) {
+            send_debug_log_message("CYCLEFSM: Unable to send buzzer message to pwmRxQueue.");
+          }
+        #endif
         }
 
         // Set the variable LED from the battery percentage

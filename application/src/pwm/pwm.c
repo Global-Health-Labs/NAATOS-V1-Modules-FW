@@ -311,6 +311,20 @@ void pwm_task(void *pvParameters) {
         break;
       }
 
+      case PWM_MSG_BUZZER_TONE_200ms_1: {
+        // tone freq, duration=ms
+        pwm_buzzer_blocking_sound(100,25);
+        pwm_buzzer_blocking_sound(150,25);
+        pwm_buzzer_blocking_sound(200,25);
+        pwm_buzzer_blocking_sound(250,25);
+        
+        pwm_buzzer_blocking_sound(400,25);
+        pwm_buzzer_blocking_sound(500,25);
+
+        pwm_buzzer_blocking_sound(1000,50);
+        break;
+      }
+
       default:
         break;
       }
