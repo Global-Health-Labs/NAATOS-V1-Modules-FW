@@ -979,7 +979,8 @@ void main_task(void *pvParameters) {
         #ifdef POWER_MODULE_BOARD
           // PLAY STARTUP SOUND
           PwmRxQueueMsg_t pwmmsg = {
-              .type = PWM_MSG_BUZZER_TONE_200ms_1
+              .type = PWM_MSG_BUZZER_TONE_200ms_1,
+              .buzzer_pwm_duty = config.sound_volume_start,
           };
           BaseType_t xReturned;
           xReturned = xQueueSend(pwmRxQueue, &pwmmsg, 0);

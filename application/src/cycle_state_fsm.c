@@ -340,7 +340,8 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       #ifdef POWER_MODULE_BOARD
         // PLAY SOUND
         PwmRxQueueMsg_t pwmmsg = {
-            .type = PWM_MSG_BUZZER_TONE_1SEC_1
+            .type = PWM_MSG_BUZZER_TONE_1SEC_1,
+            .buzzer_pwm_duty = config.sound_volume_complete
         };
         BaseType_t xReturned;
         xReturned = xQueueSend(pwmRxQueue, &pwmmsg, 0);
@@ -456,9 +457,10 @@ void handle_exit_notifications(void) {
   if (exitInfo != CYCLE_COMPLETE) {
     send_event_log_message(eventType, exitString);
   #ifdef POWER_MODULE_BOARD
-    // PLAY SOUND
+    // PLAY SOUND (error sound)
     PwmRxQueueMsg_t pwmmsg = {
-        .type = PWM_MSG_BUZZER_TONE_1SEC_2
+        .type = PWM_MSG_BUZZER_TONE_1SEC_2,
+        .buzzer_pwm_duty = config.sound_volume_abort
     };
     BaseType_t xReturned;
     xReturned = xQueueSend(pwmRxQueue, &pwmmsg, 0);

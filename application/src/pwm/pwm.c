@@ -291,37 +291,37 @@ void pwm_task(void *pvParameters) {
 
       case PWM_MSG_BUZZER_TONE_1SEC_1: {
         // tone freq, duration=ms
-        pwm_buzzer_blocking_sound(1000,100);
-        pwm_buzzer_blocking_sound(1200,100);
-        pwm_buzzer_blocking_sound(1400,100);
-        pwm_buzzer_blocking_sound(1800,100);
-        pwm_buzzer_blocking_sound(500,500);
-        pwm_buzzer_blocking_sound(800,100);
+        pwm_buzzer_blocking_sound(1000,100,pwmMsg.buzzer_pwm_duty);
+        pwm_buzzer_blocking_sound(1200,100,pwmMsg.buzzer_pwm_duty);
+        pwm_buzzer_blocking_sound(1400,100,pwmMsg.buzzer_pwm_duty);
+        pwm_buzzer_blocking_sound(1800,100,pwmMsg.buzzer_pwm_duty);
+        pwm_buzzer_blocking_sound(500,500,pwmMsg.buzzer_pwm_duty);
+        pwm_buzzer_blocking_sound(800,100,pwmMsg.buzzer_pwm_duty);
         break;
       }
 
       case PWM_MSG_BUZZER_TONE_1SEC_2: {
         // tone freq, duration=ms
-        pwm_buzzer_blocking_sound(1000,100);
-        pwm_buzzer_blocking_sound(900,100);
-        pwm_buzzer_blocking_sound(800,100);
-        pwm_buzzer_blocking_sound(700,100);
-        pwm_buzzer_blocking_sound(250,500);
-        pwm_buzzer_blocking_sound(150,100);
+        pwm_buzzer_blocking_sound(1000,100,pwmMsg.buzzer_pwm_duty);
+        pwm_buzzer_blocking_sound(900,100,pwmMsg.buzzer_pwm_duty);
+        pwm_buzzer_blocking_sound(800,100,pwmMsg.buzzer_pwm_duty);
+        pwm_buzzer_blocking_sound(700,100,pwmMsg.buzzer_pwm_duty);
+        pwm_buzzer_blocking_sound(250,500,pwmMsg.buzzer_pwm_duty);
+        pwm_buzzer_blocking_sound(150,100,pwmMsg.buzzer_pwm_duty);
         break;
       }
 
       case PWM_MSG_BUZZER_TONE_200ms_1: {
         // tone freq, duration=ms
-        pwm_buzzer_blocking_sound(100,25);
-        pwm_buzzer_blocking_sound(150,25);
-        pwm_buzzer_blocking_sound(200,25);
-        pwm_buzzer_blocking_sound(250,25);
+        pwm_buzzer_blocking_sound(100,25,pwmMsg.buzzer_pwm_duty);
+        pwm_buzzer_blocking_sound(150,25,pwmMsg.buzzer_pwm_duty);
+        pwm_buzzer_blocking_sound(200,25,pwmMsg.buzzer_pwm_duty);
+        pwm_buzzer_blocking_sound(250,25,pwmMsg.buzzer_pwm_duty);
         
-        pwm_buzzer_blocking_sound(400,25);
-        pwm_buzzer_blocking_sound(500,25);
+        pwm_buzzer_blocking_sound(400,25,pwmMsg.buzzer_pwm_duty);
+        pwm_buzzer_blocking_sound(500,25,pwmMsg.buzzer_pwm_duty);
 
-        pwm_buzzer_blocking_sound(1000,50);
+        pwm_buzzer_blocking_sound(1000,50,pwmMsg.buzzer_pwm_duty);
         break;
       }
 
@@ -344,7 +344,7 @@ void pwmbuzzer_ready_callback(uint32_t pwm_id) {
 }
 #endif
 
-void pwm_buzzer_blocking_sound(uint16_t frequency, uint16_t durationms) {
+void pwm_buzzer_blocking_sound(uint16_t frequency, uint16_t durationms, uint8_t duty) {
 #ifdef POWER_MODULE_BOARD & POWER_MODULE_REV_B
   ret_code_t err;
 
@@ -367,8 +367,9 @@ void pwm_buzzer_blocking_sound(uint16_t frequency, uint16_t durationms) {
   //vTaskDelay(pdMS_TO_TICKS(5));
 
   // duty
-  app_pwm_channel_duty_set(&PWMbuzzer, 0, 50);
-  app_pwm_channel_duty_set(&PWMbuzzer, 1, 50);
+  // 50% should be loudest, 0% inaudible; what about >50% ? maybe 100% also inaudible
+  app_pwm_channel_duty_set(&PWMbuzzer, 0, duty);
+  app_pwm_channel_duty_set(&PWMbuzzer, 1, duty);
 
   vTaskDelay(pdMS_TO_TICKS(durationms));
 

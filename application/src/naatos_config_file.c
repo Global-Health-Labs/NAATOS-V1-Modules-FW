@@ -77,6 +77,9 @@ naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
   { "logging_rate"                    , NAATOS_KV_DT_FLOAT  , (void *) &(config.logging_rate),          "1.00"},
   { "low_power_threshold"             , NAATOS_KV_DT_UINT16 , (void *) &(config.low_power_threshold),   "46"},
   { "recovery_power_threshold"        , NAATOS_KV_DT_UINT16 , (void *) &(config.recovery_power_thresh), "47"},
+  { "sound_volume_complete"           , NAATOS_KV_DT_UINT16 , (void *) &(config.sound_volume_complete), "50"},
+  { "sound_volume_start"              , NAATOS_KV_DT_UINT16 , (void *) &(config.sound_volume_start),    "50"},
+  { "sound_volume_abort"              , NAATOS_KV_DT_UINT16 , (void *) &(config.sound_volume_abort),    "50"},
   { "sample_valid_timeout_s"          , NAATOS_KV_DT_FLOAT  , (void *) &(config.sample_valid_timeout_s),"3600.00"},
   { "alert_timeout_time_s"            , NAATOS_KV_DT_FLOAT  , (void *) &(config.alert_timeout_time_s),  "3.00"},
   { "debug_to_com_en"                 , NAATOS_KV_DT_BOOLS  , (void *) &(config.debug_to_com_en),       "true"},
@@ -95,7 +98,6 @@ naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
 };
 const naatos_kv_table_entry_t* KV_TABLE_GLOBAL_PTR = KV_TABLE_GLOBAL;
 const uint8_t KV_TABLE_GLOBAL_SIZE = sizeof(KV_TABLE_GLOBAL)/sizeof(KV_TABLE_GLOBAL[0]);
-
 
 // Cycle Config
 naatos_kv_table_entry_cycle_t KV_TABLE_CYCLE[] = {

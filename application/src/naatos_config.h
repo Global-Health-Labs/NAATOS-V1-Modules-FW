@@ -568,6 +568,7 @@ typedef enum {
 
 typedef struct {
   PWMRxQueueType_t type;
+  uint16_t buzzer_pwm_duty;
 } PwmRxQueueMsg_t;
 
 // LED Handeling
@@ -655,6 +656,9 @@ typedef struct {
   float     min_run_zone_temp;
   bool      min_run_zone_temp_en;
 #ifndef SAMPLE_PREP_BOARD  
+  uint16_t  sound_volume_complete;
+  uint16_t  sound_volume_abort;
+  uint16_t  sound_volume_start;
   uint16_t  optical_distance;
   float     max_amp_pid_pwm;
   float     max_valve_pid_pwm;
