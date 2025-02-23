@@ -724,5 +724,7 @@ typedef union {
 /* Configuration Parameters Variables */
 extern naatos_config_parameters config;
 extern cycle_config_parameters *cycle_configs;
+extern const cycle_config_parameters *cycle_cfg_ptr;
+extern cycle_config_parameters cycle_cfg_single;
 extern int total_cycles;
 extern bool batt_recovering;

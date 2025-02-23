@@ -2,74 +2,127 @@
 #include <string.h>
 #include "naatos_config.h"
 
-#ifndef SAMPLE_PREP_BOARD
-const uint8_t KV_TABLE_GLOBAL_SIZE=19;
-const naatos_kv_table_entry_t KV_TABLE_GLOBAL[KV_TABLE_GLOBAL_SIZE] = {
-  // name       ,       dtype,                dataptr (pointer to config struct field)
-  { "sample_rate"                     , NAATOS_KV_DT_FLOAT  , (void *) &(config.sample_rate) },
-  { "logging_rate"                    , NAATOS_KV_DT_FLOAT  , (void *) &(config.logging_rate) },
-  { "low_power_threshold"             , NAATOS_KV_DT_UINT16 , (void *) &(config.low_power_threshold) },
-  { "recovery_power_thresh"           , NAATOS_KV_DT_UINT16 , (void *) &(config.recovery_power_thresh) },
-  { "sample_valid_timeout_s"          , NAATOS_KV_DT_FLOAT  , (void *) &(config.sample_valid_timeout_s) },
-  { "alert_timeout_time_s"            , NAATOS_KV_DT_FLOAT  , (void *) &(config.alert_timeout_time_s) },
-  { "debug_to_com_en"                 , NAATOS_KV_DT_BOOLS  , (void *) &(config.debug_to_com_en) },
-  { "min_run_zone_temp"               , NAATOS_KV_DT_FLOAT  , (void *) &(config.min_run_zone_temp) },
-  { "min_run_zone_temp_en"            , NAATOS_KV_DT_BOOLS  , (void *) &(config.min_run_zone_temp_en) },
+#if defined(SAMPLE_PREP_BOARD)
 
-  { "heater_max_temp"                 , NAATOS_KV_DT_FLOAT  , (void *) &(config.heater_max_temp) },
-  { "max_heater_pid_pwm"              , NAATOS_KV_DT_FLOAT  , (void *) &(config.max_heater_pid_pwm) },
-  { "switch_motor_ccw_cw"             , NAATOS_KV_DT_BOOLS  , (void *) &(config.switch_motor_ccw_cw) },
-  { "hal_sensor_thresh"               , NAATOS_KV_DT_FLOAT  , (void *) &(config.hal_sensor_thresh) },
-  { "motor_stall_percent"             , NAATOS_KV_DT_INT    , (void *) &(config.motor_stall_percent) },
-  { "motor_stall_pwm"                 , NAATOS_KV_DT_FLOAT  , (void *) &(config.motor_stall_pwm) },
-  { "motor_stall_en"                  , NAATOS_KV_DT_BOOLS  , (void *) &(config.motor_stall_en) },
+// Global Config
+naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
+  // name       ,       dtype,                dataptr (pointer to config struct field),       default value as a string
+  { "sample_rate"                     , NAATOS_KV_DT_FLOAT  , (void *) &(config.sample_rate),           "0.20"},
+  { "logging_rate"                    , NAATOS_KV_DT_FLOAT  , (void *) &(config.logging_rate),          "1.00"},
+  { "low_power_threshold"             , NAATOS_KV_DT_UINT16 , (void *) &(config.low_power_threshold),   "46"},
+  { "recovery_power_threshold"        , NAATOS_KV_DT_UINT16 , (void *) &(config.recovery_power_thresh), "47"},
+  { "sample_valid_timeout_s"          , NAATOS_KV_DT_FLOAT  , (void *) &(config.sample_valid_timeout_s),"3600.00"},
+  { "alert_timeout_time_s"            , NAATOS_KV_DT_FLOAT  , (void *) &(config.alert_timeout_time_s),  "3.00"},
+  { "debug_to_com_en"                 , NAATOS_KV_DT_BOOLS  , (void *) &(config.debug_to_com_en),       "true"},
+  { "min_run_zone_temp_en"            , NAATOS_KV_DT_BOOLS  , (void *) &(config.min_run_zone_temp_en),  "false"},
+  { "min_run_zone_temp"               , NAATOS_KV_DT_FLOAT  , (void *) &(config.min_run_zone_temp),     "80.00"},
+
+  { "heater_max_temp"                 , NAATOS_KV_DT_FLOAT  , (void *) &(config.heater_max_temp),       "120.0"},
+  { "max_heater_pid_pwm"              , NAATOS_KV_DT_FLOAT  , (void *) &(config.max_heater_pid_pwm),    "100"},
+  { "switch_motor_ccw_cw"             , NAATOS_KV_DT_BOOLS  , (void *) &(config.switch_motor_ccw_cw),   "true"},
+  { "hal_sensor_thresh"               , NAATOS_KV_DT_FLOAT  , (void *) &(config.hal_sensor_thresh),     "0.30"},
+  { "motor_stall_percent"             , NAATOS_KV_DT_INT    , (void *) &(config.motor_stall_percent),   "20"},
+  { "motor_stall_pwm"                 , NAATOS_KV_DT_FLOAT  , (void *) &(config.motor_stall_pwm),       "61"},
+  { "motor_stall_en"                  , NAATOS_KV_DT_BOOLS  , (void *) &(config.motor_stall_en),        "true"},
   
-  { "mmddyy"                          , NAATOS_KV_DT_INT    , (void *) &(config.mmddyy) },
-  { "hhmmss"                          , NAATOS_KV_DT_INT    , (void *) &(config.hhmmss) },
-  { "set_date_time"                   , NAATOS_KV_DT_BOOLS  , (void *) &(config.set_date_time) }
+  { "mmddyy"                          , NAATOS_KV_DT_INT    , (void *) &(config.mmddyy),                "100124"},
+  { "hhmmss"                          , NAATOS_KV_DT_INT    , (void *) &(config.hhmmss),                "120000"},
+  { "set_time_date"                   , NAATOS_KV_DT_BOOLS  , (void *) &(config.set_date_time),         "false"}
+
 };
-//const naatos_kv_table_entry_t KV_TABLE_CYCLE[KV_TABLE_GLOBAL_SIZE] = {
-//  // name   , dtype,    dataptr (pointer to config struct field)
-//  { "cycle_run_time_s"                , NAATOS_KV_DT_FLOAT  , (void *) &(config.cycle_run_time_s) },
-//  { "cycle_delay_time"                , NAATOS_KV_DT_UINT16 , (void *) &(config.cycle_delay_time) },
-//  { "ramp_to_temp_before_start_cycle" , NAATOS_KV_DT_FLOAT  , (void *) &(config.ramp_to_temp_before_start_cycle) },
-//  { "ramp_to_temp_timeout"            , NAATOS_KV_DT_FLOAT  , (void *) &(config.ramp_to_temp_timeout) },
+const naatos_kv_table_entry_t* KV_TABLE_GLOBAL_PTR = KV_TABLE_GLOBAL;
+const uint8_t KV_TABLE_GLOBAL_SIZE = sizeof(KV_TABLE_GLOBAL)/sizeof(KV_TABLE_GLOBAL[0]);
 
-//  { "cycle_run_time_s"       , NAATOS_KV_DT_FLOAT  , (void *) &(config.cycle_run_time_s) },
-//  { "cycle_run_time_s"       , NAATOS_KV_DT_FLOAT  , (void *) &(config.cycle_run_time_s) },
-//  { "cycle_run_time_s"       , NAATOS_KV_DT_FLOAT  , (void *) &(config.cycle_run_time_s) },
-//  { "cycle_run_time_s"       , NAATOS_KV_DT_FLOAT  , (void *) &(config.cycle_run_time_s) },
-//  { "cycle_run_time_s"       , NAATOS_KV_DT_FLOAT  , (void *) &(config.cycle_run_time_s) },
-//  { "cycle_run_time_s"       , NAATOS_KV_DT_FLOAT  , (void *) &(config.cycle_run_time_s) },
-//  { "cycle_run_time_s"       , NAATOS_KV_DT_FLOAT  , (void *) &(config.cycle_run_time_s) },
-//  { "cycle_run_time_s"       , NAATOS_KV_DT_FLOAT  , (void *) &(config.cycle_run_time_s) },
-//  { "cycle_run_time_s"       , NAATOS_KV_DT_FLOAT  , (void *) &(config.cycle_run_time_s) },
-//  { "cycle_run_time_s"       , NAATOS_KV_DT_FLOAT  , (void *) &(config.cycle_run_time_s) },
-//  { "cycle_run_time_s"       , NAATOS_KV_DT_FLOAT  , (void *) &(config.cycle_run_time_s) },
-//  { "cycle_run_time_s"       , NAATOS_KV_DT_FLOAT  , (void *) &(config.cycle_run_time_s) },
-//}
+// Cycle Config
+//TODO: this is not right for sample-prep
+naatos_kv_table_entry_cycle_t KV_TABLE_CYCLE[] = {
+  // name       ,       dtype,                dataptr (pointer to config struct field) 
+  { "cycle_run_time_s"                , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.cycle_run_time_s) },
+  { "cycle_delay_time_s"              , NAATOS_KV_DT_UINT16 , (void *) &(cycle_cfg_single.cycle_delay_time) },
+  { "ramp_to_temp_before_start_cycle" , NAATOS_KV_DT_BOOLS  , (void *) &(cycle_cfg_single.ramp_to_temp_before_start_cycle) },
+  { "ramp_to_temp_timeout"            , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.ramp_to_temp_timeout) },
+  { "heater_setpoint"                 , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.heater_setpoint) },
+  { "motor_setpoint"                  , NAATOS_KV_DT_UINT16 , (void *) &(cycle_cfg_single.motor_setpoint) },
+  { "run_heater"                      , NAATOS_KV_DT_BOOLS  , (void *) &(cycle_cfg_single.run_heater) },
+  { "run_motor"                       , NAATOS_KV_DT_BOOLS  , (void *) &(cycle_cfg_single.run_motor) },
+  { "heater_kp"                       , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.heater_kp) },
+  { "heater_ki"                       , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.heater_ki) },
+  { "heater_kd"                       , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.heater_kd) },
+  { "motor_kp"                        , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.motor_kp) },
+  { "motor_ki"                        , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.motor_ki) },
+  { "motor_kd"                        , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.motor_kd) }
+};
+const naatos_kv_table_entry_cycle_t* KV_TABLE_CYCLE_PTR = KV_TABLE_CYCLE;
+const uint8_t KV_TABLE_CYCLE_SIZE = sizeof(KV_TABLE_CYCLE)/sizeof(KV_TABLE_CYCLE[0]);
 
-#else
+  float     heater_setpoint;
+  uint16_t  motor_setpoint;
+  bool      run_heater;
+  bool      run_motor;
+  float     heater_kp;
+  float     heater_ki;
+  float     heater_kd;
+  float     motor_kp;
+  float     motor_ki;
+  float     motor_kd;
+
+
+
+#elif defined(POWER_MODULE_BOARD)
+
+// Global Config
+naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
+  // name       ,       dtype,                dataptr (pointer to config struct field),       default value as a string
+  { "sample_rate"                     , NAATOS_KV_DT_FLOAT  , (void *) &(config.sample_rate),           "0.20"},
+  { "logging_rate"                    , NAATOS_KV_DT_FLOAT  , (void *) &(config.logging_rate),          "1.00"},
+  { "low_power_threshold"             , NAATOS_KV_DT_UINT16 , (void *) &(config.low_power_threshold),   "46"},
+  { "recovery_power_threshold"        , NAATOS_KV_DT_UINT16 , (void *) &(config.recovery_power_thresh), "47"},
+  { "sample_valid_timeout_s"          , NAATOS_KV_DT_FLOAT  , (void *) &(config.sample_valid_timeout_s),"3600.00"},
+  { "alert_timeout_time_s"            , NAATOS_KV_DT_FLOAT  , (void *) &(config.alert_timeout_time_s),  "3.00"},
+  { "debug_to_com_en"                 , NAATOS_KV_DT_BOOLS  , (void *) &(config.debug_to_com_en),       "true"},
+  { "min_run_zone_temp_en"            , NAATOS_KV_DT_BOOLS  , (void *) &(config.min_run_zone_temp_en),  "false"},
+  { "min_run_zone_temp"               , NAATOS_KV_DT_FLOAT  , (void *) &(config.min_run_zone_temp),     "80.00"},
+
+  { "optical_distace"                 , NAATOS_KV_DT_UINT16 , (void *) &(config.optical_distance),      "800"},
+  { "max_amp_pid_pwm"                 , NAATOS_KV_DT_FLOAT  , (void *) &(config.max_amp_pid_pwm),       "100"},
+  { "max_valve_pid_pwm"               , NAATOS_KV_DT_FLOAT  , (void *) &(config.max_valve_pid_pwm),     "100"},
+  { "valve_max_temp"                  , NAATOS_KV_DT_FLOAT  , (void *) &(config.valve_max_temp),        "130.0"},
+  { "amp_max_temp"                    , NAATOS_KV_DT_FLOAT  , (void *) &(config.amp_max_temp),          "120.0"},
+  
+  { "mmddyy"                          , NAATOS_KV_DT_INT    , (void *) &(config.mmddyy),                "100124"},
+  { "hhmmss"                          , NAATOS_KV_DT_INT    , (void *) &(config.hhmmss),                "120000"},
+  { "set_time_date"                   , NAATOS_KV_DT_BOOLS  , (void *) &(config.set_date_time),         "false"}
+};
+const naatos_kv_table_entry_t* KV_TABLE_GLOBAL_PTR = KV_TABLE_GLOBAL;
+const uint8_t KV_TABLE_GLOBAL_SIZE = sizeof(KV_TABLE_GLOBAL)/sizeof(KV_TABLE_GLOBAL[0]);
+
+
+// Cycle Config
+naatos_kv_table_entry_cycle_t KV_TABLE_CYCLE[] = {
+  // name       ,       dtype,                dataptr (pointer to config struct field) 
+  { "cycle_run_time_s"                , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.cycle_run_time_s) },
+  { "cycle_delay_time_s"              , NAATOS_KV_DT_UINT16 , (void *) &(cycle_cfg_single.cycle_delay_time) },
+  { "ramp_to_temp_before_start_cycle" , NAATOS_KV_DT_BOOLS  , (void *) &(cycle_cfg_single.ramp_to_temp_before_start_cycle) },
+  { "ramp_to_temp_timeout"            , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.ramp_to_temp_timeout) },
+  { "amp_setpoint"                    , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.amp_setpoint) },
+  { "valve_setpoint"                  , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.valve_setpoint) },
+  { "run_amp_enable"                  , NAATOS_KV_DT_BOOLS  , (void *) &(cycle_cfg_single.run_amp) },
+  { "run_valve_enable"                , NAATOS_KV_DT_BOOLS  , (void *) &(cycle_cfg_single.run_valve) },
+  { "amp_kp"                          , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.amp_kp) },
+  { "amp_ki"                          , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.amp_kd) },
+  { "amp_kd"                          , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.amp_ki) },
+  { "valve_kp"                        , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.valve_kp) },
+  { "valve_ki"                        , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.valve_ki) },
+  { "valve_kd"                        , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.valve_kd) }
+};
+const naatos_kv_table_entry_cycle_t* KV_TABLE_CYCLE_PTR = KV_TABLE_CYCLE;
+const uint8_t KV_TABLE_CYCLE_SIZE = sizeof(KV_TABLE_CYCLE)/sizeof(KV_TABLE_CYCLE[0]);
+
 #endif
-
-float get_config_value_by_key_float(const char* key) {
-  for(uint8_t i; i<KV_TABLE_GLOBAL_SIZE; i++) {
-    if( strcmp(key, KV_TABLE_GLOBAL[i].name)==0 ) {
-      //found;
-      if( KV_TABLE_GLOBAL[i].dtype == NAATOS_KV_DT_FLOAT )  {
-        // matches dtype
-        return *((float *) (KV_TABLE_GLOBAL[i].dataptr));
-      } else{
-        return -666.0;
-      }
-    }
-  }
-  return -666.0;
-}
 
 //float get_config_value_by_key_float(const char* key) {
 //  for(uint8_t i; i<KV_TABLE_GLOBAL_SIZE; i++) {
-//    if( stricmp(key, KV_TABLE_GLOBAL[i].name)==0 ) {
+//    if( strcmp(key, KV_TABLE_GLOBAL[i].name)==0 ) {
 //      //found;
 //      if( KV_TABLE_GLOBAL[i].dtype == NAATOS_KV_DT_FLOAT )  {
 //        // matches dtype
@@ -81,3 +134,4 @@ float get_config_value_by_key_float(const char* key) {
 //  }
 //  return -666.0;
 //}
+

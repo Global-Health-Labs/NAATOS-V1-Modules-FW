@@ -345,7 +345,7 @@ void pwmbuzzer_ready_callback(uint32_t pwm_id) {
 #endif
 
 void pwm_buzzer_blocking_sound(uint16_t frequency, uint16_t durationms) {
-#ifdef POWER_MODULE_BOARD
+#ifdef POWER_MODULE_BOARD & POWER_MODULE_REV_B
   ret_code_t err;
 
   // INIT PWM

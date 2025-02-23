@@ -184,12 +184,89 @@ FRESULT remount_goto_logs_dir(void) {
   }
 }
 
+bool _assignParameterUsingKeyValueTable_given_key_and_value_from_config_file(const naatos_kv_table_entry_t * KVTABLE, const uint8_t TABLE_SIZE, const char* keystr, const char* valstr) {
+  // Search the key-value table for a matching key
+  const bool _printdebugs = false;
+  char tmp[80];
+  bool matched;
+
+  if(_printdebugs)  {
+    sprintf(tmp,"key = \"%s\" in file, checking key-value table...",keystr);
+    send_debug_log_message(tmp);
+  }
+  matched = false;
+
+  // Loop through the key-value table for a matching key
+  for(uint8_t i=0; i<TABLE_SIZE; i++){
+    // pick item from table
+    const naatos_kv_table_entry_t * item = &(KVTABLE[i]);
+
+    // check for match of the key in the table
+    if(strcasecmp(keystr,item->name) == 0) {
+      if(_printdebugs)  {
+        sprintf(tmp,"  matched key = %s -> file value str = \"%s\"",item->name,valstr);
+        send_debug_log_message(tmp);
+      }
+
+      // we have a match! now
+      // parse the value string
+      switch(item->dtype) {
+        case NAATOS_KV_DT_FLOAT:
+          *((float*) item->dataptr) = parse_double(valstr,parse_double(item->defaultcfgstr,0));
+          if(_printdebugs)  {
+            sprintf(tmp,"  was DT_FLOAT. parsed = %g", *((float*) item->dataptr) );
+            send_debug_log_message(tmp);
+          }
+
+          matched = true;
+          break;
+        case NAATOS_KV_DT_INT:
+          *((int*) item->dataptr) = parse_int(valstr,parse_int(item->defaultcfgstr,0));
+          if(_printdebugs)  {
+            sprintf(tmp,"  was DT_INT. parsed = %d", *((int*) item->dataptr) );
+            send_debug_log_message(tmp);
+          }
+          matched = true;
+          break;
+        case NAATOS_KV_DT_UINT16:
+          *((uint16_t*) item->dataptr) = (uint16_t) parse_int(valstr,parse_int(item->defaultcfgstr,0));
+          if(_printdebugs)  {
+            sprintf(tmp,"  was DT_UINT16. parsed = %d", *((uint16_t*) item->dataptr) );
+            send_debug_log_message(tmp);
+          }
+          matched = true;
+          break;
+        case NAATOS_KV_DT_BOOLS:
+          *((bool*) item->dataptr) = strcmp(valstr, "true") ? false : true;
+          if(_printdebugs)  {
+            sprintf(tmp,"  was DT_BOOLS. parsed = %d", *((bool*) item->dataptr) );
+            send_debug_log_message(tmp);
+          }
+          matched = true;
+          break;
+        default:
+          sprintf(tmp,"couldn't parse key = %s -> file value str = \"%s\" because couldn't handle the datatype",item->name,valstr);
+          send_debug_log_message(tmp);
+          break;
+      }
+      if(matched)
+        break;
+    }
+  }
+  if(!matched)  {
+    sprintf(tmp,"couldn't parse key = %s -> file value str = \"%s\"",keystr,valstr);
+    send_debug_log_message(tmp);
+  }
+  return matched;
+}
+
 FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters) {
   char configBuffer[50];
   FRESULT res;
   char *pch;
   char key[50];
   char val[50];
+  char val2[50];
   int num;
 
   // Re-Mount Storage
@@ -214,8 +291,14 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
   }
 
   // Set the struct
-  for (int i = 0; i < NUM_MASTER_CONFIG_PARAMETERS; i++) {
+  //for (int i = 0; i < NUM_MASTER_CONFIG_PARAMETERS; i++) {
+  while(true) {
     pch = f_gets(configBuffer, 50, &file);
+    if(pch[0]==0) {
+      // END OF FILE
+      break;
+    }
+
     // key
     pch = strtok(configBuffer, ":");
     sprintf(key, "%s", pch);
@@ -229,99 +312,13 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
       *newline = '\0';
     }
 
-/*
-    switch ((naatos_config_params_t)i) {
-    case SAMPLE_RATE:
-      parameters->sample_rate = atof(val);
-      if (parameters->sample_rate < 0.048) {
-        send_debug_log_message("Warning: Sample rate lower than minimum (0.048), setting sample rate to minimum.");
-        parameters->sample_rate = 0.048;
-        break;
-      }
-      break;
-    case LOGGING_RATE:
-      parameters->logging_rate = parse_double(val, DEFAULT_LOGGING_RATE);
-      break;
-    case LOW_POWER_THRESHOLD:
-      parameters->low_power_threshold = parse_int(val, DEFAULT_LOW_POWER_THRESHOLD);
-      break;
-    case RECOVERY_POWER_THRESHOLD:
-      parameters->recovery_power_thresh = parse_int(val, DEFAULT_RECOVERY_THRESHOLD);
-      break;
-    case SAMPLE_VALID_TIMEOUT:
-      parameters->sample_valid_timeout_s = parse_double(val, DEFAULT_VALID_TIMEOUT_S);
-      break;
-    case ALERT_TIMEOUT_TIME:
-      parameters->alert_timeout_time_s = parse_double(val, DEFAULT_ALERT_TIMEOUT_S);
-      break;
-    case DEBUG_TO_COM_EN:
-      num = strcmp(val, "true");
-      parameters->debug_to_com_en = num ? false : true;
-      break;
-    case MIN_RUN_ZONE_TEMP_EN:
-      num = strcmp(val, "true");
-      parameters->min_run_zone_temp_en = num ? false : true;
-      break;
-    case MIN_RUN_ZONE_TEMP_C:
-      parameters->min_run_zone_temp = parse_double(val, DEFAULT_MIN_RUN_ZONE_TEMP_C);
-      break;
-#ifndef SAMPLE_PREP_BOARD
-    case OPTICAL_DISTANCE:
-      parameters->optical_distance = atoi(val);
-      break;
-    case MAX_AMP_PID_PWM:
-      parameters->max_amp_pid_pwm = parse_int(val, DEFAULT_MAX_AMP_PID);
-      break;
-    case MAX_VALVE_PID_PWM:
-      parameters->max_valve_pid_pwm = parse_int(val, DEFAULT_MAX_VALVE_PID);
-      break;
-    case VALVE_MAX_TEMP_C:
-      parameters->valve_max_temp = atof(val);
-      break;
-    case AMP_MAX_TEMP_C:
-      parameters->amp_max_temp = atof(val);
-      break;
-#else
-    case HEATER_MAX_TEMP_C:
-      parameters->heater_max_temp = parse_double(val, DEFAULT_MAX_HEATER_TEMP);
-      break;
-    case MAX_HEATER_PID_PWM:
-      parameters->max_heater_pid_pwm = parse_int(val, DEFAULT_MAX_HEATER_PID);
-      break;
-    case MOTOR_SWTICH_CCW_CW:
-      num = strcmp(val, "true");
-      parameters->switch_motor_ccw_cw = num ? false : true;
-      break;
-    case HAL_SENSOR_THRESH:
-      parameters->hal_sensor_thresh = parse_double(val, DEFAULT_HAL_SENSOR_THRESHOLD);
-      break;
-    case MOTOR_STALL_PERCENT:
-      parameters->motor_stall_percent = parse_int(val, DEFAULT_MOTOR_STALL_PERCENT);
-      break;
-    case MOTOR_STALL_PWM:
-      parameters->motor_stall_pwm = parse_double(val, DEFAULT_MOTOR_STALL_PWM);
-      break;  
-    case MOTOR_STALL_ENABLE:
-      num = strcmp(val, "true");
-      parameters->motor_stall_en = num ? false : true;
-      break;
-#endif
-    case MMDDYY:
-      parameters->mmddyy = parse_int(val, DEFAULT_DATE);
-      break;
-    case HHMMSS:
-      parameters->hhmmss = parse_int(val, DEFAULT_TIME);
-      break;
-    case SET_DATE_TIME:
-      num = strcmp(val, "true");
-      parameters->set_date_time = num ? false : true;
-      break;
-    default:
-      // Handle default case
-      break;
-    }
-  }
-  */
+    // Search the key-value table for a matching key. if found, then parse and populate the parameters data structure
+    strcpy(val2,val);
+    _assignParameterUsingKeyValueTable_given_key_and_value_from_config_file(KV_TABLE_GLOBAL_PTR,KV_TABLE_GLOBAL_SIZE,key,val2);
+    // after this function runs, if a match was found, it should have been populated int the config structure
+
+  } // file for-loop
+
 
   // Close the file
   res = f_close(&file);
@@ -338,10 +335,88 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
   return FR_OK;
 }
 
+bool _assignParameterToCycleStruct_given_key_and_value_from_config_file( const char* keystr, const char* valstr) {
+  // Search the key-value table for a matching key
+  const bool _printdebugs = false;
+  char tmp[80];
+  bool matched;
+
+  if(_printdebugs)  {
+    sprintf(tmp,"key = \"%s\" in file, checking key-value table...",keystr);
+    send_debug_log_message(tmp);
+  }
+  matched = false;
+
+  // Loop through the key-value table for a matching key
+  for(uint8_t i=0; i<KV_TABLE_CYCLE_SIZE; i++){
+    // pick item from table
+    const naatos_kv_table_entry_cycle_t * item = &(KV_TABLE_CYCLE_PTR[i]);
+
+    // check for match of the key in the table
+    if(strcasecmp(keystr,item->name) == 0) {
+      if(_printdebugs)  {
+        sprintf(tmp,"  matched key = %s -> file value str = \"%s\"",item->name,valstr);
+        send_debug_log_message(tmp);
+      }
+
+      // we have a match! now
+      // parse the value string
+      switch(item->dtype) {
+        case NAATOS_KV_DT_FLOAT:
+          *((float*) item->dataptr) = parse_double(valstr,0);
+          if(_printdebugs)  {
+            sprintf(tmp,"  was DT_FLOAT. parsed = %g", *((float*) item->dataptr) );
+            send_debug_log_message(tmp);
+          }
+
+          matched = true;
+          break;
+        case NAATOS_KV_DT_INT:
+          *((int*) item->dataptr) = parse_int(valstr,0);
+          if(_printdebugs)  {
+            sprintf(tmp,"  was DT_INT. parsed = %d", *((int*) item->dataptr) );
+            send_debug_log_message(tmp);
+          }
+          matched = true;
+          break;
+        case NAATOS_KV_DT_UINT16:
+          *((uint16_t*) item->dataptr) = (uint16_t) parse_int(valstr,0);
+          if(_printdebugs)  {
+            sprintf(tmp,"  was DT_UINT16. parsed = %d", *((uint16_t*) item->dataptr) );
+            send_debug_log_message(tmp);
+          }
+          matched = true;
+          break;
+        case NAATOS_KV_DT_BOOLS:
+          *((bool*) item->dataptr) = strcmp(valstr, "true") ? false : true;
+          if(_printdebugs)  {
+            sprintf(tmp,"  was DT_BOOLS. parsed = %d", *((bool*) item->dataptr) );
+            send_debug_log_message(tmp);
+          }
+          matched = true;
+          break;
+        default:
+          sprintf(tmp,"couldn't parse key = %s -> file value str = \"%s\" because couldn't handle the datatype",item->name,valstr);
+          send_debug_log_message(tmp);
+          break;
+      }
+      if(matched)
+        break;
+    }
+  }
+  if(!matched)  {
+    sprintf(tmp,"couldn't parse key = %s -> file value str = \"%s\"",keystr,valstr);
+    send_debug_log_message(tmp);
+  }
+  return matched;
+}
+
+
 FRESULT get_cycle_configurations_parameters() {
   char configBuffer[50];
   FRESULT res;
   char *pch;
+  char key[50];
   char val[50];
   int num;
 
@@ -397,11 +472,19 @@ FRESULT get_cycle_configurations_parameters() {
         return res;
       }
 
-      // Loop throught the file and populate the cycle configuration array
-      for (int j = 0; j < NUM_CYCLE_CONFIG_PARAMS; j++) {
+      // Loop through the file and populate the cycle configuration array
+      while(true) {
         pch = f_gets(configBuffer, 50, &file);
+        if(pch[0]==0) {
+          // END OF FILE
+          break;
+        }
+        
+        // key
         pch = strtok(configBuffer, ":\n\r");
-        sprintf(val, "%s", pch);
+        sprintf(key, "%s", pch);
+
+        // val
         pch = strtok(NULL, ":");
         sprintf(val, "%s", pch);
         char *newline = strchr(val, '\n'); 
@@ -410,89 +493,13 @@ FRESULT get_cycle_configurations_parameters() {
           *newline = '\0';
         }
 
-        switch ((cycle_config_params_t)j) {
-        case CYCLE_RUN_TIME:
-            cycle_configs[i].cycle_run_time_s = parse_double(val, DEFAULT_CYCLE_RUNTIME);
-            break;
-        case CYCLE_DELAY_TIME:
-            cycle_configs[i].cycle_delay_time = parse_int(val, DEFAULT_CYCLE_DELAY_TIME);
-            break;
-        case RAMP_TO_TEMP_BEFORE_CYCLE_START:
-            num = strcmp(val, "true");
-            cycle_configs[i].ramp_to_temp_before_start_cycle = num ? false : true;
-            break;
-        case RAMP_TO_TEMP_TIMEOUT:
-            cycle_configs[i].ramp_to_temp_timeout = parse_double(val, DEFAULT_RAMP_TO_TEMP_TIMEOUT);
-            break;
-    #ifndef SAMPLE_PREP_BOARD
-        case AMP_SETPOINT:
-            cycle_configs[i].amp_setpoint = parse_double(val, DEFAULT_AMP_SETPOINT);
-            break;
-        case VALVE_SETPOINT:
-            cycle_configs[i].valve_setpoint = parse_double(val, DEFAULT_VALVE_SETPOINT);
-            break;
-        case RUN_AMP:
-            num = strcmp(val, "true");
-            cycle_configs[i].run_amp = num ? false : true;
-            break;
-        case RUN_VALVE:
-            num = strcmp(val, "true");
-            cycle_configs[i].run_valve = num ? false : true;
-            break;
-        case AMP_KP:
-            cycle_configs[i].amp_kp = parse_double(val, DEFAULT_AMP_KP);
-            break;
-        case AMP_KI:
-            cycle_configs[i].amp_ki = parse_double(val, DEFAULT_AMP_KI);
-            break;
-        case AMP_KD:
-            cycle_configs[i].amp_kd = parse_double(val, DEFAULT_AMP_KD);
-            break;
-        case VALVE_KP:
-            cycle_configs[i].valve_kp = parse_double(val, DEFAULT_VALVE_KP);
-            break;
-        case VALVE_KI:
-            cycle_configs[i].valve_ki = parse_double(val, DEFAULT_VALVE_KI);
-            break;
-        case VALVE_KD:
-            cycle_configs[i].valve_kd = parse_double(val, DEFAULT_VALVE_KD);
-            break;
-    #else
-        case HEATER_SETPOINT:
-            cycle_configs[i].heater_setpoint = parse_double(val, DEFAULT_HEATER_SETPOINT);
-            break;
-        case MOTOR_SETPOINT:
-            cycle_configs[i].motor_setpoint = parse_double(val, DEFAULT_MOTOR_SETPOINT);
-            break;
-        case RUN_HEATER:
-            num = strcmp(val, "true");
-            cycle_configs[i].run_heater = num ? false : true;
-            break;
-        case RUN_MOTOR:
-            num = strcmp(val, "true");
-            cycle_configs[i].run_motor = num ? false : true;
-            break;
-        case HEATER_KP:
-            cycle_configs[i].heater_kp = parse_double(val, DEFAULT_HEATER_KP);
-            break;
-        case HEATER_KI:
-            cycle_configs[i].heater_ki = parse_double(val, DEFAULT_HEATER_KI);
-            break;
-        case HEATER_KD:
-            cycle_configs[i].heater_kd = parse_double(val, DEFAULT_HEATER_KD);
-            break;
-        case MOTOR_KP:
-            cycle_configs[i].motor_kp = parse_double(val, DEFAULT_MOTOR_KP);
-            break;
-        case MOTOR_KI:
-            cycle_configs[i].motor_ki = parse_double(val, DEFAULT_MOTOR_KI);
-            break;
-        case MOTOR_KD:
-            cycle_configs[i].motor_kd = parse_double(val, DEFAULT_MOTOR_KD);
-            break;
-    #endif
-        }
-      }
+        // Search the key-value table for a matching key. if found, then parse and populate the parameters data structure
+        // after this function runs, if a match was found, it should have been populated int the config structure
+        _assignParameterToCycleStruct_given_key_and_value_from_config_file(key,val);
+        // the above function's result was left in cycle_cfg_single. copy it to our malloc'ed cycle_config array
+        cycle_configs[i]=cycle_cfg_single;
+
+      } //loop through the lines
 
       // Close the current cycle file
       res = f_close(&file);

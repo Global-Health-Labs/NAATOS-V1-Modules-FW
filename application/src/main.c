@@ -119,6 +119,8 @@ naatos_config_parameters config = {
 };
 
 cycle_config_parameters *cycle_configs; // Will be populated by the storage when the cycle configs are pulled
+const cycle_config_parameters *cycle_cfg_ptr; // Used temporarily, to point to a current cycle config by the key-value system
+cycle_config_parameters cycle_cfg_single; // Used temporarily, to point to a current cycle config by the key-value system
 
 bool batt_recovering = false;
 
@@ -1172,9 +1174,9 @@ void main_task(void *pvParameters) {
         // Delay
         vTaskDelay(100);
       }
+      optical_triggered_last = optical_triggered;
 #endif
       buttonData.event = NONE;
-      optical_triggered_last = optical_triggered;
 
       main_wdt_time_left = pdTICKS_TO_MS(xTaskGetTickCount() - main_wdt_start_time);
 
