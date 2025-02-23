@@ -27,4 +27,5 @@ void uninit_pwms(void);
 void pwm_task(void *pvParameters);
 void updateDutyCycles(temperature_pwm_data_t pwmData);
 
+void pwm_buzzer_blocking_sound(uint16_t frequency, uint16_t durationms);
 #endif

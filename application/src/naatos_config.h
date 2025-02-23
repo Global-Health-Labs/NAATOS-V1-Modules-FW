@@ -6,11 +6,11 @@
 #include <stdint.h>
 #include "naatos_config_file.h"
 
-#define VERSION "3.1"
+#define VERSION "3.2rc1"
 
 /*Define this when building sample prep only otherwise comment out*/
-#define SAMPLE_PREP_BOARD
-//#define POWER_MODULE_BOARD
+//#define SAMPLE_PREP_BOARD
+#define POWER_MODULE_BOARD
 
 #ifdef SAMPLE_PREP_BOARD
 #define SAMPLE_PREP_REV_A 0
@@ -39,8 +39,8 @@
 #define USE_CALENDAR_CHIP 1
 #define VERBOSE_PID 0
 #define USE_MOTOR 1
-#define MOTOR_FG_REWORK 1
-#define DO_AUTOMATIC_RUNS 1
+#define MOTOR_FG_REWORK 0
+#define DO_AUTOMATIC_RUNS 0
 
 #define pdTICKS_TO_MS(xTimeInTicks) ((TickType_t)(((uint64_t)(xTimeInTicks) * (uint64_t)1000U) / (uint64_t)configTICK_RATE_HZ))
 
@@ -161,7 +161,7 @@
 #define DEFAULT_OPTICAL_TRIG_THRESHOLD  800
 #define DEFAULT_MAX_AMP_PID             100
 #define DEFAULT_MAX_VALVE_PID           100
-#define DEFAULT_VALVE_MAX_TEMP          120.0
+#define DEFAULT_VALVE_MAX_TEMP          130.0
 #define DEFAULT_AMP_MAX_TEMP            120.0
 #else 
 #define DEFAULT_MAX_HEATER_TEMP         120.0
@@ -228,7 +228,7 @@
 #define SAMPLE_OVER_TEMPERATURE "Sample over temperature error"
 #define SAMPLE_BATTERY_OVER_TEMP "Battery over temperature error:"
 #define SAMPLE_LOW_BATTERY_STRING "Battery is too low to start cycle: "
-#define POWER_ON_STRING "Unit booted up. Starting battery voltage: "
+#define POWER_ON_STRING "Boot Starting battery voltage: "
 #define USB_SUSPEND_TASKS_TIME 15000
 
 /* Main States */
@@ -560,7 +560,10 @@ typedef enum {
   PWM_MSG_HEATER_DISABLE,
   PWM_MSG_HEATER_ENABLE,
   PWM_MSG_MOTOR_DISABLE,
-  PWM_MSG_MOTOR_ENABLE
+  PWM_MSG_MOTOR_ENABLE,
+  PWM_MSG_BUZZER_TONE_1SEC_1,
+  PWM_MSG_BUZZER_TONE_1SEC_2,
+  PWM_MSG_BUZZER_TONE_200ms_1
 } PWMRxQueueType_t;
 
 typedef struct {
@@ -700,6 +703,23 @@ typedef struct {
   float     motor_kd;
 #endif
 } cycle_config_parameters;
+
+/* General Purpose Retained Registers 2 */
+// we will use this in NAATOS application to track a few things
+// one note: it does not get retained across watchdog resets (WDOG)
+typedef union {
+  struct {
+    bool app_set_this_on : 1;
+    bool _unused1    : 1; // bit 0
+    bool _unused2    : 1;
+    bool _unused3    : 1;
+    bool _unused4    : 1;
+    bool reformat    : 1; // bit 5
+    bool _unused6    : 1;
+    bool _unused7    : 1;
+  } bit;
+  uint8_t reg;
+} naatos_gpregret2_t;
 
 /* Configuration Parameters Variables */
 extern naatos_config_parameters config;

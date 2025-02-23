@@ -289,9 +289,100 @@ void pwm_task(void *pvParameters) {
         break;
       }
 
+      case PWM_MSG_BUZZER_TONE_1SEC_1: {
+        // tone freq, duration=ms
+        pwm_buzzer_blocking_sound(1000,100);
+        pwm_buzzer_blocking_sound(1200,100);
+        pwm_buzzer_blocking_sound(1400,100);
+        pwm_buzzer_blocking_sound(1800,100);
+        pwm_buzzer_blocking_sound(500,500);
+        pwm_buzzer_blocking_sound(800,100);
+        break;
+      }
+
+      case PWM_MSG_BUZZER_TONE_1SEC_2: {
+        // tone freq, duration=ms
+        pwm_buzzer_blocking_sound(1000,100);
+        pwm_buzzer_blocking_sound(900,100);
+        pwm_buzzer_blocking_sound(800,100);
+        pwm_buzzer_blocking_sound(700,100);
+        pwm_buzzer_blocking_sound(250,500);
+        pwm_buzzer_blocking_sound(150,100);
+        break;
+      }
+
+      case PWM_MSG_BUZZER_TONE_200ms_1: {
+        // tone freq, duration=ms
+        pwm_buzzer_blocking_sound(100,25);
+        pwm_buzzer_blocking_sound(150,25);
+        pwm_buzzer_blocking_sound(200,25);
+        pwm_buzzer_blocking_sound(250,25);
+        
+        pwm_buzzer_blocking_sound(400,25);
+        pwm_buzzer_blocking_sound(500,25);
+
+        pwm_buzzer_blocking_sound(1000,50);
+        break;
+      }
+
       default:
         break;
       }
     }
   }
+}
+
+#ifdef POWER_MODULE_BOARD
+APP_PWM_INSTANCE(PWMbuzzer, 1); // Create instance "PWM1" using TIMER1/(PWM1?)
+#define BUZZER_PIN_1 NRF_GPIO_PIN_MAP(0, 25)    // one side of buzzer
+#define BUZZER_PIN_2 NRF_GPIO_PIN_MAP(0, 26)    // other side of buzzer
+
+static volatile bool pwmbuzzer_ready_flag = false;
+
+void pwmbuzzer_ready_callback(uint32_t pwm_id) {
+  pwmbuzzer_ready_flag = true;
+}
+#endif
+
+void pwm_buzzer_blocking_sound(uint16_t frequency, uint16_t durationms) {
+#ifdef POWER_MODULE_BOARD
+  ret_code_t err;
+
+  // INIT PWM
+  // ---- 2 Channel PWM, frequency (?), COMPLEMENTARY, BUZZER
+  // period given in microseconds
+  app_pwm_config_t pwmbuzzer_cfg = APP_PWM_DEFAULT_CONFIG_2CH((uint32_t) ((1.0/(float)frequency)*1e6), BUZZER_PIN_1, BUZZER_PIN_2);
+  pwmbuzzer_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
+  pwmbuzzer_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_LOW;
+
+
+  /* Initalize with configurations */
+  /* Initalize PWM */
+  err = app_pwm_init(&PWMbuzzer, &pwmbuzzer_cfg, pwmbuzzer_ready_callback);
+  APP_ERROR_CHECK(err);
+
+  /* Enable PWMs */
+  app_pwm_enable(&PWMbuzzer);
+
+  //vTaskDelay(pdMS_TO_TICKS(5));
+
+  // duty
+  app_pwm_channel_duty_set(&PWMbuzzer, 0, 50);
+  app_pwm_channel_duty_set(&PWMbuzzer, 1, 50);
+
+  vTaskDelay(pdMS_TO_TICKS(durationms));
+
+  // duty
+  app_pwm_channel_duty_set(&PWMbuzzer, 0, 0);
+  app_pwm_channel_duty_set(&PWMbuzzer, 1, 0);
+
+  // disable
+  app_pwm_disable(&PWMbuzzer);
+
+  //uninit
+  err = app_pwm_uninit(&PWMbuzzer);
+  APP_ERROR_CHECK(err);
+
+
+#endif
 }

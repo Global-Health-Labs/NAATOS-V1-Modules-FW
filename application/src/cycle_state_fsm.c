@@ -336,6 +336,18 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         updateLedState(LED_COMPLETE, true);
         start_time = xTaskGetTickCount();
         end_time = ((config.sample_valid_timeout_s) * 1000);
+
+      #ifdef POWER_MODULE_BOARD
+        // PLAY SOUND
+        PwmRxQueueMsg_t pwmmsg = {
+            .type = PWM_MSG_BUZZER_TONE_1SEC_1
+        };
+        BaseType_t xReturned;
+        xReturned = xQueueSend(pwmRxQueue, &pwmmsg, 0);
+        if (xReturned != pdPASS) {
+          send_debug_log_message("CYCLEFSM: Unable to send buzzer message to pwmRxQueue.");
+        }
+      #endif
       }
      
       xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
@@ -443,6 +455,17 @@ void handle_exit_notifications(void) {
   }
   if (exitInfo != CYCLE_COMPLETE) {
     send_event_log_message(eventType, exitString);
+  #ifdef POWER_MODULE_BOARD
+    // PLAY SOUND
+    PwmRxQueueMsg_t pwmmsg = {
+        .type = PWM_MSG_BUZZER_TONE_1SEC_2
+    };
+    BaseType_t xReturned;
+    xReturned = xQueueSend(pwmRxQueue, &pwmmsg, 0);
+    if (xReturned != pdPASS) {
+      send_debug_log_message("CYCLEFSM: Unable to send buzzer message to pwmRxQueue.");
+    }
+  #endif
   }
 }
 

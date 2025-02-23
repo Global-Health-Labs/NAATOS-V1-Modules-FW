@@ -52,6 +52,13 @@ void handle_power_cycle_stopstart_heater(bool amp_heating, bool valve_heating) {
   if (amp_heating || valve_heating) {
     msg.heaterRunning = true;
   }
+  #if 0
+  // some debug messages
+  if(msg.heaterRunning)
+    send_debug_log_message("powerModuleHeater: sending sensor.heatRun=TRUE");
+  else
+    send_debug_log_message("powerModuleHeater: sending sensor.heatRun=FALSE");
+  #endif
   xReturned = xQueueSend(sensorRxQueue, &msg, 0);
   if (xReturned != pdPASS) {
     send_debug_log_message("HEATER_TASK: Unable to send heater state to sensorRxQueue.");
@@ -64,6 +71,13 @@ void handle_power_cycle_stopstart_heater(bool amp_heating, bool valve_heating) {
   if (amp_heating || valve_heating) {
     wdtUpdate.valid = true;
   }
+  #if 0
+  // some debug messages
+  if(wdtUpdate.valid)
+    send_debug_log_message("powerModuleHeater: sending wdtUpdate.valid=TRUE");
+  else
+    send_debug_log_message("powerModuleHeater: sending wdtUpdate.valid=FALSE");
+  #endif
   xReturned = xQueueSend(watchdog_rxTimesQueue, &wdtUpdate, 0);
   if (xReturned != pdPASS) {
     send_debug_log_message("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task");
