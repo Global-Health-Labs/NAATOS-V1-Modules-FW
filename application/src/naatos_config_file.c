@@ -34,7 +34,6 @@ const naatos_kv_table_entry_t* KV_TABLE_GLOBAL_PTR = KV_TABLE_GLOBAL;
 const uint8_t KV_TABLE_GLOBAL_SIZE = sizeof(KV_TABLE_GLOBAL)/sizeof(KV_TABLE_GLOBAL[0]);
 
 // Cycle Config
-//TODO: this is not right for sample-prep
 naatos_kv_table_entry_cycle_t KV_TABLE_CYCLE[] = {
   // name       ,       dtype,                dataptr (pointer to config struct field) 
   { "cycle_run_time_s"                , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.cycle_run_time_s) },
@@ -43,8 +42,8 @@ naatos_kv_table_entry_cycle_t KV_TABLE_CYCLE[] = {
   { "ramp_to_temp_timeout"            , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.ramp_to_temp_timeout) },
   { "heater_setpoint"                 , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.heater_setpoint) },
   { "motor_setpoint"                  , NAATOS_KV_DT_UINT16 , (void *) &(cycle_cfg_single.motor_setpoint) },
-  { "run_heater"                      , NAATOS_KV_DT_BOOLS  , (void *) &(cycle_cfg_single.run_heater) },
-  { "run_motor"                       , NAATOS_KV_DT_BOOLS  , (void *) &(cycle_cfg_single.run_motor) },
+  { "run_heater_enable"               , NAATOS_KV_DT_BOOLS  , (void *) &(cycle_cfg_single.run_heater) },
+  { "run_motor_enable"                , NAATOS_KV_DT_BOOLS  , (void *) &(cycle_cfg_single.run_motor) },
   { "heater_kp"                       , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.heater_kp) },
   { "heater_ki"                       , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.heater_ki) },
   { "heater_kd"                       , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.heater_kd) },
