@@ -24,6 +24,8 @@ static const nrf_drv_twi_t m_i2c[i2c_num_interfaces] = {
 static SemaphoreHandle_t m_i2c_semaphores[i2c_num_interfaces];
 static nrf_drv_twi_config_t twi_configs[i2c_num_interfaces];
 
+uint32_t GLOBAL_I2C_RECOVERY_COUNTER = 0; // global variable
+
 #define MAX_I2C_RETRIES 3
 
 void i2c_error_recovery(i2c_interface_selection_t interface) {
@@ -61,6 +63,7 @@ void i2c_error_recovery(i2c_interface_selection_t interface) {
   char buff[60];
   size = sprintf(buff, "I2C error recovery attempt on interface: %i", interface);
   send_debug_log_message(buff);
+  GLOBAL_I2C_RECOVERY_COUNTER+=1;
 }
 
 /* INIT for TWI hardware for peripheral */

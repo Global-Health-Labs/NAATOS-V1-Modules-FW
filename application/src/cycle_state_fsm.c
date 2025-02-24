@@ -105,6 +105,18 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         break;
       }
     
+      // Reset ERROR-QUEUE
+      // ensure we start with this runErrorQueue as empty
+      if(uxQueueMessagesWaiting(main_runErrorQueue) > 0)  {
+        sprintf(exitString,"CYCLE_FSM: Startup state, runErrorQueue has %d waiting messages. Consume them now.",uxQueueMessagesWaiting(main_runErrorQueue));
+        send_debug_log_message(exitString);
+        while(xQueueReceive(main_runErrorQueue, &main_err_msg, 0) == pdPASS) {
+          // consume all remaining items
+          //send_debug_log_message("CYCLE_FSM: consumed a message from main_runErrorQueue and discarded");
+        }
+      }
+
+
       next_state = START_CYCLE;
       break;
     }
@@ -485,6 +497,9 @@ bool begin_cycle(cycle_t cycle) {
   BaseType_t xRet;
   bool start_run = false;
 
+  // RESET I2C ERROR COUNTER
+  GLOBAL_I2C_RECOVERY_COUNTER = 0;
+
   // Create Cycle Zones Request For New Cycle
   HeaterRxQueueMsg_t run_cycle_zones = {
     .type = HEATER_MSG_ZONE_STATE,
@@ -545,7 +560,7 @@ void end_cycle(cycle_t cycle, bool end_from_error) {
   log_event_t cycle_stop_event = {
     .event = SAMPLE_CYCLE_ENDED,
     .message = NULL};
-  sprintf(cycle_stop_event.message, "Cycle %d Stopped.", (uint16_t)cycle);
+  sprintf(cycle_stop_event.message, "Cycle %d Stopped. I2CERRCOUNT=%u", (uint16_t)cycle, GLOBAL_I2C_RECOVERY_COUNTER);
   log_data_message_t cycle_stop_log_msg = {
     .data_type = EVENT_DATA,
     .temperature_data = NULL,
