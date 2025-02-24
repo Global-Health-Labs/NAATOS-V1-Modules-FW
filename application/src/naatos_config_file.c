@@ -17,6 +17,7 @@ naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
   { "min_run_zone_temp_en"            , NAATOS_KV_DT_BOOLS  , (void *) &(config.min_run_zone_temp_en),  "false"},
   { "min_run_zone_temp"               , NAATOS_KV_DT_FLOAT  , (void *) &(config.min_run_zone_temp),     "80.00"},
 
+  { "do_automatic_runs"               , NAATOS_KV_DT_BOOLS  , (void *) &(config.do_automatic_runs),     "false"},
   { "heater_max_temp"                 , NAATOS_KV_DT_FLOAT  , (void *) &(config.heater_max_temp),       "120.0"},
   { "max_heater_pid_pwm"              , NAATOS_KV_DT_FLOAT  , (void *) &(config.max_heater_pid_pwm),    "100"},
   { "switch_motor_ccw_cw"             , NAATOS_KV_DT_BOOLS  , (void *) &(config.switch_motor_ccw_cw),   "true"},
@@ -53,17 +54,6 @@ naatos_kv_table_entry_cycle_t KV_TABLE_CYCLE[] = {
 };
 const naatos_kv_table_entry_cycle_t* KV_TABLE_CYCLE_PTR = KV_TABLE_CYCLE;
 const uint8_t KV_TABLE_CYCLE_SIZE = sizeof(KV_TABLE_CYCLE)/sizeof(KV_TABLE_CYCLE[0]);
-
-  float     heater_setpoint;
-  uint16_t  motor_setpoint;
-  bool      run_heater;
-  bool      run_motor;
-  float     heater_kp;
-  float     heater_ki;
-  float     heater_kd;
-  float     motor_kp;
-  float     motor_ki;
-  float     motor_kd;
 
 
 
@@ -120,19 +110,4 @@ const naatos_kv_table_entry_cycle_t* KV_TABLE_CYCLE_PTR = KV_TABLE_CYCLE;
 const uint8_t KV_TABLE_CYCLE_SIZE = sizeof(KV_TABLE_CYCLE)/sizeof(KV_TABLE_CYCLE[0]);
 
 #endif
-
-//float get_config_value_by_key_float(const char* key) {
-//  for(uint8_t i; i<KV_TABLE_GLOBAL_SIZE; i++) {
-//    if( strcmp(key, KV_TABLE_GLOBAL[i].name)==0 ) {
-//      //found;
-//      if( KV_TABLE_GLOBAL[i].dtype == NAATOS_KV_DT_FLOAT )  {
-//        // matches dtype
-//        return *((float *) (KV_TABLE_GLOBAL[i].dataptr));
-//      } else{
-//        return -666.0;
-//      }
-//    }
-//  }
-//  return -666.0;
-//}
 

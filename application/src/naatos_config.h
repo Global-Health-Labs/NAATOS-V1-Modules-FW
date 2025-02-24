@@ -6,11 +6,11 @@
 #include <stdint.h>
 #include "naatos_config_file.h"
 
-#define VERSION "3.2rc1"
+#define VERSION "3.2rc2"
 
 /*Define this when building sample prep only otherwise comment out*/
-//#define SAMPLE_PREP_BOARD
-#define POWER_MODULE_BOARD
+#define SAMPLE_PREP_BOARD
+//#define POWER_MODULE_BOARD
 
 #ifdef SAMPLE_PREP_BOARD
 #define SAMPLE_PREP_REV_A 0
@@ -40,7 +40,6 @@
 #define VERBOSE_PID 0
 #define USE_MOTOR 1
 #define MOTOR_FG_REWORK 0
-#define DO_AUTOMATIC_RUNS 0
 
 #define pdTICKS_TO_MS(xTimeInTicks) ((TickType_t)(((uint64_t)(xTimeInTicks) * (uint64_t)1000U) / (uint64_t)configTICK_RATE_HZ))
 
@@ -665,6 +664,7 @@ typedef struct {
   float     amp_max_temp;
   float     valve_max_temp;
 #else
+  bool      do_automatic_runs;
   float     heater_max_temp;
   float     max_heater_pid_pwm;
   bool      switch_motor_ccw_cw;
