@@ -103,8 +103,8 @@ naatos_kv_table_entry_cycle_t KV_TABLE_CYCLE[] = {
   { "run_amp_enable"                  , NAATOS_KV_DT_BOOLS  , (void *) &(cycle_cfg_single.run_amp) },
   { "run_valve_enable"                , NAATOS_KV_DT_BOOLS  , (void *) &(cycle_cfg_single.run_valve) },
   { "amp_kp"                          , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.amp_kp) },
-  { "amp_ki"                          , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.amp_kd) },
-  { "amp_kd"                          , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.amp_ki) },
+  { "amp_ki"                          , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.amp_ki) },
+  { "amp_kd"                          , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.amp_kd) },
   { "valve_kp"                        , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.valve_kp) },
   { "valve_ki"                        , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.valve_ki) },
   { "valve_kd"                        , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.valve_kd) }
