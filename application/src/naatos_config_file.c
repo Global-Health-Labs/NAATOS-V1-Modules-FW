@@ -1,9 +1,10 @@
 #include "naatos_config_file.h"
-#include <string.h>
 #include "naatos_config.h"
 
 #if defined(SAMPLE_PREP_BOARD)
-
+/****************************************************************************************************************
+ * SAMPLE PREP MODULE
+ ****************************************************************************************************************/
 // Global Config
 naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
   // name       ,       dtype,                dataptr (pointer to config struct field),       default value as a string
@@ -58,7 +59,9 @@ const uint8_t KV_TABLE_CYCLE_SIZE = sizeof(KV_TABLE_CYCLE)/sizeof(KV_TABLE_CYCLE
 
 
 #elif defined(POWER_MODULE_BOARD)
-
+/****************************************************************************************************************
+ * POWER MODULE
+ ****************************************************************************************************************/
 // Global Config
 naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
   // name       ,       dtype,                dataptr (pointer to config struct field),       default value as a string
