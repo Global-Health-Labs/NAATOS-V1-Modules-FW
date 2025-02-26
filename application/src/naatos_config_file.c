@@ -84,6 +84,7 @@ naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
   { "max_valve_pid_pwm"               , NAATOS_KV_DT_FLOAT  , (void *) &(config.max_valve_pid_pwm),     "100"},
   { "valve_max_temp"                  , NAATOS_KV_DT_FLOAT  , (void *) &(config.valve_max_temp),        "130.0"},
   { "amp_max_temp"                    , NAATOS_KV_DT_FLOAT  , (void *) &(config.amp_max_temp),          "120.0"},
+  { "ledtop0frnt1"                    , NAATOS_KV_DT_UINT16 , (void *) &(config.ledtop0frnt1),          "0"},
   
   { "mmddyy"                          , NAATOS_KV_DT_INT    , (void *) &(config.mmddyy),                "100124"},
   { "hhmmss"                          , NAATOS_KV_DT_INT    , (void *) &(config.hhmmss),                "120000"},

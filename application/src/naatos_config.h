@@ -664,6 +664,7 @@ typedef struct {
   float     max_valve_pid_pwm;
   float     amp_max_temp;
   float     valve_max_temp;
+  uint16_t  ledtop0frnt1;   // top led's if 0; front led's if 1
 #else
   float     heater_max_temp;
   float     max_heater_pid_pwm;

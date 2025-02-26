@@ -54,6 +54,7 @@ uint8_t led_pos_bms[9] =
         0b00000010,
         0b00000100};
 
+static uint8_t led_driver_i2c_addr;
 static bool driverIsBusy = false;
 static led_driver_internal_op_type_t current_op_type = led_driver_init_read_op;
 
@@ -90,11 +91,12 @@ static led_driver_errors_t led_driver_writeRegister(uint8_t *buf,
 
   current_op_type = led_operation;
 
-#ifdef SAMPLE_PREP_BOARD
-  err_code = xUtil_TWI_Write_Single(i2c_interface_sensors, IS31FL3199_ADDR_low, reg, buf, 2); //acquire data
-#else
-  err_code = xUtil_TWI_Write_Single(i2c_interface_sensors, IS31FL3199_ADDR_low, reg, buf, 2); //acquire data (non-low is smaller leds)
-#endif
+//#ifdef SAMPLE_PREP_BOARD
+//  err_code = xUtil_TWI_Write_Single(i2c_interface_sensors, IS31FL3199_ADDR_low, reg, buf, 2); //acquire data
+//#else
+//  err_code = xUtil_TWI_Write_Single(i2c_interface_sensors, IS31FL3199_ADDR_low, reg, buf, 2); //acquire data (non-low is smaller leds)
+//#endif
+  err_code = xUtil_TWI_Write_Single(i2c_interface_sensors, led_driver_i2c_addr, reg, buf, 2); //acquire data (non-low is smaller leds)
 
   if (err_code != NRF_SUCCESS) {
     driverIsBusy = false;
@@ -181,12 +183,19 @@ static led_driver_errors_t led_alt_driver_writeRegisterBlocking(uint8_t *buf, ui
 #endif
 #endif
 
-void led_driver_init(void) {
+void led_driver_init(uint16_t ledtop0frnt1) {
 #if !POWER_MODULE_REV_B
   nrf_gpio_cfg_output(LED_DRV_EN);
 #else 
   nrf_gpio_cfg_output(TOP_LED_DRV_EN);
 #endif
+
+  // Select I2C address based on the config file
+  if(config.ledtop0frnt1==1)
+    led_driver_i2c_addr = IS31FL3199_ADDR;
+  else
+    led_driver_i2c_addr = IS31FL3199_ADDR_low;
+
   
   enable_led_driver(false);
   for (int i = 0; i < 100; i++) {

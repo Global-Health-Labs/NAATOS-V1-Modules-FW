@@ -159,7 +159,6 @@ void reset_and_enter_dfu(void) {
 }
 
 void reset(void)  {
-  // Device will enter bootloader on next reset,
   // use this line of code to perform the reset:
   NVIC_SystemReset();
   asm volatile("nop");
@@ -373,9 +372,9 @@ void init_peripherals(void) {
   init_pwms();
   vInit_TWI_Hardware(i2c_interface_system, I2C1_SDA_PIN, I2C1_SCL_PIN, i2c_speed_100k);
   vInit_TWI_Hardware(i2c_interface_sensors, I2C0_SDA_PIN, I2C0_SCL_PIN, i2c_speed_100k);
-#if ENABLE_LEDS
-  led_driver_init();
-#endif
+//#if ENABLE_LEDS
+//  led_driver_init();
+//#endif  // moved to after config file is read
   fuelGauge_init();
   init_naatos_storage();
   button_init();
@@ -863,13 +862,6 @@ void main_task(void *pvParameters) {
   gpregret2.reg = (NRF_POWER->GPREGRET2); // for nordic only 8 bits lsb are retained
   gpregret2.bit.app_set_this_on = true; // our app will just always set this bit to 1 at startup
 
-
-  // Initalize the charger in here after 1 second to avoid 
-  // issues with charging when the kill switch is off
-  vTaskDelay(pdMS_TO_TICKS(1000));
-  while(!pd_eeprom_init_complete());
-  setup_charger();
-
   // See if we are resetting the file system
   bool button_pressed  = !(nrf_gpio_pin_read(BUTTON_INPUT_PIN));
   // either holding down button with no USB, or gpregret2 bitfield set (through uart)
@@ -878,6 +870,21 @@ void main_task(void *pvParameters) {
 
     reformat_filesystem_and_reread();
   }
+
+  // Initialize the LEDs we are going to use
+#if ENABLE_LEDS
+  #if defined(POWER_MODULE_BOARD)
+  led_driver_init(config.ledtop0frnt1);
+  #else
+  led_driver_init(0);
+  #endif
+#endif
+
+  // Initalize the charger in here after 1 second to avoid 
+  // issues with charging when the kill switch is off
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  while(!pd_eeprom_init_complete());
+  setup_charger();
 
   // Set GPREGRET2 register
   NRF_POWER->GPREGRET2 = gpregret2.reg;
