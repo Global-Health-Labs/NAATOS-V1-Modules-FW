@@ -79,7 +79,7 @@ naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
   { "min_run_zone_temp"               , NAATOS_KV_DT_FLOAT  , (void *) &(config.min_run_zone_temp),     "80.00"},
   { "do_automatic_runs"               , NAATOS_KV_DT_BOOLS  , (void *) &(config.do_automatic_runs),     "false"},
 
-  { "optical_distace"                 , NAATOS_KV_DT_UINT16 , (void *) &(config.optical_distance),      "800"},
+  { "optical_distance"                , NAATOS_KV_DT_UINT16 , (void *) &(config.optical_distance),      "800"},
   { "max_amp_pid_pwm"                 , NAATOS_KV_DT_FLOAT  , (void *) &(config.max_amp_pid_pwm),       "100"},
   { "max_valve_pid_pwm"               , NAATOS_KV_DT_FLOAT  , (void *) &(config.max_valve_pid_pwm),     "100"},
   { "valve_max_temp"                  , NAATOS_KV_DT_FLOAT  , (void *) &(config.valve_max_temp),        "130.0"},

@@ -616,84 +616,101 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
     // CFGGET,
     } else if(strncmp(strmsg,"CFGGET",6) == 0) {
       send_debug_log_message("COMRXTASK: PARSE --> CFGGET command handler");
+      vTaskDelay(pdMS_TO_TICKS(50));
+
+      // we will be directly writing to COM in this command, since
+      // we have to dump a lot of lines back to the UART
+      // and the message/queue-based logger syste is just a bit too slow for us
+
       // main global config
-      send_debug_log_message("---Config Dump: Global---");
-   #ifdef SAMPLE_PREP_BOARD
-      snprintf(tmp,tmpsz,"sample_valid_timeout_s:%f heater_max_temp:%f",
-        config.sample_valid_timeout_s,config.heater_max_temp
-      );
-      send_debug_log_message(tmp);
-      snprintf(tmp,tmpsz,"motor cwccw:%d stall maxpwm:%f spdpct:%d,%d",
-        config.switch_motor_ccw_cw,
-        config.motor_stall_pwm,
-        config.motor_stall_en,config.motor_stall_percent
-      );
-      send_debug_log_message(tmp);
-   #endif
-   #ifdef POWER_MODULE_BOARD
-      snprintf(tmp,tmpsz,"sample_valid_timeout_s:%f valve_max_temp:%f amp_max_temp:%f",
-        config.sample_valid_timeout_s,config.valve_max_temp,config.amp_max_temp
-      );
-      send_debug_log_message(tmp);
-      snprintf(tmp,tmpsz,"optical_distance:%f",
-        config.optical_distance
-      );
-      send_debug_log_message(tmp);
-   #endif
+      //send_debug_log_message("---Config Dump: Global---");
+      snprintf(tmp,tmpsz,"---Config Dump: Global---\r\n");
+      write_to_com(tmp,strlen(tmp));
+      // Iterate through the key-value table and write everything to file
+      for(uint8_t i = 0; i<KV_TABLE_GLOBAL_SIZE; i++) {
+        const naatos_kv_table_entry_t * item = &(KV_TABLE_GLOBAL_PTR[i]);
+
+        switch(item->dtype) {
+          case NAATOS_KV_DT_FLOAT:
+            snprintf(tmp,tmpsz,"%s:%g\r\n",item->name,*((float*) item->dataptr)); break;
+          case NAATOS_KV_DT_INT:
+            snprintf(tmp,tmpsz,"%s:%d\r\n",item->name,*((int*) item->dataptr)); break;
+          case NAATOS_KV_DT_UINT16:
+            snprintf(tmp,tmpsz,"%s:%d\r\n",item->name,*((uint16_t*) item->dataptr)); break;
+          case NAATOS_KV_DT_BOOLS:
+            if(*((bool*) item->dataptr))
+              snprintf(tmp,tmpsz,"%s:true\r\n",item->name);
+            else
+              snprintf(tmp,tmpsz,"%s:false\r\n",item->name);
+            break;
+          default:
+            snprintf(tmp,tmpsz,"%s:<unknown / not implemented>\n",item->name);
+            break;
+        };
+        //send_debug_log_message(tmp);
+        write_to_com(tmp,strlen(tmp));  // write directly to COM, the debug log interface is a bit slow for so many lines and queue-based
+      }
 
 
       // cycle config
       for(uint8_t i=0; i<total_cycles; i++) {
-        snprintf(tmp,tmpsz,"---Config Dump: Cycle %d/%d---",
+        snprintf(tmp,tmpsz,"---Config Dump: Cycle %d/%d---\r\n",
           i+1,total_cycles
         );
-        send_debug_log_message(tmp);
+        //send_debug_log_message(tmp);
+        write_to_com(tmp,strlen(tmp));
   #ifdef SAMPLE_PREP_BOARD
-        snprintf(tmp,tmpsz,"time_s:%.1f temp_ramp:%d,%.1f",
+        snprintf(tmp,tmpsz,"time_s:%.1f temp_ramp:%d,%.1f\r\n",
           cycle_configs[i].cycle_run_time_s,cycle_configs[i].ramp_to_temp_before_start_cycle,cycle_configs[i].ramp_to_temp_timeout
         );
-        send_debug_log_message(tmp);
+        //send_debug_log_message(tmp);
+        write_to_com(tmp,strlen(tmp));
         if(cycle_configs[i].run_heater) {
-          snprintf(tmp,tmpsz,"heater sp:%.1f kp:%.4f ki:%.4f kd:%.4f",
+          snprintf(tmp,tmpsz,"heater sp:%.1f kp:%.4f ki:%.4f kd:%.4f\r\n",
             cycle_configs[i].heater_setpoint,
             cycle_configs[i].heater_kp,
             cycle_configs[i].heater_ki,
             cycle_configs[i].heater_kd
           );
-          send_debug_log_message(tmp);
+          //send_debug_log_message(tmp);
+          write_to_com(tmp,strlen(tmp));
         }
         if(cycle_configs[i].run_motor) {
-          snprintf(tmp,tmpsz,"motor  sp:%d kp:%.4f ki:%.4f kd:%.4f",
+          snprintf(tmp,tmpsz,"motor  sp:%d kp:%.4f ki:%.4f kd:%.4f\r\n",
             cycle_configs[i].motor_setpoint,
             cycle_configs[i].motor_kp,
             cycle_configs[i].motor_ki,
             cycle_configs[i].motor_kd
           );
-          send_debug_log_message(tmp);
+          //send_debug_log_message(tmp);
+          write_to_com(tmp,strlen(tmp));
         }
   #endif
   #ifdef POWER_MODULE_BOARD
-        snprintf(tmp,tmpsz,"time_s:%.1f temp_ramp:%d,%.1f",
+        snprintf(tmp,tmpsz,"time_s:%.1f temp_ramp:%d,%.1f\r\n",
           cycle_configs[i].cycle_run_time_s,cycle_configs[i].ramp_to_temp_before_start_cycle,cycle_configs[i].ramp_to_temp_timeout
         );
-        send_debug_log_message(tmp);
+        //send_debug_log_message(tmp);
+        write_to_com(tmp,strlen(tmp));
         if(cycle_configs[i].run_amp) {
-          snprintf(tmp,tmpsz,"ampl. sp:%.1f kp:%.4f ki:%.4f kd:%.4f",
+          snprintf(tmp,tmpsz,"ampl. sp:%.1f kp:%.4f ki:%.4f kd:%.4f\r\n",
             cycle_configs[i].amp_setpoint,
             cycle_configs[i].amp_kp,
             cycle_configs[i].amp_ki,
             cycle_configs[i].amp_kd
           );
-          send_debug_log_message(tmp);
+          //send_debug_log_message(tmp);
+          write_to_com(tmp,strlen(tmp));
         }
         if(cycle_configs[i].run_valve) {
-          snprintf(tmp,tmpsz,"valve sp:%.1f kp:%.4f ki:%.4f kd:%.4f",
+          snprintf(tmp,tmpsz,"valve sp:%.1f kp:%.4f ki:%.4f kd:%.4f\r\n",
             cycle_configs[i].valve_setpoint,
             cycle_configs[i].valve_kp,
             cycle_configs[i].valve_ki,
             cycle_configs[i].valve_kd
           );
-          send_debug_log_message(tmp);
+          //send_debug_log_message(tmp);
+          write_to_com(tmp,strlen(tmp));
         }
   #endif
 
