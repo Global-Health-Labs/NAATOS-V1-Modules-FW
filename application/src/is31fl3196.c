@@ -380,18 +380,23 @@ led_driver_errors_t led_driver_set_channel_animation_flashing(led_driver_led_sel
 
 led_driver_errors_t led_driver_set_channel_animation_breathing(led_driver_led_selection led_selection, led_color color, bool enable, led_driver_opDoneCallback_t cb) {
   led_driver_errors_t err_code;
-  // A = 0 for 260ms rise/fall time, B = 2, DT = 1
+  //// A = 0 for 260ms rise/fall time, B = 2, DT = 1
+  // T13 register
+  // 7   - DT (doubletime
+  // 6:4 - B value
+  // 3   - don't care
+  // 2:0 - A value
   uint8_t t13_update_addr = 0x1A + led_selection;
-  uint8_t t13_update_value = 0b00110010;
+  uint8_t t13_update_value = 0b00000001;
   uint8_t t13_write_buf[2] = {t13_update_addr, t13_update_value};
   err_code = led_driver_writeRegister(t13_write_buf, 1, write_reg, NULL);
   if (err_code != led_driver_success) {
     return err_code;
   }
 
-  // Extend off time for breathing
+  // T4 (offtime)
   uint8_t t4_update_addr = 0x1D + led_selection * 3 + color;
-  uint8_t t4_update_value = 0x04;
+  uint8_t t4_update_value = 0x00;
   uint8_t t4_write_buf[2] = {t4_update_addr, t4_update_value};
   err_code = led_driver_writeRegister(t4_write_buf, 1, write_reg, NULL);
   if (err_code != led_driver_success) {
