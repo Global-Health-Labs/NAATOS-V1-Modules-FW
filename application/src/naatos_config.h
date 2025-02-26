@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include "naatos_config_file.h"
 
-#define VERSION "3.2rc3"
+#define VERSION "3.2rc4"
 
 /*Define this when building sample prep only otherwise comment out*/
 //#define SAMPLE_PREP_BOARD
@@ -654,6 +654,7 @@ typedef struct {
   bool      debug_to_com_en;
   float     min_run_zone_temp;
   bool      min_run_zone_temp_en;
+  bool      do_automatic_runs;
 #ifndef SAMPLE_PREP_BOARD  
   uint16_t  sound_volume_complete;
   uint16_t  sound_volume_abort;
@@ -664,7 +665,6 @@ typedef struct {
   float     amp_max_temp;
   float     valve_max_temp;
 #else
-  bool      do_automatic_runs;
   float     heater_max_temp;
   float     max_heater_pid_pwm;
   bool      switch_motor_ccw_cw;

@@ -1157,16 +1157,6 @@ void main_task(void *pvParameters) {
         // Delay
         vTaskDelay(100);
       }
-      if(config.do_automatic_runs)  {
-        // automatically change to running-mode after a fixed time elapses (twice the sample_valid_timeout_s)
-        // this is for running back to back tests, should be same as pushing the button
-        // will run forever if cycle exited normally (cycle_exit_info == CYCLE_SAMPLE_INVALIDATED)
-        if ( (pdTICKS_TO_MS(xTaskGetTickCount() - end_time)>((uint32_t) (config.sample_valid_timeout_s*1.0*1000.0))) && (cycle_exit_info == CYCLE_SAMPLE_INVALIDATED) ) {
-          next_state = MAIN_RUNNING;
-          // Delay
-          vTaskDelay(100);
-        }
-      }
 #else
       // Check if we can go to RUN state
       // - should only occur from low to high transition on optical sensor so it doesn't start right away when powering on
@@ -1177,6 +1167,17 @@ void main_task(void *pvParameters) {
       }
       optical_triggered_last = optical_triggered;
 #endif
+      if(config.do_automatic_runs)  {
+        // automatically change to running-mode after a fixed time elapses (twice the sample_valid_timeout_s)
+        // this is for running back to back tests, should be same as pushing the button or transitioning the optical state
+        // will run forever if cycle exited normally (cycle_exit_info == CYCLE_SAMPLE_INVALIDATED)
+        if ( (pdTICKS_TO_MS(xTaskGetTickCount() - end_time)>((uint32_t) (config.sample_valid_timeout_s*1.0*1000.0))) && (cycle_exit_info == CYCLE_SAMPLE_INVALIDATED) ) {
+          next_state = MAIN_RUNNING;
+          // Delay
+          vTaskDelay(100);
+        }
+      }
+
       buttonData.event = NONE;
 
       main_wdt_time_left = pdTICKS_TO_MS(xTaskGetTickCount() - main_wdt_start_time);

@@ -17,8 +17,8 @@ naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
   { "debug_to_com_en"                 , NAATOS_KV_DT_BOOLS  , (void *) &(config.debug_to_com_en),       "true"},
   { "min_run_zone_temp_en"            , NAATOS_KV_DT_BOOLS  , (void *) &(config.min_run_zone_temp_en),  "false"},
   { "min_run_zone_temp"               , NAATOS_KV_DT_FLOAT  , (void *) &(config.min_run_zone_temp),     "80.00"},
-
   { "do_automatic_runs"               , NAATOS_KV_DT_BOOLS  , (void *) &(config.do_automatic_runs),     "false"},
+
   { "heater_max_temp"                 , NAATOS_KV_DT_FLOAT  , (void *) &(config.heater_max_temp),       "120.0"},
   { "max_heater_pid_pwm"              , NAATOS_KV_DT_FLOAT  , (void *) &(config.max_heater_pid_pwm),    "100"},
   { "switch_motor_ccw_cw"             , NAATOS_KV_DT_BOOLS  , (void *) &(config.switch_motor_ccw_cw),   "true"},
@@ -77,6 +77,7 @@ naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
   { "debug_to_com_en"                 , NAATOS_KV_DT_BOOLS  , (void *) &(config.debug_to_com_en),       "true"},
   { "min_run_zone_temp_en"            , NAATOS_KV_DT_BOOLS  , (void *) &(config.min_run_zone_temp_en),  "false"},
   { "min_run_zone_temp"               , NAATOS_KV_DT_FLOAT  , (void *) &(config.min_run_zone_temp),     "80.00"},
+  { "do_automatic_runs"               , NAATOS_KV_DT_BOOLS  , (void *) &(config.do_automatic_runs),     "false"},
 
   { "optical_distace"                 , NAATOS_KV_DT_UINT16 , (void *) &(config.optical_distance),      "800"},
   { "max_amp_pid_pwm"                 , NAATOS_KV_DT_FLOAT  , (void *) &(config.max_amp_pid_pwm),       "100"},
