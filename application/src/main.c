@@ -843,6 +843,7 @@ void main_task(void *pvParameters) {
   BaseType_t xReturned;
   uint8_t queue_size;
   sensor_switches_t switch_data = {.optical_tiggered = false};
+  sensor_switches_t switch_data_last;
   fuel_batt_info_t batt_info_recv;
   button_update_t buttonData = {.event = NONE};
   bool hal_triggered = false, optical_triggered = false;
@@ -960,6 +961,14 @@ void main_task(void *pvParameters) {
         updateLedState(LED_RUN_HEATER, false);
         updateLedState(LED_STANDBY, true);
         updateLedState(LED_COMPLETE, false);
+
+        //// show solid RED led if the last run exited with INVALID
+        //if(cycle_exit_info==CYCLE_SAMPLE_INVALIDATED) {
+        //  updateLedState(LED_INVALID, true);
+        //} else{
+        //  //updateLedState(LED_COMPLETE, false);
+        //  updateLedState(LED_INVALID, false);
+        //}
         sendWdtMain(true);
         start_time = xTaskGetTickCount();
         loggedLowPowerOnce = false;
@@ -1177,6 +1186,7 @@ void main_task(void *pvParameters) {
       }
 
       // Wait for Sensor Switch Data
+      switch_data_last = switch_data;
       xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
       if (xReturned != pdPASS) {
         send_debug_log_message("MAIN_TASK: Error receiving switch data from main_switchQueue");
@@ -1185,6 +1195,12 @@ void main_task(void *pvParameters) {
       // Update switches triggered
       hal_triggered = switch_data.hal_triggered;
       optical_triggered = switch_data.optical_tiggered;
+
+      // Ensure we clear sample invalidation when lid is opened or laminate is removed
+      if((!switch_data.hal_triggered && switch_data_last.hal_triggered) || (!switch_data.optical_tiggered && switch_data_last.optical_tiggered))  {
+        updateLedState(LED_INVALID,false);
+      }
+
 
 #ifdef SAMPLE_PREP_BOARD
       // Check if we can go to RUN state
@@ -1272,7 +1288,8 @@ void main_task(void *pvParameters) {
 
       break;
     }
-
+    
+    case MAIN_ALERT_YLW:
     case MAIN_ALERT: {
       if (last_state != main_state) {
         updateLedState(LED_WAKEUP, true);
@@ -1836,7 +1853,7 @@ void create_queues() {
     send_debug_log_message("Unable to create ledRxQueue queue");
   }
 
-  main_setPointReached = xQueueCreate(QUEUE_SIZE, sizeof(bool));
+  main_setPointReached = xQueueCreate(1, sizeof(bool));
   if (main_setPointReached == NULL) {
     send_debug_log_message("Unable to create main_setPointReached queue");
   }

@@ -9,11 +9,15 @@ cycle_state_exit_t exitInfo = CYCLE_COMPLETE;
 char exitString[256] = {};
 
 sensor_switches_t switch_data = {.optical_tiggered = false, .hal_triggered = false};
+sensor_switches_t last_switch_data;
 button_update_t buttonData = {.event = NONE};
 
 uint32_t start_time = 0;
 uint32_t end_time = 0;
 uint32_t time_left = 0;
+float time_s_in_cycle_elapsed = 0;
+bool setReachedRx = false;
+
 fuel_batt_info_t batt_info_recv =  {
   .batt_percent = 0,
   .batt_voltage = 0,
@@ -43,7 +47,7 @@ cycle_state_t handleBatteryMessage() {
 
   if (xQueueReceive(main_batteryDataQueue, &batt_info_recv, pdMS_TO_TICKS(0)) == pdPASS) {
     if(batt_info_recv.batt_temp >= 59.0) {
-      return RUN_ERROR_OR_FINISHED;
+      return EXIT_CYCLE;
     }
   }
   return current_state;
@@ -78,7 +82,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       // Check for Battery Data in Battery Queue
       if (xQueueReceive(main_batteryDataQueue, &batt_info_recv, pdMS_TO_TICKS(1000)) == pdPASS) {
         if (batt_recovering) {
-          updateLedState(LED_DECLINE, true);
+          //updateLedState(LED_ABORT_YELLOW, true);
           exitInfo = CYCLE_ERROR_POWER_LOW;
           runThrough = true;
           next_state = RUN_ERROR_OR_FINISHED;
@@ -86,7 +90,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         }
 
         if(batt_info_recv.batt_temp >= 59.0) {
-          updateLedState(LED_DECLINE, true);
+          //updateLedState(LED_ABORT_YELLOW, true);
           exitInfo = CYCLE_ERROR_OVER_TEMP_BATTERY;
           runThrough = true;
           next_state = RUN_ERROR_OR_FINISHED;
@@ -97,8 +101,8 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       // Get Switch data
       xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
       if (limitSwitchFreed(switch_data)) {
-        end_cycle((cycle_t)(current_cycle_index + 1), true);
-        updateLedState(LED_ABORT, true);
+        //end_cycle((cycle_t)(current_cycle_index + 1), true);
+        //updateLedState(LED_ABORT_YELLOW, true);
         exitInfo = CYCLE_ERROR_SENSOR_BREAK;
         runThrough = true;
         next_state = RUN_ERROR_OR_FINISHED;
@@ -116,6 +120,16 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         }
       }
 
+      // Reset SETPOint reacheD QUEUE
+      if(uxQueueMessagesWaiting(main_setPointReached) > 0)  {
+        sprintf(exitString,"CYCLE_FSM: Startup state, main_setPointReached has %d waiting messages. Consume them now.",uxQueueMessagesWaiting(main_setPointReached));
+        send_debug_log_message(exitString);
+        while(xQueueReceive(main_setPointReached, &main_err_msg, 0) == pdPASS) {
+          // consume all remaining items
+          //send_debug_log_message("CYCLE_FSM: consumed a message from main_runErrorQueue and discarded");
+        }
+      }
+
 
       next_state = START_CYCLE;
       break;
@@ -126,160 +140,114 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (!begin_cycle((cycle_t)(current_cycle_index + 1))) {
         send_debug_log_message("MAIN_TASK: Unable to begin sample run, temperatures have not yet stabalized.\r\n");
 
-        // Stop cycle one
-        end_cycle((cycle_t)(current_cycle_index + 1), true);
-        next_state = MAIN_STANDBY;
-        // Set error during run and wait alert timeout
-        updateLedState(LED_DECLINE, true);
+        // TODO: We'll probably rework this. Cycle refused to start (NOTE: This seems to be legacy, checking if temperature too high, etc) Move out i think
+
         exitInfo = CYCLE_ERROR_START_TEMP_TOO_HIGH;
         runThrough = true;
         next_state = RUN_ERROR_OR_FINISHED;
         break;
       }
 
-#ifdef SAMPLE_PREP_BOARD
-      // Set LEDs
-      if (cycle_configs[current_cycle_index].run_heater) {
-        updateLedState(LED_RUN_HEATER, true);
-        updateLedState(LED_RUN_MOTOR, false);
-      }
-      if (cycle_configs[current_cycle_index].run_motor) {
-        updateLedState(LED_RUN_MOTOR, true);
-        updateLedState(LED_RUN_HEATER, false);
-      }
-
-      if (cycle_configs[current_cycle_index].ramp_to_temp_before_start_cycle && cycle_configs[current_cycle_index].run_heater) {
-        start_time = xTaskGetTickCount();
-        end_time = (cycle_configs[current_cycle_index].ramp_to_temp_timeout) * configTICK_RATE_HZ;
-        next_state = CYCLE_RAMP_TO_TEMP;
-      } else {
-        next_state = CYCLE_TIMER;
-      }
-#else
       updateLedState(LED_RUN_HEATER, true);
 
-      if (cycle_configs[current_cycle_index].ramp_to_temp_before_start_cycle && (cycle_configs[current_cycle_index].run_amp || cycle_configs[current_cycle_index].run_valve)) {
-        start_time = xTaskGetTickCount();
-        end_time = (cycle_configs[current_cycle_index].ramp_to_temp_timeout) * configTICK_RATE_HZ;
-        next_state = CYCLE_RAMP_TO_TEMP;
-      } else {
-        next_state = CYCLE_TIMER;
-      }
-#endif
-      break;
-    }
+      next_state = CYCLE_IS_RUNNING;
 
-    case CYCLE_RAMP_TO_TEMP: {
-      // Ramp to the required temperature for cycle 1
-      time_left = xTaskGetTickCount() - start_time;
-
-      bool setReachedRx = false;
-      xReturned = xQueueReceive(main_setPointReached, &setReachedRx, 0);
-      if (xReturned != pdPASS) {
-        setReachedRx = false;
-      }
-
-      next_state = handleBatteryMessage();
-      if(next_state == RUN_ERROR_OR_FINISHED){
-        end_cycle((cycle_t)(current_cycle_index + 1), true);
-        updateLedState(LED_ABORT, true);
-        exitInfo = CYCLE_ERROR_OVER_TEMP_BATTERY;
-        runThrough = true;
-        break;
-      }
-
-      if (setReachedRx) {
-        xReturned = xQueueSend(logger_logMessageQueue, &ramp_to_temp_complete_log_msg, 0);
-        if (xReturned != pdPASS) {
-          send_debug_log_message("MAIN_TASK: Unable to send ramp_to_temp_complete_log_msg interruption event to logging task.");
-        }
-        next_state = CYCLE_TIMER;
-        break;
-      } else if (time_left >= end_time) {
-        end_cycle((cycle_t)(current_cycle_index + 1), true);
-        exitInfo = CYCLE_ERROR_TIMEOUT_DURING_RAMP;
-        runThrough = true;
-        next_state = RUN_ERROR_OR_FINISHED;
-        break;
-      } else if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
-        end_cycle((cycle_t)(current_cycle_index + 1), true);
-        next_state = handleMainErrorMessage();
-        break;
-      }
-
-      // Get Switch Data
-      xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
-      if (limitSwitchFreed(switch_data)) {
-        end_cycle((cycle_t)(current_cycle_index + 1), true);
-        updateLedState(LED_ABORT, true);
-        exitInfo = CYCLE_ERROR_SENSOR_BREAK;
-        runThrough = true;
-        next_state = RUN_ERROR_OR_FINISHED;
-        break;
-      }
-      // Get Button Data
-      buttonData.event = NONE;
-      xQueueReceive(button_mainStateQueue, &buttonData, 0);
-      if (buttonData.event == ON_EVENT) {
-        end_cycle((cycle_t)(current_cycle_index + 1), true);
-        updateLedState(LED_ABORT, true);
-        exitInfo = CYCLE_ERROR_BUTTON_EXIT;
-        runThrough = true;
-        next_state = RUN_ERROR_OR_FINISHED;
-        break;
-      }
+      setReachedRx = false;
+      time_s_in_cycle_elapsed = 0;
 
       break;
     }
 
-    case CYCLE_TIMER: {
+    case CYCLE_IS_RUNNING: {
+      // Initial entry into this state
       if (last_state != current_state) {
         start_time = xTaskGetTickCount();
-        end_time = (cycle_configs[current_cycle_index].cycle_run_time_s) * configTICK_RATE_HZ;
+
       }
 
+      // Time left on the timer (float in seconds)
+      time_s_in_cycle_elapsed = (xTaskGetTickCount() - start_time)/configTICK_RATE_HZ;
+      //time_left = xTaskGetTickCount() - start_time;
+      
+      // Get Battery Data
       next_state = handleBatteryMessage();
       if(next_state == RUN_ERROR_OR_FINISHED){
-        end_cycle((cycle_t)(current_cycle_index + 1), true);
-        updateLedState(LED_ABORT, true);
         exitInfo = CYCLE_ERROR_OVER_TEMP_BATTERY;
         runThrough = true;
-        break;
-      }
-
-      time_left = xTaskGetTickCount() - start_time;
-
-      if (time_left >= end_time) {
-        next_state = CYCLE_COMPLETE_DELAY;
-        end_cycle((cycle_t)(current_cycle_index + 1), false);
-        break;
-      }
-
-      if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
-        end_cycle((cycle_t)(current_cycle_index + 1), true);
-        next_state = handleMainErrorMessage();
         break;
       }
 
       // Get Switch Data
       xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
       if (limitSwitchFreed(switch_data)) {
-        end_cycle((cycle_t)(current_cycle_index + 1), true);
-        updateLedState(LED_ABORT, true);
         exitInfo = CYCLE_ERROR_SENSOR_BREAK;
         runThrough = true;
-        next_state = RUN_ERROR_OR_FINISHED;
+        next_state = EXIT_CYCLE;
         break;
       }
+
       // Get Button Data
       buttonData.event = NONE;
       xQueueReceive(button_mainStateQueue, &buttonData, 0);
       if (buttonData.event == ON_EVENT ) {
-        end_cycle((cycle_t)(current_cycle_index + 1), true);
-        updateLedState(LED_ABORT, true);
         exitInfo = CYCLE_ERROR_BUTTON_EXIT;
         runThrough = true;
-        next_state = RUN_ERROR_OR_FINISHED;
+        next_state = EXIT_CYCLE;
+        break;
+      }
+
+      // Are there any other errors from within the run ?
+      if (uxQueueMessagesWaiting(main_runErrorQueue) > 0) {
+        next_state = handleMainErrorMessage();
+        // should result in EXIT_CYCLE
+        break;
+      }
+
+      // Check if we have met temperature requirement for this cycle (exceeded the ramp to temp number)
+      if( cycle_configs[current_cycle_index].ramp_to_temp_timeout > 0 ) {
+        if(!setReachedRx) {
+          xReturned = xQueueReceive(main_setPointReached, &setReachedRx, 0);
+          if (xReturned != pdPASS) {
+            setReachedRx = false;
+          }
+        }
+        
+        #if 0
+        if(setReachedRx)
+          send_debug_log_message("cycle_fsm: setReachedRx=TRUE");
+        else
+          send_debug_log_message("cycle_fsm: setReachedRx=FALSE");
+        #endif
+
+        // Did we not reach the temperature in the specified amount of time?? Error-out if so...
+        if(!setReachedRx && (time_s_in_cycle_elapsed > cycle_configs[current_cycle_index].ramp_to_temp_timeout))  {
+          exitInfo = CYCLE_ERROR_TIMEOUT_DURING_RAMP;
+          runThrough = true;
+          next_state = EXIT_CYCLE;
+          break;
+        }
+      }
+
+      // Do we want to have ramped to temp before the specified cycle-time starts?
+      if( cycle_configs[current_cycle_index].ramp_to_temp_before_start_cycle && (cycle_configs[current_cycle_index].ramp_to_temp_timeout > 0) )  {
+
+          if (setReachedRx) {
+            // we have just reached (exceeded) the setpoint
+            xReturned = xQueueSend(logger_logMessageQueue, &ramp_to_temp_complete_log_msg, 0);
+            if (xReturned != pdPASS) {
+              send_debug_log_message("MAIN_TASK: Unable to send ramp_to_temp_complete_log_msg interruption event to logging task.");
+            }
+          }
+
+          // change the start-time to right-now, so cycle timer will measure from this point
+          start_time = xTaskGetTickCount();
+
+      }
+
+      // Check if cycle has completed normally
+      if ( time_s_in_cycle_elapsed >= cycle_configs[current_cycle_index].cycle_run_time_s ) {
+        next_state = CYCLE_COMPLETE_DELAY;
+        //end_cycle((cycle_t)(current_cycle_index + 1), false);
         break;
       }
 
@@ -294,9 +262,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       next_state = handleBatteryMessage();
       if(next_state == RUN_ERROR_OR_FINISHED){
-        updateLedState(LED_ABORT, true);
         exitInfo = CYCLE_ERROR_OVER_TEMP_BATTERY;
         runThrough = true;
+        next_state = EXIT_CYCLE;
         break;
       }
 
@@ -309,20 +277,18 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       // Get Switch data
       xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
       if (limitSwitchFreed(switch_data)) {
-        updateLedState(LED_ABORT, true);
         exitInfo = CYCLE_ERROR_SENSOR_BREAK;
         runThrough = true;
-        next_state = RUN_ERROR_OR_FINISHED;
+        next_state = EXIT_CYCLE;
         break;
       }
       // Get Button Data
       buttonData.event = NONE;
       xQueueReceive(button_mainStateQueue, &buttonData, 0);
       if (buttonData.event == ON_EVENT /*|| buttonData.even == OFF_EVENT*/) {
-        updateLedState(LED_ABORT, true);
         exitInfo = CYCLE_ERROR_BUTTON_EXIT;
         runThrough = true;
-        next_state = RUN_ERROR_OR_FINISHED;
+        next_state = EXIT_CYCLE;
         break;
       }
 
@@ -330,15 +296,34 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     }
 
     case EXIT_CYCLE: {
-      /* Confirm motor is turned off might not be if we exit early due to end cycle not calling this for cycle 2 */
+      // First-entry
       if (last_state != current_state) {
-        // Check to see if there are more cycles to be completed 
-        if ((current_cycle_index + 1) == total_cycles){
-          next_state = CYCLE_SAMPLE_VALID_HOLD;
-        } else {
-          current_cycle_index++;  // Increase the current cycle index to get the next cycle information
-          next_state = START_CYCLE;
-        } 
+
+        // CHECK IF AN ERROR OCCURRED
+        if(exitInfo!=CYCLE_RUNNING) {
+          
+          // CYCLE IS ENDING BECAUSE AN ERROR OCCURRED
+          end_cycle((cycle_t)(current_cycle_index + 1), true);
+          runThrough = true;
+                    
+          next_state = RUN_ERROR_OR_FINISHED;
+
+        } else{
+          // CYCLE IS ENDING NORMALLY
+          end_cycle((cycle_t)(current_cycle_index + 1), false);
+
+          // Check to see if there are more cycles to be completed 
+          if ((current_cycle_index + 1) == total_cycles){
+            
+            // we are really all finished, no more cycles
+            next_state = CYCLE_SAMPLE_VALID_HOLD;
+          } else {
+            current_cycle_index++;  // Increase the current cycle index to get the next cycle information
+            next_state = START_CYCLE;
+          }
+        }
+        
+
       }
       break;
     }
@@ -387,6 +372,24 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
     case RUN_ERROR_OR_FINISHED: {
       runThrough = false;
+
+      // Update LED's
+      if(exitInfo != CYCLE_COMPLETE)  {
+        // exited due to an error
+        if(
+          (time_s_in_cycle_elapsed < cycle_configs[current_cycle_index].double_yellow_grace_period_s)
+            && (cycle_configs[current_cycle_index].double_yellow_grace_period_s>0.0)
+        ) {
+          // within graceperiod, flash YELLOW (sample okay)
+          updateLedState(LED_ABORT_YELLOW, true);
+          updateLedState(LED_INVALID, false);
+        } else  {
+          // outside graceperiod, flash RED (sample invalidated)
+          updateLedState(LED_ABORT, true);
+          updateLedState(LED_INVALID, true);
+        }
+      }
+
       // Perform exit operations
       // Cleanup or final actions
       current_cycle_index = 0;
@@ -410,6 +413,7 @@ void handle_exit_notifications(void) {
 
   switch (exitInfo) {
   case CYCLE_COMPLETE:
+    updateLedState(LED_INVALID, false);
     break;
   case CYCLE_ERROR_POWER_LOW:
     sprintf(exitString, "%s%d", RECOVERY_BATT, batt_info_recv.batt_percent);
@@ -560,7 +564,10 @@ void end_cycle(cycle_t cycle, bool end_from_error) {
   log_event_t cycle_stop_event = {
     .event = SAMPLE_CYCLE_ENDED,
     .message = NULL};
-  sprintf(cycle_stop_event.message, "Cycle %d Stopped. I2CERRCOUNT=%u", (uint16_t)cycle, GLOBAL_I2C_RECOVERY_COUNTER);
+  if(!end_from_error)
+    sprintf(cycle_stop_event.message, "Cycle %d Stopped. I2CERRCOUNT=%u", (uint16_t)cycle, GLOBAL_I2C_RECOVERY_COUNTER);
+  else
+    sprintf(cycle_stop_event.message, "Cycle %d Stopped early. I2CERRCOUNT=%u", (uint16_t)cycle, GLOBAL_I2C_RECOVERY_COUNTER);
   log_data_message_t cycle_stop_log_msg = {
     .data_type = EVENT_DATA,
     .temperature_data = NULL,
@@ -599,5 +606,5 @@ cycle_state_t handleMainErrorMessage() {
     }
 
     runThrough = true;
-    return RUN_ERROR_OR_FINISHED;
+    return EXIT_CYCLE;
 }

@@ -679,6 +679,14 @@ FRESULT check_for_cycle_config_files(void) {
   res = f_open(&file, SECOND_CYCLE_CONFIG_FILE, FA_CREATE_ALWAYS | FA_WRITE);
   res = f_write(&file, pm_default_cycle_config_2, pm_default_cycle_config_2_size, &b_written);
   res = f_close(&file);
+
+  res = f_open(&file, THIRD_CYCLE_CONFIG_FILE, FA_CREATE_ALWAYS | FA_WRITE);
+  res = f_write(&file, pm_default_cycle_config_3, pm_default_cycle_config_3_size, &b_written);
+  res = f_close(&file);
+
+  res = f_open(&file, FOURTH_CYCLE_CONFIG_FILE, FA_CREATE_ALWAYS | FA_WRITE);
+  res = f_write(&file, pm_default_cycle_config_4, pm_default_cycle_config_4_size, &b_written);
+  res = f_close(&file);
 #endif
   
 }

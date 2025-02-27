@@ -57,7 +57,7 @@ void handle_sample_cycle_stopstart_heater(bool heating) {
   }
 
   // Check if we want to Ramp To Temperature
-  if (s_cycle_config->ramp_to_temp_before_start_cycle) {
+  if (s_cycle_config->ramp_to_temp_timeout) {
     s_rampToTemp = true;
   }
   

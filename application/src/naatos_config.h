@@ -239,7 +239,8 @@ typedef enum {
   MAIN_FILE,
   MAIN_SLEEP,
   MAIN_BOOTLOADER,
-  MAIN_ALERT
+  MAIN_ALERT,
+  MAIN_ALERT_YLW,
 } main_state_t;
 
 typedef enum {
@@ -579,6 +580,7 @@ typedef enum {
   LED_RUN_MOTOR,
   LED_DECLINE,
   LED_ABORT,
+  LED_ABORT_YELLOW,
   LED_COMPLETE,
   LED_INVALID,
   LED_LOW_BATTERY,
@@ -684,6 +686,7 @@ typedef struct {
   uint16_t  cycle_delay_time;
   bool      ramp_to_temp_before_start_cycle;
   float     ramp_to_temp_timeout;
+  float     double_yellow_grace_period_s;
 #ifndef SAMPLE_PREP_BOARD
   float     amp_setpoint;
   float     valve_setpoint;

@@ -27,8 +27,9 @@ typedef struct {
   bool runConditionMotor;
   bool testDecline;
   bool testAbort;
+  bool testAbortYellow;
   bool testComplete;
-  bool testInvalid;
+  bool testInvalid;     // action LED is supposed to stay RED if error occurs, after alert period, until door opened/optical broken
   bool lowBattey;
   bool usbMscStarting;
 } LEDFlags_t;
