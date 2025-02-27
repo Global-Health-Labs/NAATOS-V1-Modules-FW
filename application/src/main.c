@@ -551,6 +551,18 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
 
       calendar_reset();
 
+    // ---
+    // REBOOT (argument: none)
+    // ---
+    // REBOOT,
+    // will do a Nordic software reset
+    } else if(strncmp(strmsg,"REBOOT",6) == 0) {
+      send_debug_log_message("COMRXTASK: PARSE --> REBOOT command handler");
+
+      send_debug_log_message("will reboot in 1 second");
+      vTaskDelay(pdMS_TO_TICKS(1000));
+      reset();
+
 
     /*
     // ---
