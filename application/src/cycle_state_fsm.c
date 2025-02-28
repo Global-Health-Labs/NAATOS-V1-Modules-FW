@@ -70,6 +70,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       }
 
       exitInfo = CYCLE_RUNNING;
+      time_s_in_cycle_elapsed = 0;
 
       vTaskDelay(pdMS_TO_TICKS(150));
 

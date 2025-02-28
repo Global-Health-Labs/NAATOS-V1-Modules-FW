@@ -41,7 +41,7 @@ void handle_power_cycle_stopstart_heater(bool amp_heating, bool valve_heating) {
   }
 
   // Check if we want to Ramp To Temperature
-  if (p_cycle_config->ramp_to_temp_timeout > 0.0) {
+  if ( (p_cycle_config->ramp_to_temp_timeout > 0.0) && (amp_heating||valve_heating)) {
     p_rampToTemp = true;
   }
   
@@ -150,7 +150,6 @@ void powerModuleHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
         send_debug_log_message("HEATER_TASK: Unable to send set point reached message.");
       }
       p_rampToTemp = false;
-      rampComplete = false;
     }
   }
 
