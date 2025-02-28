@@ -164,32 +164,6 @@ void samplePrepHandleHeaterSensorDataRx(temperature_data_t temperature_data) {
   temperature_pwm_data_t pwmData;
 
   local_temp_data = temperature_data;
-  // Ensure temperatures are below the minimum run zone temperature
-  if (config.min_run_zone_temp_en) {
-    if (starting_sample_prep_run && (temperature_data.heater_temp > config.min_run_zone_temp)) {
-      starting_sample_prep_run = false;
-      // Send cannot start
-      xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
-      if (xReturned != pdPASS) {
-        send_debug_log_message("HEATER_TASK: Unable to send cannot start run response.");
-      }
-      return;
-    } else if (starting_sample_prep_run && (temperature_data.heater_temp <= config.min_run_zone_temp)) {
-      // Send can start
-      xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
-      if (xReturned != pdPASS) {
-        send_debug_log_message("HEATER_TASK: Unable to send cannot start run response.");
-      }
-      starting_sample_prep_run = false;
-    }
-  } else if (!config.min_run_zone_temp_en && starting_sample_prep_run) {
-    // Send can start
-    xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
-    if (xReturned != pdPASS) {
-      send_debug_log_message("HEATER_TASK: Unable to send cannot start run response.");
-    }
-    starting_sample_prep_run = false;
-  }
 
   // Update PID and PWM
   if (heater_running) {
@@ -369,18 +343,27 @@ void samplePrepHandleZoneStateUpdate(HeaterRxQueueMsg_t heaterRxMessage) {
         pid_controller_update(&motor_pid , s_cycle_config->motor_setpoint, s_cycle_config->motor_kp, s_cycle_config->motor_ki, s_cycle_config->motor_kd);
       }
     }
+    
     // Reset Control Vars
     motorReachedSpeed = false;
     starting_sample_prep_run = true;
     counter = 0;  // for debug message output only
+    
     // Set running based on new config
     heater_running = s_cycle_config->run_heater;
     motor_running = s_cycle_config->run_motor;
+    
     // Send start heater and motor
     handle_sample_cycle_stopstart_heater(heater_running);
     bool prev_cycle_running_motor = (&cycle_configs[curr_cycle_config_index-1])->run_motor;
     if (curr_cycle_config_index == 0 || !prev_cycle_running_motor)
       handle_cycle_stopstart_motor(motor_running);
+    
+    // Send can start back to cycle_fsm (which is waiting on us)
+    xReturned = xQueueSend(main_runRespQueue, &starting_sample_prep_run, 0);
+    if (xReturned != pdPASS) {
+      send_debug_log_message("HEATER_TASK: Unable to send can start run response.");
+    }
   }
   #endif
 }
