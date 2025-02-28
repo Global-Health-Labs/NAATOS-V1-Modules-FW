@@ -44,11 +44,17 @@ xQueueHandle sensorRxQueue;
 TimerHandle_t sensorTempTimer;
 TickType_t sampleRateTicks;
 
+bool oneshot_temperature_acquisition = false;
 bool heaterRunning = false;
 bool s_motorRunning = false;
 bool usb_suspend = false;
 uint32_t sample_log_index = 0;
 uint32_t sample_log_max = 0;
+
+sensor_public_data_t PUBLIC_SENSOR_DATA = {
+  .temperatures = &temperatures,
+  .oneshot_temperature_acquisition = &oneshot_temperature_acquisition
+};
 
 static log_data_message_t log_msg = {
     .data_type = TEMPERATURE_DATA,
@@ -160,6 +166,8 @@ void sensors_task(void *pvParameters) {
             .heaterRunning = heaterRunning
             };
 
+        //send_debug_log_message("Sensor: handle SENSOR_MSG_HEATER_STATE");
+
         // Respond to heater change
         xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
         if (xReturned != pdPASS) {
@@ -174,6 +182,9 @@ void sensors_task(void *pvParameters) {
         break;
       }
 #endif
+      case SENSOR_MSG_COLLECTION_LOOP_ONESHOT_TEMPERATURES:
+        oneshot_temperature_acquisition = true;
+        break;
 
       case SENSOR_MSG_USB_SUSPEND: {
         // Send Suspend Accepted
@@ -203,6 +214,7 @@ void sensors_task(void *pvParameters) {
 #endif
         break;
       }
+
       case SENSOR_MSG_SLEEP: {
         handleSensorSleep();
         //send to main queue that we are asleep
@@ -277,11 +289,13 @@ void runPowerModuleSensorCollection(void) {
   if (xReturned != pdPASS) {
     send_debug_log_message("SENSORS_TASK: Unable to send switch data in main_switchQueue.\r\n");
   }
+
   // Send temperature data to Log Data queue
-  if (heaterRunning) {
+  if (heaterRunning || oneshot_temperature_acquisition) {
     bool readTempSuccess = false;
     bool dis = true;
     heaterMsg.readTempFailed = false;
+
     // I2C Read for Heater Zone 0
     dis = disable_valve_boost();
     while (!dis) { // Reset the Valve Boost
@@ -310,15 +324,19 @@ void runPowerModuleSensorCollection(void) {
       heaterMsg.readTempFailed = true;
     }
 
-    // Send Temperatures to heater
-    heaterMsg.type = HEATER_MSG_TEMPERATURE_DATA;
-    heaterMsg.tempData = temperatures;
-    xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
-    if (xReturned != pdPASS) {
-      char errorString[100];
-      sprintf(errorString, "SENSORS_TASK: Unable to send temperature data in heaterRxQueue. Error: %d\r\n", xReturned);
-      send_debug_log_message(errorString);
+    if(heaterRunning) {
+      // Send Temperatures to heater
+      heaterMsg.type = HEATER_MSG_TEMPERATURE_DATA;
+      heaterMsg.tempData = temperatures;
+      xReturned = xQueueSend(heaterRxQueue, &heaterMsg, 0);
+      if (xReturned != pdPASS) {
+        char errorString[100];
+        sprintf(errorString, "SENSORS_TASK: Unable to send temperature data in heaterRxQueue. Error: %d\r\n", xReturned);
+        send_debug_log_message(errorString);
+      }
     }
+    //send_debug_log_message("SENSORS_TASK: read temperatures");
+    oneshot_temperature_acquisition = false;  // we did our 1-time temperature read, so set back to false
   }
 #endif
 }
@@ -412,6 +430,7 @@ void runSamplePrepSensorCollection(void) {
     }
   }
 #endif
+  oneshot_temperature_acquisition = false;  // we did our 1-time temperature read, so set back to false
 }
 
 bool readTemp(sensor_selection_t sensor, float *temperature) {

@@ -9,6 +9,8 @@
 
 //TODO add header comment for sensor.h
 
+extern sensor_public_data_t PUBLIC_SENSOR_DATA;
+
 // --------Common Functions--------
 void sensors_task(void *pvParameters);
 bool readTemp(sensor_selection_t sensor, float *temperature);

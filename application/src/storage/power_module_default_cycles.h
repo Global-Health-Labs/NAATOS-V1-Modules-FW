@@ -44,7 +44,7 @@ const char pm_default_cycle_config_3[] =
   "cycle_run_time_s:300.0\n"
   "cycle_delay_time_s:0\n"
   "ramp_to_temp_before_start_cycle:false\n"
-  "ramp_to_temp_timeout:0.0\n"
+  "ramp_to_temp_timeout:120.0\n"
   "double_yellow_grace_period_s:0.0\n"
   "amp_setpoint:75.00\n"
   "valve_setpoint:110.00\n"

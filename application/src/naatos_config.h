@@ -341,6 +341,12 @@ typedef struct {
 #endif
 } temperature_pwm_data_t;
 
+// Holds data pointers to static sensor data
+typedef struct {
+  const temperature_data_t* temperatures;
+  const bool* oneshot_temperature_acquisition;
+} sensor_public_data_t;
+
 typedef enum {
   USB_TO_FILE,
   USB_TO_COM
@@ -438,6 +444,7 @@ typedef enum {
 #ifdef SAMPLE_PREP_BOARD
   SENSOR_MSG_MOTOR_STATE,
 #endif
+  SENSOR_MSG_COLLECTION_LOOP_ONESHOT_TEMPERATURES,
   SENSOR_MSG_USB_SUSPEND,
   SENSOR_MSG_TIMER_TEMP_EVENT,
   SENSOR_MSG_TIMER_MOTOR_EVENT,

@@ -866,6 +866,7 @@ void main_task(void *pvParameters) {
   const BatteryRxQueueMsg_t batt_req = {
       .type = BATTERY_SOC_REQUEST,
       .sendTo = BATTERY_MSG_SOC_MAIN};
+  SensorRxQueueMsg_t sensormsg;
   BaseType_t xHigherPriorityTaskWoken = pdTRUE;
 
   // Read current GPREGRET2 values
@@ -908,7 +909,7 @@ void main_task(void *pvParameters) {
   main_state = MAIN_SLEEP;
   next_state = MAIN_STANDBY;
   last_state = MAIN_SLEEP;
-  int i = 0;
+  int counter_temperature_oneshot_request = 0;
 
   // Get the alert timeout
   alert_timeout_ticks = (uint32_t)(pdMS_TO_TICKS(config.alert_timeout_time_s * 1000.0));
@@ -930,11 +931,10 @@ void main_task(void *pvParameters) {
       if (last_state != main_state) {
         sendWdtHeaterInvalid(); // Invalidate the heater to stop WDT from watching it
 
-        SensorRxQueueMsg_t msg;
-        msg.type = SENSOR_MSG_WAKEUP;
-
+        
+        sensormsg.type = SENSOR_MSG_WAKEUP;
         // Send to Sensors task
-        xReturned = xQueueSend(sensorRxQueue, &msg, 0);
+        xReturned = xQueueSend(sensorRxQueue, &sensormsg, 0);
         if (xReturned != pdPASS) {
           send_debug_log_message("MAIN: Unable to send sensor wakeup to sensorRxQueue.");
         }
@@ -962,13 +962,6 @@ void main_task(void *pvParameters) {
         updateLedState(LED_STANDBY, true);
         updateLedState(LED_COMPLETE, false);
 
-        //// show solid RED led if the last run exited with INVALID
-        //if(cycle_exit_info==CYCLE_SAMPLE_INVALIDATED) {
-        //  updateLedState(LED_INVALID, true);
-        //} else{
-        //  //updateLedState(LED_COMPLETE, false);
-        //  updateLedState(LED_INVALID, false);
-        //}
         sendWdtMain(true);
         start_time = xTaskGetTickCount();
         loggedLowPowerOnce = false;
@@ -1034,6 +1027,8 @@ void main_task(void *pvParameters) {
           }
         #endif
         }
+
+
 
         // Set the variable LED from the battery percentage
         led_power_level_t l_powerLevel = getCurrentPowerLevel();
@@ -1108,6 +1103,18 @@ void main_task(void *pvParameters) {
              break;
         }
 #endif
+      }
+
+      // Every logging period, request the temperature from the sensors task
+      counter_temperature_oneshot_request++;
+      if( (counter_temperature_oneshot_request%((int) (config.logging_rate / config.sample_rate)))==0 )  {
+        sensormsg.type = SENSOR_MSG_COLLECTION_LOOP_ONESHOT_TEMPERATURES;
+        // Send to Sensors task
+        xReturned = xQueueSend(sensorRxQueue, &sensormsg, 0);
+        if (xReturned != pdPASS) {
+          send_debug_log_message("MAIN: Unable to request temperatures from sensorRxQueue.");
+        }
+        //send_debug_log_message("MAIN: Request temperatures from sensorRxQueue.");
       }
 
       /* **** HANDLE USB AND SWITCH **** */
@@ -1199,6 +1206,20 @@ void main_task(void *pvParameters) {
       // Ensure we clear sample invalidation when lid is opened or laminate is removed
       if((!switch_data.hal_triggered && switch_data_last.hal_triggered) || (!switch_data.optical_tiggered && switch_data_last.optical_tiggered))  {
         updateLedState(LED_INVALID,false);
+      }
+
+      // Get Temperatures
+      if((*(PUBLIC_SENSOR_DATA.oneshot_temperature_acquisition)==false) && (counter_temperature_oneshot_request>(config.logging_rate / config.sample_rate))) {
+        counter_temperature_oneshot_request = 0;
+        // our temperature data is ready
+        //send_debug_log_message("MAIN: Temperature sensor data is ready.");
+      #if defined(POWER_MODULE_BOARD)
+        sprintf(exitBatteryOvrTempString, "MAIN: Temperature sensor data is ready. Valve=%.2f Amp=%.2f", PUBLIC_SENSOR_DATA.temperatures->valve_temp,PUBLIC_SENSOR_DATA.temperatures->amp_temp);
+        send_debug_log_message(exitBatteryOvrTempString);
+      #elif defined(SAMPLE_PREP_BOARD)
+        sprintf(exitBatteryOvrTempString, "MAIN: Temperature sensor data is ready. Heater=%.2f", PUBLIC_SENSOR_DATA.temperatures->heater_temp);
+        send_debug_log_message(exitBatteryOvrTempString);
+      #endif
       }
 
 
