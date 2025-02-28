@@ -73,6 +73,7 @@ naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
   { "recovery_power_threshold"        , NAATOS_KV_DT_UINT16 , (void *) &(config.recovery_power_thresh), "47"},
   { "sound_volume_complete"           , NAATOS_KV_DT_UINT16 , (void *) &(config.sound_volume_complete), "50"},
   { "sound_volume_start"              , NAATOS_KV_DT_UINT16 , (void *) &(config.sound_volume_start),    "50"},
+  { "sound_volume_graceperiod"        , NAATOS_KV_DT_UINT16 , (void *) &(config.sound_volume_graceperiod),"50"},
   { "sound_volume_abort"              , NAATOS_KV_DT_UINT16 , (void *) &(config.sound_volume_abort),    "50"},
   { "sample_valid_timeout_s"          , NAATOS_KV_DT_FLOAT  , (void *) &(config.sample_valid_timeout_s),"3600.00"},
   { "alert_timeout_time_s"            , NAATOS_KV_DT_FLOAT  , (void *) &(config.alert_timeout_time_s),  "3.00"},

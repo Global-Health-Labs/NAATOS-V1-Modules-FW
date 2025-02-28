@@ -563,7 +563,9 @@ typedef enum {
   PWM_MSG_MOTOR_ENABLE,
   PWM_MSG_BUZZER_TONE_1SEC_1,
   PWM_MSG_BUZZER_TONE_1SEC_2,
-  PWM_MSG_BUZZER_TONE_200ms_1
+  PWM_MSG_BUZZER_TONE_500ms_1,
+  PWM_MSG_BUZZER_TONE_200ms_1,
+  PWM_MSG_BUZZER_SONG_mariointro
 } PWMRxQueueType_t;
 
 typedef struct {
@@ -660,6 +662,7 @@ typedef struct {
 #ifndef SAMPLE_PREP_BOARD  
   uint16_t  sound_volume_complete;
   uint16_t  sound_volume_abort;
+  uint16_t  sound_volume_graceperiod;
   uint16_t  sound_volume_start;
   uint16_t  optical_distance;
   float     max_amp_pid_pwm;

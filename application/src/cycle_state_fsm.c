@@ -338,7 +338,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       #ifdef POWER_MODULE_BOARD
         // PLAY SOUND
         PwmRxQueueMsg_t pwmmsg = {
-            .type = PWM_MSG_BUZZER_TONE_1SEC_1,
+            .type = PWM_MSG_BUZZER_SONG_mariointro,
             .buzzer_pwm_duty = config.sound_volume_complete
         };
         BaseType_t xReturned;
@@ -347,6 +347,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
           send_debug_log_message("CYCLEFSM: Unable to send buzzer message to pwmRxQueue.");
         }
       #endif
+        send_event_log_message(SAMPLE_UNKNOWN, "Exiting with DoubleGreenHold");
       }
      
       xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
@@ -384,10 +385,39 @@ cycle_state_exit_t run_cycle_state_machine(void) {
           // within graceperiod, flash YELLOW (sample okay)
           updateLedState(LED_ABORT_YELLOW, true);
           updateLedState(LED_INVALID, false);
+
+        #ifdef POWER_MODULE_BOARD
+          // PLAY SOUND (graceperiod sound)
+          PwmRxQueueMsg_t pwmmsg = {
+              .type = PWM_MSG_BUZZER_TONE_500ms_1,
+              .buzzer_pwm_duty = config.sound_volume_graceperiod
+          };
+          BaseType_t xReturned;
+          xReturned = xQueueSend(pwmRxQueue, &pwmmsg, 0);
+          if (xReturned != pdPASS) {
+            send_debug_log_message("CYCLEFSM: Unable to send buzzer message to pwmRxQueue.");
+          }
+        #endif
+        send_event_log_message(SAMPLE_UNKNOWN, "Exiting with DoubleYellow");
+
         } else  {
           // outside graceperiod, flash RED (sample invalidated)
           updateLedState(LED_ABORT, true);
           updateLedState(LED_INVALID, true);
+
+        #ifdef POWER_MODULE_BOARD
+          // PLAY SOUND (error sound)
+          PwmRxQueueMsg_t pwmmsg = {
+              .type = PWM_MSG_BUZZER_TONE_1SEC_2,
+              .buzzer_pwm_duty = config.sound_volume_abort
+          };
+          BaseType_t xReturned;
+          xReturned = xQueueSend(pwmRxQueue, &pwmmsg, 0);
+          if (xReturned != pdPASS) {
+            send_debug_log_message("CYCLEFSM: Unable to send buzzer message to pwmRxQueue.");
+          }
+        #endif
+        send_event_log_message(SAMPLE_UNKNOWN, "Exiting with DoubleRed and SampleInvalidated");
         }
       }
 
@@ -473,18 +503,6 @@ void handle_exit_notifications(void) {
   }
   if (exitInfo != CYCLE_COMPLETE) {
     send_event_log_message(eventType, exitString);
-  #ifdef POWER_MODULE_BOARD
-    // PLAY SOUND (error sound)
-    PwmRxQueueMsg_t pwmmsg = {
-        .type = PWM_MSG_BUZZER_TONE_1SEC_2,
-        .buzzer_pwm_duty = config.sound_volume_abort
-    };
-    BaseType_t xReturned;
-    xReturned = xQueueSend(pwmRxQueue, &pwmmsg, 0);
-    if (xReturned != pdPASS) {
-      send_debug_log_message("CYCLEFSM: Unable to send buzzer message to pwmRxQueue.");
-    }
-  #endif
   }
 }
 
