@@ -81,6 +81,7 @@ FRESULT reset_set_time_date(void);
 FRESULT create_log_file(const char *file_name);
 FRESULT write_log_line(const char *logName, const char *writeBuff, uint32_t writeBuffSize);
 FRESULT remount_goto_logs_dir(void);
+bool is_naatos_storage_okay(void);
 
 // Parse Helpers
 double parse_double(const char *str, double default_value);

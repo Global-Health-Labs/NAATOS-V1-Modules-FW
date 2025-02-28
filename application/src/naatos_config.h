@@ -654,7 +654,6 @@ extern xTaskHandle compositeTaskHandle;
 extern xTaskHandle buttonTaskHandle;
 
 // Config parameters
-
 typedef struct {
   float     sample_rate;
   float     logging_rate;
@@ -721,6 +720,36 @@ typedef struct {
   float     motor_kd;
 #endif
 } cycle_config_parameters;
+
+/* Bit Fields To Track Device Readyness */
+typedef union {
+  struct {
+    bool temperature_zones_in_range : 1;
+    bool battery_charge_level_acceptable : 1;
+    bool _unused2    : 1;
+    bool _unused3    : 1;
+
+    bool _unused4    : 1;
+    bool _unused5    : 1;
+    bool _unused6    : 1;
+    bool _unused7    : 1;
+  } bit;
+  uint8_t reg;
+} naatos_conditions_to_start_run_t;
+typedef union {
+  struct {
+    bool configs_loaded_and_validated : 1;
+    bool filesystem_deemed_okay : 1;
+    bool battery_has_stayed_cool : 1;
+    bool _unused3    : 1;
+
+    bool _unused4    : 1;
+    bool _unused5    : 1;
+    bool _unused6    : 1;
+    bool _unused7    : 1;
+  } bit;
+  uint8_t reg;
+} naatos_conditions_to_have_machine_start_t;
 
 /* General Purpose Retained Registers 2 */
 // we will use this in NAATOS application to track a few things

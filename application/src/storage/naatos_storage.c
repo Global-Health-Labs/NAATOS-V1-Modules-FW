@@ -799,3 +799,7 @@ int parse_int(const char *str, int default_value) {
 
   return value;
 }
+
+bool is_naatos_storage_okay() {
+  return naatos_storage_initalized;
+}

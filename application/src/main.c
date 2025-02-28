@@ -130,6 +130,11 @@ static main_state_t next_state = MAIN_STANDBY;
 static main_state_t last_state = MAIN_SLEEP;
 static naatos_gpregret2_t gpregret2;  // track the general purpose retained register 2 (1 is used for DFU entry)
 
+naatos_conditions_to_have_machine_start_t conditions_for_machine = {0};
+naatos_conditions_to_start_run_t conditions_for_run = {0};
+bool machine_last_okay;
+bool run_conditions_last_can_start;
+
 // Function defs
 void sendWdtHeaterInvalid();
 void sendWdtMain(bool valid);
@@ -218,6 +223,31 @@ void read_sd_and_notify_tasks(void) {
   if (xReturned != pdPASS) {
     send_debug_log_message("USB: Unable to send update config request to sensorRxQueue.");
   }
+}
+
+bool conditions_can_we_start_a_run(void)  {
+  //bool canStartRun = true;
+
+  //if(!conditions_for_run.bit.battery_charge_level_acceptable)
+  //  canStartRun = false;
+
+  //if(!conditions_for_run.bit.temperature_zones_in_range)
+  //  canStartRun = false;
+  
+  //return canStartRun;
+  return (conditions_for_run.reg == 0b11);
+};
+
+bool conditions_is_device_okay(void)  {
+  //bool deviceOkay = true;
+
+  //if(!conditions_for_machine.bit.filesystem_deemed_okay)
+  //  deviceOkay = false;
+  //if(!conditions_for_machine.bit.configs_loaded_and_validated)
+  //  deviceOkay = false;
+  
+  //return deviceOkay;
+  return (conditions_for_machine.reg == 0b111);
 }
 
 void set_startup_enables(void) {
@@ -987,7 +1017,7 @@ void main_task(void *pvParameters) {
             send_debug_log_message("MAIN_TASK: Unable to send log start\r\n");
           }
           sprintf(exitBatteryOvrTempString, "%s%0.02f", POWER_ON_STRING, batt_info_recv.batt_voltage);
-          send_event_log_message(SAMPLE_BATTERY_OVERTEMP, exitBatteryOvrTempString);
+          send_event_log_message(SAMPLE_UNKNOWN, exitBatteryOvrTempString);
 
           // reset reason
           uint32_t rstreason = nrf_power_resetreas_get();
@@ -1003,7 +1033,7 @@ void main_task(void *pvParameters) {
             (rstreason&POWER_RESETREAS_NFC_Msk)!=0,
             (rstreason&POWER_RESETREAS_VBUS_Msk)!=0
           );
-          send_event_log_message(SAMPLE_BATTERY_OVERTEMP, exitBatteryOvrTempString);
+          send_event_log_message(SAMPLE_UNKNOWN, exitBatteryOvrTempString);
           // must be cleared or it becomes "cumulative" weirdly, not truly reflecting this last bootup
           nrf_power_resetreas_clear((uint32_t) POWER_RESETREAS_RESETPIN_Msk|POWER_RESETREAS_DOG_Msk|POWER_RESETREAS_SREQ_Msk|POWER_RESETREAS_LOCKUP_Msk|POWER_RESETREAS_OFF_Msk|POWER_RESETREAS_LPCOMP_Msk|POWER_RESETREAS_DIF_Msk|POWER_RESETREAS_NFC_Msk|POWER_RESETREAS_VBUS_Msk);
 
@@ -1012,7 +1042,7 @@ void main_task(void *pvParameters) {
             gpregret2.reg
           );
           get_nordic_uniqueid_concat_to_a_string(exitBatteryOvrTempString);
-          send_event_log_message(SAMPLE_BATTERY_OVERTEMP, exitBatteryOvrTempString);
+          send_event_log_message(SAMPLE_UNKNOWN, exitBatteryOvrTempString);
 
         #ifdef POWER_MODULE_BOARD
           // PLAY STARTUP SOUND
@@ -1037,8 +1067,9 @@ void main_task(void *pvParameters) {
         float recovery_starting_voltage = MIN_BATTERY_VOLTAGE + ((MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE) * ((float)config.recovery_power_thresh / 100.0));
 
         if(batt_info_recv.batt_voltage<1.0) {
-          sprintf(exitBatteryOvrTempString, "main_task: battery voltage less than 1.0V (was %fV)", batt_info_recv.batt_voltage);
-          send_debug_log_message(exitBatteryOvrTempString);
+          sprintf(exitBatteryOvrTempString, "main_task ghl_debug: battery voltage measured at less than 1.0V (was %fV)", batt_info_recv.batt_voltage);
+          //send_debug_log_message(exitBatteryOvrTempString);
+          send_event_log_message(SAMPLE_BATTERY_LOW,exitBatteryOvrTempString);
         }
 
         if (l_powerLevel != led_pl_high && 
@@ -1083,6 +1114,7 @@ void main_task(void *pvParameters) {
           if (!usb_started)
             updateLedStatePowerLevel(LED_STANDBY, true, led_pl_low);
         }
+        conditions_for_run.bit.battery_charge_level_acceptable = !batt_recovering;
 
 
         if(batt_info_recv.batt_temp >= 59.0) {
@@ -1092,9 +1124,10 @@ void main_task(void *pvParameters) {
             if (xReturned != pdPASS) {
               send_debug_log_message("MAIN_TASK: Unable to send log start\r\n");
             }
-             sprintf(exitBatteryOvrTempString, "%s%f", SAMPLE_BATTERY_OVER_TEMP, batt_info_recv.batt_temp);
-             send_event_log_message(SAMPLE_BATTERY_OVERTEMP, exitBatteryOvrTempString);
+            sprintf(exitBatteryOvrTempString, "%s%f", SAMPLE_BATTERY_OVER_TEMP, batt_info_recv.batt_temp);
+            send_event_log_message(SAMPLE_BATTERY_OVERTEMP, exitBatteryOvrTempString);
           }
+          conditions_for_machine.bit.battery_has_stayed_cool = false;
         }
 
 #if ENABLE_LOW_POWER_MODE
@@ -1213,13 +1246,35 @@ void main_task(void *pvParameters) {
         counter_temperature_oneshot_request = 0;
         // our temperature data is ready
         //send_debug_log_message("MAIN: Temperature sensor data is ready.");
+        conditions_for_run.bit.temperature_zones_in_range = true;
       #if defined(POWER_MODULE_BOARD)
         sprintf(exitBatteryOvrTempString, "MAIN: Temperature sensor data is ready. Valve=%.2f Amp=%.2f", PUBLIC_SENSOR_DATA.temperatures->valve_temp,PUBLIC_SENSOR_DATA.temperatures->amp_temp);
         send_debug_log_message(exitBatteryOvrTempString);
+        if(config.min_run_zone_temp_en) {
+          conditions_for_run.bit.temperature_zones_in_range = (PUBLIC_SENSOR_DATA.temperatures->valve_temp < config.min_run_zone_temp)
+                                                           && (PUBLIC_SENSOR_DATA.temperatures->amp_temp < config.min_run_zone_temp);
+        }
+        conditions_for_run.bit.temperature_zones_in_range = conditions_for_run.bit.temperature_zones_in_range && (
+                                                            (PUBLIC_SENSOR_DATA.temperatures->valve_temp > 0.1)
+                                                         && (PUBLIC_SENSOR_DATA.temperatures->amp_temp > 0.1)
+                                                  );
+
       #elif defined(SAMPLE_PREP_BOARD)
         sprintf(exitBatteryOvrTempString, "MAIN: Temperature sensor data is ready. Heater=%.2f", PUBLIC_SENSOR_DATA.temperatures->heater_temp);
         send_debug_log_message(exitBatteryOvrTempString);
+        if(config.min_run_zone_temp_en) {
+          conditions_for_run.bit.temperature_zones_in_range = (PUBLIC_SENSOR_DATA.temperatures->valve_temp < config.min_run_zone_temp);
+        }
+        if(config.min_run_zone_temp_en) {
+          conditions_for_run.bit.temperature_zones_in_range = (PUBLIC_SENSOR_DATA.temperatures->heater_temp < config.min_run_zone_temp)
+        }
+        conditions_for_run.bit.temperature_zones_in_range = conditions_for_run.bit.temperature_zones_in_range && (
+                                                            (PUBLIC_SENSOR_DATA.temperatures->heater_temp > 0.1)
+                                                  );
       #endif
+
+        sprintf(exitBatteryOvrTempString, "MAIN: MachineBool=%d MachineVec=0x%x RunBool=%d RunVec=0x%x", conditions_is_device_okay(),conditions_for_machine.reg,conditions_can_we_start_a_run(),conditions_for_run.reg);
+        send_debug_log_message(exitBatteryOvrTempString);
       }
 
 
