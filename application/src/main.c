@@ -141,6 +141,9 @@ void sendWdtMain(bool valid);
 void create_tasks(void);
 void send_usb_change(usb_command_t cmd);
 void reset_and_enter_dfu(void);
+void get_nordic_uniqueid_concat_to_a_string(char* string);
+//bool conditions_can_we_start_a_run(void);
+bool conditions_is_device_okay(void);
 
 char exitBatteryOvrTempString[256];
 const uint8_t tmpsz = 128;
@@ -169,12 +172,52 @@ void reset(void)  {
   asm volatile("nop");
 }
 
+void read_filesystem_and_configurations(void) {
+  FRESULT res;
+
+  // Get the configuration parameters
+  conditions_for_machine.bit.configs_loaded_and_validated = true;
+  res = get_naatos_configuration_parameters(&config);
+  if (res != FR_OK) {
+    send_debug_log_message("Warning: configuration file was not able to be read. Using default configuration parameters.");
+    /*
+    // Report that the confirguation file cannot be read to a log if sd card is ok
+    if (sd_card_inited) {
+      log_event_t exit_event_info = {
+        .event = SAMPLE_CANT_READ_CONFIG,
+        .message = "Configuration file was not able to be read. Using default configuration parameters."};
+      log_data_message_t exit_log_message = {
+        .data_type = EVENT_DATA,
+        .temperature_data = NULL,
+        .event_data = exit_event_info};
+
+      xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
+      if (xReturned != pdPASS) {
+        send_debug_log_message("MAIN_TASK: Unable to send configuration error to logging task.");
+      }
+      xReturned = xQueueSend(logger_logMessageQueue, &exit_log_message, 0);
+      if (xReturned != pdPASS) {
+        send_debug_log_message("MAIN_TASK: Unable to send recovery battery percentage event to logging task.");
+      }
+    }
+    */
+    conditions_for_machine.bit.configs_loaded_and_validated = false;
+  }
+  // Get Cycle Configuration Parameters
+  res = get_cycle_configurations_parameters();
+  if (res != FR_OK) {
+    send_debug_log_message("Error: cycle configuration file was not able to be read.");
+    conditions_for_machine.bit.configs_loaded_and_validated = false;
+  }
+}
+
 void reformat_filesystem_and_reread(void) {
   unmount_storage();
   nor_flash_fatfs_mkfs();
   create_naatos_directories();
-  get_naatos_configuration_parameters(&config);
-  get_cycle_configurations_parameters();
+  //get_naatos_configuration_parameters(&config);
+  //get_cycle_configurations_parameters();
+  read_filesystem_and_configurations();
 }
 
 void get_nordic_uniqueid_concat_to_a_string(char* string)  {
@@ -189,7 +232,6 @@ void get_nordic_uniqueid_concat_to_a_string(char* string)  {
                  serial_num_high_bytes,
                  serial_num_low_bytes);
 
-  //string_create(serial_number_string);
   strcat(string,serial_number_string);
 }
 
@@ -235,7 +277,7 @@ bool conditions_can_we_start_a_run(void)  {
   //  canStartRun = false;
   
   //return canStartRun;
-  return (conditions_for_run.reg == 0b11);
+  return (conditions_for_run.reg == 0b10000011);
 };
 
 bool conditions_is_device_okay(void)  {
@@ -248,6 +290,42 @@ bool conditions_is_device_okay(void)  {
   
   //return deviceOkay;
   return (conditions_for_machine.reg == 0b111);
+}
+
+bool calculate_conditions_for_can_we_run()  {
+  run_conditions_last_can_start = conditions_can_we_start_a_run();
+
+  // -- MACHINE IS OKAY? --
+  conditions_for_run.bit.machine_can_run = conditions_is_device_okay();
+
+  // --BATTERY POWER OKAY?--
+  conditions_for_run.bit.battery_charge_level_acceptable = !batt_recovering;
+
+
+  // --ENSURE TEMPERATURES ARE IN THE PROPER RANGE--
+  conditions_for_run.bit.temperature_zones_in_range = true;
+#if defined(POWER_MODULE_BOARD)
+  if(config.min_run_zone_temp_en) {
+    conditions_for_run.bit.temperature_zones_in_range = (PUBLIC_SENSOR_DATA.temperatures->valve_temp < config.min_run_zone_temp)
+                                                     && (PUBLIC_SENSOR_DATA.temperatures->amp_temp < config.min_run_zone_temp);
+  }
+  conditions_for_run.bit.temperature_zones_in_range = conditions_for_run.bit.temperature_zones_in_range && (
+                                                      (PUBLIC_SENSOR_DATA.temperatures->valve_temp > 0.1)
+                                                   && (PUBLIC_SENSOR_DATA.temperatures->amp_temp > 0.1)
+                                            );
+#elif defined(SAMPLE_PREP_BOARD)
+  if(config.min_run_zone_temp_en) {
+    conditions_for_run.bit.temperature_zones_in_range = (PUBLIC_SENSOR_DATA.temperatures->valve_temp < config.min_run_zone_temp);
+  }
+  if(config.min_run_zone_temp_en) {
+    conditions_for_run.bit.temperature_zones_in_range = (PUBLIC_SENSOR_DATA.temperatures->heater_temp < config.min_run_zone_temp)
+  }
+  conditions_for_run.bit.temperature_zones_in_range = conditions_for_run.bit.temperature_zones_in_range && (
+                                                      (PUBLIC_SENSOR_DATA.temperatures->heater_temp > 0.1)
+                                            );
+#endif
+
+  return conditions_can_we_start_a_run();
 }
 
 void set_startup_enables(void) {
@@ -910,10 +988,15 @@ void main_task(void *pvParameters) {
   bool button_pressed  = !(nrf_gpio_pin_read(BUTTON_INPUT_PIN));
   // either holding down button with no USB, or gpregret2 bitfield set (through uart)
   if ( (button_pressed && !usb_started) || (gpregret2.bit.reformat) ) {
+    // REFORMAT DISK THEN READ CONFIGS
     gpregret2.bit.reformat = false;
 
     reformat_filesystem_and_reread();
+  } else{
+    // READ CONFIGS WITHOUT RE-FORMATTING DISK
+    read_filesystem_and_configurations();
   }
+  conditions_for_machine.bit.filesystem_deemed_okay = is_naatos_storage_okay();
 
   // Initialize the LEDs we are going to use
 #if ENABLE_LEDS
@@ -947,6 +1030,9 @@ void main_task(void *pvParameters) {
   uint32_t main_wdt_start_time = 0;
   uint32_t main_wdt_end_time = pdMS_TO_TICKS(1000);
   uint32_t main_wdt_time_left = 0;
+
+  // Quick startup check
+  conditions_for_machine.bit.battery_has_stayed_cool = true;  // will be adjusted later in main_Standby loop
 
   create_tasks();
 
@@ -991,6 +1077,9 @@ void main_task(void *pvParameters) {
         updateLedState(LED_RUN_HEATER, false);
         updateLedState(LED_STANDBY, true);
         updateLedState(LED_COMPLETE, false);
+        //updateLedState(LED_STANDBY_UNSTARTABLE,true); // for test
+        //updateLedState(LED_MACHINE_IN_ERROR,true);    // for test
+        updateLedState(LED_STANDBY_UNSTARTABLE,!calculate_conditions_for_can_we_run());
 
         sendWdtMain(true);
         start_time = xTaskGetTickCount();
@@ -1044,6 +1133,15 @@ void main_task(void *pvParameters) {
           get_nordic_uniqueid_concat_to_a_string(exitBatteryOvrTempString);
           send_event_log_message(SAMPLE_UNKNOWN, exitBatteryOvrTempString);
 
+          // IS THERE A MACHINE ERROR?
+          //if(machine_last_okay!=conditions_is_device_okay())  {
+          if(!conditions_is_device_okay())  {
+            updateLedState(LED_MACHINE_IN_ERROR,!conditions_is_device_okay());
+
+            sprintf(exitBatteryOvrTempString, "Machine Is In Error State: 0x%02x - Device will not run anymore", conditions_for_machine.reg);
+            send_event_log_message(SAMPLE_BATTERY_LOW,exitBatteryOvrTempString);
+          }
+
         #ifdef POWER_MODULE_BOARD
           // PLAY STARTUP SOUND
           PwmRxQueueMsg_t pwmmsg = {
@@ -1056,6 +1154,7 @@ void main_task(void *pvParameters) {
             send_debug_log_message("CYCLEFSM: Unable to send buzzer message to pwmRxQueue.");
           }
         #endif
+
         }
 
 
@@ -1114,7 +1213,6 @@ void main_task(void *pvParameters) {
           if (!usb_started)
             updateLedStatePowerLevel(LED_STANDBY, true, led_pl_low);
         }
-        conditions_for_run.bit.battery_charge_level_acceptable = !batt_recovering;
 
 
         if(batt_info_recv.batt_temp >= 59.0) {
@@ -1246,35 +1344,25 @@ void main_task(void *pvParameters) {
         counter_temperature_oneshot_request = 0;
         // our temperature data is ready
         //send_debug_log_message("MAIN: Temperature sensor data is ready.");
-        conditions_for_run.bit.temperature_zones_in_range = true;
       #if defined(POWER_MODULE_BOARD)
         sprintf(exitBatteryOvrTempString, "MAIN: Temperature sensor data is ready. Valve=%.2f Amp=%.2f", PUBLIC_SENSOR_DATA.temperatures->valve_temp,PUBLIC_SENSOR_DATA.temperatures->amp_temp);
         send_debug_log_message(exitBatteryOvrTempString);
-        if(config.min_run_zone_temp_en) {
-          conditions_for_run.bit.temperature_zones_in_range = (PUBLIC_SENSOR_DATA.temperatures->valve_temp < config.min_run_zone_temp)
-                                                           && (PUBLIC_SENSOR_DATA.temperatures->amp_temp < config.min_run_zone_temp);
-        }
-        conditions_for_run.bit.temperature_zones_in_range = conditions_for_run.bit.temperature_zones_in_range && (
-                                                            (PUBLIC_SENSOR_DATA.temperatures->valve_temp > 0.1)
-                                                         && (PUBLIC_SENSOR_DATA.temperatures->amp_temp > 0.1)
-                                                  );
-
       #elif defined(SAMPLE_PREP_BOARD)
         sprintf(exitBatteryOvrTempString, "MAIN: Temperature sensor data is ready. Heater=%.2f", PUBLIC_SENSOR_DATA.temperatures->heater_temp);
         send_debug_log_message(exitBatteryOvrTempString);
-        if(config.min_run_zone_temp_en) {
-          conditions_for_run.bit.temperature_zones_in_range = (PUBLIC_SENSOR_DATA.temperatures->valve_temp < config.min_run_zone_temp);
-        }
-        if(config.min_run_zone_temp_en) {
-          conditions_for_run.bit.temperature_zones_in_range = (PUBLIC_SENSOR_DATA.temperatures->heater_temp < config.min_run_zone_temp)
-        }
-        conditions_for_run.bit.temperature_zones_in_range = conditions_for_run.bit.temperature_zones_in_range && (
-                                                            (PUBLIC_SENSOR_DATA.temperatures->heater_temp > 0.1)
-                                                  );
       #endif
 
         sprintf(exitBatteryOvrTempString, "MAIN: MachineBool=%d MachineVec=0x%x RunBool=%d RunVec=0x%x", conditions_is_device_okay(),conditions_for_machine.reg,conditions_can_we_start_a_run(),conditions_for_run.reg);
         send_debug_log_message(exitBatteryOvrTempString);
+      }
+
+      // Check runability
+      //run_conditions_last_can_start = conditions_can_we_start_a_run();
+      //if(run_conditions_last_can_start!=calculate_conditions_for_can_we_run())  {
+      //  updateLedState(LED_STANDBY_UNSTARTABLE,!conditions_can_we_start_a_run());
+      //}
+      if( ledFlags.bit.testUnstartable!=(!calculate_conditions_for_can_we_run()) )  {
+        updateLedState(LED_STANDBY_UNSTARTABLE,!conditions_can_we_start_a_run());
       }
 
 
@@ -1386,7 +1474,17 @@ void main_task(void *pvParameters) {
         main_wdt_time_left = 0;
       }
 
-      xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY); // TODO do we do  anything with this?
+      // Wait for Sensor Switch Data
+      switch_data_last = switch_data;
+      xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
+      // Update switches triggered
+      hal_triggered = switch_data.hal_triggered;
+      optical_triggered = switch_data.optical_tiggered;
+      // Ensure we clear sample invalidation when lid is opened or laminate is removed
+      if((!switch_data.hal_triggered && switch_data_last.hal_triggered) || (!switch_data.optical_tiggered && switch_data_last.optical_tiggered))  {
+        updateLedState(LED_INVALID,false);
+      }
+
 
       if (xTaskGetTickCount() >= (a_t_start + alert_timeout_ticks)) {
         updateLedState(LED_CLEAR_ALL_ERROR, true);
@@ -1978,36 +2076,6 @@ int main(void) {
   nrf_drv_gpiote_init();
   setup_uart_semaphore();
   
-  // Get the configuration parameters
-  res = get_naatos_configuration_parameters(&config);
-  if (res != FR_OK) {
-    send_debug_log_message("Warning: configuration file was not able to be read. Using default configuration parameters.");
-    // Report that the confirguation file cannot be read to a log if sd card is ok
-    if (sd_card_inited) {
-      log_event_t exit_event_info = {
-        .event = SAMPLE_CANT_READ_CONFIG,
-        .message = "Configuration file was not able to be read. Using default configuration parameters."};
-      log_data_message_t exit_log_message = {
-        .data_type = EVENT_DATA,
-        .temperature_data = NULL,
-        .event_data = exit_event_info};
-
-      xReturned = xQueueSend(logger_logMessageQueue, &new_log_msg, 10);
-      if (xReturned != pdPASS) {
-        send_debug_log_message("MAIN_TASK: Unable to send configuration error to logging task.");
-      }
-      xReturned = xQueueSend(logger_logMessageQueue, &exit_log_message, 0);
-      if (xReturned != pdPASS) {
-        send_debug_log_message("MAIN_TASK: Unable to send recovery battery percentage event to logging task.");
-      }
-    }
-  }
-  // Get Cycle Configuration Parameters
-  res = get_cycle_configurations_parameters();
-  if (res != FR_OK) {
-    send_debug_log_message("Error: cycle configuration file was not able to be read.");
-  }
-
   // Create Queues
   create_queues();
 

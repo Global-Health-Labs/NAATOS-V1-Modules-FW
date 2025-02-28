@@ -592,6 +592,8 @@ typedef enum {
   LED_ABORT_YELLOW,
   LED_COMPLETE,
   LED_INVALID,
+  LED_STANDBY_UNSTARTABLE,
+  LED_MACHINE_IN_ERROR,
   LED_LOW_BATTERY,
   LED_USB_MSC_STARTING,
   LED_CLEAR_ALL_ERROR
@@ -732,7 +734,7 @@ typedef union {
     bool _unused4    : 1;
     bool _unused5    : 1;
     bool _unused6    : 1;
-    bool _unused7    : 1;
+    bool machine_can_run : 1;
   } bit;
   uint8_t reg;
 } naatos_conditions_to_start_run_t;
@@ -775,3 +777,8 @@ extern const cycle_config_parameters *cycle_cfg_ptr;
 extern cycle_config_parameters cycle_cfg_single;
 extern int total_cycles;
 extern bool batt_recovering;
+extern naatos_conditions_to_have_machine_start_t conditions_for_machine;
+extern naatos_conditions_to_start_run_t conditions_for_run;
+
+/* Defined in Main.c */
+bool conditions_can_we_start_a_run(void);

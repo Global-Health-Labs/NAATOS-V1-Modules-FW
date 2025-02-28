@@ -109,6 +109,25 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         next_state = RUN_ERROR_OR_FINISHED;
         break;
       }
+
+      // Check Temperatures Are Low-enough If Applicable
+      // (was previously set in main_standby())
+      if(!conditions_for_run.bit.temperature_zones_in_range)  {
+        exitInfo = CYCLE_ERROR_START_TEMP_TOO_HIGH;
+        runThrough = true;
+        next_state = RUN_ERROR_OR_FINISHED;
+        break;
+      }
+
+      // Check Other Conditions We Didn't Handle
+      // (was previously set in main_standby())
+      if(!conditions_can_we_start_a_run())  {
+        exitInfo = CYCLE_ERROR_OTHERFLAGS;
+        runThrough = true;
+        next_state = RUN_ERROR_OR_FINISHED;
+        break;
+      }
+
     
       // Reset ERROR-QUEUE
       // ensure we start with this runErrorQueue as empty
@@ -363,7 +382,6 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       time_left = (xTaskGetTickCount() - start_time);
       if (time_left >= end_time) {
-        updateLedState(LED_ABORT, true);
         exitInfo = CYCLE_SAMPLE_INVALIDATED;
         runThrough = true;
         next_state = RUN_ERROR_OR_FINISHED;
@@ -419,6 +437,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         #endif
         send_event_log_message(SAMPLE_UNKNOWN, "Exiting with DoubleRed and SampleInvalidated");
         }
+      } else  {
+        // ENDED DUE TO CYCLE_COMPLETE
+        updateLedState(LED_INVALID, false);
       }
 
       // Perform exit operations
@@ -493,6 +514,10 @@ void handle_exit_notifications(void) {
   case CYCLE_ERROR_MOTOR_STALLED_PWM:
     eventType = SAMPLE_MOTOR_STALLED_PWM;
     sprintf(exitString, SAMPLE_MOTOR_STALLED_PWM_ERROR_MSG);
+    break;
+  case CYCLE_ERROR_OTHERFLAGS:
+    eventType = SAMPLE_UNKNOWN;
+    sprintf(exitString, "Cannot start run due to unhandled flags. conditions_for_run=0x%x",conditions_for_run.reg);
     break;
   case CYCLE_ERROR_UNKNOWN: // drop to default
   default:
