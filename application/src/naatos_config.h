@@ -697,6 +697,7 @@ typedef struct {
   float     motor_stall_pwm;
   bool      motor_stall_en;
 #endif
+  uint16_t canary;    // one way to try to determine if we are possibly too corrupted
   int mmddyy;
   int hhmmss;
   bool set_date_time;
@@ -753,9 +754,9 @@ typedef union {
     bool configs_loaded_and_validated : 1;
     bool filesystem_deemed_okay : 1;
     bool battery_has_stayed_cool : 1;
-    bool _unused3    : 1;
+    bool canary_value_noninitializer : 1;
 
-    bool _unused4    : 1;
+    bool canary_value_nondefault : 1;
     bool _unused5    : 1;
     bool _unused6    : 1;
     bool _unused7    : 1;

@@ -113,6 +113,7 @@ naatos_config_parameters config = {
     .motor_stall_pwm = 0.0,
     .motor_stall_en = 0.0,
 #endif
+    .canary = 999,
     .mmddyy = 0,
     .hhmmss = 0,
     .set_date_time = false
@@ -289,7 +290,7 @@ bool conditions_is_device_okay(void)  {
   //  deviceOkay = false;
   
   //return deviceOkay;
-  return (conditions_for_machine.reg == 0b111);
+  return (conditions_for_machine.reg == 0b11111);
 }
 
 bool calculate_conditions_for_can_we_run()  {
@@ -702,7 +703,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
       }
 
       calendar_get_time(&time);
-      snprintf(tmp,tmpsz,"V=\"%s\" T=\"%s\" ECL=\"0x%02x\" TS=\"20%02d-%02d-%02d %02d:%02d:%02d\" MAIN_STATE=\"%s\" SN=\"",
+      snprintf(tmp,tmpsz,"V=\"%s\" T=\"%s\" ECL=0x%02x TS=\"20%02d-%02d-%02d %02d:%02d:%02d\" MAIN_STATE=\"%s\" SN=\"",
         VERSION, BOARD_STR, logger_cumulative_errors.reg,
         time.year,
         time.month,
@@ -989,6 +990,8 @@ void main_task(void *pvParameters) {
     read_filesystem_and_configurations();
   }
   conditions_for_machine.bit.filesystem_deemed_okay = is_naatos_storage_okay();
+  conditions_for_machine.bit.canary_value_noninitializer = (config.canary != 999);
+  conditions_for_machine.bit.canary_value_nondefault = (config.canary != 747);
 
   // Initialize the LEDs we are going to use
 #if ENABLE_LEDS
@@ -1130,7 +1133,7 @@ void main_task(void *pvParameters) {
           if(!conditions_is_device_okay())  {
             updateLedState(LED_MACHINE_IN_ERROR,!conditions_is_device_okay());
 
-            sprintf(exitBatteryOvrTempString, "Machine Is In Error State: 0x%02x - Device will not run anymore", conditions_for_machine.reg);
+            sprintf(exitBatteryOvrTempString, "Machine Is In Error State: 0x%02x - Device will not start runs", conditions_for_machine.reg);
             send_event_log_message(SAMPLE_BATTERY_LOW,exitBatteryOvrTempString);
           }
 

@@ -517,7 +517,7 @@ void handle_exit_notifications(void) {
     break;
   case CYCLE_ERROR_OTHERFLAGS:
     eventType = SAMPLE_UNKNOWN;
-    sprintf(exitString, "Cannot start run due to unhandled flags. conditions_for_run=0x%x",conditions_for_run.reg);
+    sprintf(exitString, "Cannot run due to unhandled flags. runflags=0x%x machine=0x%x",conditions_for_run.reg,conditions_for_machine.reg);
     break;
   case CYCLE_ERROR_UNKNOWN: // drop to default
   default:

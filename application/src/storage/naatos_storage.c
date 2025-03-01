@@ -600,8 +600,13 @@ FRESULT check_for_naatos_config_file(void) {
   for(uint8_t i = 0; i<KV_TABLE_GLOBAL_SIZE; i++) {
     const naatos_kv_table_entry_t * item = &(KV_TABLE_GLOBAL_PTR[i]);
 
-    configBufferSize = sprintf(configBuffer, "%s:%s\n", item->name,item->defaultcfgstr);
-    res = f_write(&file, configBuffer, configBufferSize, &b_written);
+    if(strcmp(item->name,"canary")==0)  {
+      configBufferSize = sprintf(configBuffer, "%s:12345\n", item->name);
+      res = f_write(&file, configBuffer, configBufferSize, &b_written);
+    } else{
+      configBufferSize = sprintf(configBuffer, "%s:%s\n", item->name,item->defaultcfgstr);
+      res = f_write(&file, configBuffer, configBufferSize, &b_written);
+    }
     if (res != FR_OK) {
       return res;
     }

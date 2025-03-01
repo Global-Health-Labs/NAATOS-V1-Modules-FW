@@ -27,6 +27,7 @@ naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
   { "motor_stall_pwm"                 , NAATOS_KV_DT_FLOAT  , (void *) &(config.motor_stall_pwm),       "61"},
   { "motor_stall_en"                  , NAATOS_KV_DT_BOOLS  , (void *) &(config.motor_stall_en),        "true"},
   
+  { "canary"                          , NAATOS_KV_DT_UINT16 , (void *) &(config.canary),                "747"},
   { "mmddyy"                          , NAATOS_KV_DT_INT    , (void *) &(config.mmddyy),                "100124"},
   { "hhmmss"                          , NAATOS_KV_DT_INT    , (void *) &(config.hhmmss),                "120000"},
   { "set_time_date"                   , NAATOS_KV_DT_BOOLS  , (void *) &(config.set_date_time),         "false"}
@@ -89,6 +90,7 @@ naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
   { "amp_max_temp"                    , NAATOS_KV_DT_FLOAT  , (void *) &(config.amp_max_temp),          "120.0"},
   { "ledtop0frnt1"                    , NAATOS_KV_DT_UINT16 , (void *) &(config.ledtop0frnt1),          "0"},
   
+  { "canary"                          , NAATOS_KV_DT_UINT16 , (void *) &(config.canary),                "747"},
   { "mmddyy"                          , NAATOS_KV_DT_INT    , (void *) &(config.mmddyy),                "100124"},
   { "hhmmss"                          , NAATOS_KV_DT_INT    , (void *) &(config.hhmmss),                "120000"},
   { "set_time_date"                   , NAATOS_KV_DT_BOOLS  , (void *) &(config.set_date_time),         "false"}
