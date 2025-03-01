@@ -702,9 +702,8 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
       }
 
       calendar_get_time(&time);
-      #ifdef SAMPLE_PREP_BOARD
-      snprintf(tmp,tmpsz,"V=\"%s\" FGREWORK=%d TS=\"20%02d-%02d-%02d %02d:%02d:%02d\" MAIN_STATE=\"%s\" SN=\"",
-        VERSION, MOTOR_FG_REWORK,
+      snprintf(tmp,tmpsz,"V=\"%s\" T=\"%s\" ECL=\"0x%02x\" TS=\"20%02d-%02d-%02d %02d:%02d:%02d\" MAIN_STATE=\"%s\" SN=\"",
+        VERSION, BOARD_STR, logger_cumulative_errors.reg,
         time.year,
         time.month,
         time.day,
@@ -713,20 +712,13 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
         time.second,
         strmsg
       );
-      #else
-      snprintf(tmp,tmpsz,"V=\"%s\" TS=\"20%02d-%02d-%02d %02d:%02d:%02d\" MAIN_STATE=\"%s\" SN=\"",
-        VERSION,
-        time.year,
-        time.month,
-        time.day,
-        time.hour,
-        time.minute,
-        time.second,
-        strmsg
-      );
-      #endif
       get_nordic_uniqueid_concat_to_a_string(tmp);
       strcat(tmp,"\"");
+    #ifdef SAMPLE_PREP_BOARD
+      snprintf(tmp,tmpsz,"%s FGREWORK=%d",
+        tmp,MOTOR_FG_REWORK,
+      );
+    #endif
       send_debug_log_message(tmp);
 
     // ---

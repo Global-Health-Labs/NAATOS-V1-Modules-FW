@@ -30,6 +30,8 @@ LoggerInterface powerModuleLogger_I = {
     .constructSensorDataLogLine = &powerModuleConstructSensorDataLogLine,
     .constructEventDataLogLine = &powerModuleConstructEventDataLogLine};
 
+logger_cumulative_errors_t logger_cumulative_errors;
+
 void normalize_pwm_data(log_data_message_t *rxLogMsg);
 
 uint32_t constructDebugLogLine(char *logLineBuffer, char *message, calendar_time_t time);
@@ -86,6 +88,8 @@ void logger_task(void *pvParameters) {
     .batt_temp = 0.0
   };
 
+  logger_cumulative_errors.reg = 0;
+
   log_data_message_t rxLogMsg;
 
 #ifdef SAMPLE_PREP_BOARD
@@ -110,6 +114,7 @@ void logger_task(void *pvParameters) {
         send_debug_log_message("LOG_TASK: Warning! Log file with name already exist, will be overwritting that file.");
       } else if (res != FR_OK) {
         send_debug_log_message("LOG_TASK: Unable to create log file for current sample preperation.");
+        logger_cumulative_errors.bit.file_create_error = true;
       }
 
       //Zero out the last_temp_message elements so that they all start at zero for the next log file
@@ -146,6 +151,7 @@ void logger_task(void *pvParameters) {
         FRESULT res = write_log_line(logFileName, logFileLine, logFileLineSize);
         if (res != FR_OK) {
           send_debug_log_message("LOG_TASK: Unable to write last log line!");
+          logger_cumulative_errors.bit.unable_to_write_last_log_line_data = true;
         }
       }
       break;
@@ -189,6 +195,7 @@ void logger_task(void *pvParameters) {
         FRESULT res = write_log_line(logFileName, logFileLine, logFileLineSize);
         if (res != FR_OK) {
           send_debug_log_message("LOG_TASK: Unable to write last log line!");
+          logger_cumulative_errors.bit.unable_to_write_last_log_line_event = true;
         }
       }
 

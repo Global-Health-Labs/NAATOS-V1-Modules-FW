@@ -34,6 +34,15 @@
 #endif
 #endif
 
+#if defined(POWER_MODULE_BOARD)
+  static const char BOARD_STR[] = "PM";
+#elif defined(SAMPLE_PREP_BOARD)
+  static const char BOARD_STR[] = "SP";
+#else
+  static const char BOARD_STR[] = "--";
+#endif
+
+
 /* Device Debug Parameters */
 #define I2C_CONNECTED 1
 #define USE_CALENDAR_CHIP 1
