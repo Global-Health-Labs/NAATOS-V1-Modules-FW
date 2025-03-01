@@ -757,7 +757,7 @@ typedef union {
     bool canary_value_noninitializer : 1;
 
     bool canary_value_nondefault : 1;
-    bool _unused5    : 1;
+    bool norflash_could_mount_filesystem : 1;
     bool _unused6    : 1;
     bool _unused7    : 1;
   } bit;

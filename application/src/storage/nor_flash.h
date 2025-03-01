@@ -59,10 +59,11 @@ NRF_BLOCK_DEV_QSPI_DEFINE(
 #endif
 
 extern bool nor_flash_inited;
+extern bool nor_flash_could_mount_filesystem;
 
-void init_nor_flash(void);
+FRESULT init_nor_flash(void);
 void uninit_nor_flash(void);
 FRESULT mount_nor_flash(void);
 FRESULT unmount_nor_flash(void);
 void nor_flash_list_contents(void);
-void nor_flash_fatfs_mkfs(void);
+FRESULT nor_flash_fatfs_mkfs(void);

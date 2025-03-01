@@ -16,6 +16,7 @@ uint32_t blocks_per_mb;
 uint32_t capacity;
 
 bool nor_flash_inited = false;
+bool nor_flash_could_mount_filesystem = true;
 
 // Initialize FATFS disk I/O interface by providing the block device.
 static diskio_blkdev_t drives[] =
@@ -23,9 +24,10 @@ static diskio_blkdev_t drives[] =
     DISKIO_BLOCKDEV_CONFIG(NRF_BLOCKDEV_BASE_ADDR(m_block_dev_qspi, block_dev), NULL)
 };
 
-void init_nor_flash(void) {
+FRESULT init_nor_flash(void) {
   char buff[100];
   disk_state = STA_NOINIT;
+  nor_flash_could_mount_filesystem = false;
 
   memset(&fs, 0, sizeof(FATFS));
 
@@ -37,19 +39,26 @@ void init_nor_flash(void) {
   if (disk_state) {
       sprintf(buff, "Disk initialization failed. State: %d", disk_state);
       send_debug_log_message(buff);
-      return;
+      return disk_state;
   }
   send_debug_log_message("NOR Flash Storage initialized");
 
   // Mount the NOR Flash Volume
   ff_result = mount_nor_flash();
   if (ff_result == FR_NO_FILESYSTEM) {
-    nor_flash_fatfs_mkfs();
+    ff_result = nor_flash_fatfs_mkfs();
+    if (ff_result != FR_OK) {
+      send_debug_log_message("init_nor_flash() Unable to mkfs!");
+      return ff_result;
+    }
   }
   else if (ff_result != FR_OK) {
     send_debug_log_message("Unable to mount NOR flash!");
-    return;
+    nor_flash_could_mount_filesystem = false;
+    return ff_result;
   }
+  
+  nor_flash_could_mount_filesystem = true;
 
   // Show contents
   nor_flash_list_contents();
@@ -63,22 +72,25 @@ void uninit_nor_flash(void) {
   send_debug_log_message("NOR Flash Storage Uninitialized.");
 }
 
-void nor_flash_fatfs_mkfs(void) {
+FRESULT nor_flash_fatfs_mkfs(void) {
   FRESULT ff_result;
   
   send_debug_log_message("Creating filesystem...");
   static uint8_t buf[512];
-  ff_result = f_mkfs("", FM_ANY, 0, buf, sizeof(buf));
+  ff_result = f_mkfs("", FM_FAT, 2048, buf, sizeof(buf)); //allocation unit 2kb, FAT format
   if (ff_result != FR_OK) {
       send_debug_log_message("Mkfs failed.");
-      return;
+      return ff_result;
   }
 
   // Mount the NOR Flash Volume
   ff_result = mount_nor_flash();
   if (ff_result != FR_OK) {
-    send_debug_log_message("Unable to mount NOR flash!");
-    return;
+    send_debug_log_message("Unable to mount NOR flash after formatting!");
+    nor_flash_could_mount_filesystem = false;
+    return ff_result;
+  } else{
+    nor_flash_could_mount_filesystem = true;
   }
 
 }

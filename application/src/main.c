@@ -290,7 +290,7 @@ bool conditions_is_device_okay(void)  {
   //  deviceOkay = false;
   
   //return deviceOkay;
-  return (conditions_for_machine.reg == 0b11111);
+  return (conditions_for_machine.reg == 0b00111111);
 }
 
 bool calculate_conditions_for_can_we_run()  {
@@ -992,6 +992,7 @@ void main_task(void *pvParameters) {
   conditions_for_machine.bit.filesystem_deemed_okay = is_naatos_storage_okay();
   conditions_for_machine.bit.canary_value_noninitializer = (config.canary != 999);
   conditions_for_machine.bit.canary_value_nondefault = (config.canary != 747);
+  conditions_for_machine.bit.norflash_could_mount_filesystem = nor_flash_could_mount_filesystem;
 
   // Initialize the LEDs we are going to use
 #if ENABLE_LEDS
