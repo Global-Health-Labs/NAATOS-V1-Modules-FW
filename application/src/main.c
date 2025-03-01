@@ -1335,6 +1335,8 @@ void main_task(void *pvParameters) {
       if((*(PUBLIC_SENSOR_DATA.oneshot_temperature_acquisition)==false) && (counter_temperature_oneshot_request>(config.logging_rate / config.sample_rate))) {
         counter_temperature_oneshot_request = 0;
         // our temperature data is ready
+
+        #if 0
         //send_debug_log_message("MAIN: Temperature sensor data is ready.");
       #if defined(POWER_MODULE_BOARD)
         sprintf(exitBatteryOvrTempString, "MAIN: Temperature sensor data is ready. Valve=%.2f Amp=%.2f", PUBLIC_SENSOR_DATA.temperatures->valve_temp,PUBLIC_SENSOR_DATA.temperatures->amp_temp);
@@ -1346,6 +1348,7 @@ void main_task(void *pvParameters) {
 
         sprintf(exitBatteryOvrTempString, "MAIN: MachineBool=%d MachineVec=0x%x RunBool=%d RunVec=0x%x", conditions_is_device_okay(),conditions_for_machine.reg,conditions_can_we_start_a_run(),conditions_for_run.reg);
         send_debug_log_message(exitBatteryOvrTempString);
+        #endif
       }
 
       // Check runability

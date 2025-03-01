@@ -611,7 +611,8 @@ typedef enum {
 typedef enum {
   led_pl_high,
   led_pl_medium,
-  led_pl_low
+  led_pl_low,
+  led_pl_UNSET
 } led_power_level_t;
 
 typedef struct {

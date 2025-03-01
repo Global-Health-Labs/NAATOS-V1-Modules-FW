@@ -11,6 +11,7 @@ bool first_run_through = true;
 
 int powerLevel = 100;
 led_power_level_t led_power_level = led_pl_high;
+led_power_level_t led_power_level_last = led_pl_UNSET;
 
 void handleLedState(LEDRxQueueMsg_t ledMsg);
 
@@ -34,6 +35,7 @@ void led_task(void *pvParameters) {
 
 void handleLedState(LEDRxQueueMsg_t ledMsg) {
   ledFlags_previous.vec = ledFlags.vec;
+  led_power_level_last = led_power_level;
 
   switch (ledMsg.type) {
   case LED_WAKEUP:
@@ -94,7 +96,7 @@ void handleLedState(LEDRxQueueMsg_t ledMsg) {
   }
 
   // DID THE FLAGS CHANGE? ONLY CONTINUE (MAKING DRIVER EFFECT) IF IT DID
-  if(ledFlags_previous.vec == ledFlags.vec)
+  if((ledFlags_previous.vec == ledFlags.vec) && (led_power_level_last==led_power_level))
     return; // exit early
 
   // continuing on to decision-tree
