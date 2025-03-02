@@ -702,6 +702,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
         sprintf(strmsg,"other");
       }
 
+      // output a generic string with time, states, fw version
       calendar_get_time(&time);
       snprintf(tmp,tmpsz,"V=\"%s\" T=\"%s\" ECL=0x%02x TS=\"20%02d-%02d-%02d %02d:%02d:%02d\" MAIN_STATE=\"%s\" SN=\"",
         VERSION, BOARD_STR, logger_cumulative_errors.reg,
@@ -721,6 +722,28 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
       );
     #endif
       send_debug_log_message(tmp);
+
+      // output some sensor information
+      snprintf(tmp,tmpsz,"Vbatt=%f SOC=%d Tbatt=%f",
+        PUBLIC_FUELGAUGE_DATA.batt_info->batt_voltage,
+        PUBLIC_FUELGAUGE_DATA.batt_info->batt_percent,
+        PUBLIC_FUELGAUGE_DATA.batt_info->batt_temp
+      );
+      #if defined(POWER_MODULE_BOARD)
+        snprintf(tmp,tmpsz,"%s Tamp=%f Tvalve=%f",
+          tmp,
+          PUBLIC_SENSOR_DATA.temperatures->amp_temp,
+          PUBLIC_SENSOR_DATA.temperatures->valve_temp
+        );
+      #elif defined(SAMPLE_PREP_BOARD)
+        snprintf(tmp,tmpsz,"%s Theater=%f MotorRPM=%f",
+          tmp,
+          PUBLIC_SENSOR_DATA.temperatures->heater_temp,
+          PUBLIC_SENSOR_DATA.temperatures->motor_speed
+        );
+      #endif
+      send_debug_log_message(tmp);
+
 
     // ---
     // CFGGET (argument: none)
@@ -799,8 +822,10 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
         }
   #endif
   #ifdef POWER_MODULE_BOARD
-        snprintf(tmp,tmpsz,"time_s:%.1f temp_ramp:%d,%.1f\r\n",
-          cycle_configs[i].cycle_run_time_s,cycle_configs[i].ramp_to_temp_before_start_cycle,cycle_configs[i].ramp_to_temp_timeout
+        snprintf(tmp,tmpsz,"time_s:%.1f dblylw_s:%.1f temp_ramp:%d,%.1f\r\n",
+          cycle_configs[i].cycle_run_time_s,
+          cycle_configs[i].double_yellow_grace_period_s,
+          cycle_configs[i].ramp_to_temp_before_start_cycle,cycle_configs[i].ramp_to_temp_timeout
         );
         //send_debug_log_message(tmp);
         write_to_com(tmp,strlen(tmp));

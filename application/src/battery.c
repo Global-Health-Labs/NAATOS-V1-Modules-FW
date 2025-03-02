@@ -17,6 +17,9 @@ fuel_batt_info_t batt_info = {
   .batt_voltage = 8.0,
   .batt_temp = 20.0
 };
+battery_public_data_t PUBLIC_FUELGAUGE_DATA= {
+  .batt_info = &batt_info
+};
 int battery_percentage = 100;
 main_state_t batt_main_state = MAIN_STANDBY;
 
