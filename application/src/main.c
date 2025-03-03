@@ -521,8 +521,8 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
   calendar_time_t time;
   button_update_t button_update_msg;  //<-- for sending button events to rest of tasks
 
-  sprintf(tmp,"COMRXTASK: PARSE RX'ed->""%s""",strmsg);
-  send_debug_log_message(tmp);
+  //sprintf(tmp,"COMRXTASK: PARSE RX'ed->""%s""",strmsg);
+  //send_debug_log_message(tmp);
 
   // add termination nulls in the string to the first \n or \r characters
   sPtrTmp = strchr(strmsg,'\r');
@@ -573,7 +573,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
             time.minute,
             time.second
         );
-        send_debug_log_message(tmp);
+        send_debug_log_message_reliableblocking(tmp);
 
         // SET DATETIME STRUCTURE
         time.year   = ((sPtrTmp[2]-'0')*10)+(sPtrTmp[3]-'0');
@@ -624,7 +624,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
               time.minute,
               time.second
           );
-          send_debug_log_message(tmp);
+          send_debug_log_message_reliableblocking(tmp);
 
           // Readback the time
           calendar_get_time(&time);
@@ -636,7 +636,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
               time.minute,
               time.second
           );
-          send_debug_log_message(tmp);
+          send_debug_log_message_reliableblocking(tmp);
         }
       }
 
@@ -721,8 +721,8 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
         tmp,MOTOR_FG_REWORK,
       );
     #endif
-      send_debug_log_message(tmp);
-
+      send_debug_log_message_reliableblocking(tmp);
+      
       // output some sensor information
       snprintf(tmp,tmpsz,"Vbatt=%f SOC=%d Tbatt=%f",
         PUBLIC_FUELGAUGE_DATA.batt_info->batt_voltage,
@@ -742,7 +742,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
           PUBLIC_SENSOR_DATA.temperatures->motor_speed
         );
       #endif
-      send_debug_log_message(tmp);
+      send_debug_log_message_reliableblocking(tmp); // will block until things are complete
 
 
     // ---

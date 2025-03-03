@@ -10,6 +10,7 @@
 
 xQueueHandle logger_recvBattPercentQueue;
 xQueueHandle logger_logMessageQueue;
+volatile bool loggerbusy = false;
 
 calendar_time_t time = {
     .second = 0,
@@ -99,7 +100,9 @@ void logger_task(void *pvParameters) {
 #endif
 
   for (;;) {
+    loggerbusy = false;
     xReturned = xQueueReceive(logger_logMessageQueue, &rxLogMsg, portMAX_DELAY);
+    loggerbusy = true;
 
     switch (rxLogMsg.data_type) {
     case LOGGER_START_CYCLE_LOG: {
@@ -277,7 +280,7 @@ void send_data_log_message() {
 void send_debug_log_message(char *message) {
   char tmp_msg[256];
   
-  sprintf(tmp_msg, "%s\r\n", message);
+  snprintf(tmp_msg, 256, "%s\r\n", message);
   printf(tmp_msg);
 
   if (!usb_started) {
@@ -304,3 +307,17 @@ void send_debug_log_message(char *message) {
 }
 
 
+void send_debug_log_message_reliableblocking(char *message) {
+  send_debug_log_message(message);
+
+  // LINGER UNTIL THE QUEUE WAS EMPTIED
+  while( uxQueueMessagesWaiting(logger_logMessageQueue)>0 ){
+    // wait to ensure we don't send while previous is still sending
+    vTaskDelay(1);
+  }
+  while(loggerbusy) {
+    // wait to ensure we don't send while previous is still sending
+    vTaskDelay(1);
+  }
+
+}
