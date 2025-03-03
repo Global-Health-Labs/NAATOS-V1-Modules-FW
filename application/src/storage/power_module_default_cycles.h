@@ -22,7 +22,7 @@ const int pm_default_cycle_config_1_size = STRLEN(pm_default_cycle_config_1);
 
 // AMPLIFICATION CYCLE
 const char pm_default_cycle_config_2[] = 
-  "cycle_run_time_s:900.0\n"
+  "cycle_run_time_s:1050.0\n"
   "cycle_delay_time_s:0\n"
   "ramp_to_temp_before_start_cycle:false\n"
   "ramp_to_temp_timeout:300.0\n"
@@ -60,7 +60,7 @@ const int pm_default_cycle_config_3_size = STRLEN(pm_default_cycle_config_3);
 
 // WAIT / NO HEATING
 const char pm_default_cycle_config_4[] = 
-  "cycle_run_time_s:10\n"
+  "cycle_run_time_s:420\n"
   "cycle_delay_time_s:0\n"
   "ramp_to_temp_before_start_cycle:false\n"
   "ramp_to_temp_timeout:0.0\n"

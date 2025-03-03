@@ -79,8 +79,8 @@ naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
   { "sample_valid_timeout_s"          , NAATOS_KV_DT_FLOAT  , (void *) &(config.sample_valid_timeout_s),"3600.00"},
   { "alert_timeout_time_s"            , NAATOS_KV_DT_FLOAT  , (void *) &(config.alert_timeout_time_s),  "3.00"},
   { "debug_to_com_en"                 , NAATOS_KV_DT_BOOLS  , (void *) &(config.debug_to_com_en),       "true"},
-  { "min_run_zone_temp_en"            , NAATOS_KV_DT_BOOLS  , (void *) &(config.min_run_zone_temp_en),  "false"},
-  { "min_run_zone_temp"               , NAATOS_KV_DT_FLOAT  , (void *) &(config.min_run_zone_temp),     "80.00"},
+  { "min_run_zone_temp_en"            , NAATOS_KV_DT_BOOLS  , (void *) &(config.min_run_zone_temp_en),  "true"},
+  { "min_run_zone_temp"               , NAATOS_KV_DT_FLOAT  , (void *) &(config.min_run_zone_temp),     "60.00"},
   { "do_automatic_runs"               , NAATOS_KV_DT_BOOLS  , (void *) &(config.do_automatic_runs),     "false"},
 
   { "optical_distance"                , NAATOS_KV_DT_UINT16 , (void *) &(config.optical_distance),      "800"},
