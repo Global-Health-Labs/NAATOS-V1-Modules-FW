@@ -49,8 +49,12 @@ void handle_power_cycle_stopstart_heater(bool amp_heating, bool valve_heating) {
   SensorRxQueueMsg_t msg;
   msg.type = SENSOR_MSG_HEATER_STATE;
   msg.heaterRunning = false;
+  msg.heaterRunningValve = false;
   if (amp_heating || valve_heating) {
     msg.heaterRunning = true;
+  }
+  if(valve_heating) {
+    msg.heaterRunningValve = true;
   }
   #if 0
   // some debug messages

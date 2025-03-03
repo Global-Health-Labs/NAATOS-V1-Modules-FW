@@ -465,6 +465,9 @@ typedef enum {
 typedef struct {
   SensorRxQueueType_t type;
   bool heaterRunning;
+#ifdef POWER_MODULE_BOARD
+  bool heaterRunningValve;
+#endif
 #ifdef SAMPLE_PREP_BOARD
   bool motorRunning;
 #endif

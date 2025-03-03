@@ -46,6 +46,7 @@ TickType_t sampleRateTicks;
 
 bool oneshot_temperature_acquisition = false;
 bool heaterRunning = false;
+bool p_heaterRunningValve = false;
 bool s_motorRunning = false;
 bool usb_suspend = false;
 uint32_t sample_log_index = 0;
@@ -159,7 +160,16 @@ void sensors_task(void *pvParameters) {
     } else {
       switch (sensorRxMessage.type) {
       case SENSOR_MSG_HEATER_STATE: {
+        //char tmp[100];
+        // dbg
+        //snprintf(tmp,100,"rx SENSOR_MSG_HEATER_STATE: heater=%d->%d ",heaterRunning,sensorRxMessage.heaterRunning);
+        //send_event_log_message(SAMPLE_I2C_READ_ERROR,tmp);
+        // dbg
+
         heaterRunning = sensorRxMessage.heaterRunning;
+        #if defined(POWER_MODULE_BOARD)
+          p_heaterRunningValve = sensorRxMessage.heaterRunningValve;
+        #endif
 
         HeaterRxQueueMsg_t heaterMsg = {
             .type = HEATER_MSG_SENSOR_CONFIRM,
@@ -269,6 +279,7 @@ void runPowerModuleSensorCollection(void) {
 #ifndef SAMPLE_PREP_BOARD
   BaseType_t xReturned;
   HeaterRxQueueMsg_t heaterMsg;
+  uint8_t nretries = 0;
 
   // ADC Read for Optical Sensors
   bool prev = switches.optical_tiggered;
@@ -297,31 +308,55 @@ void runPowerModuleSensorCollection(void) {
     heaterMsg.readTempFailed = false;
 
     // I2C Read for Heater Zone 0
-    dis = disable_valve_boost();
-    while (!dis) { // Reset the Valve Boost
-      nrf_gpio_pin_clear(VALVE_PWR_EN); 
-      nrf_gpio_pin_set(VALVE_PWR_EN); 
-      valve_zone_set_6v();
-      dis = disable_valve_boost();
-    }
-    readTempSuccess = readTemp(valve_zone, &temperatures.valve_temp);
-    enable_valve_boost();
-    if (!readTempSuccess) {
-      heaterMsg.readTempFailed = true;
+    nretries = 0;
+    while(nretries<3) {
+      if(p_heaterRunningValve)  {
+        dis = disable_valve_boost();
+        while (!dis) { // Reset the Valve Boost
+          nrf_gpio_pin_clear(VALVE_PWR_EN); 
+          nrf_gpio_pin_set(VALVE_PWR_EN); 
+          valve_zone_set_6v();
+          dis = disable_valve_boost();
+        }
+      }
+      readTempSuccess = readTemp(valve_zone, &temperatures.valve_temp);
+      if(p_heaterRunningValve)  {
+        enable_valve_boost();
+      }
+      if (!readTempSuccess) {
+        send_event_log_message(SAMPLE_I2C_READ_ERROR,"temp read failure on valve zone");
+        heaterMsg.readTempFailed = true;
+        nretries++;
+      } else{
+        heaterMsg.readTempFailed = false;
+        break;
+      }
     }
 
     // I2C Read for Heater Zone 2
-    dis = disable_valve_boost();
-    while (!dis) {  // Reset the Valve Boost
-      nrf_gpio_pin_clear(VALVE_PWR_EN); 
-      nrf_gpio_pin_set(VALVE_PWR_EN); 
-      valve_zone_set_6v();
-      dis = disable_valve_boost();
-    }
-    readTempSuccess = readTemp(amp_zone, &temperatures.amp_temp);
-    enable_valve_boost();
-    if (!readTempSuccess) {
-      heaterMsg.readTempFailed = true;
+    nretries = 0;
+    while(nretries<3) {
+      if(p_heaterRunningValve)  {
+        dis = disable_valve_boost();
+        while (!dis) {  // Reset the Valve Boost
+          nrf_gpio_pin_clear(VALVE_PWR_EN); 
+          nrf_gpio_pin_set(VALVE_PWR_EN); 
+          valve_zone_set_6v();
+          dis = disable_valve_boost();
+        }
+      }
+      readTempSuccess = readTemp(amp_zone, &temperatures.amp_temp);
+      if(p_heaterRunningValve)  {
+        enable_valve_boost();
+      }
+      if (!readTempSuccess) {
+      send_event_log_message(SAMPLE_I2C_READ_ERROR,"temp read failure on amp zone");
+        heaterMsg.readTempFailed = true;
+        nretries++;
+      } else{
+        heaterMsg.readTempFailed = false;
+        break;
+      }
     }
 
     if(heaterRunning) {
