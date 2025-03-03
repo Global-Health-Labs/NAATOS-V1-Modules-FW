@@ -66,6 +66,11 @@ void unmount_storage(void) {
 // Creates the needed naatos directories if they dont already exist
 void create_naatos_directories() {
   FRESULT res;
+
+  // POPULATE GLOBALS IN CONFIG DEFAULT
+  // Initialize the config struct to defaults here.... later the structure will be filled from filesystem
+  _init_global_configuration();
+
   // Create logs directory
   res = f_mkdir(LOGS_DIR);
   if (res == FR_OK) {
@@ -297,7 +302,8 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
   }
 
   // Initialize the config struct to defaults (in case configuration file does not have certain keys defined)
-  _init_global_configuration();
+  //_init_global_configuration();
+  // !!! This is now called earlier, in the create directories stage
 
   // Set the struct
   //for (int i = 0; i < NUM_MASTER_CONFIG_PARAMETERS; i++) {

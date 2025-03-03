@@ -77,7 +77,7 @@ FRESULT nor_flash_fatfs_mkfs(void) {
   
   send_debug_log_message("Creating filesystem...");
   static uint8_t buf[512];
-  ff_result = f_mkfs("", FM_FAT, 2048, buf, sizeof(buf)); //allocation unit 2kb, FAT format
+  ff_result = f_mkfs("", FM_ANY, 0, buf, sizeof(buf));
   if (ff_result != FR_OK) {
       send_debug_log_message("Mkfs failed.");
       return ff_result;
