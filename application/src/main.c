@@ -316,10 +316,7 @@ bool calculate_conditions_for_can_we_run()  {
                                             );
 #elif defined(SAMPLE_PREP_BOARD)
   if(config.min_run_zone_temp_en) {
-    conditions_for_run.bit.temperature_zones_in_range = (PUBLIC_SENSOR_DATA.temperatures->valve_temp < config.min_run_zone_temp);
-  }
-  if(config.min_run_zone_temp_en) {
-    conditions_for_run.bit.temperature_zones_in_range = (PUBLIC_SENSOR_DATA.temperatures->heater_temp < config.min_run_zone_temp)
+    conditions_for_run.bit.temperature_zones_in_range = (PUBLIC_SENSOR_DATA.temperatures->heater_temp < config.min_run_zone_temp);
   }
   conditions_for_run.bit.temperature_zones_in_range = conditions_for_run.bit.temperature_zones_in_range && (
                                                       (PUBLIC_SENSOR_DATA.temperatures->heater_temp > 0.1)
@@ -718,7 +715,7 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
       strcat(tmp,"\"");
     #ifdef SAMPLE_PREP_BOARD
       snprintf(tmp,tmpsz,"%s FGREWORK=%d",
-        tmp,MOTOR_FG_REWORK,
+        tmp,MOTOR_FG_REWORK
       );
     #endif
       send_debug_log_message_reliableblocking(tmp);
