@@ -506,6 +506,42 @@ void uninit_peripherals(void) {
   uninit_adc();
 }
 
+void serialCommand_LSDIR(char* arg) {
+  DIR dir;
+  FILINFO fno;
+  //uint32_t bytes_written;
+  FRESULT ff_result;
+
+  char buff[50];
+
+  send_debug_log_message("\r\n Listing NOR Flash directory: /");
+  // Open Root Directory
+  ff_result = f_opendir(&dir, "/");
+  if (ff_result) {
+    send_debug_log_message("Directory listing failed!");
+    return;
+  }
+
+  // Get the other directories
+  do {
+    ff_result = f_readdir(&dir, &fno);
+    if (ff_result != FR_OK) {
+      send_debug_log_message("Directory read failed.");
+      return;
+    }
+
+    if (fno.fname[0]) {
+      if (fno.fattrib & AM_DIR) {
+        sprintf(buff, "   <DIR>   %s", (uint32_t)fno.fname);
+        send_debug_log_message(buff);
+      } else {
+        sprintf("%9lu  %s", fno.fsize, (uint32_t)fno.fname);
+        send_debug_log_message(buff);
+      }
+    }
+  } while (fno.fname[0]);
+}
+
 /*********************************************************************
 *
 *       parseIncomingSerialMessageAndAct(char* strmsg)
@@ -646,6 +682,20 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
       send_debug_log_message("COMRXTASK: PARSE --> TSTCLK command handler");
 
       calendar_check_state();
+
+    // ---
+    // LIST CONTENTS (argument: none)
+    // ---
+    // LSDIR,
+    // queries a few PCF85063A registers for debug purposes and displays
+    } else if(strncmp(strmsg,"LSDIR",5) == 0) {
+      send_debug_log_message("COMRXTASK: PARSE --> LSDIR command handler");
+
+      if(main_state==MAIN_STANDBY)  {
+        serialCommand_LSDIR(sPtrTmp);
+      } else{
+        send_debug_log_message("error, main_state!=MAIN_STANDBY, cannot run command");
+      }
 
     // ---
     // RESET RTC CLOCK (argument: none)
@@ -928,14 +978,17 @@ void parseIncomingSerialMessageAndAct(char* strmsg)  {
 
       if(main_state==MAIN_STANDBY)  {
         send_debug_log_message("set a retained bitfield and reset, to reformat the filesystem, soon");
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(50));
         gpregret2.bit.reformat = true;
         NRF_POWER->GPREGRET2 = gpregret2.reg;
         
         //TODO: ideally i'd like to rectreate the button-holding action, but the GPREGRET2 seems to not persist after the NVIC_SystemReset():
         //TODO: so as a work-around we'll just do the reformat here, then reset
         reformat_filesystem_and_reread();
+        vTaskDelay(pdMS_TO_TICKS(50));
+        send_debug_log_message("SUCCESS!! Will reboot soon with cleared filesystem...");
 
+        vTaskDelay(pdMS_TO_TICKS(100));
         reset();
         // should never continue beyond
 
