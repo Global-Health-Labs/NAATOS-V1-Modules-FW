@@ -366,7 +366,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
           send_debug_log_message("CYCLEFSM: Unable to send buzzer message to pwmRxQueue.");
         }
       #endif
-        send_event_log_message(SAMPLE_UNKNOWN, "Exiting with DoubleGreenHold");
+        send_event_log_message(SAMPLE_UNKNOWN, "Exiting with SingleGreenHold");
       }
      
       xReturned = xQueueReceive(main_switchQueue, &switch_data, portMAX_DELAY);
@@ -416,7 +416,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
             send_debug_log_message("CYCLEFSM: Unable to send buzzer message to pwmRxQueue.");
           }
         #endif
-        send_event_log_message(SAMPLE_UNKNOWN, "Exiting with DoubleYellow");
+        send_event_log_message(SAMPLE_UNKNOWN, "Exiting with SingleYellow");
 
         } else  {
           // outside graceperiod, flash RED (sample invalidated)
@@ -435,7 +435,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
             send_debug_log_message("CYCLEFSM: Unable to send buzzer message to pwmRxQueue.");
           }
         #endif
-        send_event_log_message(SAMPLE_UNKNOWN, "Exiting with DoubleRed and SampleInvalidated");
+        send_event_log_message(SAMPLE_UNKNOWN, "Exiting with SingleRed and SampleInvalidated");
         }
       } else  {
         // ENDED DUE TO CYCLE_COMPLETE

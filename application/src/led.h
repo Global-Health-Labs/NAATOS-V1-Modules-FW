@@ -82,6 +82,7 @@ void set_led2_green_solid(void);
 void set_led2_red_solid(void);
 void set_led2_blue_breathe(void);
 void turn_off_led_channels(void);
+void set_led1_off(void);
 void set_led1_green_fast_blink(void);
 void updateLedState(LEDEvent_e event, bool active);
 void updateLedStatePowerLevel(LEDEvent_e event, bool active, led_power_level_t led_pl);

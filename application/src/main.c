@@ -1533,7 +1533,7 @@ void main_task(void *pvParameters) {
         updateLedState(LED_WAKEUP, true);
         updateLedState(LED_RUN_MOTOR, false);
         updateLedState(LED_RUN_HEATER, false);
-        updateLedState(LED_STANDBY, true);
+        updateLedState(LED_STANDBY, false);
         updateLedState(LED_COMPLETE, false);
         a_t_start = xTaskGetTickCount();
         sprintf(tmp, "MAIN_TASK: Alert Timeout - %dms", pdTICKS_TO_MS(alert_timeout_ticks));
@@ -1562,11 +1562,7 @@ void main_task(void *pvParameters) {
 
       if (xTaskGetTickCount() >= (a_t_start + alert_timeout_ticks)) {
         updateLedState(LED_CLEAR_ALL_ERROR, true);
-        updateLedState(LED_WAKEUP, true);
-        updateLedState(LED_RUN_MOTOR, false);
-        updateLedState(LED_RUN_HEATER, false);
-        updateLedState(LED_STANDBY, true);
-        updateLedState(LED_COMPLETE, false);
+
         next_state = MAIN_STANDBY;
       }
 

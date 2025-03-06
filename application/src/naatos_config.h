@@ -612,10 +612,10 @@ typedef enum {
 } LEDEvent_e;
 
 typedef enum {
-  led_pl_high,
-  led_pl_medium,
-  led_pl_low,
-  led_pl_UNSET
+  led_pl_UNSET=0,
+  led_pl_high=1,
+  led_pl_medium=2,
+  led_pl_low=3,
 } led_power_level_t;
 
 typedef struct {
