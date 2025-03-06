@@ -71,7 +71,7 @@ cached_registers_t cached_registers = {
 static char tmp[128];
 static const uint8_t tmp_sz=128;
 
-static uint8_t led_driver_i2c_addr;
+static uint8_t led_driver_i2c_addr = IS31FL3199_ADDR_low;   // this works for sampleprep revB/C and for power module revB top leds
 static bool driverIsBusy = false;
 static led_driver_internal_op_type_t current_op_type = led_driver_init_read_op;
 

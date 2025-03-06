@@ -43,7 +43,7 @@ naatos_kv_table_entry_cycle_t KV_TABLE_CYCLE[] = {
   { "cycle_delay_time_s"              , NAATOS_KV_DT_UINT16 , (void *) &(cycle_cfg_single.cycle_delay_time) },
   { "ramp_to_temp_before_start_cycle" , NAATOS_KV_DT_BOOLS  , (void *) &(cycle_cfg_single.ramp_to_temp_before_start_cycle) },
   { "ramp_to_temp_timeout"            , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.ramp_to_temp_timeout) },
-  { "double_yellow_grace_period_s"    , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.double_yellow_grace_period_s) },
+  { "yellow_grace_period_s"           , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.double_yellow_grace_period_s) },
 
   { "heater_setpoint"                 , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.heater_setpoint) },
   { "motor_setpoint"                  , NAATOS_KV_DT_UINT16 , (void *) &(cycle_cfg_single.motor_setpoint) },
@@ -105,7 +105,7 @@ naatos_kv_table_entry_cycle_t KV_TABLE_CYCLE[] = {
   { "cycle_delay_time_s"              , NAATOS_KV_DT_UINT16 , (void *) &(cycle_cfg_single.cycle_delay_time) },
   { "ramp_to_temp_before_start_cycle" , NAATOS_KV_DT_BOOLS  , (void *) &(cycle_cfg_single.ramp_to_temp_before_start_cycle) },
   { "ramp_to_temp_timeout"            , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.ramp_to_temp_timeout) },
-  { "double_yellow_grace_period_s"    , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.double_yellow_grace_period_s) },
+  { "yellow_grace_period_s"           , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.double_yellow_grace_period_s) },
 
   { "amp_setpoint"                    , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.amp_setpoint) },
   { "valve_setpoint"                  , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.valve_setpoint) },
