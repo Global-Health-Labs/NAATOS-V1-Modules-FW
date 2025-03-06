@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include "naatos_config_file.h"
 
-#define VERSION "3.2rc4"
+#define VERSION "3.3"
 
 /*Define this when building sample prep only otherwise comment out*/
 //#define SAMPLE_PREP_BOARD
