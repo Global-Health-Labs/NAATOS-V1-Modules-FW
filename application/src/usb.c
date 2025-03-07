@@ -158,14 +158,26 @@ void write_to_com(const char * msg, int len) {
   if (!usb_detected || !com_port_open)
     return;
 
-  if (xSemaphoreTake(uartSemaphore, portMAX_DELAY) != pdPASS) {
-      return NRF_ERROR_BUSY;
+  // Write via COM port
+  // but yield to other threads if app_usbd_cdc_acm_write
+  // returned NRF_ERROR_BUSY (which happened time to time causing missing outputs)
+  while(true) {
+    if (xSemaphoreTake(uartSemaphore, portMAX_DELAY) != pdPASS) {
+        return NRF_ERROR_BUSY;
+    }
+    app_usbd_class_inst_t const *class_cdc_acm = app_usbd_cdc_acm_class_inst_get(&m_app_cdc_acm);
+    ret_code_t ret = app_usbd_cdc_acm_write(class_cdc_acm, msg, len);
+    xSemaphoreGive(uartSemaphore);
+
+    if(ret == NRF_ERROR_BUSY) {
+      // write was not successful because of BUSY, wait a little to try again
+      vTaskDelay(10); // non-block delay, yielding to other tasks
+      continue;
+    } else{
+      // write was successful or other error we are not handling has occurred
+      break;
+    }
   }
-
-  app_usbd_class_inst_t const *class_cdc_acm = app_usbd_cdc_acm_class_inst_get(&m_app_cdc_acm);
-  app_usbd_cdc_acm_write(class_cdc_acm, msg, len);
-
-  xSemaphoreGive(uartSemaphore);
 }
 
 void cdc_acm_user_ev_handler(app_usbd_class_inst_t const *p_inst,
