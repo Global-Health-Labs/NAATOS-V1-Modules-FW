@@ -5,8 +5,8 @@
 #include "sensors.h"      // for PUBLIC SENSOR DATA
 #include "main.h"
 
-static const uint8_t tmpsz = 128;
-static char tmp[128];
+static const uint8_t tmpsz = 200;
+static char tmp[200];
 
 /*
 All command functions should have prototype:
@@ -301,7 +301,76 @@ bool serialCmd_CFGGET(char* sPtrTmp)  {
     write_to_com(tmp,strlen(tmp));  // write directly to COM, the debug log interface is a bit slow for so many lines and queue-based
   }
 
+  // NEW STYLE DISPLAY AS OF V3.4 USING KEY-VALUE TABLES
+  // cycle config outputted as a fixed-width table
+  /* intended representation/output
+  name                          1       2       3       4
+  cycle_run_time_s            30.00   120.00  720.00  350.00
+  ...
+  ...
+  ..
+  */
+  // important variable - total_cycles - number of cycles read from config files
+  // important variable - cycle_configs[n] - structure with the cycle configs
+  // extern const uint8_t KV_TABLE_CYCLE_SIZE;
+  // extern const naatos_kv_table_entry_cycle_t* KV_TABLE_CYCLE_PTR;
 
+  snprintf(tmp,tmpsz,"---Config Dump: Cycles Count %d---\r\n",
+    total_cycles
+  );
+  //send_debug_log_message(tmp);
+  write_to_com(tmp,strlen(tmp));
+
+  // generate the header row for the table we are outputting
+  sprintf(tmp,"%-35s","parameter_name");
+  for(uint8_t j = 0; j < total_cycles; j++) {
+    sprintf(tmp,"%s%5s%2d%5s",tmp, "Cycle",j+1,"");
+  }
+  strcat(tmp,"\r\n");
+  write_to_com(tmp,strlen(tmp));  // write out the row
+
+  // generate the divider row
+  sprintf(tmp,"%s","-");
+  for(int i = 0; i < (35+(12*total_cycles)); i++) {
+    strcat(tmp,"-");
+  }
+  strcat(tmp,"\r\n");
+  write_to_com(tmp,strlen(tmp));  // write out the row
+
+  // iterate the KV_TABLE_CYCLE_PTR lookup table defined in naatos_config_file.c
+  for(uint8_t i = 0; i<KV_TABLE_CYCLE_SIZE; i++)  {
+    const naatos_kv_table_entry_cycle_t * tableitem = &(KV_TABLE_CYCLE_PTR[i]);
+    sprintf(tmp,"%-35s",tableitem->name);
+    int offset_in_cycle_structure = (tableitem->dataptr) - ((void*)&cycle_cfg_single);  //pointer offset math
+
+    // iterate the cycles using structure-field offsetting to access the values
+    for(uint8_t j = 0; j < total_cycles; j++) {
+      const cycle_config_parameters * ptrCycleActiveConfigStruct = &(cycle_configs[j]);
+
+      // Pointer offset math to dereference the proper value will be done, and formatted into a string for the row
+      if(tableitem->dtype==NAATOS_KV_DT_FLOAT)  {
+        sprintf(tmp,"%s%-12.05f",tmp, (float) *( (float*) ( (void*) ptrCycleActiveConfigStruct + offset_in_cycle_structure) ));
+      } else if(tableitem->dtype==NAATOS_KV_DT_INT)  {
+        sprintf(tmp,"%s%-12d",tmp, (int) *( (int*) ( (void*) ptrCycleActiveConfigStruct + offset_in_cycle_structure) ));
+      } else if(tableitem->dtype==NAATOS_KV_DT_UINT16)  {
+        sprintf(tmp,"%s%-12d",tmp, (uint16_t) *( (uint16_t*) ( (void*) ptrCycleActiveConfigStruct + offset_in_cycle_structure) ));
+      } else if(tableitem->dtype==NAATOS_KV_DT_BOOLS)  {
+        if(true == (bool) *( (bool*) ( (void*) ptrCycleActiveConfigStruct + offset_in_cycle_structure)  ) ) {
+          sprintf(tmp,"%s%-12s",tmp,"true");
+        } else{
+          sprintf(tmp,"%s%-12s",tmp,"false");
+        }
+      } else{
+        sprintf(tmp,"%s%-12s",tmp, "---");
+      }
+    }
+    strcat(tmp,"\r\n");
+    write_to_com(tmp,strlen(tmp));  // write out the row
+  }
+
+
+  /*
+  // OLD STYLE DISPLAY
   // cycle config
   for(uint8_t i=0; i<total_cycles; i++) {
     snprintf(tmp,tmpsz,"---Config Dump: Cycle %d/%d---\r\n",
@@ -366,6 +435,7 @@ bool serialCmd_CFGGET(char* sPtrTmp)  {
     }
 #endif
   }
+  */
   return true;  // command ran successfully
 }
 
