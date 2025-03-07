@@ -29,7 +29,6 @@ xQueueHandle compositeRxQueue;
 // Main Loop
 usb_message_t recv_msg;
 charge_state_t connection_state;
-main_state_t main_state;
 usb_command_t command;
 
 // USB Suspended Vars
