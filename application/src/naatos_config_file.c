@@ -24,7 +24,7 @@ naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
   { "switch_motor_ccw_cw"             , NAATOS_KV_DT_BOOLS  , (void *) &(config.switch_motor_ccw_cw),   "true"},
   { "hal_sensor_thresh"               , NAATOS_KV_DT_FLOAT  , (void *) &(config.hal_sensor_thresh),     "0.30"},
   { "motor_stall_percent"             , NAATOS_KV_DT_INT    , (void *) &(config.motor_stall_percent),   "20"},
-  { "motor_stall_pwm"                 , NAATOS_KV_DT_FLOAT  , (void *) &(config.motor_stall_pwm),       "61"},
+  { "motor_stall_pwm"                 , NAATOS_KV_DT_FLOAT  , (void *) &(config.motor_stall_pwm),       "65"},
   { "motor_stall_en"                  , NAATOS_KV_DT_BOOLS  , (void *) &(config.motor_stall_en),        "true"},
   
   { "canary"                          , NAATOS_KV_DT_UINT16 , (void *) &(config.canary),                "747"},
