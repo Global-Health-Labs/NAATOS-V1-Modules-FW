@@ -266,11 +266,11 @@ bool serialCmd_STATUS(char* sPtrTmp) {
 // ---
 // CFGGET,
 bool serialCmd_CFGGET(char* sPtrTmp)  {
-  vTaskDelay(pdMS_TO_TICKS(50));
-
   // we will be directly writing to COM in this command, since
   // we have to dump a lot of lines back to the UART
   // and the message/queue-based logger syste is just a bit too slow for us
+  // and don't want to overrun the message queue
+  vTaskDelay(50);
 
   // main global config
   //send_debug_log_message("---Config Dump: Global---");
@@ -280,23 +280,11 @@ bool serialCmd_CFGGET(char* sPtrTmp)  {
   for(uint8_t i = 0; i<KV_TABLE_GLOBAL_SIZE; i++) {
     const naatos_kv_table_entry_t * item = &(KV_TABLE_GLOBAL_PTR[i]);
 
-    switch(item->dtype) {
-      case NAATOS_KV_DT_FLOAT:
-        snprintf(tmp,tmpsz,"%s:%g\r\n",item->name,*((float*) item->dataptr)); break;
-      case NAATOS_KV_DT_INT:
-        snprintf(tmp,tmpsz,"%s:%d\r\n",item->name,*((int*) item->dataptr)); break;
-      case NAATOS_KV_DT_UINT16:
-        snprintf(tmp,tmpsz,"%s:%d\r\n",item->name,*((uint16_t*) item->dataptr)); break;
-      case NAATOS_KV_DT_BOOLS:
-        if(*((bool*) item->dataptr))
-          snprintf(tmp,tmpsz,"%s:true\r\n",item->name);
-        else
-          snprintf(tmp,tmpsz,"%s:false\r\n",item->name);
-        break;
-      default:
-        snprintf(tmp,tmpsz,"%s:<unknown / not implemented>\n",item->name);
-        break;
-    };
+    // get value of this by string, using lookup key item from key-value table
+    snprintf(tmp,tmpsz,"%s:%s\r\n",
+      item->name,
+      naatos_config_global_getval_as_string_from_item(item)
+    );
     //send_debug_log_message(tmp);
     write_to_com(tmp,strlen(tmp));  // write directly to COM, the debug log interface is a bit slow for so many lines and queue-based
   }
@@ -368,76 +356,114 @@ bool serialCmd_CFGGET(char* sPtrTmp)  {
     write_to_com(tmp,strlen(tmp));  // write out the row
   }
 
-
-  /*
-  // OLD STYLE DISPLAY
-  // cycle config
-  for(uint8_t i=0; i<total_cycles; i++) {
-    snprintf(tmp,tmpsz,"---Config Dump: Cycle %d/%d---\r\n",
-      i+1,total_cycles
-    );
-    //send_debug_log_message(tmp);
-    write_to_com(tmp,strlen(tmp));
-#ifdef SAMPLE_PREP_BOARD
-    snprintf(tmp,tmpsz,"time_s:%.1f temp_ramp:%d,%.1f\r\n",
-      cycle_configs[i].cycle_run_time_s,cycle_configs[i].ramp_to_temp_before_start_cycle,cycle_configs[i].ramp_to_temp_timeout
-    );
-    //send_debug_log_message(tmp);
-    write_to_com(tmp,strlen(tmp));
-    if(cycle_configs[i].run_heater) {
-      snprintf(tmp,tmpsz,"heater sp:%.1f kp:%.4f ki:%.4f kd:%.4f\r\n",
-        cycle_configs[i].heater_setpoint,
-        cycle_configs[i].heater_kp,
-        cycle_configs[i].heater_ki,
-        cycle_configs[i].heater_kd
-      );
-      //send_debug_log_message(tmp);
-      write_to_com(tmp,strlen(tmp));
-    }
-    if(cycle_configs[i].run_motor) {
-      snprintf(tmp,tmpsz,"motor  sp:%d kp:%.4f ki:%.4f kd:%.4f\r\n",
-        cycle_configs[i].motor_setpoint,
-        cycle_configs[i].motor_kp,
-        cycle_configs[i].motor_ki,
-        cycle_configs[i].motor_kd
-      );
-      //send_debug_log_message(tmp);
-      write_to_com(tmp,strlen(tmp));
-    }
-#endif
-#ifdef POWER_MODULE_BOARD
-    snprintf(tmp,tmpsz,"time_s:%.1f dblylw_s:%.1f temp_ramp:%d,%.1f\r\n",
-      cycle_configs[i].cycle_run_time_s,
-      cycle_configs[i].double_yellow_grace_period_s,
-      cycle_configs[i].ramp_to_temp_before_start_cycle,cycle_configs[i].ramp_to_temp_timeout
-    );
-    //send_debug_log_message(tmp);
-    write_to_com(tmp,strlen(tmp));
-    if(cycle_configs[i].run_amp) {
-      snprintf(tmp,tmpsz,"ampl. sp:%.1f kp:%.4f ki:%.4f kd:%.4f\r\n",
-        cycle_configs[i].amp_setpoint,
-        cycle_configs[i].amp_kp,
-        cycle_configs[i].amp_ki,
-        cycle_configs[i].amp_kd
-      );
-      //send_debug_log_message(tmp);
-      write_to_com(tmp,strlen(tmp));
-    }
-    if(cycle_configs[i].run_valve) {
-      snprintf(tmp,tmpsz,"valve sp:%.1f kp:%.4f ki:%.4f kd:%.4f\r\n",
-        cycle_configs[i].valve_setpoint,
-        cycle_configs[i].valve_kp,
-        cycle_configs[i].valve_ki,
-        cycle_configs[i].valve_kd
-      );
-      //send_debug_log_message(tmp);
-      write_to_com(tmp,strlen(tmp));
-    }
-#endif
-  }
-  */
   return true;  // command ran successfully
 }
+
+// ---
+// CFGSET (arguments as shown below in examples)
+// Set configuration parameters.
+// Note, configuration structure commands will set the config. struct immediately.
+// But these won't be written to file until a "writeglobal" command is issued.
+// Some config items (like ledtop0frnt1) are only read at startup so won't take effect until writing and resetting.
+// Other items will take effect immediately without a writeout/reset.
+// ---
+// Format:
+//    CFGSET,global,<config_param_key_name>,<newvalue>
+//
+// Examples:
+//
+// CFGSET,global,ledtop0frnt1,1
+//  # will set the ledtop0frnt1 parameter to 1
+//
+// CFGSET,writeglobal
+//  # will write-out the current active configuration to the config file on filesystem
+bool serialCmd_CFGSET(char* sPtrTmp)  {
+  FRESULT res;
+  bool success = false;
+  char * pch;
+  char bufkey[32];
+  char bufval[32];
+
+
+  if(main_state!=MAIN_STANDBY)  {
+    send_debug_log_message("CFGSET error, main_state!=MAIN_STANDBY, cannot use this command");
+    return false;  // command failed/did not run
+  }
+
+
+  //first parameter is a sub-action
+  snprintf(tmp,tmpsz,"CFGSET: arg parsing: \"%s\"",sPtrTmp);
+  send_debug_log_message(tmp);
+
+  //// search for COMMA, which separates LEFTSIDE command, and RIGHTSIDE arguments
+  //sPtrTmp = strchr(sPtrTmp,',');
+  //if(sPtrTmp != NULL) {
+  //  // found comma separator
+  
+  //  // move pointer just to the right of the COMMA if not end of string
+  //  if(*(sPtrTmp+1)!='\0')
+  //    sPtrTmp++;
+
+  //  snprintf(tmp,tmpsz,"CFGSET: arg parsing: \"%s\"",sPtrTmp);
+  //  send_debug_log_message(tmp);
+  //}
+
+  // split arguments into comma tokens
+  pch = strtok(sPtrTmp,",");
+  if(pch != NULL) {
+    // EXPECT SUBCOMMAND
+    snprintf(tmp,tmpsz,"CFGSET: arg subcommand: \"%s\"",pch);
+    send_debug_log_message(tmp);
+
+    if(strncmp(pch,"global",6)==0)  {
+      //recognized as set "global" subcommand
+
+      //EXPECT PARAMETER KEYNAME
+      pch = strtok(NULL,",");
+      if(pch!= NULL)  {
+        strncpy(bufkey,pch,32);
+
+        //EXPECT PARAMETER VALUE STRING
+        pch = strtok(NULL,",");
+        if(pch!= NULL)  {
+          strncpy(bufval,pch,32);
+
+          //GET KEY ITEM FROM CONFIG TABLE
+          const naatos_kv_table_entry_t * tableitem = naatos_config_global_get_itemptr_by_key(bufkey);
+          if(tableitem != NULL)  {
+            snprintf(tmp,tmpsz,"CFGSET: set global understood and found keystr=\"%s\" valstr=\"%s\"",bufkey,bufval);
+            send_debug_log_message(tmp);
+
+            // Do the parameter assignment
+            success = naatos_config_assignParameterUsingKeyValueTable_given_key_and_value_strings(KV_TABLE_GLOBAL_PTR,KV_TABLE_GLOBAL_SIZE,bufkey,bufval);
+
+            //success = true;            
+          }
+        } // endif strtok parameter value
+      } // endif strtok parameter name
+    } // end subcommand GLOBAL
+    else if (strncmp(pch,"writeglobal",11)==0)  {
+      res = create_overwrite_naatos_master_config_file(false);
+
+      snprintf(tmp,tmpsz,"CFGSET: overrite master config file result=0x%02x reboot to take effect",(uint8_t) res);
+      send_debug_log_message(tmp);
+
+      success = (res == FR_OK);
+    } // end subcommand WRITEGLOBAL
+
+    //pch = strtok(NULL,",");
+  }
+
+
+  // end/return
+  if(success) {
+    return true;  // command ran successfully
+  } else{
+    send_debug_log_message("CFGSET error, arguments not handled somehow");
+    return false;  // command not run / bad arguments
+  }
+}
+
 
 // ---
 // Initiate DFU (argument: none)
@@ -566,6 +592,7 @@ const serialCmd_list_entry_t serialCmd_list[] = {
   { "REBOOT",   serialCmd_REBOOT  },
   { "STATUS",   serialCmd_STATUS  },
   { "CFGGET",   serialCmd_CFGGET  },
+  { "CFGSET",   serialCmd_CFGSET  },
   { "TODFU",    serialCmd_TODFU   },
   { "TOMSC",    serialCmd_TOMSC   },
   { "EXITMSC",  serialCmd_EXITMSC },

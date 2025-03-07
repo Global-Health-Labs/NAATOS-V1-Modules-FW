@@ -536,6 +536,63 @@ FRESULT get_cycle_configurations_parameters() {
   return FR_OK;
 }
 
+FRESULT create_overwrite_naatos_master_config_file(bool useDefaults) {
+  FRESULT res;
+  DIR dir;
+  char configBuffer[50];
+  uint32_t configBufferSize;
+  uint32_t b_written;
+
+  // Change directory into configs
+  res = f_chdir(CONFIG_DIR);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Try to create new naatos_config.txt
+  res = f_open(&file, NAATOS_CONFIG_FILE, FA_CREATE_ALWAYS | FA_WRITE); // will create or truncate if already exists
+  if (res != FR_OK) {
+      return res;
+  }
+
+  // Populate new config file
+  // Iterate through the key-value table and write everything to file
+  for(uint8_t i = 0; i<KV_TABLE_GLOBAL_SIZE; i++) {
+    const naatos_kv_table_entry_t * item = &(KV_TABLE_GLOBAL_PTR[i]);
+
+    if(useDefaults) {
+      if(strcmp(item->name,"canary")==0)  {
+        configBufferSize = sprintf(configBuffer, "%s:12345\n", item->name);
+        res = f_write(&file, configBuffer, configBufferSize, &b_written);
+      } else{
+        configBufferSize = sprintf(configBuffer, "%s:%s\n", item->name,item->defaultcfgstr);
+        res = f_write(&file, configBuffer, configBufferSize, &b_written);
+      }
+    } else  {
+        configBufferSize = sprintf(configBuffer, "%s:%s\n", item->name, naatos_config_global_getval_as_string_from_item(item) );
+        res = f_write(&file, configBuffer, configBufferSize, &b_written);
+    }
+    if (res != FR_OK) {
+      return res;
+    }
+  }
+  
+  // Close the file
+  res = f_close(&file);
+  if (res != FR_OK) {
+    return res;
+  }
+
+  // Change back directories
+  res = f_chdir("..");
+  if (res != FR_OK) {
+    return res;
+  }
+
+  return res;
+}
+
+
 FRESULT check_for_naatos_config_file(void) {
   FRESULT res;
   DIR dir;
@@ -560,8 +617,6 @@ FRESULT check_for_naatos_config_file(void) {
     } else{
       send_debug_log_message("Found config file existed but it was zero size. Proceed as if it wasn't there.");
     }
-
-
   }
 
   // Open the directory for reading
@@ -594,41 +649,14 @@ FRESULT check_for_naatos_config_file(void) {
 
   f_closedir(&dir);
 
-  // Create new naatos_config.txt
-  res = f_open(&file, NAATOS_CONFIG_FILE, FA_CREATE_NEW | FA_WRITE);
-  if (res == FR_EXIST) {
-    // Return that it already exists
-    return res;
-  }
-
-  // Populate new config file
-  // Iterate through the key-value table and write everything to file
-  for(uint8_t i = 0; i<KV_TABLE_GLOBAL_SIZE; i++) {
-    const naatos_kv_table_entry_t * item = &(KV_TABLE_GLOBAL_PTR[i]);
-
-    if(strcmp(item->name,"canary")==0)  {
-      configBufferSize = sprintf(configBuffer, "%s:12345\n", item->name);
-      res = f_write(&file, configBuffer, configBufferSize, &b_written);
-    } else{
-      configBufferSize = sprintf(configBuffer, "%s:%s\n", item->name,item->defaultcfgstr);
-      res = f_write(&file, configBuffer, configBufferSize, &b_written);
-    }
-    if (res != FR_OK) {
-      return res;
-    }
-  }
-  
-  // Close the file
-  res = f_close(&file);
-  if (res != FR_OK) {
-    return res;
-  }
-
   // Change back directories
   res = f_chdir("..");
   if (res != FR_OK) {
     return res;
   }
+
+  // create new master config file from defaults (see naatos_config_file.c for defaults)
+  res = create_overwrite_naatos_master_config_file(true);
 
   return res;
 }

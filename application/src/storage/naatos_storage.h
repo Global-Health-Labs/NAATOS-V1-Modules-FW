@@ -73,6 +73,7 @@ void uninit_naatos_storage(void);
 void mount_storage(void);
 void unmount_storage(void);
 void create_naatos_directories(void);
+FRESULT create_overwrite_naatos_master_config_file(bool useDefaults);   // useDefaults=False to write out current config structure
 FRESULT check_for_naatos_config_file(void);
 FRESULT check_for_cycle_config_files(void);
 FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters);

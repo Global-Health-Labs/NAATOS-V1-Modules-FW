@@ -1,6 +1,9 @@
 #include "naatos_config_file.h"
 #include "naatos_config.h"
 
+static char tmp[80];
+static uint8_t tmp_sz = 80;
+
 #if defined(SAMPLE_PREP_BOARD)
 /****************************************************************************************************************
  * SAMPLE PREP MODULE
@@ -123,3 +126,148 @@ const uint8_t KV_TABLE_CYCLE_SIZE = sizeof(KV_TABLE_CYCLE)/sizeof(KV_TABLE_CYCLE
 
 #endif
 
+bool naatos_config_assignParameterUsingKeyValueTable_given_key_and_value_strings(const naatos_kv_table_entry_t * KVTABLE, const uint8_t TABLE_SIZE, const char* keystr, const char* valstr) {
+  // Search the key-value table for a matching key
+  const bool _printdebugs = false;
+  bool matched;
+
+  if(_printdebugs)  {
+    sprintf(tmp,"key = \"%s\" in file, checking key-value table...",keystr);
+    send_debug_log_message(tmp);
+  }
+  matched = false;
+
+  // Loop through the key-value table for a matching key
+  for(uint8_t i=0; i<TABLE_SIZE; i++){
+    // pick item from table
+    const naatos_kv_table_entry_t * item = &(KVTABLE[i]);
+
+    // check for match of the key in the table
+    if(strcasecmp(keystr,item->name) == 0) {
+      if(_printdebugs)  {
+        sprintf(tmp,"  matched key = %s -> file value str = \"%s\"",item->name,valstr);
+        send_debug_log_message(tmp);
+      }
+
+      // we have a match! now
+      // parse the value string
+      switch(item->dtype) {
+        case NAATOS_KV_DT_FLOAT:
+          *((float*) item->dataptr) = parse_double(valstr,parse_double(item->defaultcfgstr,0));
+          if(_printdebugs)  {
+            sprintf(tmp,"  was DT_FLOAT. parsed = %g", *((float*) item->dataptr) );
+            send_debug_log_message(tmp);
+          }
+
+          matched = true;
+          break;
+        case NAATOS_KV_DT_INT:
+          *((int*) item->dataptr) = parse_int(valstr,parse_int(item->defaultcfgstr,0));
+          if(_printdebugs)  {
+            sprintf(tmp,"  was DT_INT. parsed = %d", *((int*) item->dataptr) );
+            send_debug_log_message(tmp);
+          }
+          matched = true;
+          break;
+        case NAATOS_KV_DT_UINT16:
+          *((uint16_t*) item->dataptr) = (uint16_t) parse_int(valstr,parse_int(item->defaultcfgstr,0));
+          if(_printdebugs)  {
+            sprintf(tmp,"  was DT_UINT16. parsed = %d", *((uint16_t*) item->dataptr) );
+            send_debug_log_message(tmp);
+          }
+          matched = true;
+          break;
+        case NAATOS_KV_DT_BOOLS:
+          *((bool*) item->dataptr) = strcmp(valstr, "true") ? false : true;
+          if(_printdebugs)  {
+            sprintf(tmp,"  was DT_BOOLS. parsed = %d", *((bool*) item->dataptr) );
+            send_debug_log_message(tmp);
+          }
+          matched = true;
+          break;
+        default:
+          sprintf(tmp,"couldn't parse key = \"%s\" -> valstr = \"%s\" because couldn't handle the datatype",item->name,valstr);
+          send_debug_log_message(tmp);
+          break;
+      }
+      if(matched)
+        break;
+    }
+  }
+  if(!matched)  {
+    sprintf(tmp,"couldn't find key = \"%s\" -> valstr = \"%s\"",keystr,valstr);
+    send_debug_log_message(tmp);
+  }
+  return matched;
+}
+
+
+const naatos_kv_table_entry_t* naatos_config_global_get_itemptr_by_key(const char* keystr)  {
+  naatos_kv_table_entry_t * tableitem;
+  for(uint8_t i = 0; i<KV_TABLE_GLOBAL_SIZE; i++) {
+    tableitem = &(KV_TABLE_GLOBAL_PTR[i]);
+    if(strcmp(tableitem->name,keystr)==0) {
+      return tableitem;
+    }
+  }
+  return NULL;
+}
+
+char * naatos_config_global_getval_as_string_from_item(const naatos_kv_table_entry_t * item)  {
+  switch(item->dtype) {
+    case NAATOS_KV_DT_FLOAT:
+      snprintf(tmp,tmp_sz,"%g",*((float*) item->dataptr)); break;
+    case NAATOS_KV_DT_INT:
+      snprintf(tmp,tmp_sz,"%d",*((int*) item->dataptr)); break;
+    case NAATOS_KV_DT_UINT16:
+      snprintf(tmp,tmp_sz,"%d",*((uint16_t*) item->dataptr)); break;
+    case NAATOS_KV_DT_BOOLS:
+      if(*((bool*) item->dataptr))
+        snprintf(tmp,tmp_sz,"true");
+      else
+        snprintf(tmp,tmp_sz,"false");
+      break;
+    default:
+      //unknown/unimplement/error?
+      snprintf(tmp,tmp_sz,"");
+      break;
+  };
+
+  return tmp;
+}
+
+
+// CYCLE TABLE FUNCTIONs
+//const naatos_kv_table_entry_t* naatos_config_cycle_get_itemptr_by_key(const char* keystr)  {
+//  naatos_kv_table_entry_t * tableitem;
+//  for(uint8_t i = 0; i<KV_TABLE_GLOBAL_SIZE; i++) {
+//    tableitem = &(KV_TABLE_GLOBAL_PTR[i]);
+//    if(strcmp(tableitem->name,keystr)==0) {
+//      return tableitem;
+//    }
+//  }
+//  return NULL;
+//}
+
+//char * naatos_config_cycle_getval_as_string_from_item(const naatos_kv_table_entry_cycle_t * item)  {
+//  switch(item->dtype) {
+//    case NAATOS_KV_DT_FLOAT:
+//      snprintf(tmp,tmp_sz,"%g",*((float*) item->dataptr)); break;
+//    case NAATOS_KV_DT_INT:
+//      snprintf(tmp,tmp_sz,"%d",*((int*) item->dataptr)); break;
+//    case NAATOS_KV_DT_UINT16:
+//      snprintf(tmp,tmp_sz,"%d",*((uint16_t*) item->dataptr)); break;
+//    case NAATOS_KV_DT_BOOLS:
+//      if(*((bool*) item->dataptr))
+//        snprintf(tmp,tmp_sz,"true");
+//      else
+//        snprintf(tmp,tmp_sz,"true");
+//      break;
+//    default:
+//      //unknown/unimplement/error?
+//      snprintf(tmp,tmp_sz,"ERROR");
+//      break;
+//  };
+
+//  return tmp;
+//}
