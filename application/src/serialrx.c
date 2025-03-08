@@ -145,7 +145,10 @@ bool serialCmd_RSTCLK(char* sPtrTmp) {
 // queries a few PCF85063A registers for debug purposes and displays
 bool serialCmd_LSDIR(char* arg) {
   DIR dir;
+  DIR subdir;
   FILINFO fno;
+  FILINFO fnosub;
+  uint32_t dircounter;
   //uint32_t bytes_written;
   FRESULT ff_result;
   char buff[50];
@@ -169,10 +172,32 @@ bool serialCmd_LSDIR(char* arg) {
 
       if (fno.fname[0]) {
         if (fno.fattrib & AM_DIR) {
-          sprintf(buff, "   <DIR>   %s", (uint32_t)fno.fname);
+          // is directory. count how many entries in here.
+
+          // Open Root Directory
+          snprintf(buff,50,"/%s",fno.fname);  // path of subdirectory
+          ff_result = f_opendir(&subdir, buff);
+          if (ff_result) {
+            send_debug_log_message("Sub-Directory listing failed!");
+            return false;
+          }
+
+          dircounter = 0;
+          do  {
+            ff_result = f_readdir(&subdir, &fnosub);
+            if (ff_result != FR_OK) {
+              send_debug_log_message("Sub-Directory read failed.");
+              return false;
+            }
+            dircounter++;
+          } while (fnosub.fname[0]);
+          f_closedir(&subdir);
+
+          // output directory row
+          sprintf(buff, "   <DIR>   %-30s (%d entries)", (uint32_t)fno.fname,dircounter);
           send_debug_log_message(buff);
         } else {
-          sprintf(buff, "%9lu  %s", fno.fsize, (uint32_t)fno.fname);
+          sprintf(buff, "%9lu  %-30s", fno.fsize, (uint32_t)fno.fname);
           send_debug_log_message(buff);
         }
       }
