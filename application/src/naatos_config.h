@@ -6,11 +6,12 @@
 #include <stdint.h>
 #include "naatos_config_file.h"
 
-#define VERSION "3.3"
+#define VERSION "3.4"
 
 /*Define this when building sample prep only otherwise comment out*/
 //#define SAMPLE_PREP_BOARD
-#define POWER_MODULE_BOARD
+//#define POWER_MODULE_BOARD
+// -- As of V3.4 these are now set at the build-configuration level in the Segger Embedded studio build options
 
 #ifdef SAMPLE_PREP_BOARD
 #define SAMPLE_PREP_REV_A 0
