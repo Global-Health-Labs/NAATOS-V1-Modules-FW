@@ -23,6 +23,7 @@ naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
   { "min_run_zone_temp_en"            , NAATOS_KV_DT_BOOLS  , (void *) &(config.min_run_zone_temp_en),  "false"},
   { "min_run_zone_temp"               , NAATOS_KV_DT_FLOAT  , (void *) &(config.min_run_zone_temp),     "80.00"},
   { "do_automatic_runs"               , NAATOS_KV_DT_BOOLS  , (void *) &(config.do_automatic_runs),     "false"},
+  { "accept_run_time_error_s"         , NAATOS_KV_DT_FLOAT  , (void *) &(config.accept_run_time_error_s),"30.0"},
 
   { "heater_max_temp"                 , NAATOS_KV_DT_FLOAT  , (void *) &(config.heater_max_temp),       "120.0"},
   { "max_heater_pid_pwm"              , NAATOS_KV_DT_FLOAT  , (void *) &(config.max_heater_pid_pwm),    "100"},
@@ -32,7 +33,7 @@ naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
   { "motor_stall_pwm"                 , NAATOS_KV_DT_FLOAT  , (void *) &(config.motor_stall_pwm),       "65"},
   { "motor_stall_en"                  , NAATOS_KV_DT_BOOLS  , (void *) &(config.motor_stall_en),        "true"},
   
-  { "canary"                          , NAATOS_KV_DT_UINT16 , (void *) &(config.canary),                "747"},
+  { "canary"                          , NAATOS_KV_DT_UINT16 , (void *) &(config.canary),                "747"}, // method to detect if settings are defaulted
   { "mmddyy"                          , NAATOS_KV_DT_INT    , (void *) &(config.mmddyy),                "100124"},
   { "hhmmss"                          , NAATOS_KV_DT_INT    , (void *) &(config.hhmmss),                "120000"},
   { "set_time_date"                   , NAATOS_KV_DT_BOOLS  , (void *) &(config.set_date_time),         "false"}
@@ -87,6 +88,7 @@ naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
   { "min_run_zone_temp_en"            , NAATOS_KV_DT_BOOLS  , (void *) &(config.min_run_zone_temp_en),  "true"},
   { "min_run_zone_temp"               , NAATOS_KV_DT_FLOAT  , (void *) &(config.min_run_zone_temp),     "60.00"},
   { "do_automatic_runs"               , NAATOS_KV_DT_BOOLS  , (void *) &(config.do_automatic_runs),     "false"},
+  { "accept_run_time_error_s"         , NAATOS_KV_DT_FLOAT  , (void *) &(config.accept_run_time_error_s),"30.0"},
 
   { "optical_distance"                , NAATOS_KV_DT_UINT16 , (void *) &(config.optical_distance),      "800"},
   { "max_amp_pid_pwm"                 , NAATOS_KV_DT_FLOAT  , (void *) &(config.max_amp_pid_pwm),       "100"},
@@ -95,7 +97,7 @@ naatos_kv_table_entry_t KV_TABLE_GLOBAL[] = {
   { "amp_max_temp"                    , NAATOS_KV_DT_FLOAT  , (void *) &(config.amp_max_temp),          "120.0"},
   { "ledtop0frnt1"                    , NAATOS_KV_DT_UINT16 , (void *) &(config.ledtop0frnt1),          "0"},
   
-  { "canary"                          , NAATOS_KV_DT_UINT16 , (void *) &(config.canary),                "747"},
+  { "canary"                          , NAATOS_KV_DT_UINT16 , (void *) &(config.canary),                "747"}, // method to detect if settings are defaulted
   { "mmddyy"                          , NAATOS_KV_DT_INT    , (void *) &(config.mmddyy),                "100124"},
   { "hhmmss"                          , NAATOS_KV_DT_INT    , (void *) &(config.hhmmss),                "120000"},
   { "set_time_date"                   , NAATOS_KV_DT_BOOLS  , (void *) &(config.set_date_time),         "false"}

@@ -5,6 +5,7 @@
 #include "naatos_config.h"
 #include "logger/logger.h"
 #include <stdint.h>
+#include <time.h>
 
 #define PCF85_S_ADDR 0x51
 
@@ -16,6 +17,8 @@
 #define PCF85_REG_COUNTDOWN_TIMER_VALUE_ADDR 0x10
 #define PCF85_REG_COUNTDOWN_TIMER_MODE_ADDR 0x11
 
+extern struct tm timeinfo;
+
 bool calendar_get_time(calendar_time_t *now);
 bool calendar_set_time(calendar_time_t *now);
 bool calendar_reset(void);
@@ -24,5 +27,6 @@ bool calendar_stop(void);
 bool calendar_start(void);
 bool calendar_set_32k(void);
 bool calendar_check_state(void);
+struct tm * calendar_get_ctimeinfo(calendar_time_t rtctime);
 
 #endif

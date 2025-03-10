@@ -1,5 +1,6 @@
 #include "cycle_state_fsm.h"
 #include "naatos_messages.h"
+#include <time.h>
 
 cycle_state_t current_state = VALIDATE_INIT_CONDITIONS;
 cycle_state_t next_state = VALIDATE_INIT_CONDITIONS;
@@ -11,6 +12,15 @@ char exitString[256] = {};
 sensor_switches_t switch_data = {.optical_tiggered = false, .hal_triggered = false};
 sensor_switches_t last_switch_data;
 button_update_t buttonData = {.event = NONE};
+
+// Times for the entire run
+float run_expected_time_s;
+bool run_has_variable_time_steps;
+uint32_t run_start_time_ticks;
+uint32_t run_success_stop_time_ticks;
+uint32_t run_success_expected_stop_time_ticks;
+time_t run_rtc_start;
+time_t run_rtc_stop;
 
 uint32_t start_time = 0;
 uint32_t end_time = 0;
@@ -149,6 +159,21 @@ cycle_state_exit_t run_cycle_state_machine(void) {
           //send_debug_log_message("CYCLE_FSM: consumed a message from main_runErrorQueue and discarded");
         }
       }
+
+      // Reset expected successful runtime numbers
+      run_expected_time_s = 0;  // <-- holds the expected run time that a successful run will take
+      run_has_variable_time_steps = false;  // <-- if any cycles have ramp_to_temp_before_start_cycle=true, this will become true and time will become variable
+      for(uint8_t i=0; i<total_cycles; i++) {
+        run_expected_time_s += cycle_configs[i].cycle_run_time_s;
+        run_has_variable_time_steps = cycle_configs[i].ramp_to_temp_before_start_cycle;
+      }
+      run_start_time_ticks = xTaskGetTickCount();   //<-- holds current "timestamp" of when the run started
+      run_success_stop_time_ticks = 0;    //<-- reset to zero
+      run_success_expected_stop_time_ticks = run_start_time_ticks + pdMS_TO_TICKS( (uint32_t) (run_expected_time_s*1e3) );  //<-- holds expected "timestamp" of when run is thought to need to stop
+    #ifdef USE_CALENDAR_CHIP
+      calendar_get_time(&timestruct);
+      run_rtc_start = mktime(calendar_get_ctimeinfo(timestruct));
+    #endif
 
 
       next_state = START_CYCLE;
@@ -336,7 +361,46 @@ cycle_state_exit_t run_cycle_state_machine(void) {
           if ((current_cycle_index + 1) == total_cycles){
             
             // we are really all finished, no more cycles
+            run_success_stop_time_ticks = xTaskGetTickCount();
+
+            // run is deemed complete
+
+            // check to make sure that the run took the expected amount of time.
+            run_rtc_stop = mktime(calendar_get_ctimeinfo(timestruct));
+            snprintf(exitString,255,"Run complete. expected_sec=%g tick_delta_sec=%g rtc_delta_sec=%g",
+              run_expected_time_s,
+              ((double) pdTICKS_TO_MS(run_success_stop_time_ticks-run_start_time_ticks))*(1e-3) - run_expected_time_s,
+              difftime(run_rtc_start,run_rtc_stop) - run_expected_time_s
+            );
+            send_event_log_message(SAMPLE_DESCRIPTIVE_EVENT_TEXT, exitString);
+
+
+            // No Error, Good-Exit (Green)
             next_state = CYCLE_SAMPLE_VALID_HOLD;
+
+            // OPTIONALLY CHECK FOR TIME-ERRORS TO DETERMINE IF WE SHOULD ERROR-OUT
+            if(
+              (!run_has_variable_time_steps) &&      // simple cycles with no variable time (ramp waits)
+              (config.accept_run_time_error_s>0.0)   // config parameter is nonzero
+            )  {
+              // is time-error according to RTC, good ?
+              if( abs(difftime(run_rtc_start,run_rtc_stop) - run_expected_time_s ) >= config.accept_run_time_error_s ) {
+                // total run time according to rtc exceeded threshold
+                next_state = RUN_ERROR_OR_FINISHED;
+                exitInfo = CYCLE_ERROR_FINISHED_BUT_ACTUAL_RUNTIME_HAD_A_MISMATCH;
+                runThrough = true;
+              }
+              // is time-error according to TASK TICKS, good ?
+              if( abs(((double) pdTICKS_TO_MS(run_success_stop_time_ticks-run_start_time_ticks))*(1e-3) - run_expected_time_s) >= config.accept_run_time_error_s ) {
+                // total run time according to freertos / systick exceeded threshold
+                next_state = RUN_ERROR_OR_FINISHED;
+                exitInfo = CYCLE_ERROR_FINISHED_BUT_ACTUAL_RUNTIME_HAD_A_MISMATCH;
+                runThrough = true;
+              }   
+            } else{
+              // default will exit normally/successfully
+            }
+
           } else {
             current_cycle_index++;  // Increase the current cycle index to get the next cycle information
             next_state = START_CYCLE;
@@ -519,6 +583,10 @@ void handle_exit_notifications(void) {
     eventType = SAMPLE_UNKNOWN;
     sprintf(exitString, "Cannot run due to unhandled flags. runflags=0x%x machine=0x%x",conditions_for_run.reg,conditions_for_machine.reg);
     break;
+  case CYCLE_ERROR_FINISHED_BUT_ACTUAL_RUNTIME_HAD_A_MISMATCH:
+    eventType = SAMPLE_UNKNOWN;
+    sprintf(exitString, "Total run time taken was beyond the configured threshold of %g seconds",config.accept_run_time_error_s);
+    break;
   case CYCLE_ERROR_UNKNOWN: // drop to default
   default:
     eventType = SAMPLE_UNKNOWN;
@@ -563,7 +631,7 @@ bool begin_cycle(cycle_t cycle) {
   log_event_t cycle_start_event = {
     .event = SAMPLE_CYCLE_STARTED,
     .message = NULL};
-  sprintf(cycle_start_event.message, "Cycle %d Started.", (uint16_t)cycle);
+  sprintf(cycle_start_event.message, "Cycle %d Started. runtime_s=%g ticks=%lu rtc=%lu", (uint16_t)cycle, cycle_configs[current_cycle_index].cycle_run_time_s, xTaskGetTickCount(), mktime(calendar_get_ctimeinfo(timestruct)) );
   log_data_message_t cycle_start_log_msg = {
     .data_type = EVENT_DATA,
     .temperature_data = NULL,

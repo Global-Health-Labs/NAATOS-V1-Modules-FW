@@ -2,6 +2,10 @@
 #include "ff.h"
 #include "time.h"
 
+// timeinfo structure from clibrary
+struct tm timeinfo;
+
+
 // Decode retreived info
 uint8_t calendar_decode(uint8_t reading) {
   return (reading >> 4) * 10 + (reading & 0x0F);
@@ -335,4 +339,16 @@ bool calendar_check_state(void) {
 
 
   #endif
+}
+
+struct tm * calendar_get_ctimeinfo(calendar_time_t rtctime)  {
+  //https://cplusplus.com/reference/ctime/tm/
+  //tm timestruct;
+  timeinfo.tm_hour = rtctime.hour;
+  timeinfo.tm_min =  rtctime.minute;
+  timeinfo.tm_sec =  rtctime.second;
+  timeinfo.tm_mon =  rtctime.month-1;     // 0 to 11 (months since january)
+  timeinfo.tm_mday = rtctime.day;         // 1 to 31
+  timeinfo.tm_year = rtctime.year+100;    // years since 1900, naatos calendar returns since 2000
+  return &timeinfo;
 }

@@ -21,6 +21,7 @@ typedef union {
   uint8_t reg;
 } logger_cumulative_errors_t;
 extern logger_cumulative_errors_t logger_cumulative_errors;
+extern calendar_time_t timestruct;
 
 void set_log_level();
 void send_start_log_message();

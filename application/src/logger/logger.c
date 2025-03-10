@@ -12,7 +12,7 @@ xQueueHandle logger_recvBattPercentQueue;
 xQueueHandle logger_logMessageQueue;
 volatile bool loggerbusy = false;
 
-calendar_time_t time = {
+calendar_time_t timestruct = {
     .second = 0,
     .minute = 0,
     .hour = 0,
@@ -35,7 +35,7 @@ logger_cumulative_errors_t logger_cumulative_errors;
 
 void normalize_pwm_data(log_data_message_t *rxLogMsg);
 
-uint32_t constructDebugLogLine(char *logLineBuffer, char *message, calendar_time_t time);
+uint32_t constructDebugLogLine(char *logLineBuffer, char *message, calendar_time_t timestruct);
 
 fuel_batt_info_t battery_info_recv = {
   .batt_percent = 0,
@@ -61,18 +61,18 @@ fuel_batt_info_t getBatteryPercent(void) {
 
 // Puts log file name in char pointer
 void getLogFileName(const char *_logFileName) {
-  if (!(calendar_get_time(&time))) {
+  if (!(calendar_get_time(&timestruct))) {
     send_debug_log_message("LOG_TASK: Unable to get time for log file name!");
     sprintf(_logFileName, "unknown.csv");
   }
-  if (!(calendar_get_time(&time))) {
+  if (!(calendar_get_time(&timestruct))) {
     send_debug_log_message("LOG_TASK: Unable to get time for log file name!");
     sprintf(_logFileName, "unknown.csv");
   }
   // Get current Date and Time and update vars
   sprintf(_logFileName, "sample_%02d-%02d-%02d_%02d%02d%02d.csv",
-      time.month, time.day, time.year, // Assuming 'year' is the full year, so we use % 100 to get last two digits
-      time.hour, time.minute, time.second);
+      timestruct.month, timestruct.day, timestruct.year, // Assuming 'year' is the full year, so we use % 100 to get last two digits
+      timestruct.hour, timestruct.minute, timestruct.second);
 }
 
 void logger_task(void *pvParameters) {
@@ -137,7 +137,7 @@ void logger_task(void *pvParameters) {
     }
     case TEMPERATURE_DATA: {
       // Get current time
-      if (!(calendar_get_time(&time))) {
+      if (!(calendar_get_time(&timestruct))) {
         send_debug_log_message("LOG_TASK: Unable to retreive time!");
       }
 
@@ -145,7 +145,7 @@ void logger_task(void *pvParameters) {
 
       normalize_pwm_data(&rxLogMsg);
 
-      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, battery_info.batt_percent, battery_info.batt_voltage, battery_info.batt_temp);
+      logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, timestruct, rxLogMsg, battery_info.batt_percent, battery_info.batt_voltage, battery_info.batt_temp);
       last_temp_message = rxLogMsg;
 
       // Check UART Only
@@ -162,7 +162,7 @@ void logger_task(void *pvParameters) {
 
     case EVENT_DATA: {
       // Get current time
-      if (!(calendar_get_time(&time))) {
+      if (!(calendar_get_time(&timestruct))) {
         send_debug_log_message("LOG_TASK: Unable to retreive time!");
       }
 
@@ -172,7 +172,7 @@ void logger_task(void *pvParameters) {
 
       last_temp_message.event_data = rxLogMsg.event_data;
 
-      logFileLineSize = loggerInterface->constructEventDataLogLine(logFileLine, time, last_temp_message, battery_info.batt_percent, battery_info.batt_voltage, battery_info.batt_temp);
+      logFileLineSize = loggerInterface->constructEventDataLogLine(logFileLine, timestruct, last_temp_message, battery_info.batt_percent, battery_info.batt_voltage, battery_info.batt_temp);
       if (rxLogMsg.event_data.event == SAMPLE_INTERRUPTED ||
           rxLogMsg.event_data.event == SAMPLE_TEMPS_NOT_STABALIZED ||
           rxLogMsg.event_data.event == SAMPLE_RECOVERY_BATT ||
@@ -209,13 +209,13 @@ void logger_task(void *pvParameters) {
     case UART_DATA: {
       normalize_pwm_data(&rxLogMsg);
       //if (config.debug_to_com_en) { Not sure if this is considered debug statement or not, going to keep it printing to com for now
-        logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, time, rxLogMsg, battery_info.batt_percent, battery_info.batt_voltage, battery_info.batt_temp);
+        logFileLineSize = loggerInterface->constructSensorDataLogLine(logFileLine, timestruct, rxLogMsg, battery_info.batt_percent, battery_info.batt_voltage, battery_info.batt_temp);
         write_to_com(logFileLine, logFileLineSize);
       //}
       break;
     }
     case LOGGER_LOG_DEBUG_EVENT:
-      logFileLineSize = constructDebugLogLine(logFileLine, rxLogMsg.event_data.message, time);
+      logFileLineSize = constructDebugLogLine(logFileLine, rxLogMsg.event_data.message, timestruct);
       write_to_com(logFileLine, logFileLineSize);
       break;
     default:

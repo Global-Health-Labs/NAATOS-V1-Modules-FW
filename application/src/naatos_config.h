@@ -301,6 +301,7 @@ typedef enum {
   SAMPLE_MOTOR_STALLED_PERCENT,
   SAMPLE_MOTOR_STALLED_PWM,
   SAMPLE_UNKNOWN,
+  SAMPLE_DESCRIPTIVE_EVENT_TEXT,
   SAMPLE_BATTERY_LOW,
   SAMPLE_BATTERY_OVERTEMP,
   // Add more events here
@@ -681,6 +682,7 @@ typedef struct {
   float     min_run_zone_temp;
   bool      min_run_zone_temp_en;
   bool      do_automatic_runs;
+  float     accept_run_time_error_s;
 #ifndef SAMPLE_PREP_BOARD  
   uint16_t  sound_volume_complete;
   uint16_t  sound_volume_abort;
