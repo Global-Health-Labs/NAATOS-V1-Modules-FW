@@ -33,7 +33,10 @@ extern const naatos_kv_table_entry_cycle_t* KV_TABLE_CYCLE_PTR;
 
 
 
-bool naatos_config_assignParameterUsingKeyValueTable_given_key_and_value_strings(const naatos_kv_table_entry_t * KVTABLE, const uint8_t TABLE_SIZE, const char* keystr, const char* valstr);
+// Functions To Deal With GLOBAL Config
 const naatos_kv_table_entry_t* naatos_config_global_get_itemptr_by_key(const char* keystr);
 char * naatos_config_global_getval_as_string_from_item(const naatos_kv_table_entry_t * item);
+bool   naatos_config_global_settval_for_item_from_string(const naatos_kv_table_entry_t * item, const char* valstr);
+
+// Functions To Deal With CYCLE Config
 char * naatos_config_cycle_getval_as_string_from_item(const naatos_kv_table_entry_cycle_t * item);

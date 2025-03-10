@@ -460,7 +460,7 @@ bool serialCmd_CFGSET(char* sPtrTmp)  {
             send_debug_log_message(tmp);
 
             // Do the parameter assignment
-            success = naatos_config_assignParameterUsingKeyValueTable_given_key_and_value_strings(KV_TABLE_GLOBAL_PTR,KV_TABLE_GLOBAL_SIZE,bufkey,bufval);
+            success = naatos_config_global_settval_for_item_from_string(tableitem, bufval);
 
             //success = true;            
           }

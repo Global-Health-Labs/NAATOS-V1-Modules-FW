@@ -189,7 +189,7 @@ FRESULT remount_goto_logs_dir(void) {
   }
 }
 
-bool _assignParameterUsingKeyValueTable_given_key_and_value_from_config_file(const naatos_kv_table_entry_t * KVTABLE, const uint8_t TABLE_SIZE, const char* keystr, const char* valstr) {
+bool _assignParameterUsingKeyValueTable_given_key_and_value_from_config_file(const char* keystr, const char* valstr) {
   // Search the key-value table for a matching key
   const bool _printdebugs = false;
   char tmp[80];
@@ -201,63 +201,24 @@ bool _assignParameterUsingKeyValueTable_given_key_and_value_from_config_file(con
   }
   matched = false;
 
-  // Loop through the key-value table for a matching key
-  for(uint8_t i=0; i<TABLE_SIZE; i++){
-    // pick item from table
-    const naatos_kv_table_entry_t * item = &(KVTABLE[i]);
+  // Search for matching key in the key-value table
+  //GET KEY ITEM FROM CONFIG TABLE
+  const naatos_kv_table_entry_t * tableitem = naatos_config_global_get_itemptr_by_key(keystr);
 
-    // check for match of the key in the table
-    if(strcasecmp(keystr,item->name) == 0) {
-      if(_printdebugs)  {
-        sprintf(tmp,"  matched key = %s -> file value str = \"%s\"",item->name,valstr);
-        send_debug_log_message(tmp);
-      }
-
-      // we have a match! now
-      // parse the value string
-      switch(item->dtype) {
-        case NAATOS_KV_DT_FLOAT:
-          *((float*) item->dataptr) = parse_double(valstr,parse_double(item->defaultcfgstr,0));
-          if(_printdebugs)  {
-            sprintf(tmp,"  was DT_FLOAT. parsed = %g", *((float*) item->dataptr) );
-            send_debug_log_message(tmp);
-          }
-
-          matched = true;
-          break;
-        case NAATOS_KV_DT_INT:
-          *((int*) item->dataptr) = parse_int(valstr,parse_int(item->defaultcfgstr,0));
-          if(_printdebugs)  {
-            sprintf(tmp,"  was DT_INT. parsed = %d", *((int*) item->dataptr) );
-            send_debug_log_message(tmp);
-          }
-          matched = true;
-          break;
-        case NAATOS_KV_DT_UINT16:
-          *((uint16_t*) item->dataptr) = (uint16_t) parse_int(valstr,parse_int(item->defaultcfgstr,0));
-          if(_printdebugs)  {
-            sprintf(tmp,"  was DT_UINT16. parsed = %d", *((uint16_t*) item->dataptr) );
-            send_debug_log_message(tmp);
-          }
-          matched = true;
-          break;
-        case NAATOS_KV_DT_BOOLS:
-          *((bool*) item->dataptr) = strcmp(valstr, "true") ? false : true;
-          if(_printdebugs)  {
-            sprintf(tmp,"  was DT_BOOLS. parsed = %d", *((bool*) item->dataptr) );
-            send_debug_log_message(tmp);
-          }
-          matched = true;
-          break;
-        default:
-          sprintf(tmp,"couldn't parse key = %s -> file value str = \"%s\" because couldn't handle the datatype",item->name,valstr);
-          send_debug_log_message(tmp);
-          break;
-      }
-      if(matched)
-        break;
+  //If key found, set the value
+  if(tableitem != NULL)  {
+    // KEY FOUND
+    if(_printdebugs)  {
+      //snprintf(tmp,tmpsz,"CFGSET: set global understood and found keystr=\"%s\" valstr=\"%s\"",bufkey,bufval);
+      //send_debug_log_message(tmp);
     }
+
+    // Do the parameter assignment
+    matched = naatos_config_global_settval_for_item_from_string(tableitem, valstr);
+
+    //success = true;            
   }
+
   if(!matched)  {
     sprintf(tmp,"couldn't parse key = %s -> file value str = \"%s\"",keystr,valstr);
     send_debug_log_message(tmp);
@@ -268,7 +229,7 @@ void _init_global_configuration() {
   for(uint8_t i = 0; i<KV_TABLE_GLOBAL_SIZE; i++) {
     const naatos_kv_table_entry_t * item = &(KV_TABLE_GLOBAL_PTR[i]);
 
-    _assignParameterUsingKeyValueTable_given_key_and_value_from_config_file(KV_TABLE_GLOBAL_PTR, KV_TABLE_GLOBAL_SIZE, item->name, item->defaultcfgstr);
+    _assignParameterUsingKeyValueTable_given_key_and_value_from_config_file(item->name, item->defaultcfgstr);
   }
 }
 FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters) {
@@ -329,7 +290,7 @@ FRESULT get_naatos_configuration_parameters(naatos_config_parameters *parameters
 
     // Search the key-value table for a matching key. if found, then parse and populate the parameters data structure
     strcpy(val2,val);
-    _assignParameterUsingKeyValueTable_given_key_and_value_from_config_file(KV_TABLE_GLOBAL_PTR,KV_TABLE_GLOBAL_SIZE,key,val2);
+    _assignParameterUsingKeyValueTable_given_key_and_value_from_config_file(key, val2);
     // after this function runs, if a match was found, it should have been populated int the config structure
 
   } // file for-loop
