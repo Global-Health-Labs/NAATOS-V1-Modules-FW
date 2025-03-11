@@ -35,9 +35,14 @@ void handle_power_cycle_stopstart_heater(bool amp_heating, bool valve_heating) {
 
   // Set the Valve Zone Boost Enable
   if (valve_heating) {
-    enable_valve_boost();
+    nrf_gpio_pin_set(VALVE_PWR_EN);
+    vTaskDelay(2);  //2 tick delay
+    //valve_zone_set_6v();
+    //enable_valve_boost();
+    valve_zone_set_6v_and_configure_and_ENABLE();
   } else {
-    disable_valve_boost();
+    nrf_gpio_pin_clear(VALVE_PWR_EN);
+    //disable_valve_boost();
   }
 
   // Check if we want to Ramp To Temperature

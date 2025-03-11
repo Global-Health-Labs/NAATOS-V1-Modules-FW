@@ -52,6 +52,13 @@ bool usb_suspend = false;
 uint32_t sample_log_index = 0;
 uint32_t sample_log_max = 0;
 
+
+uint32_t tickstart1;
+uint32_t tickstop1;
+
+uint32_t tickstart2;
+uint32_t tickstop2;
+
 sensor_public_data_t PUBLIC_SENSOR_DATA = {
   .temperatures = &temperatures,
   .oneshot_temperature_acquisition = &oneshot_temperature_acquisition
@@ -280,6 +287,7 @@ void runPowerModuleSensorCollection(void) {
   BaseType_t xReturned;
   HeaterRxQueueMsg_t heaterMsg;
   uint8_t nretries = 0;
+  static uint8_t counter = 0;
 
   // ADC Read for Optical Sensors
   bool prev = switches.optical_tiggered;
@@ -307,10 +315,12 @@ void runPowerModuleSensorCollection(void) {
     bool dis = true;
     heaterMsg.readTempFailed = false;
 
+    /*
     // I2C Read for Heater Zone 0
     nretries = 0;
     while(nretries<3) {
       if(p_heaterRunningValve)  {
+        tickstart1 = xTaskGetTickCount();
         dis = disable_valve_boost();
         while (!dis) { // Reset the Valve Boost
           nrf_gpio_pin_clear(VALVE_PWR_EN); 
@@ -322,6 +332,7 @@ void runPowerModuleSensorCollection(void) {
       readTempSuccess = readTemp(valve_zone, &temperatures.valve_temp);
       if(p_heaterRunningValve)  {
         enable_valve_boost();
+        tickstop1 = xTaskGetTickCount();
       }
       if (!readTempSuccess) {
         send_event_log_message(SAMPLE_I2C_READ_ERROR,"temp read failure on valve zone");
@@ -337,6 +348,7 @@ void runPowerModuleSensorCollection(void) {
     nretries = 0;
     while(nretries<3) {
       if(p_heaterRunningValve)  {
+        tickstart2 = xTaskGetTickCount();
         dis = disable_valve_boost();
         while (!dis) {  // Reset the Valve Boost
           nrf_gpio_pin_clear(VALVE_PWR_EN); 
@@ -348,9 +360,10 @@ void runPowerModuleSensorCollection(void) {
       readTempSuccess = readTemp(amp_zone, &temperatures.amp_temp);
       if(p_heaterRunningValve)  {
         enable_valve_boost();
+        tickstop2 = xTaskGetTickCount();
       }
       if (!readTempSuccess) {
-      send_event_log_message(SAMPLE_I2C_READ_ERROR,"temp read failure on amp zone");
+        send_event_log_message(SAMPLE_I2C_READ_ERROR,"temp read failure on amp zone");
         heaterMsg.readTempFailed = true;
         nretries++;
       } else{
@@ -358,6 +371,70 @@ void runPowerModuleSensorCollection(void) {
         break;
       }
     }
+    */
+
+    // I2C Read for Temperature Sensors (try 3 times then return with error which will abandon cycle)
+    if(p_heaterRunningValve)  {
+      tickstart1 = xTaskGetTickCount();
+      
+      nrf_gpio_pin_clear(VALVE_PWR_EN);       //<-- turn off the VALVE power supply; this will clear it's registers
+      //dis = disable_valve_boost();
+      //while (!dis) { // Reset the Valve Boost
+      //  nrf_gpio_pin_clear(VALVE_PWR_EN); 
+      //  nrf_gpio_pin_set(VALVE_PWR_EN); 
+      //  valve_zone_set_6v();
+      //  dis = disable_valve_boost();
+      //}
+    }
+    nretries = 0;
+    while(nretries<3) {
+      readTempSuccess = readTemp(valve_zone, &temperatures.valve_temp);
+      if (!readTempSuccess) {
+        send_event_log_message(SAMPLE_I2C_READ_ERROR,"saw a temperature read failure on valve zone");
+        heaterMsg.readTempFailed = true;
+        nretries++;
+      } else{
+        heaterMsg.readTempFailed = false;
+        break;
+      }
+    }
+    nretries = 0;
+    while(nretries<3) {
+      readTempSuccess = readTemp(amp_zone, &temperatures.amp_temp);
+      if (!readTempSuccess) {
+        send_event_log_message(SAMPLE_I2C_READ_ERROR,"saw a temperature read failure on amp zone");
+        heaterMsg.readTempFailed = true;
+        nretries++;
+      } else{
+        heaterMsg.readTempFailed = false;
+        break;
+      }
+    }
+    if(p_heaterRunningValve)  {
+      // TURN ON VALVE HEATER POWER SUPPLY AGAIN
+      nrf_gpio_pin_set(VALVE_PWR_EN);
+      vTaskDelay(2);  //2 tick delay
+      //valve_zone_set_6v();
+      //enable_valve_boost();
+      valve_zone_set_6v_and_configure_and_ENABLE();
+
+      tickstop1 = xTaskGetTickCount();
+    }
+
+#if 0
+    // Summarize down-time for no valve power supply
+    if(p_heaterRunningValve && (counter%20 == 0) )  {
+      char buf[100];
+      counter = 1;
+      snprintf(buf,100,"SENSORS: valve power supply downtimes 1=%lums  2=%lums",
+        pdTICKS_TO_MS(tickstop1-tickstart1),
+        pdTICKS_TO_MS(tickstop2-tickstart2)
+      );
+      send_event_log_message(SAMPLE_UNKNOWN,buf);
+    } else{
+      counter++;
+    }
+ #endif
 
     if(heaterRunning) {
       // Send Temperatures to heater

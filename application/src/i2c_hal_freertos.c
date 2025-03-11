@@ -28,7 +28,7 @@ uint32_t GLOBAL_I2C_RECOVERY_COUNTER = 0; // global variable
 
 #define MAX_I2C_RETRIES 3
 
-void i2c_error_recovery(i2c_interface_selection_t interface) {
+void i2c_error_recovery(i2c_interface_selection_t interface, uint8_t slaveaddr_triggered) {
   nrf_drv_twi_disable(&m_i2c[interface]);
   nrf_drv_twi_uninit(&m_i2c[interface]);
 
@@ -59,9 +59,8 @@ void i2c_error_recovery(i2c_interface_selection_t interface) {
   vTaskDelay(pdMS_TO_TICKS(5)); // Short delay to ensure the bus is idle
   nrf_drv_twi_init(&m_i2c[interface], &twi_configs[interface], NULL, NULL);
 
-  int size;
   char buff[60];
-  size = sprintf(buff, "I2C error recovery attempt on interface: %i", interface);
+  snprintf(buff, 60, "I2C error recovery on interface: %i talking to slave 0x%02x", interface,slaveaddr_triggered);
   send_debug_log_message(buff);
   GLOBAL_I2C_RECOVERY_COUNTER+=1;
 }
@@ -171,7 +170,7 @@ ret_code_t xUtil_TWI_Read(i2c_interface_selection_t interface, uint8_t slave_add
     if (err_code == NRF_SUCCESS) {
       break;
     } else {
-      i2c_error_recovery(interface);
+      i2c_error_recovery(interface,slave_addr);
     }
   }
 
@@ -209,7 +208,7 @@ ret_code_t xUtil_TWI_Write(i2c_interface_selection_t interface, uint8_t slave_ad
     if (err_code == NRF_SUCCESS) {
       break;
     } else {
-      i2c_error_recovery(interface);
+      i2c_error_recovery(interface,slave_addr);
     }
   }
 
@@ -243,7 +242,7 @@ ret_code_t xUtil_TWI_Write_Single(i2c_interface_selection_t interface, uint8_t s
     if (err_code == NRF_SUCCESS) {
       break;
     } else {
-      i2c_error_recovery(interface);
+      i2c_error_recovery(interface,slave_addr);
     }
   }
 

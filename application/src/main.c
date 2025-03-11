@@ -385,12 +385,12 @@ void set_startup_enables(void) {
   // Front LED driver enable
   nrf_gpio_cfg_output(FRONT_LED_DRV_EN);
   nrf_gpio_pin_set(FRONT_LED_DRV_EN);
-  // Turn off boost for Valve heater
+  // Turn off boost enable line for Valve heater
   nrf_gpio_cfg_output(VALVE_PWR_EN);
-  nrf_gpio_pin_set(VALVE_PWR_EN); 
-  // Turn off boost for amp heater
+  nrf_gpio_pin_clear(VALVE_PWR_EN);
+  // Turn off boost enable line for Amp heater
   nrf_gpio_cfg_output(AMP_PWR_EN);
-  nrf_gpio_pin_clear(AMP_PWR_EN); 
+  nrf_gpio_pin_clear(AMP_PWR_EN);
   // Sensors power enable
   nrf_gpio_cfg_output(SENSORS_PWR_EN);
   nrf_gpio_pin_set(SENSORS_PWR_EN);
@@ -485,9 +485,9 @@ void init_peripherals(void) {
   fuelGauge_init();
   init_naatos_storage();
   button_init();
-#ifdef POWER_MODULE_BOARD
-  valve_zone_set_6v();
-#endif
+//#ifdef POWER_MODULE_BOARD
+//  valve_zone_set_6v();
+//#endif  // moved to the actual powermoduleheater module
 }
 
 void uninit_peripherals(void) {
