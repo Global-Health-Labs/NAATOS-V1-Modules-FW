@@ -22,9 +22,15 @@ uint32_t run_success_expected_stop_time_ticks;
 time_t run_rtc_start;
 time_t run_rtc_stop;
 
+#if !FSM_USE_RTC_FOR_CYCLE_TIME
 uint32_t start_time = 0;
 uint32_t end_time = 0;
 uint32_t time_left = 0;
+#else
+time_t start_time = 0;
+time_t end_time = 0;
+float time_left = 0;
+#endif
 float time_s_in_cycle_elapsed = 0;
 bool setReachedRx = false;
 
@@ -206,13 +212,19 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     case CYCLE_IS_RUNNING: {
       // Initial entry into this state
       if (last_state != current_state) {
+        #if !FSM_USE_RTC_FOR_CYCLE_TIME
         start_time = xTaskGetTickCount();
-
+        #else
+        start_time = mktime(calendar_get_ctimeinfo(timestruct));
+        #endif
       }
 
       // Time left on the timer (float in seconds)
+      #if !FSM_USE_RTC_FOR_CYCLE_TIME
       time_s_in_cycle_elapsed = (xTaskGetTickCount() - start_time)/configTICK_RATE_HZ;
-      //time_left = xTaskGetTickCount() - start_time;
+      #else
+      time_s_in_cycle_elapsed = difftime( start_time, mktime(calendar_get_ctimeinfo(timestruct)) );
+      #endif
       
       // Get Battery Data
       next_state = handleBatteryMessage();
@@ -285,8 +297,11 @@ cycle_state_exit_t run_cycle_state_machine(void) {
           }
 
           // change the start-time to right-now, so cycle timer will measure from this point
+          #if !FSM_USE_RTC_FOR_CYCLE_TIME
           start_time = xTaskGetTickCount();
-
+          #else
+          start_time = mktime(calendar_get_ctimeinfo(timestruct));
+          #endif
       }
 
       // Check if cycle has completed normally
@@ -415,8 +430,14 @@ cycle_state_exit_t run_cycle_state_machine(void) {
     case CYCLE_SAMPLE_VALID_HOLD: {
       if (last_state != current_state) {
         updateLedState(LED_COMPLETE, true);
+        #if !FSM_USE_RTC_FOR_CYCLE_TIME
         start_time = xTaskGetTickCount();
         end_time = ((config.sample_valid_timeout_s) * 1000);
+        #else
+        start_time = mktime(calendar_get_ctimeinfo(timestruct));
+        end_time = config.sample_valid_timeout_s;
+        #endif
+
 
       #ifdef POWER_MODULE_BOARD
         // PLAY SOUND
@@ -444,7 +465,14 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       buttonData.event = NONE;
       xQueueReceive(button_mainStateQueue, &buttonData, 0);
 
+      #if !FSM_USE_RTC_FOR_CYCLE_TIME
       time_left = (xTaskGetTickCount() - start_time);
+      #else
+      calendar_get_time(&timestruct); // get new time from rtc, because in this state the logger is usually not running
+      time_left = difftime(start_time,mktime(calendar_get_ctimeinfo(timestruct)));
+      //start_time = mktime(calendar_get_ctimeinfo(timestruct));
+      //end_time = config.sample_valid_timeout_s;
+      #endif
       if (time_left >= end_time) {
         exitInfo = CYCLE_SAMPLE_INVALIDATED;
         runThrough = true;
