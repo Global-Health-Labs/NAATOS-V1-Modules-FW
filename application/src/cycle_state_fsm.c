@@ -22,6 +22,10 @@ uint32_t run_success_expected_stop_time_ticks;
 time_t run_rtc_start;
 time_t run_rtc_stop;
 
+uint32_t cycle_start_time_ticks;
+time_t cycle_rtc_start;
+time_t cycle_rtc_stop;
+
 #if !FSM_USE_RTC_FOR_CYCLE_TIME
 uint32_t start_time = 0;
 uint32_t end_time = 0;
@@ -199,6 +203,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         break;
       }
 
+      cycle_start_time_ticks = xTaskGetTickCount();
+      cycle_rtc_start = mktime(calendar_get_ctimeinfo(timestruct));
+
       updateLedState(LED_RUN_HEATER, true);
 
       next_state = CYCLE_IS_RUNNING;
@@ -359,6 +366,9 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       // First-entry
       if (last_state != current_state) {
 
+        run_success_stop_time_ticks = xTaskGetTickCount();
+        run_rtc_stop = mktime(calendar_get_ctimeinfo(timestruct));
+
         // CHECK IF AN ERROR OCCURRED
         if(exitInfo!=CYCLE_RUNNING) {
           
@@ -376,12 +386,10 @@ cycle_state_exit_t run_cycle_state_machine(void) {
           if ((current_cycle_index + 1) == total_cycles){
             
             // we are really all finished, no more cycles
-            run_success_stop_time_ticks = xTaskGetTickCount();
 
             // run is deemed complete
 
             // check to make sure that the run took the expected amount of time.
-            run_rtc_stop = mktime(calendar_get_ctimeinfo(timestruct));
             snprintf(exitString,255,"Run complete. expected_sec=%g tick_delta_sec=%g rtc_delta_sec=%g",
               run_expected_time_s,
               ((double) pdTICKS_TO_MS(run_success_stop_time_ticks-run_start_time_ticks))*(1e-3) - run_expected_time_s,
@@ -417,8 +425,35 @@ cycle_state_exit_t run_cycle_state_machine(void) {
             }
 
           } else {
-            current_cycle_index++;  // Increase the current cycle index to get the next cycle information
+            // THERE ARE MORE CYCLES TO RUN
+
             next_state = START_CYCLE;
+
+            // OPTIONALLY CHECK FOR TIME-ERRORS TO DETERMINE IF WE SHOULD ERROR-OUT HERE BEFORE NEXT CYCLE
+            if(
+              (!run_has_variable_time_steps) &&      // simple cycles with no variable time (ramp waits)
+              (cycle_configs[current_cycle_index].accept_cycle_time_error_s>0.0)   // config parameter is nonzero
+            )  {
+              // is time-error according to RTC, good ?
+              if( abs(difftime(cycle_rtc_start,run_rtc_stop) - cycle_configs[current_cycle_index].cycle_run_time_s ) >= cycle_configs[current_cycle_index].accept_cycle_time_error_s ) {
+                // total run time according to rtc exceeded threshold
+                next_state = RUN_ERROR_OR_FINISHED;
+                exitInfo = CYCLE_ERROR_ACTUAL_RUNTIME_HAD_A_MISMATCH;
+                runThrough = true;
+              }
+              // is time-error according to TASK TICKS, good ?
+              if( abs(((double) pdTICKS_TO_MS(run_success_stop_time_ticks-cycle_start_time_ticks))*(1e-3) - cycle_configs[current_cycle_index].cycle_run_time_s) >= cycle_configs[current_cycle_index].accept_cycle_time_error_s ) {
+                // total run time according to freertos / systick exceeded threshold
+                next_state = RUN_ERROR_OR_FINISHED;
+                exitInfo = CYCLE_ERROR_ACTUAL_RUNTIME_HAD_A_MISMATCH;
+                runThrough = true;
+              }   
+            } else{
+
+              // cycle runtime check okay
+
+            }
+            current_cycle_index++;  // Increase the current cycle index to get the next cycle information
           }
         }
         
@@ -611,9 +646,13 @@ void handle_exit_notifications(void) {
     eventType = SAMPLE_UNKNOWN;
     sprintf(exitString, "Cannot run due to unhandled flags. runflags=0x%x machine=0x%x",conditions_for_run.reg,conditions_for_machine.reg);
     break;
+  case CYCLE_ERROR_ACTUAL_RUNTIME_HAD_A_MISMATCH:
+    eventType = SAMPLE_UNKNOWN;
+    sprintf(exitString, "Cycle run time error was beyond the configured threshold of %g seconds",cycle_configs[current_cycle_index].accept_cycle_time_error_s);
+    break;
   case CYCLE_ERROR_FINISHED_BUT_ACTUAL_RUNTIME_HAD_A_MISMATCH:
     eventType = SAMPLE_UNKNOWN;
-    sprintf(exitString, "Total run time taken was beyond the configured threshold of %g seconds",config.accept_run_time_error_s);
+    sprintf(exitString, "Total run time taken error was beyond the configured threshold of %g seconds",config.accept_run_time_error_s);
     break;
   case CYCLE_ERROR_UNKNOWN: // drop to default
   default:
@@ -659,7 +698,10 @@ bool begin_cycle(cycle_t cycle) {
   log_event_t cycle_start_event = {
     .event = SAMPLE_CYCLE_STARTED,
     .message = NULL};
-  sprintf(cycle_start_event.message, "Cycle %d Started. runtime_s=%g ticks=%lu rtc=%lu", (uint16_t)cycle, cycle_configs[current_cycle_index].cycle_run_time_s, xTaskGetTickCount(), mktime(calendar_get_ctimeinfo(timestruct)) );
+  sprintf(cycle_start_event.message, "Cycle %d Started. runtime_s=%g ticks=%lu rtc=%lu",
+    (uint16_t)cycle, cycle_configs[current_cycle_index].cycle_run_time_s,
+    xTaskGetTickCount(), mktime(calendar_get_ctimeinfo(timestruct))
+  );
   log_data_message_t cycle_start_log_msg = {
     .data_type = EVENT_DATA,
     .temperature_data = NULL,
@@ -704,10 +746,17 @@ void end_cycle(cycle_t cycle, bool end_from_error) {
   log_event_t cycle_stop_event = {
     .event = SAMPLE_CYCLE_ENDED,
     .message = NULL};
-  if(!end_from_error)
-    sprintf(cycle_stop_event.message, "Cycle %d Stopped. I2CERRCOUNT=%u", (uint16_t)cycle, GLOBAL_I2C_RECOVERY_COUNTER);
-  else
+  if(!end_from_error) {
+    //sprintf(cycle_stop_event.message, "Cycle %d Stopped. I2CERRCOUNT=%u", (uint16_t)cycle, GLOBAL_I2C_RECOVERY_COUNTER);
+    sprintf(cycle_stop_event.message, "Cycle %d Stopped. I2CERRCOUNT=%u expected_sec=%g tick_delta_sec=%g rtc_delta_sec=%g",
+      (uint16_t)cycle, GLOBAL_I2C_RECOVERY_COUNTER,
+      cycle_configs[current_cycle_index].cycle_run_time_s,
+      ((double) pdTICKS_TO_MS(run_success_stop_time_ticks-cycle_start_time_ticks))*(1e-3) - cycle_configs[current_cycle_index].cycle_run_time_s,
+      difftime(cycle_rtc_start,run_rtc_stop) - cycle_configs[current_cycle_index].cycle_run_time_s
+    );
+  } else  {
     sprintf(cycle_stop_event.message, "Cycle %d Stopped early. I2CERRCOUNT=%u", (uint16_t)cycle, GLOBAL_I2C_RECOVERY_COUNTER);
+  }
   log_data_message_t cycle_stop_log_msg = {
     .data_type = EVENT_DATA,
     .temperature_data = NULL,

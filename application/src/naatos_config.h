@@ -712,6 +712,7 @@ typedef struct {
 
 typedef struct {
   float     cycle_run_time_s;
+  float     accept_cycle_time_error_s;
   uint16_t  cycle_delay_time;
   bool      ramp_to_temp_before_start_cycle;
   float     ramp_to_temp_timeout;

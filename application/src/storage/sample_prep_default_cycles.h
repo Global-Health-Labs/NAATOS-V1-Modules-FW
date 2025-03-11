@@ -3,6 +3,7 @@
 
 const char sp_default_cycle_config_1[] = 
   "cycle_run_time_s:51.00\n"
+  "accept_cycle_time_error_s:4.5\n"
   "cycle_delay_time_s:0\n"
   "ramp_to_temp_before_start_cycle:false\n"
   "ramp_to_temp_timeout:50.00\n"
@@ -21,6 +22,7 @@ const int sp_default_cycle_config_1_size = STRLEN(sp_default_cycle_config_1);
 
 const char sp_default_cycle_config_2[] = 
   "cycle_run_time_s:120.00\n"
+  "accept_cycle_time_error_s:4.5\n"
   "cycle_delay_time_s:0\n"
   "ramp_to_temp_before_start_cycle:false\n"
   "ramp_to_temp_timeout:0.0\n"
@@ -39,6 +41,7 @@ const int sp_default_cycle_config_2_size = STRLEN(sp_default_cycle_config_2);
 
 const char sp_default_cycle_config_3[] = 
   "cycle_run_time_s:19.00\n"
+  "accept_cycle_time_error_s:4.5\n"
   "cycle_delay_time_s:0\n"
   "ramp_to_temp_before_start_cycle:false\n"
   "ramp_to_temp_timeout:0.0\n"
@@ -57,6 +60,7 @@ const int sp_default_cycle_config_3_size = STRLEN(sp_default_cycle_config_3);
 
 const char sp_default_cycle_config_4[] = 
   "cycle_run_time_s:170.00\n"
+  "accept_cycle_time_error_s:4.5\n"
   "cycle_delay_time_s:0\n"
   "ramp_to_temp_before_start_cycle:false\n"
   "ramp_to_temp_timeout:0.0\n"

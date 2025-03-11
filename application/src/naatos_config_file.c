@@ -46,6 +46,7 @@ const uint8_t KV_TABLE_GLOBAL_SIZE = sizeof(KV_TABLE_GLOBAL)/sizeof(KV_TABLE_GLO
 naatos_kv_table_entry_cycle_t KV_TABLE_CYCLE[] = {
   // name       ,       dtype,                dataptr (pointer to config struct field) 
   { "cycle_run_time_s"                , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.cycle_run_time_s) },
+  { "accept_cycle_time_error_s"       , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.accept_cycle_time_error_s) },
   { "cycle_delay_time_s"              , NAATOS_KV_DT_UINT16 , (void *) &(cycle_cfg_single.cycle_delay_time) },
   { "ramp_to_temp_before_start_cycle" , NAATOS_KV_DT_BOOLS  , (void *) &(cycle_cfg_single.ramp_to_temp_before_start_cycle) },
   { "ramp_to_temp_timeout"            , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.ramp_to_temp_timeout) },
@@ -109,6 +110,7 @@ const uint8_t KV_TABLE_GLOBAL_SIZE = sizeof(KV_TABLE_GLOBAL)/sizeof(KV_TABLE_GLO
 naatos_kv_table_entry_cycle_t KV_TABLE_CYCLE[] = {
   // name       ,       dtype,                dataptr (pointer to config struct field) 
   { "cycle_run_time_s"                , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.cycle_run_time_s) },
+  { "accept_cycle_time_error_s"       , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.accept_cycle_time_error_s) },
   { "cycle_delay_time_s"              , NAATOS_KV_DT_UINT16 , (void *) &(cycle_cfg_single.cycle_delay_time) },
   { "ramp_to_temp_before_start_cycle" , NAATOS_KV_DT_BOOLS  , (void *) &(cycle_cfg_single.ramp_to_temp_before_start_cycle) },
   { "ramp_to_temp_timeout"            , NAATOS_KV_DT_FLOAT  , (void *) &(cycle_cfg_single.ramp_to_temp_timeout) },
