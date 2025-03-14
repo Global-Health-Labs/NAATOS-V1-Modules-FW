@@ -24,7 +24,7 @@ const int pm_default_cycle_config_1_size = STRLEN(pm_default_cycle_config_1);
 // AMPLIFICATION CYCLE
 const char pm_default_cycle_config_2[] = 
   "cycle_run_time_s:1050.0\n"
-  "accept_cycle_time_error_s:7.5\n"
+  "accept_cycle_time_error_s:15.0\n"
   "cycle_delay_time_s:0\n"
   "ramp_to_temp_before_start_cycle:false\n"
   "ramp_to_temp_timeout:300.0\n"
