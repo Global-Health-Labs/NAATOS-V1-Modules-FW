@@ -162,6 +162,9 @@ void reset_and_enter_dfu(void) {
   *p_gpreg1 = 0;
   *p_gpreg1 = BOOTLOADER_DFU_START;
 
+  // Feed Watchdog Timer Immediately Before Reboot
+  dfuPreEntryWatchdogKick();
+
   // Device will enter bootloader on next reset,
   // use this line of code to perform the reset:
   NVIC_SystemReset();

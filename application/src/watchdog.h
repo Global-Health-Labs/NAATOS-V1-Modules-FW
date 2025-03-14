@@ -18,3 +18,5 @@ void watchdog_init(void);
 void sendWatchdogKickFromTask(tasks_t task, bool valid);
 
 void wdtFeedTask(void *pvParameters);
+
+void dfuPreEntryWatchdogKick();

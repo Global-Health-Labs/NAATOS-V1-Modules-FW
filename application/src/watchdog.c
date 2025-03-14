@@ -137,3 +137,9 @@ void sendWatchdogKickFromTask(tasks_t task, bool valid) {
     send_debug_log_message("LOG_TASK: Unable to send WDT update to watchdog_rxTimesQueue. in battery task");
   }
 }
+
+void dfuPreEntryWatchdogKick() {
+#if NAATOS_ENABLE_WATCHDOG
+  nrf_drv_wdt_channel_feed(m_channel_id);
+#endif
+}
