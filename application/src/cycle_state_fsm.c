@@ -26,6 +26,7 @@ uint32_t cycle_start_time_ticks;
 time_t cycle_rtc_start;
 time_t cycle_rtc_stop;
 
+uint32_t start_time_cputicks = 0;
 #if !FSM_USE_RTC_FOR_CYCLE_TIME
 uint32_t start_time = 0;
 uint32_t end_time = 0;
@@ -36,6 +37,7 @@ time_t end_time = 0;
 float time_left = 0;
 #endif
 float time_s_in_cycle_elapsed = 0;
+float time_s_in_cycle_elapsed_cputickcheck = 0;
 bool setReachedRx = false;
 
 fuel_batt_info_t batt_info_recv =  {
@@ -195,8 +197,6 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       if (!begin_cycle((cycle_t)(current_cycle_index + 1))) {
         send_debug_log_message("MAIN_TASK: Unable to begin sample run, temperatures have not yet stabalized.\r\n");
 
-        // TODO: We'll probably rework this. Cycle refused to start (NOTE: This seems to be legacy, checking if temperature too high, etc) Move out i think
-
         exitInfo = CYCLE_ERROR_START_TEMP_TOO_HIGH;
         runThrough = true;
         next_state = RUN_ERROR_OR_FINISHED;
@@ -212,6 +212,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
 
       setReachedRx = false;
       time_s_in_cycle_elapsed = 0;
+      time_s_in_cycle_elapsed_cputickcheck = 0;
 
       break;
     }
@@ -224,6 +225,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         #else
         start_time = mktime(calendar_get_ctimeinfo(timestruct));
         #endif
+        start_time_cputicks = xTaskGetTickCount();  //<-- for catch-mechanism that RTC start_time was not incorrect
       }
 
       // Time left on the timer (float in seconds)
@@ -232,6 +234,16 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       #else
       time_s_in_cycle_elapsed = difftime( start_time, mktime(calendar_get_ctimeinfo(timestruct)) );
       #endif
+      time_s_in_cycle_elapsed_cputickcheck = (xTaskGetTickCount() - start_time_cputicks)/configTICK_RATE_HZ;
+
+      // Check if the cpu tick time and the current timining mechanism (RTC) are in disagreement between the config parameter
+      // This will cause an early exit in the case of a bad start_time obtained from the RTC
+      if ( abs(time_s_in_cycle_elapsed_cputickcheck-time_s_in_cycle_elapsed) > config.accept_run_time_error_s ) {
+        exitInfo = CYCLE_ERROR_TIME_ERROR_BETWEEN_RTC_AND_CPUTICKS_DURING_RUN;
+        runThrough = true;
+        next_state = EXIT_CYCLE;
+        break;
+      }
       
       // Get Battery Data
       next_state = handleBatteryMessage();
@@ -309,6 +321,7 @@ cycle_state_exit_t run_cycle_state_machine(void) {
           #else
           start_time = mktime(calendar_get_ctimeinfo(timestruct));
           #endif
+          start_time_cputicks = xTaskGetTickCount();  //<-- for catch-mechanism that RTC start_time was not incorrect
       }
 
       // Check if cycle has completed normally
@@ -653,6 +666,14 @@ void handle_exit_notifications(void) {
   case CYCLE_ERROR_FINISHED_BUT_ACTUAL_RUNTIME_HAD_A_MISMATCH:
     eventType = SAMPLE_UNKNOWN;
     sprintf(exitString, "Total run time taken error was beyond the configured threshold of %g seconds",config.accept_run_time_error_s);
+    break;
+  case CYCLE_ERROR_TIME_ERROR_BETWEEN_RTC_AND_CPUTICKS_DURING_RUN:
+    eventType = SAMPLE_UNKNOWN;
+    sprintf(exitString, "Caught time-error beyond %g sec between RTCelapsed_s:%g & TICKelapsed_s:%g while cycle_run_time_s was %g sec",
+      config.accept_run_time_error_s,
+      time_s_in_cycle_elapsed, time_s_in_cycle_elapsed_cputickcheck,
+      cycle_configs[current_cycle_index].cycle_run_time_s
+    );
     break;
   case CYCLE_ERROR_UNKNOWN: // drop to default
   default:
