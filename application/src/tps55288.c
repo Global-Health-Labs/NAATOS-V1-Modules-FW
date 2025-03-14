@@ -41,9 +41,6 @@ bool valve_zone_set_6v_and_configure_and_ENABLE(void) {
     0b10100000,     // reg 0x06,    //<-- default + output enabled!
 
     //// 0x07 "STATUS"  , Operating Status
-    //// default is 0b11100000 which is what ODIC has used
-    //// reg 0x04
-    //0b11100000,     // reg 0x05,
   };
 
   // Send the above configuration parameters to the TPS55288
@@ -55,7 +52,7 @@ bool valve_zone_set_6v_and_configure_and_ENABLE(void) {
   }
 
   // Readback all the registers from the TPS55288 to verify
-  status = tps55288_read_multi(0x00,rxbuf,8); //<-- include additional
+  status = tps55288_read_multi(0x00,rxbuf,8); //<-- include additional for status
   if (status != i2c_success) {
     ret = false;
     send_debug_log_message("TPS55288 Reading Settings Failed.");

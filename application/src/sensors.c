@@ -416,7 +416,15 @@ void runPowerModuleSensorCollection(void) {
       vTaskDelay(2);  //2 tick delay
       //valve_zone_set_6v();
       //enable_valve_boost();
-      valve_zone_set_6v_and_configure_and_ENABLE();
+      nretries = 0;
+      while(nretries<3) {
+        if(valve_zone_set_6v_and_configure_and_ENABLE() == true)  {
+          break;
+        } else  {
+          send_debug_log_message("PM Workaround - TPS55288 retry");
+          nretries++;
+        }
+      }
 
       tickstop1 = xTaskGetTickCount();
     }
