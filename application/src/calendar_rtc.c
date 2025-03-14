@@ -50,37 +50,59 @@ DWORD get_fattime(void) {
 // Get the current time on the calendar chip
 bool calendar_get_time(calendar_time_t *now) {
   uint8_t buff[7];
+  char tmp[80];
   ret_code_t ret;
+  uint8_t retries = 0;
 
-#if USE_CALENDAR_CHIP
-  // Get the Time and Date from the calendar chip
-#ifdef SAMPLE_PREP_BOARD
-#if SAMPLE_PREP_REV_A
-  ret = xUtil_TWI_Read(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
-#elif SAMPLE_PREP_REV_B
-  ret = xUtil_TWI_Read(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
-#endif
-#else
-#if POWER_MODULE_REV_A
-  ret = xUtil_TWI_Read(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
-#elif POWER_MODULE_REV_B
-  ret = xUtil_TWI_Read(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
-#endif
-#endif
+  #if USE_CALENDAR_CHIP
+  for(retries = 0; retries<3; retries++)  {
+    // Get the Time and Date from the calendar chip
+  #ifdef SAMPLE_PREP_BOARD
+  #if SAMPLE_PREP_REV_A
+    ret = xUtil_TWI_Read(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
+  #elif SAMPLE_PREP_REV_B
+    ret = xUtil_TWI_Read(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
+  #endif
+  #else
+  #if POWER_MODULE_REV_A
+    ret = xUtil_TWI_Read(i2c_interface_sensors, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
+  #elif POWER_MODULE_REV_B
+    ret = xUtil_TWI_Read(i2c_interface_system, PCF85_S_ADDR, PCF85_REG_TIME_DATE_ADDR, buff, 7);
+  #endif
+  #endif
 
-  if (ret) {
-    send_debug_log_message("Unable to i2c communicate with calendar chip!");
-    return false;
+    if (ret) {
+      send_debug_log_message("Unable to i2c communicate with calendar chip!");
+      return false;
+    }
+
+    // Decode the retreived data
+    now->second = calendar_decode(buff[0] & ~0x80);
+    now->minute = calendar_decode(buff[1] & ~0x80);
+    now->hour = calendar_decode(buff[2] & ~0xC0);
+    now->day = calendar_decode(buff[3] & ~0xC0);
+    now->week_day = calendar_decode(buff[4] & ~0xF8);
+    now->month = calendar_decode(buff[5] & ~0xE0);
+    now->year = calendar_decode(buff[6]);
+
+    // Catch if the RTC date does not make sense
+    // 2025-3-13 - this became an issue when we switched to using RTC to track runs in the FSM
+    if( (now->year == 80) || (now->month == 0) || (now->day == 0) || ((now->hour == 0) && (now->minute == 0) && (now->second == 0))) {
+      //send_debug_log_message("BAD RTC TIME");
+      snprintf(tmp,100,"GOT BAD RTC TIME 20%02d-%02d-%02d %02d:%02d:%02d retries=%d/2",
+        now->year,now->month,now->day,now->hour,now->minute,now->second,
+        retries
+      );
+      //send_event_log_message(SAMPLE_DESCRIPTIVE_EVENT_TEXT,tmp);
+      send_debug_log_message(tmp);
+    } else{
+      // GOOD, exit retry loop
+      break;
+    }
+  } // end: for - retryloop
+  if(retries>2)  {
+    send_event_log_message(SAMPLE_DESCRIPTIVE_EVENT_TEXT,tmp);
   }
-
-  // Decode the retreived data
-  now->second = calendar_decode(buff[0] & ~0x80);
-  now->minute = calendar_decode(buff[1] & ~0x80);
-  now->hour = calendar_decode(buff[2] & ~0xC0);
-  now->day = calendar_decode(buff[3] & ~0xC0);
-  now->week_day = calendar_decode(buff[4] & ~0xF8);
-  now->month = calendar_decode(buff[5] & ~0xE0);
-  now->year = calendar_decode(buff[6]);
   
   return ~(buff[0] & 0x80);
 #else
