@@ -4,11 +4,11 @@
 // DUMMY CYCLE
 const char pm_default_cycle_config_1[] = 
   "cycle_run_time_s:30.0\n"
-  "accept_cycle_time_error_s:7.5\n"
+  "accept_cycle_time_error_s:0.0\n"
   "cycle_delay_time_s:0\n"
   "ramp_to_temp_before_start_cycle:false\n"
   "ramp_to_temp_timeout:0.0\n"
-  "yellow_grace_period_s:30.0\n"
+  "yellow_grace_period_s:90.0\n"
   "amp_setpoint:0.00\n"
   "valve_setpoint:0.00\n"
   "run_amp_enable:true\n"
@@ -44,7 +44,7 @@ const int pm_default_cycle_config_2_size = STRLEN(pm_default_cycle_config_2);
 // VALVE MELT CYCLE
 const char pm_default_cycle_config_3[] = 
   "cycle_run_time_s:300.0\n"
-  "accept_cycle_time_error_s:7.5\n"
+  "accept_cycle_time_error_s:0.0\n"
   "cycle_delay_time_s:0\n"
   "ramp_to_temp_before_start_cycle:false\n"
   "ramp_to_temp_timeout:0.0\n"
@@ -64,7 +64,7 @@ const int pm_default_cycle_config_3_size = STRLEN(pm_default_cycle_config_3);
 // WAIT / NO HEATING
 const char pm_default_cycle_config_4[] = 
   "cycle_run_time_s:420\n"
-  "accept_cycle_time_error_s:7.5\n"
+  "accept_cycle_time_error_s:0.0\n"
   "cycle_delay_time_s:0\n"
   "ramp_to_temp_before_start_cycle:false\n"
   "ramp_to_temp_timeout:0.0\n"
