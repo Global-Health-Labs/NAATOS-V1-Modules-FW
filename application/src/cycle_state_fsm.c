@@ -246,10 +246,11 @@ cycle_state_exit_t run_cycle_state_machine(void) {
       }
       
       // Get Battery Data
-      next_state = handleBatteryMessage();
-      if(next_state == RUN_ERROR_OR_FINISHED){
+      next_state = handleBatteryMessage();  // handleBatteryMessage() will set to EXIT_CYCLE here if problem
+      if(next_state == EXIT_CYCLE){
         exitInfo = CYCLE_ERROR_OVER_TEMP_BATTERY;
         runThrough = true;
+        //next_state = EXIT_CYCLE;
         break;
       }
 
@@ -340,11 +341,12 @@ cycle_state_exit_t run_cycle_state_machine(void) {
         end_time = ((cycle_configs[current_cycle_index].cycle_delay_time) * 1000);
       }
 
-      next_state = handleBatteryMessage();
-      if(next_state == RUN_ERROR_OR_FINISHED){
+      // Get Battery Data
+      next_state = handleBatteryMessage();  // handleBatteryMessage() will set to EXIT_CYCLE here if problem
+      if(next_state == EXIT_CYCLE){
         exitInfo = CYCLE_ERROR_OVER_TEMP_BATTERY;
         runThrough = true;
-        next_state = EXIT_CYCLE;
+        //next_state = EXIT_CYCLE;
         break;
       }
 
